@@ -49,3 +49,35 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `check_redis` uses `async with` | Avoids deprecated `close()` / untyped `aclose()` |
 | `test_readiness_integration` in CI | Catches `ssl=disable` / bucket regressions on every push |
 | Regenerated `.secrets.baseline` | Baseline plugins matched `detect-secrets==1.5.0` pre-commit pin |
+
+---
+
+## Mission 01 — Developer data layer & shared types (2026-06-06)
+
+**Scope:** README commands, `packages/schemas` export flow, Makefile targets (`migrate`, `seed`, `backup`), migration/seed ergonomics. No product UI.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One command per concern; no duplicate type definitions |
+| Kare | 1 | CLI-only; warmth deferred to Mission 02 |
+| Norman | 2 | Clear migrate → seed → export path; port override docs |
+| Nielsen | 2 | Command table covers backup/restore and drift check |
+| Tufte | 2 | Tree layout + table; no noise |
+| Vignelli | 2 | Consistent naming (`jober_api`, `jober_schemas`) |
+| Rand | 1 | Infra mission; identity still minimal |
+| Maeda | 2 | Shared types exported once, consumed by web later |
+| Wroblewski | 1 | Docs readable on mobile; product UI N/A |
+| Ive | 2 | Fernet encryption, drift CI, backup scripts feel deliberate |
+
+**Total: 19/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 01) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `jober_api.db.migration_drift` module + unit tests | Regression fixture for Alembic nested-diff / VARCHAR↔Enum false positives |
+| `test_policy_baseline.py` blocking in CI | Locks `review_before_submit` default and encrypted vault column at schema layer |
+| `docs/missions/mission_01_*.md` | MISSION_INDEX link was broken; task checkboxes now auditable |
+| README: `migrate-check`, `backup`, `VAULT_ENCRYPTION_KEY` | New contributor cold-start without reading commit history |

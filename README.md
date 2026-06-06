@@ -47,8 +47,11 @@ make infra
 | `make doctor` | Check tools and port conflicts |
 | `make ping-worker` | Dispatch Celery ping task |
 | `make migrate` | Apply Alembic migrations (`upgrade head`) |
+| `make migrate-check` | Migrate + verify models match DB (drift check) |
 | `make seed` | Insert demo profile + job targets |
 | `make schemas-export` | Regenerate TypeScript types from `packages/schemas` |
+| `make backup` | Snapshot Postgres + MinIO to `infra/backups/snapshots/` |
+| `make restore` | Restore from `infra/backups/latest` or `SOURCE=...` |
 
 Without Make:
 
@@ -57,6 +60,18 @@ docker compose --env-file .env -f infra/compose.yaml --profile full up -d --buil
 ```
 
 If default ports are busy, copy `.env.example` to `.env` and set `POSTGRES_HOST_PORT`, `REDIS_HOST_PORT`, `API_HOST_PORT`, `MINIO_API_HOST_PORT`, and `MINIO_CONSOLE_HOST_PORT`.
+
+### Database & vault
+
+```bash
+make migrate          # apply schema
+make seed             # demo UserProfile + JobTargets (idempotent)
+make migrate-check    # migrate + fail if models drift from DB
+```
+
+Set `VAULT_ENCRYPTION_KEY` in `.env` before seeding profiles with sensitive EEO data (generate with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`). CI uses a fixed test key.
+
+Backup/restore requires the infra profile (`make infra` or `make up`). On Windows, use Git Bash or WSL for `make backup`/`restore` (bash scripts).
 
 ## Where things live
 
