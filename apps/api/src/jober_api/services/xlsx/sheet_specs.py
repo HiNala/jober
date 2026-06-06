@@ -23,15 +23,15 @@ JOB_LEADS_SPEC = SheetSpec(
     columns=(
         SheetColumnSpec("rank", ("Rank",)),
         SheetColumnSpec("priority", ("Priority",)),
-        SheetColumnSpec("company", ("Company",), required=True),
-        SheetColumnSpec("role", ("Role",), required=True),
+        SheetColumnSpec("company", ("Company", "Company name", "Employer"), required=True),
+        SheetColumnSpec("role", ("Role", "Title", "Job title"), required=True),
         SheetColumnSpec("fit_lane", ("Fit lane", "Fit Lane")),
         SheetColumnSpec("stage_signal", ("Stage / size signal", "Stage signal", "Stage")),
         SheetColumnSpec("location_work_style", ("Location / work style", "Location")),
         SheetColumnSpec("why_fit", ("Why this fits Brian", "Why fit", "Why this fits")),
         SheetColumnSpec("cover_letter_hook", ("Cover-letter hook", "Cover letter hook")),
         SheetColumnSpec("public_contact", ("Public email / contact", "Public contact", "Email")),
-        SheetColumnSpec("direct_apply_url", ("Direct apply URL", "Apply URL")),
+        SheetColumnSpec("direct_apply_url", ("Direct apply URL", "Apply URL", "Apply link")),
         SheetColumnSpec(
             "company_careers_url",
             ("Company careers / ATS URL", "Careers URL", "ATS URL"),

@@ -60,5 +60,12 @@ async def test_import_jobs_xlsx_endpoint(db_session, truncate_tables) -> None:
             items = listing.json()["items"]
             assert len(items) == 3
             assert items[0]["ats_guess"] == "lever"
+
+            bad = await client.post(
+                "/api/imports/jobs-xlsx",
+                files={"file": ("bad.xlsx", b"not-a-workbook", "application/octet-stream")},
+            )
+            assert bad.status_code == 422
+            assert "Could not read workbook" in bad.json()["detail"]
     finally:
         app.dependency_overrides.clear()
