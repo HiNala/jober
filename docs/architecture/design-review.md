@@ -1,0 +1,51 @@
+# Design Council Reviews
+
+Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with **no zeros** on touched surfaces.
+
+| Criterion | Lens |
+|-----------|------|
+| Rams | Minimal, honest, unobtrusive |
+| Kare | Warmth, humanity, delight |
+| Norman | Affordances, feedback, recoverability |
+| Nielsen | Heuristics, learnability, error prevention |
+| Tufte | Data-ink, clarity of information |
+| Vignelli | Grid, consistency, timeless structure |
+| Rand | Purpose, memorable identity |
+| Maeda | Simplicity, meaningful reduction |
+| Wroblewski | Mobile-first, priority of content |
+| Ive | Craft, cohesion, restraint |
+
+---
+
+## Mission 00 — README & developer onboarding (2026-06-06)
+
+**Scope:** `README.md`, Makefile command table, quick-start flow. No product UI yet.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One-command start; no marketing fluff |
+| Kare | 1 | Functional tone; warmth deferred until Mission 02 UI |
+| Norman | 2 | Clear verify steps, port-conflict remediation |
+| Nielsen | 2 | Prerequisites listed; command table scannable |
+| Tufte | 2 | Dense but legible; tree diagram shows layout |
+| Vignelli | 2 | Consistent headings and structure |
+| Rand | 1 | Identity minimal (appropriate for infra mission) |
+| Maeda | 2 | Only what a new contributor needs |
+| Wroblewski | 1 | N/A for CLI docs; table works on narrow viewports |
+| Ive | 2 | Polished prose, no cruft |
+
+**Total: 19/20** — passes gate.
+
+**Follow-ups for Mission 02:** brand voice, visual hierarchy, responsive marketing shell.
+
+---
+
+## Mission 99 (post–Mission 00) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| CI: MinIO via `docker run` + health wait | GHA service `options` cannot pass shell entrypoints reliably |
+| CI: `working-directory` for ruff/mypy/pytest | Ensures per-app `pyproject.toml` mypy overrides apply |
+| `check_redis` uses `async with` | Avoids deprecated `close()` / untyped `aclose()` |
+| `test_readiness_integration` in CI | Catches `ssl=disable` / bucket regressions on every push |
+| Regenerated `.secrets.baseline` | Baseline plugins matched `detect-secrets==1.5.0` pre-commit pin |

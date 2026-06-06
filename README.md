@@ -78,5 +78,6 @@ docs/
 - Backend: `ruff`, `mypy`, `pytest`
 - Pre-commit: `pre-commit install` then hooks run on commit
 - CI: `.github/workflows/ci.yml`
+- Architecture notes: [`docs/architecture/`](docs/architecture/) (design reviews, policy baseline)
 
 Full product spec and mission sequence: [`docs/MASTER_PLAN.md`](docs/MASTER_PLAN.md) and [`docs/MISSION_INDEX.md`](docs/MISSION_INDEX.md).
