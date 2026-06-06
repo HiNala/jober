@@ -79,7 +79,7 @@ Backup/restore requires the infra profile (`make infra` or `make up`). On Window
 apps/
   api/      FastAPI — /healthz, /readyz
   worker/   Celery + Playwright (Chromium)
-  web/      Next.js placeholder (Mission 02)
+  web/      Next.js app shell + design system (Mission 02)
 packages/
   schemas/  Shared Pydantic types + `generated/types.ts` for the web app
 infra/
@@ -91,9 +91,21 @@ docs/
   missions/
 ```
 
+## Web app (Mission 02+)
+
+```bash
+cd apps/web
+cp .env.example .env.local   # set NEXT_PUBLIC_API_URL if API is not on :8000
+pnpm install
+pnpm dev                     # http://localhost:3000
+```
+
+Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/settings`, `/kitchen-sink` (component catalog).
+
 ## Development gates
 
 - Backend: `ruff`, `mypy`, `pytest`
+- Web: `pnpm typecheck`, `pnpm lint:strict`, `pnpm build` (in `apps/web`)
 - Pre-commit: `pre-commit install` then hooks run on commit
 - CI: `.github/workflows/ci.yml`
 - Architecture notes: [`docs/architecture/`](docs/architecture/) (design reviews, policy baseline)

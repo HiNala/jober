@@ -4,7 +4,7 @@ COMPOSE := docker compose $(COMPOSE_ENV) -f $(COMPOSE_FILE)
 COMPOSE_FULL := COMPOSE_PROFILES=full $(COMPOSE)
 COMPOSE_INFRA := COMPOSE_PROFILES=infra $(COMPOSE)
 
-.PHONY: up down logs infra api-shell worker-shell fmt lint test migrate migrate-check seed schemas-export backup restore doctor ping-worker
+.PHONY: up down logs infra api-shell worker-shell fmt lint test web-lint web-build migrate migrate-check seed schemas-export backup restore doctor ping-worker
 
 up:
 	$(COMPOSE_FULL) up -d --build
@@ -38,6 +38,12 @@ lint:
 test:
 	cd apps/api && pytest -q
 	cd apps/worker && pytest -q
+
+web-lint:
+	cd apps/web && pnpm lint:strict && pnpm typecheck
+
+web-build:
+	cd apps/web && pnpm build
 
 migrate:
 	cd apps/api && alembic upgrade head

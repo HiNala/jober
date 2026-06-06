@@ -81,3 +81,30 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `test_policy_baseline.py` blocking in CI | Locks `review_before_submit` default and encrypted vault column at schema layer |
 | `docs/missions/mission_01_*.md` | MISSION_INDEX link was broken; task checkboxes now auditable |
 | README: `migrate-check`, `backup`, `VAULT_ENCRYPTION_KEY` | New contributor cold-start without reading commit history |
+
+---
+
+## Mission 02 — App shell, landing & kitchen sink (2026-06-06)
+
+**Scope:** Sidebar nav, top bar + worker health pill, route shells, marketing hero, `/kitchen-sink`, design tokens.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Calm dark app chrome; motion isolated to landing |
+| Kare | 2 | Clear empty states; human-review messaging on landing |
+| Norman | 2 | Health pill feedback; focus rings on nav; loading/error shells |
+| Nielsen | 2 | Predictable nav labels; kitchen sink for reuse |
+| Tufte | 2 | Metric cards low ink; queue table scannable |
+| Vignelli | 2 | Shared tokens + shadcn primitives |
+| Rand | 2 | Distinct accent hue; “Jober” shell identity emerging |
+| Maeda | 2 | Marketing vs app surfaces separated |
+| Wroblewski | 2 | Collapsible sidebar; horizontal kanban scroll |
+| Ive | 2 | Cohesive dark palette, restrained motion |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 02) — planned
+
+Run iteration loop before Mission 03.

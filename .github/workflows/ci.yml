@@ -125,9 +125,30 @@ jobs:
 
   web:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
-      - name: Web checks (stub — Mission 02)
-        run: |
-          echo "apps/web is a placeholder until Mission 02 scaffolds Next.js."
-          test -f apps/web/.gitkeep
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint (strict)
+        run: pnpm lint:strict
+
+      - name: Build
+        run: pnpm build
