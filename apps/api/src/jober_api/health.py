@@ -19,14 +19,12 @@ async def check_postgres(engine: AsyncEngine) -> tuple[bool, str]:
 
 
 async def check_redis(url: str) -> tuple[bool, str]:
-    client = aioredis.from_url(url, socket_connect_timeout=2)
     try:
-        pong = await client.ping()
+        async with aioredis.from_url(url, socket_connect_timeout=2) as client:
+            pong = await client.ping()
         return (pong is True, "ok" if pong else "no pong")
     except Exception as exc:  # noqa: BLE001
         return False, str(exc)
-    finally:
-        await client.close()
 
 
 def check_minio() -> tuple[bool, str]:

@@ -92,13 +92,16 @@ jobs:
         run: pip install "./apps/worker[dev]"
 
       - name: Ruff (worker)
-        run: ruff check apps/worker/src apps/worker/tests
+        working-directory: apps/worker
+        run: ruff check src tests
 
       - name: Mypy (worker)
-        run: mypy apps/worker/src
+        working-directory: apps/worker
+        run: mypy src
 
       - name: Pytest (worker)
-        run: pytest -q apps/worker/tests
+        working-directory: apps/worker
+        run: pytest -q
 
   web:
     runs-on: ubuntu-latest
