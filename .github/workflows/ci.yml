@@ -44,8 +44,6 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-          --entrypoint sh
-          -c "mkdir -p /data && minio server /data"
 
     env:
       DATABASE_URL: postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
