@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: jober
+          POSTGRES_PASSWORD: jober
+          POSTGRES_DB: jober
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jober -d jober"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      minio:
+        image: minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+          --entrypoint sh
+          -c "mkdir -p /data && minio server /data"
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
+      REDIS_URL: redis://localhost:6379/0
+      MINIO_ENDPOINT: localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: jober-artifacts
+      MINIO_SECURE: "false"
+      CELERY_BROKER_URL: redis://localhost:6379/0
+      CELERY_RESULT_BACKEND: redis://localhost:6379/1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MinIO client and create bucket
+        run: |
+          curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
+          chmod +x mc
+          ./mc alias set local http://localhost:9000 minioadmin minioadmin
+          ./mc mb local/jober-artifacts --ignore-existing
+
+      - name: Install API dependencies
+        run: pip install "./apps/api[dev]"
+
+      - name: Ruff (api)
+        run: ruff check apps/api/src apps/api/tests
+
+      - name: Mypy (api)
+        run: mypy apps/api/src
+
+      - name: Pytest (api)
+        run: pytest -q apps/api/tests
+
+      - name: Install worker dependencies
+        run: pip install "./apps/worker[dev]"
+
+      - name: Ruff (worker)
+        run: ruff check apps/worker/src apps/worker/tests
+
+      - name: Mypy (worker)
+        run: mypy apps/worker/src
+
+      - name: Pytest (worker)
+        run: pytest -q apps/worker/tests
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Web checks (stub — Mission 02)
+        run: |
+          echo "apps/web is a placeholder until Mission 02 scaffolds Next.js."
+          test -f apps/web/.gitkeep

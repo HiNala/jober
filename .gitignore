@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+.npm
+.yarn/
+.pnp.*
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials.json
+
+# Docker & local storage volumes
+storage/local-dev/*
+!storage/local-dev/.gitkeep
+infra/volumes/
+pg_data/
+minio_data/
+
+# Playwright artifacts
+traces/
+videos/
+playwright-report/
+test-results/
+*.zip
+.blob_storage/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Logs
+*.log
+logs/
+
+# MinIO / Postgres local data
+data/
