@@ -46,7 +46,7 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["jober_worker.tasks"]
-disable_error_code = ["misc"]
+disable_error_code = ["misc", "untyped-decorator"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
