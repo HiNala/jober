@@ -115,6 +115,8 @@ Upload a canonical resume (PDF/DOCX) and manage tiered profile fields at `/vault
 
 Set `VAULT_ENCRYPTION_KEY` before storing sensitive EEO answers. Sensitive fields default to **never auto-fill**; the fill policy returns `NEEDS_HUMAN` unless explicit consent + stored value exist.
 
+After pulling Mission 04+, run `make migrate` once (adds `profile_common_answers`, `current_title`, `notice_period`).
+
 ## Job spreadsheet import (Mission 03)
 
 Import Brian's tracker workbook into Postgres and round-trip status back to XLSX.

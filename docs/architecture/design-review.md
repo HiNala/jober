@@ -172,3 +172,6 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Test DB `drop_all` + `create_all` | Keeps pytest schema aligned with new migrations |
 | `session.refresh` after vault commits | Avoids lazy-load errors in API serializers |
 | Claims index + invented-credential test | Mission 05 guardrail starts here |
+| Seed stores work authorization in encrypted vault only | Plaintext column must not be a bypass path |
+| `test_vault_security` + PDF route test | Fixture for legacy-column bypass + upload format routing |
+| README `make migrate` note for M04 schema | Cold-start contributor path |

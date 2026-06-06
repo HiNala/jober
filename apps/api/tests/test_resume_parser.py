@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from io import BytesIO
 
+import pytest
 from docx import Document
 
 from jober_api.services.claims_index import build_claims_index, validate_claims
-from jober_api.services.resume_parser import extract_docx_text, parse_skills_index
+from jober_api.services.resume_parser import (
+    extract_docx_text,
+    extract_resume_text,
+    parse_skills_index,
+)
 
 
 def _sample_docx() -> bytes:
@@ -27,6 +32,15 @@ def test_extract_docx_and_parse_skills() -> None:
     index = parse_skills_index(text)
     assert "Python" in index["skills"]
     assert "FastAPI" in index["skills"]
+
+
+def test_extract_resume_text_routes_pdf(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "jober_api.services.resume_parser.extract_pdf_text",
+        lambda _data: "Skills\nRust, Python",
+    )
+    text = extract_resume_text(b"%PDF-fake", "resume.pdf")
+    assert "Rust" in text
 
 
 def test_claims_check_rejects_invented_credential() -> None:

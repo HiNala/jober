@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 
 from jober_api.config import settings
 from jober_api.db.session import async_session_factory
@@ -31,14 +32,22 @@ async def seed() -> None:
                 "linkedin": "https://linkedin.com/in/example",
                 "portfolio": "https://glidedesign.com",
             },
-            work_authorization="Authorized to work in the US",
+            current_title="Founder & Engineer",
             relocation_pref=False,
             hybrid_pref=True,
             onsite_pref=False,
+            notice_period="2 weeks",
             salary_prefs={"target_usd": 180000, "floor_usd": 160000},
+            sensitive_eeo_answers=json.dumps(
+                {"work_authorization": "Authorized to work in the US"},
+            ),
             profile_completeness_score=0.72,
             field_consent={
-                "work_authorization": {"consent": True, "never_autofill": False},
+                "work_authorization": {
+                    "consent": True,
+                    "never_autofill": False,
+                    "consented_at": "2026-01-01T00:00:00+00:00",
+                },
                 "veteran_status": {"consent": True, "never_autofill": True},
             },
         )
