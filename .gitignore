@@ -72,3 +72,5 @@ logs/
 
 # MinIO / Postgres local data
 data/
+infra/backups/snapshots/
+infra/backups/latest

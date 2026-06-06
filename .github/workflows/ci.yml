@@ -43,6 +43,8 @@ jobs:
       MINIO_SECURE: "false"
       CELERY_BROKER_URL: redis://localhost:6379/0
       CELERY_RESULT_BACKEND: redis://localhost:6379/1
+      VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
+      CI: "true"
 
     steps:
       - uses: actions/checkout@v4
@@ -78,8 +80,21 @@ jobs:
           pip install detect-secrets==1.5.0
           detect-secrets scan --baseline .secrets.baseline
 
-      - name: Install API dependencies
-        run: pip install "./apps/api[dev]"
+      - name: Install shared schemas and API dependencies
+        run: |
+          pip install "./packages/schemas"
+          pip install "./apps/api[dev]"
+
+      - name: Export shared TypeScript types
+        run: python packages/schemas/scripts/export_typescript.py
+
+      - name: Alembic migrate and drift check
+        working-directory: apps/api
+        run: |
+          alembic upgrade head
+          python scripts/check_migration_drift.py
+          alembic downgrade base
+          alembic upgrade head
 
       - name: Ruff (api)
         working-directory: apps/api

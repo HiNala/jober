@@ -10,6 +10,7 @@ x-common-env: &common-env
   MINIO_SECRET_KEY: minioadmin
   MINIO_BUCKET: jober-artifacts
   MINIO_SECURE: "false"
+  VAULT_ENCRYPTION_KEY: ${VAULT_ENCRYPTION_KEY:-}
 
 services:
   postgres:

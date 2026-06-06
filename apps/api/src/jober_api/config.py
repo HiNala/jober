@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     minio_secure: bool = False
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+    secret_key: str = ""
+    vault_encryption_key: str = ""
 
 
 settings = Settings()

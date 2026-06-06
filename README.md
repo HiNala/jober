@@ -46,6 +46,9 @@ make infra
 | `make fmt` | Format + auto-fix |
 | `make doctor` | Check tools and port conflicts |
 | `make ping-worker` | Dispatch Celery ping task |
+| `make migrate` | Apply Alembic migrations (`upgrade head`) |
+| `make seed` | Insert demo profile + job targets |
+| `make schemas-export` | Regenerate TypeScript types from `packages/schemas` |
 
 Without Make:
 
@@ -63,7 +66,7 @@ apps/
   worker/   Celery + Playwright (Chromium)
   web/      Next.js placeholder (Mission 02)
 packages/
-  schemas/  Shared types (Mission 01)
+  schemas/  Shared Pydantic types + `generated/types.ts` for the web app
 infra/
   compose.yaml
   docker/   Dockerfiles

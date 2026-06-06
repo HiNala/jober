@@ -4,7 +4,7 @@ COMPOSE := docker compose $(COMPOSE_ENV) -f $(COMPOSE_FILE)
 COMPOSE_FULL := COMPOSE_PROFILES=full $(COMPOSE)
 COMPOSE_INFRA := COMPOSE_PROFILES=infra $(COMPOSE)
 
-.PHONY: up down logs infra api-shell worker-shell fmt lint test migrate doctor ping-worker
+.PHONY: up down logs infra api-shell worker-shell fmt lint test migrate migrate-check seed schemas-export backup restore doctor ping-worker
 
 up:
 	$(COMPOSE_FULL) up -d --build
@@ -40,7 +40,22 @@ test:
 	cd apps/worker && pytest -q
 
 migrate:
-	@echo "Alembic migrations land in Mission 01. Nothing to run yet."
+	cd apps/api && alembic upgrade head
+
+migrate-check:
+	cd apps/api && alembic upgrade head && python scripts/check_migration_drift.py
+
+seed:
+	cd apps/api && python scripts/seed.py
+
+schemas-export:
+	cd packages/schemas && python scripts/export_typescript.py
+
+backup:
+	bash infra/backups/backup.sh
+
+restore:
+	bash infra/backups/restore.sh $(SOURCE)
 
 doctor:
 	@echo "=== Jober doctor ==="
