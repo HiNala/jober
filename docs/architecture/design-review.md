@@ -145,3 +145,30 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Fuzzy header mapping unit test | Minor column renames won't break import silently |
 | Import API 422 on corrupt uploads | Clear error instead of opaque 500 |
 | Queue location filter + README import section | Completes filter spec; cold-start docs for contributors |
+
+---
+
+## Mission 04 — Profile vault
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Norman | 2 | Tiered sections + explicit consent toggles with timestamps |
+| Nielsen | 2 | Completeness checklist shows what's missing before runs |
+| Tufte | 2 | Skills chips + progress bar; encrypted badge on sensitive rows |
+| Vignelli | 2 | Shared card/input primitives across tiers |
+| Rand | 2 | Lock iconography for EEO tier without alarmism |
+| Maeda | 2 | Resume upload reuses dropzone; clear empty states |
+| Wroblewski | 2 | Public → preference → sensitive vertical hierarchy |
+| Ive | 2 | Restrained amber accents on sensitive tier only |
+
+**Total: 18/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 04) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Test DB `drop_all` + `create_all` | Keeps pytest schema aligned with new migrations |
+| `session.refresh` after vault commits | Avoids lazy-load errors in API serializers |
+| Claims index + invented-credential test | Mission 05 guardrail starts here |

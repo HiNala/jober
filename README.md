@@ -102,6 +102,19 @@ pnpm dev                     # http://localhost:3000
 
 Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/settings`, `/kitchen-sink` (component catalog).
 
+## Profile vault (Mission 04)
+
+Upload a canonical resume (PDF/DOCX) and manage tiered profile fields at `/vault`.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/profile` | Vault + completeness checklist |
+| `PATCH /api/profile` | Public / preference fields |
+| `PATCH /api/profile/vault` | Encrypted EEO values + consent flags |
+| `POST /api/resumes` | Upload resume → MinIO + text/skills parse |
+
+Set `VAULT_ENCRYPTION_KEY` before storing sensitive EEO answers. Sensitive fields default to **never auto-fill**; the fill policy returns `NEEDS_HUMAN` unless explicit consent + stored value exist.
+
 ## Job spreadsheet import (Mission 03)
 
 Import Brian's tracker workbook into Postgres and round-trip status back to XLSX.

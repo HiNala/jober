@@ -1,20 +1,17 @@
-import { FileUpload } from "@/components/import/file-upload";
-import { PageEmpty } from "@/components/states/page-states";
+"use client";
+
+import { ProfileVault } from "@/components/vault/profile-vault";
 
 export default function VaultPage() {
   return (
-    <div className="space-y-8 p-4 md:p-6">
-      <section className="max-w-xl space-y-2">
-        <h2 className="text-sm font-medium">Import spreadsheet</h2>
+    <div className="space-y-6 p-4 md:p-6">
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight">Profile vault</h1>
         <p className="text-sm text-muted-foreground">
-          Full XLSX import lands in Mission 03. Dropzone is wired for early UX testing.
+          Resume, preferences, and encrypted EEO answers — sensitive fields never guessed.
         </p>
-        <FileUpload />
-      </section>
-      <PageEmpty
-        title="Profile vault"
-        description="Resume assets and encrypted EEO answers are managed here starting Mission 04."
-      />
+      </div>
+      <ProfileVault />
     </div>
   );
 }
