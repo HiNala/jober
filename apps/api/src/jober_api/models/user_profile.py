@@ -11,6 +11,7 @@ from jober_api.db.base import Base
 from jober_api.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from jober_api.models.profile_common_answer import ProfileCommonAnswer
     from jober_api.models.resume_asset import ResumeAsset
 
 
@@ -21,6 +22,8 @@ class UserProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     email: Mapped[str | None] = mapped_column(String(320))
     phone: Mapped[str | None] = mapped_column(String(64))
     location: Mapped[str | None] = mapped_column(String(255))
+    current_title: Mapped[str | None] = mapped_column(String(255))
+    notice_period: Mapped[str | None] = mapped_column(String(128))
     links: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     work_authorization: Mapped[str | None] = mapped_column(Text)
     relocation_pref: Mapped[bool | None] = mapped_column()
@@ -41,4 +44,8 @@ class UserProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     default_resume_asset: Mapped["ResumeAsset | None"] = relationship(
         back_populates="profiles_as_default",
         foreign_keys=[default_resume_asset_id],
+    )
+    common_answers: Mapped[list["ProfileCommonAnswer"]] = relationship(
+        back_populates="profile",
+        cascade="all, delete-orphan",
     )

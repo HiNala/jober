@@ -51,9 +51,7 @@ async def test_export_reflects_app_status_after_update(db_session, truncate_tabl
 
 
 @pytest.mark.asyncio
-async def test_reimport_preserves_app_status_when_runs_exist(
-    db_session, truncate_tables
-) -> None:
+async def test_reimport_preserves_app_status_when_runs_exist(db_session, truncate_tables) -> None:
     from jober_api.models.application_run import ApplicationRun
     from jober_api.models.enums import RunPolicy, RunStatus
 

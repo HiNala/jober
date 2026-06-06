@@ -8,6 +8,7 @@ from jober_api.models.generated_document import GeneratedDocument
 from jober_api.models.human_checkpoint import HumanCheckpoint
 from jober_api.models.job_target import JobTarget
 from jober_api.models.llm_call import LlmCall
+from jober_api.models.profile_common_answer import ProfileCommonAnswer
 from jober_api.models.resume_asset import ResumeAsset
 from jober_api.models.user_profile import UserProfile
 
@@ -21,6 +22,7 @@ __all__ = [
     "GeneratedDocument",
     "HumanCheckpoint",
     "JobTarget",
+    "ProfileCommonAnswer",
     "LlmCall",
     "ResumeAsset",
     "UserProfile",

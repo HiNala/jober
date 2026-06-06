@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     secret_key: str = ""
     vault_encryption_key: str = ""
+    llm_api_key: str = ""
+    llm_embedding_model: str = "text-embedding-3-small"
 
 
 settings = Settings()

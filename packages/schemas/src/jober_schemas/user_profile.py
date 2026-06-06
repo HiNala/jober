@@ -8,7 +8,8 @@ from jober_schemas.common import SchemaBase, TimestampedSchema
 
 class FieldConsentFlags(SchemaBase):
     consent: bool = False
-    never_autofill: bool = False
+    never_autofill: bool = True
+    consented_at: str | None = None
 
 
 class UserProfileCreate(SchemaBase):
@@ -16,6 +17,8 @@ class UserProfileCreate(SchemaBase):
     email: str | None = None
     phone: str | None = None
     location: str | None = None
+    current_title: str | None = None
+    notice_period: str | None = None
     links: dict[str, str] | None = None
     work_authorization: str | None = None
     relocation_pref: bool | None = None
@@ -33,6 +36,8 @@ class UserProfileRead(TimestampedSchema):
     email: str | None
     phone: str | None
     location: str | None
+    current_title: str | None
+    notice_period: str | None
     links: dict[str, Any] | None
     work_authorization: str | None
     relocation_pref: bool | None

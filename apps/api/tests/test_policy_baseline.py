@@ -45,3 +45,12 @@ def test_field_consent_json_supported_on_profile() -> None:
     hints = inspect.getdoc(UserProfile) or ""
     # Model docstring optional; column presence is the contract for Mission 04 vault work.
     assert hints or UserProfile.__tablename__ == "user_profiles"
+
+
+def test_fill_policy_blocks_sensitive_autofill_without_consent() -> None:
+    from jober_api.models.user_profile import UserProfile
+    from jober_api.vault.fill_policy import FillOutcome, agent_propose_fill
+
+    profile = UserProfile()
+    result = agent_propose_fill(profile, "disability", agent_guess="no")
+    assert result.outcome == FillOutcome.NEEDS_HUMAN
