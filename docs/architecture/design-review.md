@@ -105,6 +105,12 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
-## Mission 99 (post–Mission 02) — planned
+## Mission 99 (post–Mission 02) — improvements logged
 
-Run iteration loop before Mission 03.
+| Change | Why |
+|--------|-----|
+| Mobile nav `Sheet` + shared `NavLinks` | Sidebar was desktop-only; small viewports had no way to reach Vault/Settings |
+| Health pill degraded tooltip with `NEXT_PUBLIC_API_URL` hint | Most common local failure is wrong API port — faster recovery |
+| `vitest` + `health.test.ts` | Regression fixture for readiness fetch success/failure paths |
+| Track `apps/web/.env.example` in git | Web `.gitignore` blocked `.env*` without exception |
+| `make lint` includes `web-lint` | One command exercises full monorepo gates |

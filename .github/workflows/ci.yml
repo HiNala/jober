@@ -150,5 +150,8 @@ jobs:
       - name: Lint (strict)
         run: pnpm lint:strict
 
+      - name: Test
+        run: pnpm test
+
       - name: Build
         run: pnpm build

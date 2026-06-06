@@ -105,7 +105,7 @@ Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/setting
 ## Development gates
 
 - Backend: `ruff`, `mypy`, `pytest`
-- Web: `pnpm typecheck`, `pnpm lint:strict`, `pnpm build` (in `apps/web`)
+- Web: `pnpm typecheck`, `pnpm lint:strict`, `pnpm test`, `pnpm build` (in `apps/web`, or `make web-lint`)
 - Pre-commit: `pre-commit install` then hooks run on commit
 - CI: `.github/workflows/ci.yml`
 - Architecture notes: [`docs/architecture/`](docs/architecture/) (design reviews, policy baseline)

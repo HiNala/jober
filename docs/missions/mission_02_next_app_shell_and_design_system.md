@@ -16,3 +16,8 @@
 - [x] Health pill polls live API `/readyz`.
 - [x] Animations honor `prefers-reduced-motion`.
 - [x] Design Council ≥18/20 on shell + landing.
+
+## Mission 99 (post–Mission 02)
+- [x] Mobile navigation sheet for viewports below `md`.
+- [x] Vitest coverage for readiness client; CI `pnpm test`.
+- [x] `apps/web/.env.example` tracked in git.

@@ -34,13 +34,14 @@ fmt:
 lint:
 	cd apps/api && ruff check src tests && mypy src
 	cd apps/worker && ruff check src tests && mypy src
+	$(MAKE) web-lint
 
 test:
 	cd apps/api && pytest -q
 	cd apps/worker && pytest -q
 
 web-lint:
-	cd apps/web && pnpm lint:strict && pnpm typecheck
+	cd apps/web && pnpm lint:strict && pnpm typecheck && pnpm test
 
 web-build:
 	cd apps/web && pnpm build

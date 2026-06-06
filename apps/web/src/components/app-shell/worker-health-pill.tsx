@@ -4,7 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Circle } from "lucide-react";
 
 import { fetchReadiness } from "@/lib/api/health";
+import { getApiBaseUrl } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
+
+function degradedHint(detail?: string): string {
+  const base = getApiBaseUrl();
+  const hint = `API: ${base}/readyz — start the stack with make up or set NEXT_PUBLIC_API_URL.`;
+  return detail ? `${detail}\n${hint}` : hint;
+}
 
 export function WorkerHealthPill() {
   const { data, isPending, isError } = useQuery({
@@ -23,20 +30,20 @@ export function WorkerHealthPill() {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium",
+        "inline-flex max-w-[min(100%,14rem)] items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium sm:max-w-none",
         ready
           ? "border-accent/30 bg-accent/10 text-accent"
           : "border-destructive/30 bg-destructive/10 text-destructive",
       )}
       role="status"
       aria-live="polite"
-      title={data?.detail}
+      title={ready ? undefined : degradedHint(data?.detail)}
     >
       <Circle
-        className={cn("size-2 fill-current", ready ? "text-accent" : "text-destructive")}
+        className={cn("size-2 shrink-0 fill-current", ready ? "text-accent" : "text-destructive")}
         aria-hidden
       />
-      <span>{label}</span>
+      <span className="truncate">{label}</span>
     </div>
   );
 }
