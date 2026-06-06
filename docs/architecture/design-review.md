@@ -141,3 +141,7 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `jobs.test.ts` for export URL helper | Cheap regression on API path wiring |
 | Mission 03 doc + design review scores | Closes documentation gap from index |
 | Ruff `B008` ignore on FastAPI routers | Standard FastAPI `Depends`/`File` pattern without noise |
+| Export round-trip + status-preservation tests | Locks acceptance criteria: app status wins in XLSX export |
+| Fuzzy header mapping unit test | Minor column renames won't break import silently |
+| Import API 422 on corrupt uploads | Clear error instead of opaque 500 |
+| Queue location filter + README import section | Completes filter spec; cold-start docs for contributors |

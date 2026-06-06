@@ -67,6 +67,7 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
   const [priority, setPriority] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [ats, setAts] = useState<string>("all");
+  const [location, setLocation] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<JobTargetRead | null>(null);
 
@@ -76,12 +77,14 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
       if (priority !== "all" && row.priority !== priority) return false;
       if (status !== "all" && row.status !== status) return false;
       if (ats !== "all" && row.ats_guess !== ats) return false;
+      const loc = location.trim().toLowerCase();
+      if (loc && !(row.location_work_style ?? "").toLowerCase().includes(loc)) return false;
       if (!q) return true;
       return (
         row.company.toLowerCase().includes(q) || row.role.toLowerCase().includes(q)
       );
     });
-  }, [rows, search, priority, status, ats]);
+  }, [rows, search, priority, status, ats, location]);
 
   const patchMutation = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: Partial<JobTargetRead> }) =>
@@ -157,6 +160,13 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
             ))}
           </SelectContent>
         </Select>
+        <Input
+          placeholder="Location / work style"
+          className="max-w-[11rem]"
+          aria-label="Filter by location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
       </div>
       <div className="rounded-lg border border-border/60">
         <Table>

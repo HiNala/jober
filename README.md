@@ -77,7 +77,7 @@ Backup/restore requires the infra profile (`make infra` or `make up`). On Window
 
 ```
 apps/
-  api/      FastAPI — /healthz, /readyz
+  api/      FastAPI — health, import/export, job targets
   worker/   Celery + Playwright (Chromium)
   web/      Next.js app shell + design system (Mission 02)
 packages/
@@ -101,6 +101,33 @@ pnpm dev                     # http://localhost:3000
 ```
 
 Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/settings`, `/kitchen-sink` (component catalog).
+
+## Job spreadsheet import (Mission 03)
+
+Import Brian's tracker workbook into Postgres and round-trip status back to XLSX.
+
+**API** (prefix `/api`):
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /imports/jobs-xlsx?dry_run=true` | Preview column mapping + row counts |
+| `POST /imports/jobs-xlsx` | Upsert JobTargets, CompanyBoards, CoverLetterAngles |
+| `GET /exports/jobs-xlsx` | Download workbook (app-owned status/dates/notes) |
+| `GET /job-targets` | List/filter queue rows |
+| `PATCH /job-targets/{id}` | Update status, dates, notes |
+
+**UI:** open `/queue` → **Import spreadsheet** (drag-drop) → confirm mapping → review warnings. Export from the queue header.
+
+Sheets mapped: **Direct Job Leads** → `JobTarget`, **Company Boards** → `CompanyBoard`, **Cover Letter Angles** → `CoverLetterAngle`. Summary / Refresh Sources are stored as metadata only.
+
+Local verification with the real workbook:
+
+```bash
+curl -X POST "http://localhost:8000/api/imports/jobs-xlsx?dry_run=true" \
+  -F "file=@/path/to/tracker.xlsx"
+```
+
+Expect **155** job targets, **130** company boards, and **10** cover-letter angles on commit; re-import should update in place without duplicates.
 
 ## Development gates
 
