@@ -114,3 +114,30 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `vitest` + `health.test.ts` | Regression fixture for readiness fetch success/failure paths |
 | Track `apps/web/.env.example` in git | Web `.gitignore` blocked `.env*` without exception |
 | `make lint` includes `web-lint` | One command exercises full monorepo gates |
+
+---
+
+## Mission 03 — Queue + import surfaces
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Norman | 2 | Import wizard steps (upload → preview → confirm); inline status saves with rollback toast |
+| Nielsen | 2 | Filters match spreadsheet columns; export link always visible on queue |
+| Tufte | 2 | ATS badge + priority in table; warnings list in import summary |
+| Vignelli | 2 | Shared table/kanban/drawer primitives; dialog import flow |
+| Rand | 2 | Queue header anchors page; kanban lanes map to real statuses |
+| Maeda | 2 | Drag-drop zone with clear empty/loaded states |
+| Wroblewski | 2 | Table for bulk ops, board for pipeline scan, drawer for detail |
+| Ive | 2 | Restrained borders; optimistic row updates without layout jump |
+
+**Total: 18/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 03) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `jobs.test.ts` for export URL helper | Cheap regression on API path wiring |
+| Mission 03 doc + design review scores | Closes documentation gap from index |
+| Ruff `B008` ignore on FastAPI routers | Standard FastAPI `Depends`/`File` pattern without noise |

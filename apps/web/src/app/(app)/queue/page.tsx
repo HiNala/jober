@@ -1,22 +1,98 @@
+"use client";
+
+import type { JobTargetRead } from "@jober/schemas";
+import { useQuery } from "@tanstack/react-query";
+import { Download } from "lucide-react";
+import { useState } from "react";
+
+import { ImportWizard } from "@/components/import/import-wizard";
 import { JobDataTable } from "@/components/jobs/job-data-table";
+import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
 import { JobKanban } from "@/components/jobs/job-kanban";
+import { PageError, PageLoading } from "@/components/states/page-states";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { exportJobsXlsxUrl, fetchJobTargets } from "@/lib/api/jobs";
 
 export default function QueuePage() {
+  const [importOpen, setImportOpen] = useState(false);
+  const [kanbanDetail, setKanbanDetail] = useState<JobTargetRead | null>(null);
+
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["job-targets"],
+    queryFn: () => fetchJobTargets(),
+  });
+
+  const rows = data ?? [];
+
   return (
     <div className="space-y-6 p-4 md:p-6">
-      <Tabs defaultValue="table">
-        <TabsList>
-          <TabsTrigger value="table">Table</TabsTrigger>
-          <TabsTrigger value="board">Board</TabsTrigger>
-        </TabsList>
-        <TabsContent value="table" className="mt-4">
-          <JobDataTable />
-        </TabsContent>
-        <TabsContent value="board" className="mt-4">
-          <JobKanban />
-        </TabsContent>
-      </Tabs>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Job queue</h1>
+          <p className="text-sm text-muted-foreground">
+            {rows.length} targets · import spreadsheet or filter below
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <a
+            href={exportJobsXlsxUrl()}
+            download
+            className="inline-flex h-7 items-center gap-1 rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium hover:bg-muted"
+          >
+            <Download className="size-3.5" aria-hidden />
+            Export XLSX
+          </a>
+          <Dialog open={importOpen} onOpenChange={setImportOpen}>
+            <DialogTrigger>
+              <Button size="sm">Import spreadsheet</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Import job tracker</DialogTitle>
+              </DialogHeader>
+              <ImportWizard />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {isLoading && <PageLoading label="Loading job targets…" />}
+      {isError && (
+        <PageError
+          title="Could not load queue"
+          message="Check that the API is running and NEXT_PUBLIC_API_URL is set."
+          onRetry={() => void refetch()}
+        />
+      )}
+
+      {!isLoading && !isError && (
+        <Tabs defaultValue="table">
+          <TabsList>
+            <TabsTrigger value="table">Table</TabsTrigger>
+            <TabsTrigger value="board">Board</TabsTrigger>
+          </TabsList>
+          <TabsContent value="table" className="mt-4">
+            <JobDataTable rows={rows} />
+          </TabsContent>
+          <TabsContent value="board" className="mt-4">
+            <JobKanban rows={rows} onSelect={setKanbanDetail} />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      <JobDetailDrawer
+        job={kanbanDetail}
+        open={kanbanDetail !== null}
+        onOpenChange={(open) => !open && setKanbanDetail(null)}
+      />
     </div>
   );
 }

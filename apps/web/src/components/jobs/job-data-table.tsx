@@ -1,7 +1,11 @@
 "use client";
 
-import type { JobTargetRead } from "@jober/schemas";
+import type { JobTargetRead, JobTargetStatus } from "@jober/schemas";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
+import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -20,10 +24,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { updateJobTarget } from "@/lib/api/jobs";
 import { cn } from "@/lib/utils";
 
-const STATUS_LABEL: Record<string, string> = {
-  new: "New",
+const STATUS_LABEL: Record<JobTargetStatus, string> = {
+  new: "Not started",
   queued: "Queued",
   in_progress: "In progress",
   applied: "Applied",
@@ -32,12 +37,76 @@ const STATUS_LABEL: Record<string, string> = {
   skipped: "Skipped",
 };
 
+const STATUS_OPTIONS: JobTargetStatus[] = [
+  "new",
+  "queued",
+  "in_progress",
+  "applied",
+  "rejected",
+  "withdrawn",
+  "skipped",
+];
+
+const ATS_OPTIONS = [
+  "ashby",
+  "lever",
+  "greenhouse",
+  "workday",
+  "jobvite",
+  "teamtailor",
+] as const;
+
 export interface JobDataTableProps {
   rows?: JobTargetRead[];
   className?: string;
 }
 
 export function JobDataTable({ rows = [], className }: JobDataTableProps) {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [priority, setPriority] = useState<string>("all");
+  const [status, setStatus] = useState<string>("all");
+  const [ats, setAts] = useState<string>("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [detail, setDetail] = useState<JobTargetRead | null>(null);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((row) => {
+      if (priority !== "all" && row.priority !== priority) return false;
+      if (status !== "all" && row.status !== status) return false;
+      if (ats !== "all" && row.ats_guess !== ats) return false;
+      if (!q) return true;
+      return (
+        row.company.toLowerCase().includes(q) || row.role.toLowerCase().includes(q)
+      );
+    });
+  }, [rows, search, priority, status, ats]);
+
+  const patchMutation = useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<JobTargetRead> }) =>
+      updateJobTarget(id, patch),
+    onMutate: async ({ id, patch }) => {
+      await queryClient.cancelQueries({ queryKey: ["job-targets"] });
+      const previous = queryClient.getQueryData<JobTargetRead[]>(["job-targets"]);
+      queryClient.setQueryData<JobTargetRead[]>(["job-targets"], (old) =>
+        old?.map((row) => (row.id === id ? { ...row, ...patch } : row)),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) {
+        queryClient.setQueryData(["job-targets"], ctx.previous);
+      }
+      toast.error("Could not save change");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["job-targets"] });
+    },
+  });
+
+  const allSelected = filtered.length > 0 && filtered.every((r) => selected.has(r.id));
+
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex flex-wrap gap-2">
@@ -45,8 +114,13 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
           placeholder="Search company or role…"
           className="max-w-xs"
           aria-label="Search jobs"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
-        <Select>
+        <Select
+          value={priority}
+          onValueChange={(value) => setPriority(value ?? "all")}
+        >
           <SelectTrigger className="w-36" aria-label="Filter by priority">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
@@ -54,17 +128,33 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
             <SelectItem value="all">All priorities</SelectItem>
             <SelectItem value="A">Priority A</SelectItem>
             <SelectItem value="B">Priority B</SelectItem>
+            <SelectItem value="C">Priority C</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
-          <SelectTrigger className="w-36" aria-label="Filter by status">
+        <Select value={status} onValueChange={(value) => setStatus(value ?? "all")}>
+          <SelectTrigger className="w-40" aria-label="Filter by status">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="queued">Queued</SelectItem>
-            <SelectItem value="in_progress">In progress</SelectItem>
-            <SelectItem value="applied">Applied</SelectItem>
+            {STATUS_OPTIONS.map((s) => (
+              <SelectItem key={s} value={s}>
+                {STATUS_LABEL[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={ats} onValueChange={(value) => setAts(value ?? "all")}>
+          <SelectTrigger className="w-36" aria-label="Filter by ATS">
+            <SelectValue placeholder="ATS" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All ATS</SelectItem>
+            {ATS_OPTIONS.map((platform) => (
+              <SelectItem key={platform} value={platform}>
+                {platform}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -73,34 +163,92 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
-                <Checkbox aria-label="Select all rows" />
+                <Checkbox
+                  aria-label="Select all rows"
+                  checked={allSelected}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelected(new Set(filtered.map((r) => r.id)));
+                    } else {
+                      setSelected(new Set());
+                    }
+                  }}
+                />
               </TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>ATS</TableHead>
               <TableHead>Lane</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.length === 0 ? (
+            {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   No job targets yet — import a spreadsheet or run{" "}
                   <code className="text-xs">make seed</code>.
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => (
-                <TableRow key={row.id} className="cursor-pointer hover:bg-muted/40">
-                  <TableCell>
-                    <Checkbox aria-label={`Select ${row.company}`} />
+              filtered.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className="cursor-pointer hover:bg-muted/40"
+                  onClick={() => setDetail(row)}
+                >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      aria-label={`Select ${row.company}`}
+                      checked={selected.has(row.id)}
+                      onCheckedChange={(checked) => {
+                        setSelected((prev) => {
+                          const next = new Set(prev);
+                          if (checked) next.add(row.id);
+                          else next.delete(row.id);
+                          return next;
+                        });
+                      }}
+                    />
                   </TableCell>
                   <TableCell className="font-medium">{row.company}</TableCell>
                   <TableCell>{row.role}</TableCell>
                   <TableCell>{row.priority ?? "—"}</TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={row.status}
+                      onValueChange={(value) =>
+                        patchMutation.mutate({
+                          id: row.id,
+                          patch: { status: value as JobTargetStatus },
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-[9.5rem] border-0 bg-transparent shadow-none">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {STATUS_LABEL[s]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{STATUS_LABEL[row.status] ?? row.status}</Badge>
+                    {row.ats_guess ? (
+                      <Badge variant="secondary" className="font-normal">
+                        {row.ats_guess}
+                      </Badge>
+                    ) : row.needs_url ? (
+                      <Badge variant="outline" className="font-normal text-amber-600">
+                        needs URL
+                      </Badge>
+                    ) : (
+                      "—"
+                    )}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {row.fit_lane ?? "—"}
@@ -111,6 +259,18 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
           </TableBody>
         </Table>
       </div>
+      {selected.size > 0 && (
+        <p className="text-xs text-muted-foreground">{selected.size} selected</p>
+      )}
+      <JobDetailDrawer
+        job={detail}
+        open={detail !== null}
+        onOpenChange={(open) => !open && setDetail(null)}
+        onNotesChange={(notes) => {
+          if (!detail) return;
+          patchMutation.mutate({ id: detail.id, patch: { notes } });
+        }}
+      />
     </div>
   );
 }
