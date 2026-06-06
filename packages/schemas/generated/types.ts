@@ -10,12 +10,52 @@ export type JobTargetStatus = "new" | "queued" | "in_progress" | "applied" | "re
 
 export interface JobTargetRead {
   id: string;
+  created_at: string;
+  updated_at: string;
   company: string;
   role: string;
   status: JobTargetStatus;
+  rank?: number | null;
   priority?: string | null;
   fit_lane?: string | null;
+  stage_signal?: string | null;
+  location_work_style?: string | null;
   direct_apply_url?: string | null;
+  company_careers_url?: string | null;
   applied_date?: string | null;
   follow_up_date?: string | null;
+  notes?: string | null;
+  ats_guess?: string | null;
+  needs_url?: boolean;
+}
+
+export interface ImportWarningRead {
+  sheet: string;
+  row: number | null;
+  code: string;
+  message: string;
+}
+
+export interface EntityImportStatsRead {
+  created: number;
+  updated: number;
+  skipped: number;
+}
+
+export interface ColumnMappingPreview {
+  field: string;
+  matched_header: string | null;
+  confidence: number;
+  required: boolean;
+}
+
+export interface ImportReportRead {
+  import_id: string;
+  dry_run: boolean;
+  mappings: Record<string, ColumnMappingPreview[]>;
+  metadata_sheets: string[];
+  job_targets: EntityImportStatsRead;
+  company_boards: EntityImportStatsRead;
+  cover_letter_angles: EntityImportStatsRead;
+  warnings: ImportWarningRead[];
 }
