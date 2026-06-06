@@ -73,6 +73,11 @@ jobs:
           ./mc alias set local http://localhost:9000 minioadmin minioadmin
           ./mc mb local/jober-artifacts --ignore-existing
 
+      - name: detect-secrets
+        run: |
+          pip install detect-secrets==1.5.0
+          detect-secrets scan --baseline .secrets.baseline
+
       - name: Install API dependencies
         run: pip install "./apps/api[dev]"
 
