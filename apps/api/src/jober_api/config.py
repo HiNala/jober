@@ -36,6 +36,13 @@ class Settings(BaseSettings):
     log_mode: str = "redacted"
     presigned_url_ttl_minutes: int = 15
     require_secrets: bool = False
+    auth_mode: str = "dev"
+    clerk_jwt_issuer: str = ""
+    clerk_jwt_secret: str = ""
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_pro_monthly: str = ""
+    browserless_url: str = ""
 
 
 settings = Settings()

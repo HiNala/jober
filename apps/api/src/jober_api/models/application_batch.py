@@ -1,8 +1,9 @@
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import DateTime, Float, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from jober_api.db.base import Base
@@ -18,6 +19,12 @@ if TYPE_CHECKING:
 class ApplicationBatch(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "application_batches"
 
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[BatchStatus] = mapped_column(
         str_enum_column(BatchStatus), default=BatchStatus.DRAFT, nullable=False

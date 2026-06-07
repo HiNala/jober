@@ -1,7 +1,8 @@
+import uuid
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Boolean, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Boolean, ForeignKey, String, Text
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from jober_api.db.base import Base
@@ -14,6 +15,12 @@ if TYPE_CHECKING:
 class ResumeAsset(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "resume_assets"
 
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     object_key: Mapped[str] = mapped_column(String(512), nullable=False)
     original_filename: Mapped[str] = mapped_column(String(512), nullable=False)
     extracted_text: Mapped[str | None] = mapped_column(Text)

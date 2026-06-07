@@ -87,3 +87,17 @@ class BatchItemStatus(StrEnum):
     FAILED = "failed"
     SKIPPED = "skipped"
     CANCELLED = "cancelled"
+
+
+class PlanTier(StrEnum):
+    FREE = "free"
+    PRO = "pro"
+
+
+class AuditAction(StrEnum):
+    DATA_EXPORT = "data_export"
+    DATA_DELETE = "data_delete"
+    POLICY_UPDATE = "policy_update"
+    BATCH_CREATED = "batch_created"
+    AUTO_SUBMIT_OPT_IN = "auto_submit_opt_in"
+    SUBSCRIPTION_CHANGED = "subscription_changed"

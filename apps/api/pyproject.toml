@@ -30,6 +30,8 @@ dependencies = [
     "jober-fill",
     "jober-verify",
     "jober-recover",
+    "PyJWT>=2.9.0",
+    "stripe>=11.0.0",
 ]
 
 [tool.hatch.metadata]

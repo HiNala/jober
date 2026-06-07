@@ -23,8 +23,16 @@ if TYPE_CHECKING:
 
 class ApplicationRun(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "application_runs"
-    __table_args__ = (Index("ix_application_runs_status", "status"),)
+    __table_args__ = (
+        Index("ix_application_runs_status", "status"),
+        Index("ix_application_runs_tenant_id", "tenant_id"),
+    )
 
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     job_target_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("job_targets.id", ondelete="CASCADE"),

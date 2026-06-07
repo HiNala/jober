@@ -18,6 +18,12 @@ if TYPE_CHECKING:
 class UserProfile(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "user_profiles"
 
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     name: Mapped[str | None] = mapped_column(String(255))
     email: Mapped[str | None] = mapped_column(String(320))
     phone: Mapped[str | None] = mapped_column(String(64))

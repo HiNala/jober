@@ -1,8 +1,9 @@
+import uuid
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Date, DateTime, Index, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Date, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from jober_api.db.base import Base
@@ -17,8 +18,16 @@ if TYPE_CHECKING:
 
 class JobTarget(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "job_targets"
-    __table_args__ = (Index("ix_job_targets_status", "status"),)
+    __table_args__ = (
+        Index("ix_job_targets_status", "status"),
+        Index("ix_job_targets_tenant_id", "tenant_id"),
+    )
 
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     rank: Mapped[int | None] = mapped_column(Integer)
     priority: Mapped[str | None] = mapped_column(String(8))
     company: Mapped[str] = mapped_column(String(255), nullable=False)
