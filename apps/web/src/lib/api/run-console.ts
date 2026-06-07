@@ -48,6 +48,18 @@ export interface RunConsoleSnapshot {
   events: RunStreamEvent[];
 }
 
+export interface RecentRunEvent {
+  id: string;
+  seq: number;
+  ts: string;
+  level: string;
+  event_type: string;
+  message: string;
+  run_id: string;
+  company: string;
+  role: string;
+}
+
 export function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 }
@@ -60,6 +72,13 @@ export function runEventsStreamUrl(runId: string, afterSeq = 0): string {
 
 export async function fetchRunConsoleSnapshot(runId: string): Promise<RunConsoleSnapshot> {
   return apiFetch<RunConsoleSnapshot>(`/api/application-runs/${runId}/console`);
+}
+
+export async function fetchRecentRunEvents(limit = 25): Promise<RecentRunEvent[]> {
+  const body = await apiFetch<{ items: RecentRunEvent[] }>(
+    `/api/console/recent-events?limit=${limit}`,
+  );
+  return body.items;
 }
 
 export async function resolveRunCheckpoint(

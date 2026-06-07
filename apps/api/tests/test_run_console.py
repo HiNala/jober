@@ -155,6 +155,93 @@ async def test_checkpoint_resolve_from_api(db_session, truncate_tables) -> None:
             )
             assert denied.status_code == 200
             assert denied.json()["run_status"] == RunStatus.NEEDS_HUMAN.value
+
+            console = await client.get(f"/api/application-runs/{run.id}/console")
+            assert console.status_code == 200
+            assert console.json()["open_checkpoint"] is None
+            assert console.json()["status"] == RunStatus.NEEDS_HUMAN.value
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_checkpoint_skip_syncs_console_snapshot(db_session, truncate_tables) -> None:
+    """Web and TUI share resolve API — skip must clear open_checkpoint in console snapshot."""
+    from jober_api.db import session as db_session_module
+    from jober_api.models.human_checkpoint import HumanCheckpoint
+    from jober_api.repositories.application_run import ApplicationRunRepository
+
+    job = await _seed_job(db_session)
+    runs = ApplicationRunRepository(db_session)
+    run = await runs.create(
+        job_target_id=job.id,
+        status=RunStatus.REVIEW_AND_SUBMIT,
+        current_step=RunStatus.REVIEW_AND_SUBMIT,
+    )
+    cp = HumanCheckpoint(
+        id=uuid.uuid4(),
+        run_id=run.id,
+        checkpoint_type=CheckpointType.REVIEW_SUBMIT,
+        prompt="Review",
+        options={"readiness": {"passed": True, "checks": []}},
+        status=CheckpointStatus.OPEN,
+    )
+    db_session.add(cp)
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            before = await client.get(f"/api/application-runs/{run.id}/console")
+            assert before.json()["open_checkpoint"]["id"] == str(cp.id)
+
+            skipped = await client.post(
+                f"/api/application-runs/{run.id}/checkpoints/{cp.id}/resolve",
+                json={"action": "skip"},
+            )
+            assert skipped.status_code == 200
+            assert skipped.json()["run_status"] == RunStatus.SKIPPED.value
+
+            after = await client.get(f"/api/application-runs/{run.id}/console")
+            assert after.json()["open_checkpoint"] is None
+            assert after.json()["status"] == RunStatus.SKIPPED.value
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_recent_events_feed(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+    from jober_api.repositories.application_run import ApplicationRunRepository
+    from jober_api.repositories.run_event import RunEventRepository
+
+    job = await _seed_job(db_session)
+    runs = ApplicationRunRepository(db_session)
+    run = await runs.create(
+        job_target_id=job.id,
+        status=RunStatus.FILL_FORM,
+        current_step=RunStatus.FILL_FORM,
+    )
+    events = RunEventRepository(db_session)
+    await events.append(run_id=run.id, event_type="run.started", message="started")
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            recent = await client.get("/api/console/recent-events")
+            assert recent.status_code == 200
+            items = recent.json()["items"]
+            assert any(item["event_type"] == "run.started" for item in items)
+            assert items[0]["company"] == "Giga"
     finally:
         app.dependency_overrides.clear()
 

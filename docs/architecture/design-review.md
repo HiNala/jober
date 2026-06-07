@@ -205,6 +205,17 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 11) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `GET /api/console/recent-events` | Dashboard event stream was still a Mission 11 placeholder |
+| Checkpoint skip clears console `open_checkpoint` | Fixture-for-bug: web and TUI must share one checkpoint row |
+| `run-console.test.ts` | Client helpers for snapshot + recent feed |
+| README recent-events endpoint | Cold-start contributor path for dashboard telemetry |
+
+---
+
 ## Mission 11 — Live Run Console
 
 **Scope:** `/runs/[id]`, SSE stream, scrub timeline, checkpoint card, artifact links.

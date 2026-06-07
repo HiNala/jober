@@ -199,6 +199,7 @@ Watch runs in the web console at `/runs/{run_id}` or the interactive terminal vi
 |----------|---------|
 | `GET /api/application-runs/{id}/console` | Snapshot + scrub timeline + artifact URLs |
 | `GET /api/application-runs/{id}/events` | SSE stream (`after_seq` / `Last-Event-ID` for reconnect) |
+| `GET /api/console/recent-events` | Dashboard feed of latest run events across jobs |
 | `POST /api/application-runs/{id}/checkpoints/{id}/resolve` | Approve / deny / edit / skip (web + TUI) |
 
 Run `make migrate` for Mission 11 (`run_events` table). Install TUI: `pip install -e apps/tui`.

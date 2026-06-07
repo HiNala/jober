@@ -22,3 +22,9 @@
 - SSE `after_seq` replays without full reload
 - Trace zip validates as Playwright archive
 - Gates green
+
+## Mission 99 (post–Mission 11)
+- [x] Dashboard event stream wired to `GET /api/console/recent-events` (was placeholder)
+- [x] Checkpoint skip/deny clears `open_checkpoint` in console snapshot (web + TUI share API)
+- [x] `run-console.test.ts` + recent-events API test
+- [x] Gates green; pushed to `origin/main`

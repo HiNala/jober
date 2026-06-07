@@ -12,8 +12,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.models.application_attempt import ApplicationAttempt
+from jober_api.models.application_run import ApplicationRun
 from jober_api.models.enums import CheckpointStatus, CheckpointType, RunStatus
 from jober_api.models.human_checkpoint import HumanCheckpoint
+from jober_api.models.job_target import JobTarget
 from jober_api.models.run_event import RunEvent
 from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.repositories.job_target import JobTargetRepository
@@ -386,5 +388,32 @@ async def artifact_url_for_key(session: AsyncSession, key: str) -> str:
     storage = ObjectStorage()
     url = await storage.presigned_get(key, expires=timedelta(hours=1))
     return url
+
+
+async def get_recent_events(session: AsyncSession, *, limit: int = 25) -> list[dict[str, Any]]:
+    stmt = (
+        select(RunEvent, JobTarget.company, JobTarget.role)
+        .join(ApplicationRun, RunEvent.run_id == ApplicationRun.id)
+        .join(JobTarget, ApplicationRun.job_target_id == JobTarget.id)
+        .order_by(RunEvent.ts.desc())
+        .limit(limit)
+    )
+    rows = (await session.execute(stmt)).all()
+    items: list[dict[str, Any]] = []
+    for event, company, role in reversed(rows):
+        items.append(
+            {
+                "id": str(event.id),
+                "seq": int(event.seq),
+                "ts": event.ts.isoformat(),
+                "level": event.level,
+                "event_type": event.event_type,
+                "message": event.message,
+                "run_id": str(event.run_id),
+                "company": company,
+                "role": role,
+            }
+        )
+    return items
 
 

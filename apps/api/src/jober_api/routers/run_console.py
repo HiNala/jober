@@ -15,11 +15,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from jober_api.db.session import async_session_factory, get_session
 from jober_api.services.console.service import (
     get_console_snapshot,
+    get_recent_events,
     resolve_checkpoint,
     stream_run_events,
 )
 
 router = APIRouter(tags=["run-console"])
+
+
+@router.get("/console/recent-events")
+async def recent_run_events(
+    session: AsyncSession = Depends(get_session),
+    limit: int = 25,
+) -> dict[str, object]:
+    events = await get_recent_events(session, limit=min(limit, 100))
+    return {"items": events}
 
 
 @router.get("/application-runs/{run_id}/console", response_model=RunConsoleSnapshotRead)
