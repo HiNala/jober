@@ -7,10 +7,13 @@ import pytest
 from jober_api.repositories.user_profile import UserProfileRepository
 from jober_api.vault.fill_policy import FillOutcome, agent_propose_fill, resolve_field_fill
 
-pytestmark = pytest.mark.skipif(
-    __import__("os").getenv("CI") != "true" and __import__("os").getenv("RUN_DB_TESTS") != "1",
-    reason="requires Postgres",
-)
+pytestmark = [
+    pytest.mark.policy,
+    pytest.mark.skipif(
+        __import__("os").getenv("CI") != "true" and __import__("os").getenv("RUN_DB_TESTS") != "1",
+        reason="requires Postgres",
+    ),
+]
 
 
 @pytest.mark.asyncio

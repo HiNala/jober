@@ -4,11 +4,15 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pytest
+
 from jober_api.services.documents.prompt_pack import (
     SYSTEM_INSTRUCTIONS,
     GenerationContext,
     pack_user_prompt,
 )
+
+pytestmark = pytest.mark.policy
 
 
 def _ctx(*, job_description: str = "n/a") -> GenerationContext:

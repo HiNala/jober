@@ -2,10 +2,14 @@
 
 import inspect
 
+import pytest
+
 from jober_api.crypto.encrypted import EncryptedText
 from jober_api.models.application_run import ApplicationRun
 from jober_api.models.enums import RunPolicy
 from jober_api.models.user_profile import UserProfile
+
+pytestmark = pytest.mark.policy
 
 
 def test_auto_submit_is_never_the_default_policy() -> None:

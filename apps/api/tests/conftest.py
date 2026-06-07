@@ -1,5 +1,6 @@
 import os
-from collections.abc import AsyncGenerator
+import time
+from collections.abc import AsyncGenerator, Generator
 
 # Worker sync sessions read DATABASE_URL via pydantic-settings (Playwright fill tests).
 os.environ.setdefault(
@@ -7,6 +8,7 @@ os.environ.setdefault(
     "postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable",
 )
 
+import httpx
 import pytest
 import pytest_asyncio
 from cryptography.fernet import Fernet
@@ -39,6 +41,8 @@ requires_db = pytest.mark.skipif(
     reason="requires Postgres (CI or RUN_DB_TESTS=1)",
 )
 
+pytestmark_policy = pytest.mark.policy
+
 
 @pytest.fixture(scope="session")
 def database_url() -> str:
@@ -54,6 +58,27 @@ def vault_key() -> str:
     if not key:
         key = Fernet.generate_key().decode("utf-8")
     return key
+
+
+@pytest.fixture(scope="session")
+def fixture_server_url() -> Generator[str, None, None]:
+    if os.getenv("SKIP_FIXTURE_SERVER") == "1":
+        pytest.skip("fixture server disabled")
+    from jober_fixtures.server import FixtureServer
+
+    port = int(os.getenv("FIXTURE_ATS_PORT", "8765"))
+    server = FixtureServer(port=port)
+    url = server.start()
+    for _ in range(50):
+        try:
+            httpx.get(f"{url}/health", timeout=1.0).raise_for_status()
+            break
+        except Exception:
+            time.sleep(0.1)
+    else:
+        pytest.fail("ATS fixture server failed to start")
+    yield url
+    server.stop()
 
 
 @pytest_asyncio.fixture

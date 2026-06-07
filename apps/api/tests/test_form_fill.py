@@ -66,6 +66,7 @@ async def test_fill_single_step_fixture(db_session, truncate_tables) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.policy
 async def test_fill_login_fixture_creates_checkpoint(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
     from tests.fixtures.ats_pages import load_ats_fixture

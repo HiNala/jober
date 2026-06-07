@@ -203,6 +203,7 @@ async def test_fill_then_verify_reuses_fill_run(db_session, truncate_tables) -> 
 
 
 @pytest.mark.asyncio
+@pytest.mark.policy
 async def test_auto_submit_requires_explicit_opt_in(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 

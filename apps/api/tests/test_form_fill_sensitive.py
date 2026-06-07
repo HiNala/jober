@@ -10,10 +10,13 @@ from jober_api.models.enums import JobTargetStatus
 from jober_api.repositories.job_target import JobTargetRepository
 from tests.fixtures.form_pages import load_form_fixture
 
-pytestmark = pytest.mark.skipif(
-    os.getenv("CI") != "true" and os.getenv("RUN_DB_TESTS") != "1",
-    reason="requires Postgres",
-)
+pytestmark = [
+    pytest.mark.policy,
+    pytest.mark.skipif(
+        os.getenv("CI") != "true" and os.getenv("RUN_DB_TESTS") != "1",
+        reason="requires Postgres",
+    ),
+]
 
 
 @pytest.mark.asyncio

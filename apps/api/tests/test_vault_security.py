@@ -11,10 +11,13 @@ from jober_api.repositories.user_profile import UserProfileRepository
 from jober_api.vault.fill_policy import FillOutcome, resolve_field_fill
 from jober_api.vault.sensitive_store import merge_sensitive_answers
 
-pytestmark = pytest.mark.skipif(
-    os.getenv("CI") != "true" and os.getenv("RUN_DB_TESTS") != "1",
-    reason="requires Postgres",
-)
+pytestmark = [
+    pytest.mark.policy,
+    pytest.mark.skipif(
+        os.getenv("CI") != "true" and os.getenv("RUN_DB_TESTS") != "1",
+        reason="requires Postgres",
+    ),
+]
 
 
 def test_plaintext_work_authorization_column_is_never_autofilled() -> None:

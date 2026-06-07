@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import pytest
 from jober_forms.policy import apply_confidence_policy
+
+pytestmark = pytest.mark.policy
 
 
 def test_low_confidence_needs_review() -> None:

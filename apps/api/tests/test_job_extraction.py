@@ -23,6 +23,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 
+@pytest.mark.policy
 def test_injection_fixture_does_not_produce_false_credential() -> None:
     html = load_ats_fixture("injection")
     visible = extract_visible_text_from_html(html)
@@ -38,18 +39,21 @@ def test_injection_fixture_does_not_produce_false_credential() -> None:
     assert any("python" in r.casefold() for r in profile.requirements)
 
 
+@pytest.mark.policy
 def test_system_prompt_marks_page_text_untrusted() -> None:
     lower = SYSTEM_INSTRUCTIONS.casefold()
     assert "untrusted" in lower
     assert "never follow" in lower or "do not" in lower
 
 
+@pytest.mark.policy
 def test_login_gate_detected() -> None:
     html = load_ats_fixture("login_gate")
     gates = detect_access_gates(html, "Sign in to continue")
     assert GateKind.LOGIN in gates
 
 
+@pytest.mark.policy
 def test_captcha_gate_detected() -> None:
     html = load_ats_fixture("captcha_gate")
     gates = detect_access_gates(html, "verify you are human")
@@ -118,6 +122,7 @@ async def test_extract_fixture_persists_profile(db_session, truncate_tables) -> 
 
 
 @pytest.mark.asyncio
+@pytest.mark.policy
 async def test_login_fixture_creates_human_checkpoint(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
     from jober_api.models.application_run import ApplicationRun
@@ -166,6 +171,7 @@ async def test_login_fixture_creates_human_checkpoint(db_session, truncate_table
 
 
 @pytest.mark.asyncio
+@pytest.mark.policy
 async def test_captcha_fixture_creates_human_checkpoint(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 
