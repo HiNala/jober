@@ -45,7 +45,7 @@ def test_browser_fixture_discovery(slug: str, fixture_server_url: str) -> None:
     outcome = FIXTURE_OUTCOMES[slug]
     url = f"{fixture_server_url}/{slug}"
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
+        browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
         page.goto(url, wait_until="domcontentloaded")
         html = page.content()
@@ -57,7 +57,7 @@ def test_browser_fixture_discovery(slug: str, fixture_server_url: str) -> None:
 def test_shifting_selector_label_survives_id_change(fixture_server_url: str) -> None:
     url = f"{fixture_server_url}/behaviors/shifting-selector"
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
+        browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
         page.goto(url, wait_until="domcontentloaded")
         locator = page.get_by_label("Email address")

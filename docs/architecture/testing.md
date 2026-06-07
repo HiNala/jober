@@ -72,6 +72,7 @@ Policy tests run in a dedicated CI job and **fail the build** on regression.
 | `SKIP_PLAYWRIGHT=1` | Skip Playwright tests |
 | `SKIP_FIXTURE_SERVER=1` | Skip tests that start the in-process fixture server |
 | `FIXTURE_ATS_PORT` | Port for fixture server (default `8765`) |
+| `PLAYWRIGHT_HEADED` | Set `false` in CI; headed mode is for local debugging only |
 
 ## Manual live smoke (not CI)
 

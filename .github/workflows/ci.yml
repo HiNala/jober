@@ -46,6 +46,7 @@ jobs:
       VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
       CI: "true"
       FIXTURE_ATS_PORT: "8765"
+      PLAYWRIGHT_HEADED: "false"
 
     steps:
       - uses: actions/checkout@v4
@@ -174,6 +175,7 @@ jobs:
       VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
       CI: "true"
       FIXTURE_ATS_PORT: "8765"
+      PLAYWRIGHT_HEADED: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

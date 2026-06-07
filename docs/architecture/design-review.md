@@ -444,3 +444,4 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `test_injection_fixture_server_treats_page_text_as_data` | injection policy now asserted end-to-end against served `security/injection` route |
 | Pushed 3 Mission 12 commits + M99 fix to `origin/main` | Mission boundary hygiene — remote was 3 commits behind |
 | `RunEvent` index aligned with migration (`ix_run_events_run_id_seq`) | CI migrate-check was failing on model vs migration drift |
+| `PLAYWRIGHT_HEADED=false` in CI + headless fixture browser tests | Playwright fill tests launched headed browsers on Linux runners without X11 |
