@@ -65,6 +65,18 @@ def upgrade() -> None:
     )
     op.create_index("ix_audit_log_entries_tenant_id", "audit_log_entries", ["tenant_id"])
 
+    op.execute(
+        sa.text(
+            """
+            INSERT INTO tenants (id, name, plan, policy, created_at, updated_at)
+            VALUES (CAST(:tid AS uuid), 'Local Dev', 'pro',
+                    '{"default_run_policy":"review_before_submit","auto_submit_opt_in":false}',
+                    now(), now())
+            ON CONFLICT (id) DO NOTHING
+            """
+        ).bindparams(tid=DEFAULT_TENANT_ID)
+    )
+
     for table in (
         "user_profiles",
         "job_targets",
@@ -77,7 +89,9 @@ def upgrade() -> None:
             sa.Column("tenant_id", postgresql.UUID(as_uuid=True), nullable=True),
         )
         op.execute(
-            sa.text(f"UPDATE {table} SET tenant_id = :tid").bindparams(tid=DEFAULT_TENANT_ID)
+            sa.text(f"UPDATE {table} SET tenant_id = CAST(:tid AS uuid)").bindparams(
+                tid=DEFAULT_TENANT_ID
+            )
         )
         op.alter_column(table, "tenant_id", nullable=False)
         op.create_foreign_key(
@@ -93,17 +107,9 @@ def upgrade() -> None:
     op.execute(
         sa.text(
             """
-            INSERT INTO tenants (id, name, plan, policy, created_at, updated_at)
-            VALUES (:tid, 'Local Dev', 'pro', '{"default_run_policy":"review_before_submit","auto_submit_opt_in":false}', now(), now())
-            ON CONFLICT (id) DO NOTHING
-            """
-        ).bindparams(tid=DEFAULT_TENANT_ID)
-    )
-    op.execute(
-        sa.text(
-            """
             INSERT INTO users (id, tenant_id, email, display_name, created_at, updated_at)
-            VALUES (:uid, :tid, 'dev@jober.local', 'Local Dev', now(), now())
+            VALUES (CAST(:uid AS uuid), CAST(:tid AS uuid), 'dev@jober.local', 'Local Dev',
+                    now(), now())
             ON CONFLICT DO NOTHING
             """
         ).bindparams(uid=DEFAULT_USER_ID, tid=DEFAULT_TENANT_ID)
