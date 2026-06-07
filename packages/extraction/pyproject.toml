@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jober-extraction"
+version = "0.1.0"
+description = "Shared job page extraction — platform detection and Job Intelligence Agent"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.9.0",
+    "jober-schemas",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jober_extraction"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["jober_extraction"]
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
