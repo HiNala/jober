@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import os
-import uuid
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from jober_forms.scanner import scan_multistep_form
 
 from jober_api.main import app
 from jober_api.models.enums import JobTargetStatus
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
-from jober_forms.scanner import scan_multistep_form
 from tests.fixtures.form_pages import load_form_fixture
 
 pytestmark = pytest.mark.skipif(
@@ -34,6 +33,46 @@ def test_scanner_marks_required_fields() -> None:
     role = next(f for f in fields if f.field_key == "role")
     assert email.required is True
     assert role.required is False
+
+
+def test_scanner_detects_combobox_role() -> None:
+    html = load_form_fixture("combobox")
+    fields = scan_multistep_form(html)
+    combobox = next(f for f in fields if f.field_type == "combobox")
+    assert combobox.label == "Department"
+
+
+@pytest.mark.asyncio
+async def test_low_confidence_field_needs_review(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(company="Acme", role="Eng", status=JobTargetStatus.NEW)
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        html = """
+        <form>
+          <label for="q1">Tell us something unique about your favorite color</label>
+          <input id="q1" name="q1" type="text" />
+        </form>
+        """
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.post(
+                f"/api/job-targets/{job.id}/discover-form",
+                json={"fixture_html": html, "platform": "generic"},
+            )
+            assert response.status_code == 200
+            item = response.json()["items"][0]
+            assert item["status"] == "needs_review"
+            assert (item["confidence"] or 0) < 0.82
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_multistep_scanner_assigns_steps() -> None:

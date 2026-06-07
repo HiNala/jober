@@ -1,9 +1,9 @@
+from jober_forms.memory import normalize_label
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.models.field_mapping_memory import FieldMappingMemory
 from jober_api.repositories.base import Repository
-from jober_forms.memory import normalize_label
 
 
 class FieldMappingMemoryRepository(Repository[FieldMappingMemory]):
