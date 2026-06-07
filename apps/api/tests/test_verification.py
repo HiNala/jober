@@ -160,6 +160,49 @@ async def test_already_applied_detected_without_submit(db_session, truncate_tabl
 
 
 @pytest.mark.asyncio
+async def test_fill_then_verify_reuses_fill_run(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    job = await _seed_job(db_session)
+    job_id = job.id
+    fixture = load_form_fixture("single_step")
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            discover = await client.post(
+                f"/api/job-targets/{job_id}/discover-form",
+                json={"fixture_html": fixture, "platform": "greenhouse"},
+            )
+            assert discover.status_code == 200
+
+            fill = await client.post(
+                f"/api/job-targets/{job_id}/fill-form",
+                json={"fixture_html": fixture},
+            )
+            assert fill.status_code == 200
+            fill_run_id = fill.json()["run_id"]
+
+            verify = await client.post(
+                f"/api/job-targets/{job_id}/verify-ready",
+                json={"fixture_html": fixture},
+            )
+            assert verify.status_code == 200, verify.text
+            assert verify.json()["run_id"] == fill_run_id
+
+            review = await client.get(f"/api/application-runs/{fill_run_id}/review")
+            assert review.status_code == 200
+            diffs = review.json()["fill_diffs"]
+            assert any(d["field_key"] == "email" for d in diffs)
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_auto_submit_requires_explicit_opt_in(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 

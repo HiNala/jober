@@ -68,6 +68,22 @@ async def _load_observation_payloads(
     return payloads, attempt_id
 
 
+async def _latest_fill_run(
+    session: AsyncSession,
+    job_target_id: uuid.UUID,
+) -> ApplicationRun | None:
+    stmt = (
+        select(ApplicationRun)
+        .where(
+            ApplicationRun.job_target_id == job_target_id,
+            ApplicationRun.status == RunStatus.FILL_FORM,
+        )
+        .order_by(ApplicationRun.created_at.desc())
+        .limit(1)
+    )
+    return (await session.execute(stmt)).scalar_one_or_none()
+
+
 async def _profile_values_for_observations(
     session: AsyncSession,
     observations: list[dict[str, Any]],
@@ -121,23 +137,42 @@ async def verify_ready_from_fixture(
             raise ValueError(msg)
     else:
         now = datetime.now(UTC)
-        run = await runs.create(
-            job_target_id=job_target_id,
-            status=RunStatus.VERIFY_READY,
-            current_step=RunStatus.VERIFY_READY,
-            policy=policy,
-            started_at=now,
-        )
-        attempt = ApplicationAttempt(
-            run_id=run.id,
-            attempt_index=1,
-            status=AttemptStatus.RUNNING,
-            strategy_name="fixture_verify_ready",
-            started_at=now,
-        )
-        session.add(attempt)
-        await session.flush()
-        await session.refresh(attempt)
+        run = await _latest_fill_run(session, job_target_id)
+        if run is not None:
+            await runs.update_fields(
+                run.id,
+                status=RunStatus.VERIFY_READY,
+                current_step=RunStatus.VERIFY_READY,
+                policy=policy,
+            )
+            attempt_stmt = (
+                select(ApplicationAttempt)
+                .where(ApplicationAttempt.run_id == run.id)
+                .order_by(ApplicationAttempt.attempt_index.desc())
+                .limit(1)
+            )
+            attempt = (await session.execute(attempt_stmt)).scalar_one_or_none()
+            if attempt is None:
+                msg = "Fill run has no attempts"
+                raise ValueError(msg)
+        else:
+            run = await runs.create(
+                job_target_id=job_target_id,
+                status=RunStatus.VERIFY_READY,
+                current_step=RunStatus.VERIFY_READY,
+                policy=policy,
+                started_at=now,
+            )
+            attempt = ApplicationAttempt(
+                run_id=run.id,
+                attempt_index=1,
+                status=AttemptStatus.RUNNING,
+                strategy_name="fixture_verify_ready",
+                started_at=now,
+            )
+            session.add(attempt)
+            await session.flush()
+            await session.refresh(attempt)
 
     observations, _ = await _load_observation_payloads(session, job_target_id, None)
     profile_values = await _profile_values_for_observations(session, observations)
@@ -381,7 +416,10 @@ async def submit_application(
         raise ValueError(msg)
 
     if not fixture_html:
-        msg = "fixture_html required for CI submit path"
+        msg = (
+            "fixture_html is required for fixture submit replay. "
+            "Live browser submit will use the worker queue in a later mission."
+        )
         raise ValueError(msg)
 
     submit_run_id = run.id

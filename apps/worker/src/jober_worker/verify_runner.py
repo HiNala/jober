@@ -33,17 +33,22 @@ def run_fixture_verify_readiness(
     storage = ObjectStorage()
     paths = file_paths or {}
 
-    obs_inputs = [
-        ObservationInput(
-            field_key=str(o["field_key"]),
-            label=o.get("label"),
-            field_type=o.get("field_type"),
-            mapped_profile_field=o.get("mapped_profile_field"),
-            status=str(o.get("status", "skipped")),
-            is_sensitive=bool(o.get("is_sensitive", False)),
+    obs_inputs = []
+    for o in observations:
+        status = str(o.get("status", "skipped"))
+        # Re-opened fixture pages are blank — re-apply values even when DB says filled.
+        if refilled and status == "filled":
+            status = "skipped"
+        obs_inputs.append(
+            ObservationInput(
+                field_key=str(o["field_key"]),
+                label=o.get("label"),
+                field_type=o.get("field_type"),
+                mapped_profile_field=o.get("mapped_profile_field"),
+                status=status,
+                is_sensitive=bool(o.get("is_sensitive", False)),
+            )
         )
-        for o in observations
-    ]
 
     with browser_session(run_id=run_id, attempt_index=attempt_index) as session:
         actions = TypedBrowserActions(

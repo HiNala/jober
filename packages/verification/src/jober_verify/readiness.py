@@ -67,8 +67,15 @@ _READINESS_JS = """
     return style.display !== 'none' && style.visibility !== 'hidden';
   });
   for (const el of invalidInputs) {
-    const label = el.labels?.[0]?.textContent?.trim() || el.name || el.id || 'field';
-    validationErrors.push(`Invalid: ${label}`);
+    const label =
+      el.labels?.[0]?.textContent?.trim() ||
+      el.getAttribute('aria-label') ||
+      el.name ||
+      el.id ||
+      'field';
+    if (label && !label.includes('[object')) {
+      validationErrors.push(`Invalid: ${label}`);
+    }
   }
 
   const submitCandidates = [
