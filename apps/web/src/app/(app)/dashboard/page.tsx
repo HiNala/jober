@@ -1,3 +1,4 @@
+import { BatchPanel } from "@/components/dashboard/batch-panel";
 import { EventStream } from "@/components/dashboard/event-stream";
 import { FailureAnalyticsPanel } from "@/components/dashboard/failure-analytics";
 import { MetricCards } from "@/components/dashboard/metric-cards";
@@ -12,7 +13,10 @@ export default function DashboardPage() {
           <EventStream />
           <FailureAnalyticsPanel />
         </div>
-        <WorkerStatusPanel />
+        <div className="space-y-4">
+          <WorkerStatusPanel />
+          <BatchPanel />
+        </div>
       </div>
     </div>
   );
