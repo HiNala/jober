@@ -18,6 +18,8 @@ export interface JobTargetRead {
   rank?: number | null;
   priority?: string | null;
   fit_lane?: string | null;
+  why_fit?: string | null;
+  cover_letter_hook?: string | null;
   stage_signal?: string | null;
   location_work_style?: string | null;
   direct_apply_url?: string | null;

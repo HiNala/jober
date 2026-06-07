@@ -45,6 +45,8 @@ def main() -> None:
         "  rank?: number | null;\n"
         "  priority?: string | null;\n"
         "  fit_lane?: string | null;\n"
+        "  why_fit?: string | null;\n"
+        "  cover_letter_hook?: string | null;\n"
         "  stage_signal?: string | null;\n"
         "  location_work_style?: string | null;\n"
         "  direct_apply_url?: string | null;\n"
