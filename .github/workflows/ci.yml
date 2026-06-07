@@ -80,9 +80,10 @@ jobs:
           pip install detect-secrets==1.5.0
           detect-secrets scan --baseline .secrets.baseline
 
-      - name: Install shared schemas and API dependencies
+      - name: Install shared packages and API dependencies
         run: |
           pip install "./packages/schemas"
+          pip install "./packages/extraction"
           pip install "./apps/api[dev]"
 
       - name: Export shared TypeScript types

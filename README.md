@@ -117,6 +117,19 @@ Set `VAULT_ENCRYPTION_KEY` before storing sensitive EEO answers. Sensitive field
 
 After pulling Mission 04+, run `make migrate` once (adds `profile_common_answers`, `current_title`, `notice_period`).
 
+## Job extraction (Mission 06)
+
+Extract a normalized job profile from an apply URL (Playwright worker) or fixture HTML (CI-safe).
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/job-targets/{id}/extract` | Extract profile (`fixture_html` for tests) or enqueue browser run |
+| `GET /api/job-targets/{id}/job-profile` | Cached profile for today |
+
+Platform detection uses URL + DOM signatures (Ashby, Lever, Greenhouse, Workday, Jobvite, Personio, Teamtailor, generic). Login/CAPTCHA/2FA pages create a human checkpoint — never auto-bypassed.
+
+After pulling Mission 06+, run `make migrate` once (adds `extracted_job_profile` columns on `job_targets`).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).
