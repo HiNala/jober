@@ -151,6 +151,44 @@ async def test_resume_from_checkpoint(db_session, truncate_tables) -> None:
 
 
 @pytest.mark.asyncio
+async def test_captcha_failure_needs_human_without_retry_burn(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    job = await _seed_job(db_session)
+    fixture = load_form_fixture("single_step")
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            discover = await client.post(
+                f"/api/job-targets/{job.id}/discover-form",
+                json={"fixture_html": fixture, "platform": "greenhouse"},
+            )
+            assert discover.status_code == 200
+
+            result = await client.post(
+                f"/api/job-targets/{job.id}/recovery-fill",
+                json={
+                    "fixture_html": fixture,
+                    "platform": "greenhouse",
+                    "simulate_failure_class": "captcha",
+                },
+            )
+            assert result.status_code == 200
+            body = result.json()
+            assert body["status"] == RunStatus.NEEDS_HUMAN.value
+            assert body["failure_report"]["failure_class"] == "captcha"
+            assert body["failure_report"]["safe_to_retry"] is False
+            assert len(body["failure_report"]["self_assessments"]) == 1
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_circuit_breaker_trips_in_analytics(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 

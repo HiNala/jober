@@ -11,6 +11,7 @@ export interface FailureReport {
   recommended_manual_action: string;
   safe_to_retry: boolean;
   attempt_count: number;
+  attempted_actions?: string[];
   screenshot_object_key?: string | null;
   self_assessments?: Array<{
     attempt_index: number;

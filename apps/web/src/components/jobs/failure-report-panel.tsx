@@ -28,6 +28,14 @@ export function FailureReportPanel({ jobTargetId }: FailureReportPanelProps) {
         <h3 className="text-sm font-semibold">Failure report</h3>
         <Badge variant="destructive">{report.failure_class.replace(/_/g, " ")}</Badge>
       </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <span>
+          {report.attempt_count} attempt{report.attempt_count === 1 ? "" : "s"}
+        </span>
+        <Badge variant={report.safe_to_retry ? "secondary" : "outline"}>
+          {report.safe_to_retry ? "Safe to retry" : "Needs you"}
+        </Badge>
+      </div>
       <p className="text-sm text-muted-foreground">{report.inferred_reason}</p>
       <p className="text-sm">
         <span className="font-medium">Recommended action:</span> {report.recommended_manual_action}
