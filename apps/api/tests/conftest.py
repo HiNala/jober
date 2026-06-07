@@ -21,6 +21,7 @@ from jober_api.models import (  # noqa: F401 — register mappers
     BrowserEvent,
     CompanyBoard,
     CoverLetterAngle,
+    FailureEvent,
     FieldMappingMemory,
     FormFieldObservation,
     GeneratedDocument,
