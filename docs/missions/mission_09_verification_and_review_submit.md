@@ -27,3 +27,4 @@
 
 ## Iteration clause
 - [x] Pre-submit human-readable summary (`build_human_summary`) shown above Submit
+- [x] Mission 99: verify-ready continues fill run; fill→verify integration test; web 404 helper test

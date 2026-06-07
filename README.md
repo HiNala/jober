@@ -171,7 +171,7 @@ After fill, run readiness verification, review masked diffs in the job drawer, t
 
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /api/job-targets/{id}/verify-ready` | Readiness checks → `review_and_submit` on pass |
+| `POST /api/job-targets/{id}/verify-ready` | Readiness checks → `review_and_submit` on pass (continues latest fill run) |
 | `GET /api/job-targets/{id}/review` | Human summary, fill diff, readiness report |
 | `POST /api/application-runs/{id}/submit` | Human submit + confirmation capture |
 | `POST /api/application-runs/{id}/skip-submit` | Skip without submitting |

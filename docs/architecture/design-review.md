@@ -205,6 +205,18 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 09) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `verify-ready` reuses latest `fill_form` run | Orphan verify runs broke fill → review pipeline |
+| Verify refill treats `filled` observations as re-apply | Fresh fixture page was empty when statuses were already `filled` |
+| `test_fill_then_verify_reuses_fill_run` | Fixture-for-bug: review package must carry fill diffs from same run |
+| `verification.test.ts` 404 → null | Drawer review panel without throwing on first open |
+| Clearer submit error without `fixture_html` | Weakest operator path was generic 422 |
+
+---
+
 ## Mission 09 — Review-and-submit panel (Job Detail drawer)
 
 **Scope:** `ReviewSubmitPanel`, readiness report, masked fill diff table, human summary, Submit / Edit / Skip.
