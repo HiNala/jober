@@ -8,6 +8,7 @@ from httpx import ASGITransport, AsyncClient
 from jober_api.config import settings
 from jober_api.main import app
 from jober_api.models.enums import JobTargetStatus
+from jober_api.models.llm_call import LlmCall
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
@@ -91,6 +92,60 @@ async def test_generate_cover_letter_endpoint_returns_pdf_path(
             pdf = await client.get(body["pdf_download_path"])
             assert pdf.status_code == 200
             assert pdf.content.startswith(b"%PDF")
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_generate_cover_letter_budget_exceeded_returns_402(
+    db_session,
+    truncate_tables,
+    monkeypatch,
+) -> None:
+    from jober_api.db import session as db_session_module
+
+    monkeypatch.setattr(settings, "llm_provider", "template")
+    monkeypatch.setattr(settings, "llm_monthly_budget_usd", 0.01)
+    db_session.add(
+        LlmCall(
+            agent_role="prior",
+            provider="template",
+            model="test",
+            cost_usd=0.02,
+        )
+    )
+
+    profiles = UserProfileRepository(db_session)
+    await profiles.create(name="Brian", email="brian@example.com")
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(company="Acme", role="Eng", status=JobTargetStatus.NEW)
+    resumes = ResumeAssetRepository(db_session)
+    text = "Python developer"
+    await resumes.create(
+        object_key="k",
+        original_filename="r.docx",
+        extracted_text=text,
+        skills_index={
+            "skills": ["Python"],
+            "claims_index": build_claims_index(text, {"skills": ["Python"]}),
+        },
+        is_active=True,
+    )
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.post(
+                "/api/documents/generate-cover-letter",
+                json={"job_target_id": str(job.id), "force": True},
+            )
+            assert response.status_code == 402, response.text
+            assert "budget" in response.json()["detail"].casefold()
     finally:
         app.dependency_overrides.clear()
 
