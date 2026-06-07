@@ -82,6 +82,31 @@ export interface ColumnMappingPreview {
   required: boolean;
 }
 
+export interface FormFieldObservationRead {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  attempt_id: string;
+  field_key: string;
+  label: string | null;
+  field_type: string | null;
+  required: boolean;
+  options: string[] | null;
+  mapped_profile_field: string | null;
+  proposed_value_redacted: string | null;
+  confidence: number | null;
+  status: FieldObservationStatus;
+  evidence: Record<string, unknown> | null;
+}
+
+export interface FormDiscoveryRead {
+  run_id: string;
+  attempt_id: string;
+  platform: string | null;
+  step_count: number;
+  items: FormFieldObservationRead[];
+}
+
 export interface ImportReportRead {
   import_id: string;
   dry_run: boolean;

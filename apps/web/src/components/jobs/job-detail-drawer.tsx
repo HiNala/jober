@@ -11,6 +11,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
+import { DiscoveredFieldsPanel } from "@/components/jobs/discovered-fields-panel";
 
 export interface JobDetailDrawerProps {
   job: JobTargetRead | null;
@@ -78,6 +79,10 @@ export function JobDetailDrawer({
               rows={4}
               onBlur={(e) => onNotesChange?.(e.target.value)}
             />
+          </div>
+          <div>
+            <h3 className="mb-2 text-sm font-medium">Discovered fields</h3>
+            <DiscoveredFieldsPanel jobTargetId={job.id} platform={job.ats_guess} />
           </div>
         </div>
       </DrawerContent>
