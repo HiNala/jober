@@ -11,7 +11,7 @@ _PREFIX = "jober:batch"
 _DOMAIN_LOCK_TTL_SEC = 3600
 
 
-def _client() -> redis.Redis:
+def _client() -> redis.Redis[str]:
     return redis.Redis.from_url(settings.redis_url, decode_responses=True)
 
 

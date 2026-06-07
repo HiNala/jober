@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,17 +19,29 @@ export function BatchPanel() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const loadPlan = useCallback(async () => {
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const data = await fetchDailyPlan();
+        if (!cancelled) setPlan(data);
+      } catch {
+        if (!cancelled) setPlan(null);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function loadPlan() {
     try {
       setPlan(await fetchDailyPlan());
     } catch {
       setPlan(null);
     }
-  }, []);
-
-  useEffect(() => {
-    void loadPlan();
-  }, [loadPlan]);
+  }
 
   async function startDryRunBatch() {
     setBusy(true);
