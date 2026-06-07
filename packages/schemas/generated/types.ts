@@ -31,6 +31,37 @@ export interface JobTargetRead {
   needs_url?: boolean;
 }
 
+export interface PlatformDetectionRead {
+  platform: string;
+  confidence: number;
+  evidence: string[];
+}
+
+export interface JobProfileRead {
+  title: string;
+  company: string;
+  location?: string | null;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  seniority_signal?: string | null;
+  keywords: string[];
+  fit_score?: number | null;
+  company_product_summary?: string | null;
+}
+
+export interface JobExtractionRead {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  job_target_id: string;
+  platform_detection: PlatformDetectionRead;
+  job_profile: JobProfileRead;
+  cached: boolean;
+  extracted_at: string | null;
+  run_id?: string | null;
+}
+
 export interface ImportWarningRead {
   sheet: string;
   row: number | null;
