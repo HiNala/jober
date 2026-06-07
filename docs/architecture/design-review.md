@@ -628,6 +628,25 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 17 — Application shell v2 (workspace)
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Chrome recedes; canvas + center column are heroes |
+| Kare | 2 | Icon rail, badges, filmstrip thumbnails scan quickly |
+| Norman | 2 | Live dot, Preview badge, Plan/Execute affordances |
+| Nielsen | 2 | ⌘B / ⌘\\ / ⌘/ shortcuts; skip link retained |
+| Tufte | 2 | No chartjunk in shell; counts in nav only |
+| Vignelli | 2 | Three-pane grid with shared tokens |
+| Rand | 1 | Utility workspace, not brand campaign |
+| Maeda | 2 | Calm borders; motion respects reduced-motion |
+| Wroblewski | 2 | Canvas drawer on narrow; 44px targets |
+| Ive | 2 | Resizable panels feel continuous, not bolted on |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 15) — improvements logged
 
 | Change | Why |

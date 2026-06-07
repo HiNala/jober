@@ -109,6 +109,8 @@ Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/setting
 
 **Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts` and `motion.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
 
+**Workspace shell (Mission 17):** three-pane layout in `components/workspace/` — collapsible nav, center work column with command bar, resizable right canvas (browser/doc preview). Layout prefs persist in `localStorage`. Shortcuts: ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas), ⌘/Ctrl-/ (command input).
+
 ## Profile vault (Mission 04)
 
 Upload a canonical resume (PDF/DOCX) and manage tiered profile fields at `/vault`.
