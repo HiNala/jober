@@ -205,6 +205,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 11 — Live Run Console
+
+**Scope:** `/runs/[id]`, SSE stream, scrub timeline, checkpoint card, artifact links.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Screenshot + log + actions; no duplicate controls |
+| Kare | 2 | Terminal lines mirror operator mental model |
+| Norman | 2 | Reconnect + scrub timeline preserve context |
+| Nielsen | 2 | Status badges + attempt count at a glance |
+| Tufte | 2 | Event log is the chart; screenshot is evidence |
+| Vignelli | 2 | Matches drawer/review visual language |
+| Rand | 2 | Amber checkpoint card distinct from failure rose |
+| Maeda | 2 | Empty screenshot state is calm, not broken |
+| Wroblewski | 2 | Two-column console stacks on narrow viewports |
+| Ive | 2 | Monospace log restrained; no fake terminal chrome |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 10 — Failure report & analytics (Job Detail + Dashboard)
 
 **Scope:** `FailureReportPanel`, `FailureAnalyticsPanel`, recovery API, self-assessment timeline.

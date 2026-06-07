@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { CheckCircle2, CircleAlert, FileText, SkipForward } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -99,9 +100,17 @@ export function ReviewSubmitPanel({ jobTargetId, onEditField }: ReviewSubmitPane
     <section className="space-y-4 rounded-lg border border-border/80 bg-card/40 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold">Review &amp; submit</h3>
-        <Badge variant={review.readiness.passed ? "secondary" : "destructive"}>
-          {review.status.replace(/_/g, " ")}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/runs/${review.run_id}`}
+            className="text-xs text-primary underline-offset-4 hover:underline"
+          >
+            Open run console
+          </Link>
+          <Badge variant={review.readiness.passed ? "secondary" : "destructive"}>
+            {review.status.replace(/_/g, " ")}
+          </Badge>
+        </div>
       </div>
 
       <p className="rounded-md bg-muted/50 p-3 text-sm leading-relaxed">{review.human_summary}</p>
