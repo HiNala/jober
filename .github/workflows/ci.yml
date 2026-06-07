@@ -184,7 +184,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
-          pip install "./packages/fill" "./fixtures/ats" "./apps/api[dev]"
+          pip install "./packages/fill" "./packages/verification" "./packages/recovery"
+          pip install "./fixtures/ats" "./apps/worker[dev]" "./apps/api[dev]"
           playwright install chromium
       - name: Alembic migrate
         working-directory: apps/api
@@ -223,7 +224,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
-          pip install "./packages/fill" "./fixtures/ats" "./apps/api[dev]"
+          pip install "./packages/fill" "./packages/verification" "./packages/recovery"
+          pip install "./fixtures/ats" "./apps/api[dev]"
       - name: Alembic migrate
         working-directory: apps/api
         run: alembic upgrade head
