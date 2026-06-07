@@ -166,6 +166,93 @@ async def test_login_fixture_creates_human_checkpoint(db_session, truncate_table
 
 
 @pytest.mark.asyncio
+async def test_captcha_fixture_creates_human_checkpoint(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(
+        company="Bot Check Co",
+        role="Engineer",
+        status=JobTargetStatus.NEW,
+    )
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.post(
+                f"/api/job-targets/{job.id}/extract",
+                json={
+                    "fixture_html": load_ats_fixture("captcha_gate"),
+                    "fixture_url": "https://example.com/apply",
+                    "force": True,
+                },
+            )
+            assert response.status_code == 409, response.text
+            assert response.json()["detail"]["gate"] == "captcha"
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_extract_without_apply_url_returns_422(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(company="No URL Co", role="Eng", status=JobTargetStatus.NEW)
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.post(f"/api/job-targets/{job.id}/extract", json={})
+            assert response.status_code == 422
+            assert "apply url" in response.json()["detail"].casefold()
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_extract_force_bypasses_daily_cache(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(company="Acme", role="Eng", status=JobTargetStatus.NEW)
+    await db_session.commit()
+    base_payload = {
+        "fixture_html": load_ats_fixture("greenhouse"),
+        "fixture_url": "https://boards.greenhouse.io/acme/jobs/1",
+    }
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            first = await client.post(f"/api/job-targets/{job.id}/extract", json=base_payload)
+            assert first.status_code == 200
+            assert first.json()["cached"] is False
+            forced = await client.post(
+                f"/api/job-targets/{job.id}/extract",
+                json={**base_payload, "force": True},
+            )
+            assert forced.status_code == 200
+            assert forced.json()["cached"] is False
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_extract_cache_skips_regeneration(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 

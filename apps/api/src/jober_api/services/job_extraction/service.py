@@ -218,8 +218,13 @@ async def enqueue_browser_extraction(
     from jober_api.services.job_extraction.celery_dispatch import dispatch_extract_job
 
     task_id = dispatch_extract_job(str(run.id), str(job_target_id), url, force)
-    return {
+    payload: dict[str, Any] = {
         "status": "queued",
         "run_id": str(run.id),
         "task_id": task_id,
     }
+    if task_id is None:
+        payload["warning"] = (
+            "Run created but worker task was not enqueued. Start Celery/worker or use fixture_html."
+        )
+    return payload
