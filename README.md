@@ -178,6 +178,19 @@ After fill, run readiness verification, review masked diffs in the job drawer, t
 
 Local install also needs `packages/verification` (`pip install -e packages/verification`).
 
+## Retry & recovery (Mission 10)
+
+Recovery loop enforces attempt budgets (3 normal + 1 alternate), classifies failures, writes self-assessments, and produces actionable failure reports. CAPTCHA/login/2FA never retry automatically.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/job-targets/{id}/recovery-fill` | Fixture recovery loop with budgets |
+| `GET /api/job-targets/{id}/failure-report` | Latest failure report for job drawer |
+| `POST /api/application-runs/{id}/resume` | Resume from last checkpoint |
+| `GET /api/recovery/failure-analytics` | Failure classes by ATS + circuit alerts |
+
+Local install also needs `packages/recovery` (`pip install -e packages/recovery`). Run `make migrate` for Mission 10 schema (`failure_events`, checkpoint columns).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).

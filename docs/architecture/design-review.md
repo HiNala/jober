@@ -205,6 +205,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 10 — Failure report & analytics (Job Detail + Dashboard)
+
+**Scope:** `FailureReportPanel`, `FailureAnalyticsPanel`, recovery API, self-assessment timeline.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Report only when failed; analytics table without chart junk |
+| Kare | 2 | Recommended manual action in plain language |
+| Norman | 2 | Self-assessment shows tried/happened/next per attempt |
+| Nielsen | 2 | Failure class badge + circuit alerts scannable |
+| Tufte | 2 | Counts table; no decorative failure viz |
+| Vignelli | 2 | Rose accent for failures only; matches drawer panels |
+| Rand | 2 | Alert icon signals needs-review without alarm |
+| Maeda | 2 | Analytics hidden when empty |
+| Wroblewski | 2 | Drawer stacks report above review panel |
+| Ive | 2 | Restrained destructive border on report card |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 09) — improvements logged
 
 | Change | Why |
