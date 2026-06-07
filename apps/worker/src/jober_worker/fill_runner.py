@@ -3,32 +3,20 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import UTC, datetime
-from typing import Any, Literal, cast
+from typing import Any
 
 from jober_extraction.gates import GateKind, detect_access_gates
 from jober_fill.runner import FieldFillOutcome, ObservationInput, run_fill_loop
 from jober_forms.scanner import scan_multistep_form
 from sqlalchemy import text
 
+from jober_worker.browser.checkpoints import gate_checkpoint
 from jober_worker.browser.event_writer import persist_browser_event
 from jober_worker.browser.session import browser_session
 from jober_worker.browser.typed_actions import TypedBrowserActions
 from jober_worker.db import get_sync_session
 from jober_worker.fill_context import is_sensitive_observation, load_fill_context
 from jober_worker.storage import ObjectStorage
-
-GateCheckpoint = Literal["login", "captcha", "two_factor"]
-
-
-def _gate_checkpoint(gate: GateKind) -> GateCheckpoint:
-    return cast(
-        GateCheckpoint,
-        {
-            GateKind.LOGIN: "login",
-            GateKind.CAPTCHA: "captcha",
-            GateKind.TWO_FACTOR: "two_factor",
-        }[gate],
-    )
 
 
 def _attempt_keys(run_id: uuid.UUID, attempt_index: int) -> dict[str, str]:
@@ -102,7 +90,7 @@ def run_fixture_form_fill(
         if gates:
             gate = gates[0]
             checkpoint = actions.request_human_checkpoint(
-                _gate_checkpoint(gate),
+                gate_checkpoint(gate),
                 f"Resolve {gate.value} before filling.",
             )
             screenshot = actions.screenshot()
@@ -214,7 +202,7 @@ def run_browser_form_fill(
             if gates:
                 gate = gates[0]
                 checkpoint = actions.request_human_checkpoint(
-                    _gate_checkpoint(gate),
+                    gate_checkpoint(gate),
                     f"Resolve {gate.value} before filling.",
                 )
                 screenshot = actions.screenshot()
@@ -248,7 +236,9 @@ def _fill_with_rescan(
     profile_values: dict[str, Any],
     file_paths: dict[str, str],
 ) -> list[FieldFillOutcome]:
-    outcomes = run_fill_loop(observations, profile_values, file_paths, actions)
+    outcomes: list[FieldFillOutcome] = run_fill_loop(
+        observations, profile_values, file_paths, actions
+    )
     html = actions.content_html()
     new_fields = scan_multistep_form(html)
     if new_fields:

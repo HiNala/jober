@@ -15,7 +15,7 @@ def ping() -> str:
 
 @celery_app.task(name="jober_worker.tasks.extract_job", bind=True)
 def extract_job(
-    self,
+    self: object,
     run_id: str,
     job_target_id: str,
     url: str,
@@ -34,7 +34,7 @@ def extract_job(
 
 @celery_app.task(name="jober_worker.tasks.fill_form", bind=True)
 def fill_form(
-    self,
+    self: object,
     run_id: str,
     job_target_id: str,
     url: str,

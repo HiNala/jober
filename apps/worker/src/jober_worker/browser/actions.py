@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from playwright.sync_api import Page
 
@@ -23,7 +23,14 @@ class BrowserActions:
         self.page = page
         self.observations: list[Observation] = []
 
-    def goto(self, url: str, *, wait_until: str = "domcontentloaded") -> None:
+    def goto(
+        self,
+        url: str,
+        *,
+        wait_until: Literal[
+            "commit", "domcontentloaded", "load", "networkidle"
+        ] = "domcontentloaded",
+    ) -> None:
         self.page.goto(url, wait_until=wait_until)
         self.record_observation("goto", f"Opened {url}", url=url)
 
@@ -49,8 +56,9 @@ class BrowserActions:
               label: el.getAttribute('aria-label'),
             }))"""
         )
-        self.record_observation("extract_form_controls", f"Found {len(controls)} controls")
-        return controls
+        typed_controls = cast(list[dict[str, Any]], controls)
+        self.record_observation("extract_form_controls", f"Found {len(typed_controls)} controls")
+        return typed_controls
 
     def screenshot(self) -> bytes:
         data = self.page.screenshot(full_page=True)

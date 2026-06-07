@@ -52,8 +52,12 @@ packages = ["jober_worker"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*", "jober_fill.*", "jober_forms.*", "jober_extraction.*", "playwright.*"]
+module = ["celery", "celery.*", "jober_forms.*", "jober_extraction.*", "playwright.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "jober_worker.tasks"
+disable_error_code = ["untyped-decorator"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -10,6 +10,7 @@ from jober_extraction.gates import GateKind, detect_access_gates
 from jober_extraction.intelligence import build_job_profile
 from jober_extraction.platform import detect_platform
 
+from jober_worker.browser.checkpoints import gate_checkpoint
 from jober_worker.browser.session import browser_session
 from jober_worker.db import get_sync_session
 from jober_worker.storage import ObjectStorage
@@ -49,11 +50,7 @@ def run_browser_extraction(
         if gates:
             gate = gates[0]
             checkpoint = actions.request_human_checkpoint(
-                {
-                    GateKind.LOGIN: "login",
-                    GateKind.CAPTCHA: "captcha",
-                    GateKind.TWO_FACTOR: "two_factor",
-                }[gate],
+                gate_checkpoint(gate),
                 f"Resolve {gate.value} before continuing.",
             )
             screenshot = actions.screenshot()

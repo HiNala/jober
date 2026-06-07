@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
 
@@ -43,7 +43,7 @@ def browser_session(
         )
         video_dir.mkdir(parents=True, exist_ok=True)
         context = browser.new_context(
-            storage_state=storage_state,
+            storage_state=cast(Any, storage_state),
             record_video_dir=str(video_dir),
         )
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
