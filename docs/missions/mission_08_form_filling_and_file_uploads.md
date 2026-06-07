@@ -23,3 +23,4 @@
 
 ## Iteration clause
 - [x] Fill diff object (`proposed_redacted` / `actual_redacted`) stored per field in `evidence.fill_diff`
+- [x] Mission 99: worker mypy/ruff green; lazy file locators; psycopg URL fix; sensitive + diff API tests

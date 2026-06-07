@@ -205,6 +205,40 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 08 — Form filling & file uploads (API + worker)
+
+**Scope:** `POST /fill-form`, typed Playwright actions, fill diff evidence, MinIO uploads, sensitive/login/CAPTCHA checkpoints. No new web UI (drawer shows existing `fill_diff` column from M07).
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Label-first locators; redacted diff only in API evidence |
+| Kare | 2 | Sensitive fields stop with human checkpoint, not silent skip |
+| Norman | 2 | 409 gates for login/CAPTCHA/sensitive; per-field failed status |
+| Nielsen | 2 | `fill_diff.matched` + locator strategy aid post-fill review |
+| Tufte | 2 | Masked proposed/actual; no raw vault bytes in events |
+| Vignelli | 2 | Reuses observation schema + discovery statuses |
+| Rand | 1 | Backend mission; UI polish deferred to review-and-submit |
+| Maeda | 2 | Sandbox AST allowlist — smallest safe executor surface |
+| Wroblewski | 1 | API/worker only; mobile N/A |
+| Ive | 2 | Screenshot keys per fill event; dropzone fallback deliberate |
+
+**Total: 18/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 08) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Worker `db.py` strips `?ssl=disable` for psycopg | API tests use asyncpg URL; sync worker engine crashed on invalid `ssl` option |
+| Lazy resolver chain in `resolve_file_input` | Tuple eager-eval called `#Upload resume (PDF)` before label match — dropzone upload fixture failed |
+| `upload_file(..., field_key=)` + safe `#id` selectors | Label text is not a valid CSS id; resume upload now uses observation `field_key` |
+| `test_fill_diff.py` + `test_form_fill_sensitive.py` | Fixture-for-bug: masked diff shape + EEO 409 checkpoint |
+| Worker `gate_checkpoint` module + mypy clean | Quality gate regression from M08 browser split |
+| `packages/fill/py.typed` | Typed consumer path for worker + API thread offload |
+
+---
+
 ## Mission 07 — Discovered fields panel (job detail drawer)
 
 | Criterion | Score | Notes |
