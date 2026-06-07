@@ -27,4 +27,6 @@
 - [x] Confirmed label recoveries persist to `FieldMappingMemory`
 - [x] Circuit breaker no double-record on final report
 - [x] Web `recovery.test.ts` + job-target failure-report API test
-- [x] Gates green (90 API, 5 recovery pkg, web lint/typecheck/build)
+- [x] CAPTCHA/login-class failures → `needs_human` (no retry burn)
+- [x] Failure report panel: attempt count + safe-to-retry badge
+- [x] Gates green; pushed to `origin/main`

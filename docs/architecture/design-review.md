@@ -235,6 +235,9 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `recovery.test.ts` 404 → null | Job drawer failure panel without throwing on clean jobs |
 | Job-target `GET /failure-report` acceptance test | Drawer uses job id, not run id |
 | Selector recovery asserts memory lookup | Fixture-for-bug: label strategy must persist mapping |
+| CAPTCHA → `needs_human` in one attempt | Policy: human-only failures must not burn retry budget |
+| Failure report panel shows retry badge | Weakest UI surface lacked safe-to-retry signal |
+| `test_captcha_failure_needs_human_without_retry_burn` | Fixture-for-bug: simulate_failure_class policy gate |
 
 ---
 
