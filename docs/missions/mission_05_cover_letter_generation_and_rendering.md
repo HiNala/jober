@@ -14,11 +14,10 @@
 - [x] Documents API integration test (generate + PDF download route)
 - [x] Prompt pack policy tests (job-page untrusted section)
 - [x] Document Studio: resume gate + word count display
-
-## Iteration (Mission 99)
-- [x] Explain panel maps `paragraph_grounding` → resume facts + job keywords
-- [x] Template LLM only asserts resume-backed skills (claims guard CI-safe)
-- [x] Shared TS types export `cover_letter_hook` / `why_fit`
+- [x] Budget exceeded API test (HTTP 402 fixture)
+- [x] `formatApiError` — clear toasts for budget cap / claims guard / missing resume
+- [x] `.env.example` LLM vars aligned with `Settings` field names
+- [x] Full gates green: ruff, mypy, pytest (45+), web lint/typecheck/build, detect-secrets
 
 ## API
 | Method | Path | Purpose |

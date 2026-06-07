@@ -193,6 +193,8 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Explain panel surfaces `paragraph_grounding` | Iteration clause — trust letter before submit |
 | `test_documents_api` + `test_prompt_pack` | Route + untrusted job-page policy regressions blocked |
 | Document Studio resume gate + word count | Clearer path when vault is empty |
+| `formatApiError` + budget 402 API test | Generic "API 402" toasts were the weakest UX surface |
+| `.env.example` LLM var names match `Settings` | Cold-start contributors had stale `LLM_DEFAULT_MODEL` |
 
 ---
 

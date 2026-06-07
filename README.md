@@ -128,7 +128,7 @@ Generate grounded cover letters at `/documents` (Document Studio).
 | `GET /api/documents/{id}/download/pdf` | Download rendered PDF |
 | `GET /api/documents/{id}/download/docx` | Download DOCX (optional) |
 
-Without `LLM_API_KEY`, the API uses a deterministic template provider (CI-safe). Set `LLM_MONTHLY_BUDGET_USD` to cap spend; calls log to `LlmCall`.
+Without `LLM_API_KEY`, the API uses a deterministic template provider (CI-safe). Optional env vars: `LLM_PROVIDER`, `LLM_BASE_URL`, `LLM_DRAFT_MODEL`, `LLM_SCORING_MODEL`, `LLM_MONTHLY_BUDGET_USD` (default $25). Calls log to `LlmCall`; exceeding the monthly cap returns HTTP 402.
 
 ## Job spreadsheet import (Mission 03)
 
