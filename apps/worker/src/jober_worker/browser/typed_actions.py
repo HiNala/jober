@@ -128,12 +128,16 @@ class TypedBrowserActions(BrowserActions):
         self._emit("check_by_label", f"Checked {label!r}={checked}", selector=resolved.selector)
         return resolved.strategy, str(checked)
 
-    def upload_file(self, control: str, file_path: str) -> tuple[str, str | None]:
+    def upload_file(
+        self, control: str, file_path: str, *, field_key: str | None = None
+    ) -> tuple[str, str | None]:
         path = Path(file_path)
         if not path.exists():
             msg = f"Upload file missing: {file_path}"
             raise FileNotFoundError(msg)
-        resolved = resolve_file_input(self.page, control=control, field_key=control)
+        resolved = resolve_file_input(
+            self.page, control=control, field_key=field_key or control
+        )
         resolved.locator.set_input_files(str(path))
         self._emit(
             "upload_file",

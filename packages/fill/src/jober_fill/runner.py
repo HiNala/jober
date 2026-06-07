@@ -10,7 +10,9 @@ class FillActions(Protocol):
     def fill_by_label(self, label: str, value: str) -> tuple[str, str | None]: ...
     def select_by_label(self, label: str, value: str) -> tuple[str, str | None]: ...
     def check_by_label(self, label: str, *, checked: bool = True) -> tuple[str, str | None]: ...
-    def upload_file(self, control: str, file_path: str) -> tuple[str, str | None]: ...
+    def upload_file(
+        self, control: str, file_path: str, *, field_key: str | None = None
+    ) -> tuple[str, str | None]: ...
     def read_value_by_label(self, label: str) -> str | None: ...
 
 
@@ -90,7 +92,7 @@ def run_fill_loop(
                 continue
             control = obs.label or obs.field_key
             try:
-                strategy, _ = actions.upload_file(control, path)
+                strategy, _ = actions.upload_file(control, path, field_key=obs.field_key)
                 actual = actions.read_value_by_label(control) if obs.label else None
                 diff = build_fill_diff(
                     proposed="[file upload]",

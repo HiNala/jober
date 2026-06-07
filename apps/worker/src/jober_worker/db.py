@@ -10,8 +10,11 @@ from jober_worker.config import settings
 
 
 def _sync_database_url() -> str:
-    url = settings.database_url
-    return url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
+    url = settings.database_url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
+    # psycopg does not accept asyncpg's `ssl=disable` query param
+    if "?ssl=disable" in url:
+        url = url.replace("?ssl=disable", "")
+    return url
 
 
 _engine = create_engine(_sync_database_url(), pool_pre_ping=True)

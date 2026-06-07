@@ -39,7 +39,10 @@ def resolve_by_role(
     *,
     name: str | None = None,
 ) -> ResolvedLocator | None:
-    loc = page.get_by_role(cast(Any, role), name=name) if name else page.get_by_role(cast(Any, role))
+    if name:
+        loc = page.get_by_role(cast(Any, role), name=name)
+    else:
+        loc = page.get_by_role(cast(Any, role))
     chosen = _first_visible(loc)
     if chosen is not None:
         return ResolvedLocator("role", f'role={role} name={name!r}', chosen)
@@ -60,12 +63,15 @@ def resolve_by_stable_attrs(
     field_key: str,
     label: str | None,
 ) -> ResolvedLocator | None:
-    for selector in (
+    selectors = [
         f'[name="{field_key}"]',
-        f'#{field_key}',
         f'[data-testid="{field_key}"]',
         f'[id="{field_key}"]',
-    ):
+    ]
+    id_selector = _safe_field_key_selector(field_key)
+    if id_selector:
+        selectors.insert(1, id_selector)
+    for selector in selectors:
         loc = page.locator(selector)
         chosen = _first_visible(loc)
         if chosen is not None:
@@ -92,23 +98,28 @@ def resolve_field_locator(
         if resolved:
             return resolved
     if label:
-        for resolver in (
-            lambda: resolve_by_label(page, label),
-            lambda: resolve_by_placeholder(page, label),
-            lambda: resolve_by_role(
-                page,
-                "textbox" if ftype in ("text", "email", "tel", "url") else ftype,
-                name=label,
-            ),
-        ):
-            resolved = resolver()
-            if resolved:
-                return resolved
+        resolved = resolve_by_label(page, label)
+        if resolved:
+            return resolved
+        resolved = resolve_by_placeholder(page, label)
+        if resolved:
+            return resolved
+        role_name = "textbox" if ftype in ("text", "email", "tel", "url") else ftype
+        resolved = resolve_by_role(page, role_name, name=label)
+        if resolved:
+            return resolved
     resolved = resolve_by_stable_attrs(page, field_key=field_key, label=label)
     if resolved:
         return resolved
     msg = f"Could not resolve locator for {label or field_key}"
     raise ValueError(msg)
+
+
+def _safe_field_key_selector(field_key: str) -> str | None:
+    """Return a `#id` selector only when field_key is a valid HTML id token."""
+    if field_key.isidentifier():
+        return f"#{field_key}"
+    return None
 
 
 def resolve_file_input(
@@ -117,12 +128,13 @@ def resolve_file_input(
     control: str,
     field_key: str,
 ) -> ResolvedLocator:
-    for resolver in (
+    resolvers = (
         lambda: resolve_by_label(page, control),
         lambda: resolve_by_role(page, "button", name=control),
         lambda: resolve_by_stable_attrs(page, field_key=field_key, label=control),
-    ):
-        resolved = resolver()
+    )
+    for resolve in resolvers:
+        resolved = resolve()
         if resolved:
             input_loc = resolved.locator.locator('input[type="file"]')
             if input_loc.count() > 0:
