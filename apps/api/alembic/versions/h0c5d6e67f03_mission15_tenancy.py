@@ -19,6 +19,9 @@ depends_on: str | Sequence[str] | None = None
 
 DEFAULT_TENANT_ID = "00000000-0000-4000-8000-000000000001"
 DEFAULT_USER_ID = "00000000-0000-4000-8000-000000000002"
+DEFAULT_TENANT_POLICY = (
+    '{"default_run_policy":"review_before_submit","auto_submit_opt_in":false}'
+)
 
 
 def upgrade() -> None:
@@ -69,12 +72,10 @@ def upgrade() -> None:
         sa.text(
             """
             INSERT INTO tenants (id, name, plan, policy, created_at, updated_at)
-            VALUES (CAST(:tid AS uuid), 'Local Dev', 'pro',
-                    '{"default_run_policy":"review_before_submit","auto_submit_opt_in":false}',
-                    now(), now())
+            VALUES (CAST(:tid AS uuid), 'Local Dev', 'pro', CAST(:policy AS jsonb), now(), now())
             ON CONFLICT (id) DO NOTHING
             """
-        ).bindparams(tid=DEFAULT_TENANT_ID)
+        ).bindparams(tid=DEFAULT_TENANT_ID, policy=DEFAULT_TENANT_POLICY)
     )
 
     for table in (
