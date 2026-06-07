@@ -165,6 +165,37 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 05 — Document Studio (cover letters)
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Job picker + letter + metrics; no decorative chrome |
+| Kare | 2 | Explain panel builds trust before submit |
+| Norman | 2 | Generate vs regenerate; lock edits; download affordances |
+| Nielsen | 2 | ATS meter + present/missing keywords at a glance |
+| Tufte | 2 | Coverage chips encode state without chart junk |
+| Vignelli | 2 | Sidebar + main column grid matches queue/vault |
+| Rand | 2 | Sparkles icon signals agent without mascot noise |
+| Maeda | 2 | Explain panel is the only “extra” — justified |
+| Wroblewski | 2 | Stacks on narrow viewports; primary content first |
+| Ive | 2 | Restrained badges; monospace letter for edit clarity |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 05) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Template LLM asserts only resume-backed skills | Claims guard passes in CI without API key |
+| `JobTargetRead` exports `cover_letter_hook` + `why_fit` | Document Studio job sidebar types align |
+| Explain panel surfaces `paragraph_grounding` | Iteration clause — trust letter before submit |
+| `test_documents_api` + `test_prompt_pack` | Route + untrusted job-page policy regressions blocked |
+| Document Studio resume gate + word count | Clearer path when vault is empty |
+
+---
+
 ## Mission 99 (post–Mission 04) — improvements logged
 
 | Change | Why |

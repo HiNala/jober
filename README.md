@@ -117,6 +117,19 @@ Set `VAULT_ENCRYPTION_KEY` before storing sensitive EEO answers. Sensitive field
 
 After pulling Mission 04+, run `make migrate` once (adds `profile_common_answers`, `current_title`, `notice_period`).
 
+## Cover letters (Mission 05)
+
+Generate grounded cover letters at `/documents` (Document Studio).
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/documents/generate-cover-letter` | Draft letter + ATS score + PDF/DOCX keys |
+| `GET /api/documents?job_target_id=` | List generated documents for a job |
+| `GET /api/documents/{id}/download/pdf` | Download rendered PDF |
+| `GET /api/documents/{id}/download/docx` | Download DOCX (optional) |
+
+Without `LLM_API_KEY`, the API uses a deterministic template provider (CI-safe). Set `LLM_MONTHLY_BUDGET_USD` to cap spend; calls log to `LlmCall`.
+
 ## Job spreadsheet import (Mission 03)
 
 Import Brian's tracker workbook into Postgres and round-trip status back to XLSX.
