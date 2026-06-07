@@ -29,6 +29,7 @@ dependencies = [
     "jober-forms",
     "jober-fill",
     "jober-verify",
+    "jober-recover",
 ]
 
 [tool.hatch.metadata]

@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from jober_api.db.base import Base
@@ -40,6 +40,8 @@ class ApplicationAttempt(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     final_screenshot_object_key: Mapped[str | None] = mapped_column(String(512))
     dom_snapshot_object_key: Mapped[str | None] = mapped_column(String(512))
     error_summary: Mapped[str | None] = mapped_column(Text)
+    failure_class: Mapped[str | None] = mapped_column(String(64))
+    self_assessment: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
     run: Mapped["ApplicationRun"] = relationship(back_populates="attempts")
     browser_events: Mapped[list["BrowserEvent"]] = relationship(back_populates="attempt")
