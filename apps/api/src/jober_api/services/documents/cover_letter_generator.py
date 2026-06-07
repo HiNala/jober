@@ -105,14 +105,15 @@ async def generate_cover_letter(
         angles = await angle_repo.list_all(limit=1)
         angle = angles[0] if angles else None
 
+    extracted_desc, extracted_reqs, extracted_summary = _extraction_context(job)
     ctx = GenerationContext(
         job=job,
         resume=resume,
         profile=profile,
         angle=angle,
-        job_description=job_description or _fallback_job_description(job),
-        job_requirements=job_requirements,
-        company_summary=company_summary,
+        job_description=job_description or extracted_desc or _fallback_job_description(job),
+        job_requirements=job_requirements or extracted_reqs,
+        company_summary=company_summary or extracted_summary,
         resume_variant=variant,
         voice_notes="direct, founder/operator, product-minded, technically credible",
     )
@@ -220,6 +221,21 @@ async def generate_cover_letter(
     await session.flush()
     await session.refresh(row)
     return _serialize_document(row, cached=False)
+
+
+def _extraction_context(job: JobTarget) -> tuple[str, str, str]:
+    raw = job.extracted_job_profile
+    if not isinstance(raw, dict):
+        return "", "", ""
+    description = str(raw.get("description") or "")
+    requirements_list = raw.get("requirements")
+    requirements = (
+        "\n".join(str(r) for r in requirements_list)
+        if isinstance(requirements_list, list)
+        else ""
+    )
+    summary = str(raw.get("company_product_summary") or "")
+    return description, requirements, summary
 
 
 def _fallback_job_description(job: JobTarget) -> str:

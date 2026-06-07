@@ -24,7 +24,12 @@ dependencies = [
     "pypdf>=5.1.0",
     "python-docx>=1.1.2",
     "reportlab>=4.2.5",
+    "jober-schemas",
+    "jober-extraction",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [project.optional-dependencies]
 dev = [
@@ -58,7 +63,17 @@ packages = ["jober_api"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["minio.*", "openpyxl.*", "pypdf.*", "docx.*", "reportlab.*"]
+module = [
+    "minio.*",
+    "openpyxl.*",
+    "pypdf.*",
+    "docx.*",
+    "reportlab.*",
+    "jober_extraction.*",
+    "jober_schemas.*",
+    "celery",
+    "celery.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

@@ -1,7 +1,8 @@
-from datetime import date
-from typing import TYPE_CHECKING
+from datetime import date, datetime
+from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Date, Index, Integer, String, Text
+from sqlalchemy import Date, DateTime, Index, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from jober_api.db.base import Base
@@ -41,6 +42,10 @@ class JobTarget(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     follow_up_date: Mapped[date | None] = mapped_column(Date)
     notes: Mapped[str | None] = mapped_column(Text)
     import_id: Mapped[str | None] = mapped_column(String(128))
+    extracted_job_profile: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    platform_detection: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    job_profile_extracted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    job_profile_cache_date: Mapped[date | None] = mapped_column(Date)
 
     application_runs: Mapped[list["ApplicationRun"]] = relationship(back_populates="job_target")
     generated_documents: Mapped[list["GeneratedDocument"]] = relationship(
