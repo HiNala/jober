@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { DiscoveredFieldsPanel } from "@/components/jobs/discovered-fields-panel";
+import { FailureReportPanel } from "@/components/jobs/failure-report-panel";
 import { ReviewSubmitPanel } from "@/components/jobs/review-submit-panel";
 
 export interface JobDetailDrawerProps {
@@ -81,6 +82,7 @@ export function JobDetailDrawer({
               onBlur={(e) => onNotesChange?.(e.target.value)}
             />
           </div>
+          <FailureReportPanel jobTargetId={job.id} />
           <ReviewSubmitPanel
             jobTargetId={job.id}
             onEditField={() => {

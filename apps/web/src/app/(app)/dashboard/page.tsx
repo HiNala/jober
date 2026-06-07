@@ -1,4 +1,5 @@
 import { EventStream } from "@/components/dashboard/event-stream";
+import { FailureAnalyticsPanel } from "@/components/dashboard/failure-analytics";
 import { MetricCards } from "@/components/dashboard/metric-cards";
 import { WorkerStatusPanel } from "@/components/dashboard/worker-status";
 
@@ -7,8 +8,9 @@ export default function DashboardPage() {
     <div className="space-y-6 p-4 md:p-6">
       <MetricCards />
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="space-y-4 lg:col-span-2">
           <EventStream />
+          <FailureAnalyticsPanel />
         </div>
         <WorkerStatusPanel />
       </div>
