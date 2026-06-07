@@ -9,6 +9,11 @@ from jober_schemas.enums import (
     RunPolicy,
     RunStatus,
 )
+from jober_schemas.form_field import (
+    FormDiscoveryRead,
+    FormFieldObservationRead,
+    FormFieldObservationUpdate,
+)
 from jober_schemas.job_profile import JobExtractionRead, JobProfileRead, PlatformDetectionRead
 from jober_schemas.job_target import JobTargetCreate, JobTargetRead, JobTargetUpdate
 from jober_schemas.user_profile import UserProfileCreate, UserProfileRead
@@ -21,6 +26,9 @@ __all__ = [
     "CheckpointType",
     "DocumentType",
     "FieldObservationStatus",
+    "FormDiscoveryRead",
+    "FormFieldObservationRead",
+    "FormFieldObservationUpdate",
     "JobExtractionRead",
     "JobProfileRead",
     "JobTargetCreate",
