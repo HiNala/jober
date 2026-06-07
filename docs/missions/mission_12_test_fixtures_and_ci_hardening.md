@@ -32,6 +32,12 @@
 - [x] `docs/architecture/testing.md` — pyramid, fixtures, "fixture for every bug" rule
 
 ## Mission 99 (post–Mission 12)
-- [x] Re-read acceptance criteria; close gaps (legacy ATS loader paths, API `items` key)
-- [x] Run all quality gates — 130 API + 19 worker + 23 fixture tests; 74% coverage
-- [x] Update checkboxes; ready for push to `origin/main`
+- [x] Finish leftovers — behavior-gate + injection fixtures now asserted via fixture server URL
+- [x] Gates green — ruff, mypy, pytest (133 api / 19 worker / 31 fixture+packages), web lint/typecheck/build/test
+- [x] No regressions — full suite green
+- [x] Policy holds — 30 blocking `pytest -m policy` tests pass
+- [x] Secrets clean — `detect-secrets` baseline passes
+- [x] Design Council — 19/20 recorded in `design-review.md`
+- [x] Self-improvement — `test_behavior_gate_fixture_verify_via_server` + `test_injection_fixture_server_treats_page_text_as_data`
+- [x] Docs current — `testing.md`, README Makefile targets
+- [x] Pushed to `origin/main`

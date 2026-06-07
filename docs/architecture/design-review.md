@@ -433,3 +433,13 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 **Total: 19/20** — passes gate.
 
 **Follow-ups:** add browser worker E2E that asserts DB state per fixture when worker fill path stabilizes.
+
+---
+
+## Mission 99 (post–Mission 12) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `test_behavior_gate_fixture_verify_via_server` | already-applied + uncertain-confirmation were only tested via legacy file loaders, not the HTTP fixture server CI uses |
+| `test_injection_fixture_server_treats_page_text_as_data` | injection policy now asserted end-to-end against served `security/injection` route |
+| Pushed 3 Mission 12 commits + M99 fix to `origin/main` | Mission boundary hygiene — remote was 3 commits behind |
