@@ -205,6 +205,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 09 — Review-and-submit panel (Job Detail drawer)
+
+**Scope:** `ReviewSubmitPanel`, readiness report, masked fill diff table, human summary, Submit / Edit / Skip.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One panel; summary + diff + checks before a single Submit |
+| Kare | 2 | Plain-language summary; disabled submit when readiness fails |
+| Norman | 2 | Edit scrolls to fields; Skip without mystery |
+| Nielsen | 2 | Checklist + diff scannable in one glance |
+| Tufte | 2 | Masked values only; no raw vault in UI |
+| Vignelli | 2 | Matches discovered-fields table primitives |
+| Rand | 2 | Review badge + policy line reinforce human gate |
+| Maeda | 2 | Panel hidden until a run awaits review |
+| Wroblewski | 2 | Stacks on narrow drawer; horizontal diff scroll |
+| Ive | 2 | Restrained success toasts; no celebratory noise |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 08 — Form filling & file uploads (API + worker)
 
 **Scope:** `POST /fill-form`, typed Playwright actions, fill diff evidence, MinIO uploads, sensitive/login/CAPTCHA checkpoints. No new web UI (drawer shows existing `fill_diff` column from M07).

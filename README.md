@@ -165,6 +165,19 @@ Each filled field stores a masked `fill_diff` (`proposed_redacted` vs `actual_re
 
 Local install also needs `packages/fill` and Playwright Chromium (`playwright install chromium`).
 
+## Review & submit (Mission 09)
+
+After fill, run readiness verification, review masked diffs in the job drawer, then submit manually. Default policy is `review_before_submit`; `auto_submit` requires explicit per-batch opt-in and is never the global default.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/job-targets/{id}/verify-ready` | Readiness checks → `review_and_submit` on pass |
+| `GET /api/job-targets/{id}/review` | Human summary, fill diff, readiness report |
+| `POST /api/application-runs/{id}/submit` | Human submit + confirmation capture |
+| `POST /api/application-runs/{id}/skip-submit` | Skip without submitting |
+
+Local install also needs `packages/verification` (`pip install -e packages/verification`).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).
