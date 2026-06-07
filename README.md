@@ -209,6 +209,25 @@ Watch runs in the web console at `/runs/{run_id}` or the interactive terminal vi
 
 Run `make migrate` for Mission 11 (`run_events` table). Install TUI: `pip install -e apps/tui`.
 
+## Batch ops & scheduling (Mission 13)
+
+Queue batches of applications with Redis-backed pacing: global pause/resume, per-domain locks (never parallel applies to the same ATS host), site cooldowns, quiet hours, and monthly LLM budget hard-stop.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/batches/preview` | Filter jobs; excludes already-applied and prior successful runs |
+| `POST /api/batches` | Create batch (`dry_run` / `review_before_submit` / `auto_submit`) |
+| `POST /api/batches/{id}/enqueue` | Start batch (respects quiet hours for non-dry-run) |
+| `POST /api/queue/pause-all` / `resume-all` | Global queue control |
+| `GET /api/dashboard/summary` | Live metrics + worker capacity |
+| `GET /api/batches/daily-plan` | Proposed Priority-A plan + pacing note |
+
+**Dashboard:** `/dashboard` shows live metrics, worker pool capacity, and batch controls (dry-run enqueue, pause/resume).
+
+`auto_submit` is never the default; set `AUTO_SUBMIT_OPT_IN=true` only when you explicitly want opt-in auto-submit batches. Worker image installs `jober-api` alongside shared packages so Celery beat can run the batch orchestrator.
+
+After pulling Mission 13+, run `make migrate` once (adds `application_batches`, `batch_items`).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).

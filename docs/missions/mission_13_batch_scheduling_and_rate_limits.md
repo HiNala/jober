@@ -39,4 +39,4 @@
 - [x] Pause/resume API + dashboard wiring
 
 ## Mission 99
-- [ ] Run full gates; push to `origin/main`
+- [x] Run full gates; push to `origin/main`

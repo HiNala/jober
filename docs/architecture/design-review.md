@@ -446,3 +446,36 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `RunEvent` index aligned with migration (`ix_run_events_run_id_seq`) | CI migrate-check was failing on model vs migration drift |
 | `PLAYWRIGHT_HEADED=false` in CI + headless fixture browser tests | Playwright fill tests launched headed browsers on Linux runners without X11 |
 | Policy CI job provisions MinIO + full package install | Gate/fill policy tests upload screenshot artifacts; job was missing `jober-recover` and MinIO |
+
+---
+
+## Mission 13 — Batch ops, scheduling & rate limits (2026-06-07)
+
+**Scope:** Batch API + Redis queue control, Celery orchestrator, dashboard batch panel, daily plan.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Default concurrency 1; dry-run first; pause-all one click |
+| Kare | 2 | Daily plan summary + pacing note explain server-friendliness |
+| Norman | 2 | Pause/resume feedback; worker capacity bar; dry-run labeled |
+| Nielsen | 2 | Dashboard groups metrics, worker pool, batch control |
+| Tufte | 2 | Metric cards show queue depth / active runs without chart junk |
+| Vignelli | 2 | Reuses card + button primitives from Mission 02 shell |
+| Rand | 2 | “Batch control” panel distinct but cohesive with dashboard |
+| Maeda | 2 | Global pause vs per-batch pause separated in API |
+| Wroblewski | 2 | Batch actions wrap on narrow viewports |
+| Ive | 2 | Redis domain lock + cooldown feel deliberate, not bolted on |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 13) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `redis.Redis[str]` typing in `redis_control.py` | CI mypy strict gate failed on bare generic |
+| `batch-panel.tsx` inline fetch effect | `react-hooks/set-state-in-effect` strict lint failure |
+| Worker Dockerfile installs `jober-api` + packages | `batch_runner` imports API models/services; container would fail at import |
+| `test_orchestrator_defers_when_domain_locked` | Redis lock unit test did not cover orchestrator defer path (runs when `jober-worker` is installed, as in CI) |
+| README + `.env.example` batch env vars | Cold-start path for Mission 13 pacing knobs |

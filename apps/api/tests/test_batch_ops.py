@@ -8,7 +8,15 @@ from httpx import ASGITransport, AsyncClient
 
 from jober_api.config import settings
 from jober_api.main import app
-from jober_api.models.enums import JobTargetStatus, RunStatus
+from jober_api.models.application_batch import ApplicationBatch
+from jober_api.models.batch_item import BatchItem
+from jober_api.models.enums import (
+    BatchItemStatus,
+    BatchStatus,
+    JobTargetStatus,
+    RunPolicy,
+    RunStatus,
+)
 from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.services.batch import redis_control
@@ -78,6 +86,48 @@ def test_domain_lock_serializes_same_domain() -> None:
     assert not redis_control.try_acquire_domain_lock("boards.greenhouse.io", "item-b")
     redis_control.release_domain_lock("boards.greenhouse.io", "item-a")
     assert redis_control.try_acquire_domain_lock("boards.greenhouse.io", "item-b")
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_defers_when_domain_locked(db_session, truncate_tables) -> None:
+    pytest.importorskip("jober_worker.batch_orchestrator")
+    from jober_worker.batch_orchestrator import run_orchestrator_tick
+
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(
+        company="Lock Co",
+        role="Eng",
+        status=JobTargetStatus.NEW,
+        priority="A",
+        direct_apply_url="https://boards.greenhouse.io/acme/jobs/1",
+    )
+    batch = ApplicationBatch(
+        name="domain-lock test",
+        status=BatchStatus.RUNNING,
+        policy=RunPolicy.DRY_RUN,
+        filters={},
+    )
+    db_session.add(batch)
+    await db_session.flush()
+    db_session.add(
+        BatchItem(
+            batch_id=batch.id,
+            job_target_id=job.id,
+            sort_order=0,
+            status=BatchItemStatus.PENDING,
+            domain="boards.greenhouse.io",
+        )
+    )
+    await db_session.commit()
+
+    assert redis_control.try_acquire_domain_lock("boards.greenhouse.io", "other-run")
+    try:
+        result = run_orchestrator_tick()
+        assert result["status"] == "domain_locked"
+        assert result["domain"] == "boards.greenhouse.io"
+        assert result["holder"] == "other-run"
+    finally:
+        redis_control.release_domain_lock("boards.greenhouse.io", "other-run")
 
 
 def test_cooldown_records_spacing() -> None:
