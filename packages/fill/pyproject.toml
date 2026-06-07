@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jober-fill"
+version = "0.1.0"
+description = "Jober form fill — fill diff, sandbox, fill loop"
+requires-python = ">=3.12"
+dependencies = [
+    "jober-forms",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jober_fill"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
