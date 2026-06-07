@@ -24,13 +24,29 @@ class BrowserSession:
     video_dir: Path | None
 
 
+def _load_encrypted_storage_state(run_id: uuid.UUID) -> dict[str, Any] | None:
+    """Restore per-run Playwright storage state (encrypted at rest). Never shared across runs."""
+    import asyncio
+
+    from jober_api.privacy.browser_state import load_run_storage_state
+
+    try:
+        state = asyncio.run(load_run_storage_state(run_id))
+        return state if isinstance(state, dict) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 @contextmanager
 def browser_session(
     *,
     run_id: uuid.UUID,
     attempt_index: int,
     storage_state: dict[str, Any] | None = None,
+    restore_run_state: bool = True,
 ) -> Iterator[BrowserSession]:
+    if storage_state is None and restore_run_state:
+        storage_state = _load_encrypted_storage_state(run_id)
     artifacts = Path("/tmp/jober-artifacts") / str(run_id) / str(attempt_index)
     artifacts.mkdir(parents=True, exist_ok=True)
     trace_path = artifacts / "trace.zip"

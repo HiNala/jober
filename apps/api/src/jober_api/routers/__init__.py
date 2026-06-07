@@ -8,6 +8,7 @@ from jober_api.routers.form_fill import router as form_fill_router
 from jober_api.routers.imports import router as imports_router
 from jober_api.routers.job_extraction import router as job_extraction_router
 from jober_api.routers.job_targets import router as job_targets_router
+from jober_api.routers.privacy import router as privacy_router
 from jober_api.routers.profile import router as profile_router
 from jober_api.routers.recovery import router as recovery_router
 from jober_api.routers.resumes import router as resumes_router
@@ -28,3 +29,4 @@ api_router.include_router(verification_router)
 api_router.include_router(recovery_router)
 api_router.include_router(run_console_router)
 api_router.include_router(batches_router)
+api_router.include_router(privacy_router)

@@ -27,3 +27,11 @@ def run_attempt_screenshot_key(run_id: uuid.UUID, attempt_index: int) -> str:
 
 def run_attempt_dom_key(run_id: uuid.UUID, attempt_index: int) -> str:
     return f"runs/{run_id}/attempts/{attempt_index}/dom.json"
+
+
+def run_storage_state_key(run_id: uuid.UUID) -> str:
+    return f"runs/{run_id}/storage-state.enc"
+
+
+def run_prefix(run_id: uuid.UUID) -> str:
+    return f"runs/{run_id}/"

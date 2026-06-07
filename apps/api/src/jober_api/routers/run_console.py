@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import AsyncIterator
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
@@ -10,9 +11,11 @@ from jober_schemas.run_console import (
     CheckpointResolveRequest,
     RunConsoleSnapshotRead,
 )
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.db.session import async_session_factory, get_session
+from jober_api.privacy.browser_state import save_run_storage_state
 from jober_api.services.console.service import (
     get_console_snapshot,
     get_recent_events,
@@ -101,3 +104,18 @@ async def resolve_run_checkpoint(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(exc),
         ) from exc
+
+
+class BrowserStorageStateRequest(BaseModel):
+    """Playwright storage state after human login — encrypted at rest, never plaintext in DB."""
+
+    state: dict[str, Any] = Field(..., description="Playwright context.storage_state() JSON")
+
+
+@router.put("/application-runs/{run_id}/browser-storage-state")
+async def save_browser_storage_state(
+    run_id: uuid.UUID,
+    body: BrowserStorageStateRequest,
+) -> dict[str, str]:
+    key = await save_run_storage_state(run_id, body.state)
+    return {"storage_key": key, "status": "saved"}
