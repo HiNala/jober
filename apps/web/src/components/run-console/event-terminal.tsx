@@ -1,6 +1,8 @@
 "use client";
 
 import type { RunStreamEvent } from "@/lib/api/run-console";
+import { surface } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
 
 export interface EventTerminalProps {
   events: RunStreamEvent[];
@@ -13,36 +15,46 @@ function formatLine(event: RunStreamEvent): string {
   const prefix = `[${time}]`;
   if (event.event_type === "field.filled") {
     const field = String(event.payload?.field_key ?? event.message);
-    return `${prefix} filled field="${field}" status=ok`;
+    return `${prefix} filled ${field}`;
   }
   if (event.event_type === "human.required") {
-    return `${prefix} HUMAN CHECKPOINT: ${event.message}`;
+    return `${prefix} checkpoint: ${event.message}`;
   }
-  return `${prefix} ${event.event_type} ${event.message}`;
+  return `${prefix} ${event.event_type.replace(/\./g, " ")} — ${event.message}`;
 }
 
 export function EventTerminal({ events, company, role }: EventTerminalProps) {
   return (
-    <div
-      className="h-full min-h-[240px] overflow-y-auto rounded-md border border-border/60 bg-zinc-950 p-3 font-mono text-xs text-zinc-100"
-      aria-label="Run event stream"
-    >
-      {company && role && (
-        <p className="mb-2 text-zinc-400">
-          job=&quot;{company} / {role}&quot;
-        </p>
-      )}
-      {events.length === 0 ? (
-        <p className="text-zinc-500">Waiting for events…</p>
-      ) : (
-        <ul className="space-y-1">
-          {events.map((event) => (
-            <li key={event.seq} className="whitespace-pre-wrap break-words">
-              {formatLine(event)}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <section aria-labelledby="run-event-stream-heading">
+      <h2 id="run-event-stream-heading" className="mb-2 text-sm font-medium">
+        Event stream
+      </h2>
+      <div
+        className={cn(
+          "min-h-[280px] max-h-[min(70vh,520px)] overflow-y-auto rounded-lg border p-3 font-mono text-xs",
+          surface.terminal,
+        )}
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
+        {company && role && (
+          <p className="mb-2 text-[var(--terminal-muted)]">
+            {company} / {role}
+          </p>
+        )}
+        {events.length === 0 ? (
+          <p className="text-[var(--terminal-muted)]">Waiting for run events…</p>
+        ) : (
+          <ol className="space-y-0.5">
+            {events.map((event) => (
+              <li key={event.seq} className="whitespace-pre-wrap break-words">
+                {formatLine(event)}
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </section>
   );
 }

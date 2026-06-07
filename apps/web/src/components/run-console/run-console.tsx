@@ -2,8 +2,12 @@
 
 import { RefreshCw } from "lucide-react";
 
+import { PageError, RunConsoleSkeleton } from "@/components/states/page-states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { motionFadeIn } from "@/lib/design/motion";
+import { surface } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
 import { useRunStream } from "@/hooks/useRunStream";
 
 import { ArtifactLinks } from "./artifact-links";
@@ -13,6 +17,13 @@ import { StateTimeline } from "./state-timeline";
 
 export interface RunConsoleProps {
   runId: string;
+}
+
+function streamStatusLabel(status: string): string {
+  if (status === "live") return "Live";
+  if (status === "reconnecting") return "Reconnecting";
+  if (status === "error") return "Disconnected";
+  return status;
 }
 
 export function RunConsole({ runId }: RunConsoleProps) {
@@ -26,49 +37,67 @@ export function RunConsole({ runId }: RunConsoleProps) {
     displayScreenshotUrl,
   } = useRunStream(runId);
 
-  if (!snapshot) {
+  if (status === "error" && !snapshot) {
     return (
-      <p className="text-sm text-muted-foreground">
-        {status === "error" ? "Could not load run console." : "Loading run console…"}
-      </p>
+      <PageError
+        title="Run console unavailable"
+        message="Could not load this run. Check the API connection and try again."
+        onRetry={() => void reconnect()}
+      />
     );
   }
 
+  if (!snapshot) {
+    return <RunConsoleSkeleton />;
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className={cn("space-y-5", motionFadeIn)}>
+      <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Application run
+          </p>
+          <h1 className="text-xl font-semibold tracking-tight">
             {snapshot.company} — {snapshot.role}
-          </h2>
-          <p className="text-sm text-muted-foreground">Run {snapshot.run_id}</p>
+          </h1>
+          <p className="mt-1 font-mono text-xs text-muted-foreground">
+            Run {snapshot.run_id.slice(0, 8)}…
+          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary">{snapshot.status}</Badge>
-          <Badge variant="outline">{status}</Badge>
-          <Button size="sm" variant="outline" onClick={() => void reconnect()}>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="tabular-nums">
+            {snapshot.status.replace(/_/g, " ")}
+          </Badge>
+          <Badge variant="outline">{streamStatusLabel(status)}</Badge>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => void reconnect()}
+            aria-label="Reconnect event stream"
+          >
             <RefreshCw className="mr-1 size-3.5" aria-hidden />
             Reconnect
           </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-3">
-          <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/20">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div className="space-y-4">
+          <figure className={cn("overflow-hidden rounded-lg", surface.card)}>
             {displayScreenshotUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={displayScreenshotUrl}
-                alt="Latest browser frame"
-                className="aspect-video w-full object-contain bg-zinc-900"
+                alt={`Latest browser frame for ${snapshot.company}`}
+                className="aspect-video w-full bg-[var(--terminal-bg)] object-contain"
               />
             ) : (
-              <div className="flex aspect-video items-center justify-center text-sm text-muted-foreground">
-                No screenshot yet
-              </div>
+              <figcaption className="flex aspect-video items-center justify-center text-sm text-muted-foreground">
+                Waiting for browser frame…
+              </figcaption>
             )}
-          </div>
+          </figure>
           <StateTimeline
             snapshot={snapshot}
             selectedSeq={selectedTimelineSeq}

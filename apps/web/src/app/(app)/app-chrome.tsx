@@ -14,7 +14,10 @@ const TITLES: Record<string, string> = {
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const title = TITLES[pathname] ?? "Jober";
+  let title = TITLES[pathname] ?? "Jober";
+  if (pathname.startsWith("/runs/")) {
+    title = "Run console";
+  }
 
   return <AppShell title={title}>{children}</AppShell>;
 }

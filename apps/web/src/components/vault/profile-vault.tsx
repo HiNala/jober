@@ -30,6 +30,11 @@ function tierLabel(tier: string) {
   return "Public / standard";
 }
 
+function maskValue(value: string): string {
+  if (!value) return "";
+  return "•".repeat(Math.min(Math.max(value.length, 6), 12));
+}
+
 function FieldRow({
   field,
   onSavePublic,
@@ -46,23 +51,30 @@ function FieldRow({
   const [draft, setDraft] = useState(
     typeof field.value === "string" ? field.value : "",
   );
+  const [revealed, setRevealed] = useState(false);
   const sensitive = field.tier === "sensitive";
+  const fieldId = `vault-field-${field.key}`;
+  const hasStoredSensitive =
+    sensitive && typeof field.value === "string" && field.value.length > 0;
 
   return (
     <div className="space-y-2 rounded-lg border border-border/60 p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium">{field.label}</span>
+        <label htmlFor={fieldId} className="text-sm font-medium">
+          {field.label}
+        </label>
         {sensitive && (
           <Badge variant="outline" className="gap-1 text-amber-600">
             <Lock className="size-3" aria-hidden />
-            Encrypted
+            Encrypted at rest
           </Badge>
         )}
       </div>
       {field.tier !== "sensitive" ? (
         typeof field.value === "boolean" ? (
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm" htmlFor={fieldId}>
             <Checkbox
+              id={fieldId}
               checked={field.value}
               onCheckedChange={(checked) =>
                 onSavePublic(field.key, checked === true ? "true" : "false")
@@ -72,19 +84,35 @@ function FieldRow({
           </label>
         ) : (
           <Input
+            id={fieldId}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onBlur={() => onSavePublic(field.key, draft)}
+            autoComplete="off"
           />
         )
       ) : (
         <>
-          <Textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={2}
-            placeholder="Enter only facts you choose to store — never inferred"
-          />
+          {hasStoredSensitive && !revealed ? (
+            <div className="flex items-center justify-between gap-2 rounded-md border border-dashed border-border/80 bg-muted/30 px-3 py-2">
+              <span className="font-mono text-sm tracking-widest text-muted-foreground" aria-hidden>
+                {maskValue(draft)}
+              </span>
+              <span className="sr-only">Value stored and masked</span>
+              <Button type="button" size="sm" variant="outline" onClick={() => setRevealed(true)}>
+                Update value
+              </Button>
+            </div>
+          ) : (
+            <Textarea
+              id={fieldId}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              rows={2}
+              placeholder="Enter only facts you choose to store — never inferred"
+              autoComplete="off"
+            />
+          )}
           <div className="flex flex-wrap gap-4 text-xs">
             <label className="flex items-center gap-2">
               <Checkbox
@@ -250,13 +278,19 @@ export function ProfileVault() {
       </section>
 
       {(["public", "preference", "sensitive"] as const).map((tier) => (
-        <section key={tier} className="space-y-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-medium">{tierLabel(tier)}</h2>
+        <fieldset key={tier} className="space-y-3">
+          <legend className="flex items-center gap-2 text-sm font-medium">
+            {tierLabel(tier)}
             {tier === "sensitive" && (
               <ShieldAlert className="size-4 text-amber-500" aria-hidden />
             )}
-          </div>
+          </legend>
+          {tier === "sensitive" && (
+            <p className="text-xs text-muted-foreground">
+              Sensitive fields require explicit consent. Jober never auto-fills without your
+              permission.
+            </p>
+          )}
           <div className="grid gap-3 md:grid-cols-2">
             {grouped[tier].map((field) => (
               <FieldRow
@@ -278,7 +312,7 @@ export function ProfileVault() {
               />
             ))}
           </div>
-        </section>
+        </fieldset>
       ))}
 
       <section className="space-y-3">

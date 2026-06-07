@@ -6,6 +6,8 @@ import { CheckCircle2, CircleAlert, FileText, SkipForward } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
+import { PageEmpty } from "@/components/states/page-states";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +25,9 @@ import {
   type ReviewPackage,
 } from "@/lib/api/verification";
 import { formatApiError } from "@/lib/api/errors";
+import { motionFadeIn } from "@/lib/design/motion";
+import { surface } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
 
 export interface ReviewSubmitPanelProps {
   jobTargetId: string;
@@ -76,7 +81,7 @@ export function ReviewSubmitPanel({ jobTargetId, onEditField }: ReviewSubmitPane
   const skipMutation = useMutation({
     mutationFn: (runId: string) => skipApplicationSubmit(runId),
     onSuccess: () => {
-      toast.message("Submit skipped");
+      toast.message("Submit skipped — run remains in review");
       void queryClient.invalidateQueries({ queryKey });
     },
     onError: (err: unknown) => toast.error(formatApiError(err)),
@@ -85,35 +90,71 @@ export function ReviewSubmitPanel({ jobTargetId, onEditField }: ReviewSubmitPane
   const review = reviewQuery.data;
 
   if (reviewQuery.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading review state…</p>;
+    return (
+      <div className="space-y-3" aria-busy="true">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
   }
 
   if (!review) {
     return (
-      <p className="text-sm text-muted-foreground">
-        No application awaiting review. Complete form fill and readiness verification first.
-      </p>
+      <PageEmpty
+        title="No run awaiting review"
+        description="Complete form fill and readiness checks first. A run will appear here when it reaches review and submit."
+      />
     );
   }
 
+  const ready = review.readiness.passed;
+
   return (
-    <section className="space-y-4 rounded-lg border border-border/80 bg-card/40 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold">Review &amp; submit</h3>
-        <div className="flex items-center gap-2">
+    <section
+      className={cn("space-y-4 rounded-lg p-4", surface.card, motionFadeIn)}
+      aria-labelledby="review-submit-heading"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">
+        <div>
+          <h3 id="review-submit-heading" className="text-base font-semibold">
+            {ready ? "Ready to submit" : "Review required before submit"}
+          </h3>
+          <p className="mt-1 max-w-prose text-sm text-muted-foreground">
+            {review.human_summary}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant={ready ? "secondary" : "destructive"}>
+            {review.status.replace(/_/g, " ")}
+          </Badge>
           <Link
             href={`/runs/${review.run_id}`}
             className="text-xs text-primary underline-offset-4 hover:underline"
           >
             Open run console
           </Link>
-          <Badge variant={review.readiness.passed ? "secondary" : "destructive"}>
-            {review.status.replace(/_/g, " ")}
-          </Badge>
         </div>
       </div>
 
-      <p className="rounded-md bg-muted/50 p-3 text-sm leading-relaxed">{review.human_summary}</p>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          onClick={() => submitMutation.mutate(review.run_id)}
+          disabled={submitMutation.isPending || !ready}
+        >
+          Submit application
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => skipMutation.mutate(review.run_id)}
+          disabled={skipMutation.isPending}
+        >
+          <SkipForward className="mr-1 size-4" aria-hidden />
+          Skip submit
+        </Button>
+      </div>
 
       <div>
         <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -125,25 +166,36 @@ export function ReviewSubmitPanel({ jobTargetId, onEditField }: ReviewSubmitPane
       {review.fill_diffs.length > 0 && (
         <div>
           <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Fill diff (masked)
+            Fill diff (masked values)
           </h4>
           <div className="overflow-x-auto rounded-md border">
             <Table>
+              <caption className="sr-only">
+                Proposed versus actual field values for this application run
+              </caption>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Field</TableHead>
-                  <TableHead>Proposed</TableHead>
-                  <TableHead>Actual</TableHead>
-                  <TableHead className="w-16">Match</TableHead>
-                  <TableHead className="w-20" />
+                  <TableHead scope="col">Field</TableHead>
+                  <TableHead scope="col">Proposed</TableHead>
+                  <TableHead scope="col">Actual</TableHead>
+                  <TableHead scope="col" className="w-16">
+                    Match
+                  </TableHead>
+                  <TableHead scope="col" className="w-20">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {review.fill_diffs.map((row) => (
                   <TableRow key={row.field_key}>
                     <TableCell className="font-medium">{row.label ?? row.field_key}</TableCell>
-                    <TableCell className="font-mono text-xs">{row.proposed_redacted ?? "—"}</TableCell>
-                    <TableCell className="font-mono text-xs">{row.actual_redacted ?? "—"}</TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {row.proposed_redacted ?? "—"}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {row.actual_redacted ?? "—"}
+                    </TableCell>
                     <TableCell>{row.matched ? "✓" : "—"}</TableCell>
                     <TableCell>
                       <Button
@@ -179,26 +231,9 @@ export function ReviewSubmitPanel({ jobTargetId, onEditField }: ReviewSubmitPane
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 pt-1">
-        <Button
-          type="button"
-          onClick={() => submitMutation.mutate(review.run_id)}
-          disabled={submitMutation.isPending || !review.readiness.passed}
-        >
-          Submit application
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => skipMutation.mutate(review.run_id)}
-          disabled={skipMutation.isPending}
-        >
-          <SkipForward className="mr-1 size-4" aria-hidden />
-          Skip
-        </Button>
-      </div>
       <p className="text-xs text-muted-foreground">
-        Policy: {review.policy.replace(/_/g, " ")}. Email confirmation may follow on-page success.
+        Run policy: {review.policy.replace(/_/g, " ")}. You approve the final submit — Jober does
+        not hide automation from you or the employer.
       </p>
     </section>
   );
