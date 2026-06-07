@@ -28,5 +28,7 @@
 - [x] Mapping memory on PATCH `remember: true` (platform + label only)
 - [x] 422 test when `fixture_html` missing
 - [x] README + TS type export for discovered fields panel
+- [x] Policy unit tests + low-confidence / combobox fixtures
+- [x] Editable status select + `forms.test.ts` for 404 empty state
 - [ ] Browser worker `discover_form` task (deferred to Mission 08)
 - [ ] Re-scan after conditional field reveal

@@ -232,6 +232,11 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | README form discovery section + `packages/forms` in pip install | Cold-start path for M07 local dev |
 | `FormFieldObservationRead` TypeScript export | Job drawer panel types align with API |
 | `FieldMappingMemory` in Alembic metadata imports | Migration drift check covers new table |
+| `test_form_policy.py` + low-confidence discovery test | Acceptance: ambiguous/low mappings never silent auto-fill |
+| Combobox fixture + scanner test | Ashby/Workday listbox path covered in CI |
+| Status `Select` on discovered-fields rows | Weakest UX gap — review state was read-only badge only |
+| `forms.test.ts` 404 → empty list | Drawer empty state without throwing on first open |
+| Ruff import sort on new M07 modules | `make lint` gate was red locally |
 
 ---
 
