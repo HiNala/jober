@@ -4,7 +4,7 @@ COMPOSE := docker compose $(COMPOSE_ENV) -f $(COMPOSE_FILE)
 COMPOSE_FULL := COMPOSE_PROFILES=full $(COMPOSE)
 COMPOSE_INFRA := COMPOSE_PROFILES=infra $(COMPOSE)
 
-.PHONY: up down logs infra api-shell worker-shell fmt lint test web-lint web-build migrate migrate-check seed schemas-export backup restore doctor ping-worker
+.PHONY: up down logs infra api-shell worker-shell fmt lint test web-lint web-build migrate migrate-check seed schemas-export backup restore doctor ping-worker tui
 
 up:
 	$(COMPOSE_FULL) up -d --build
@@ -26,6 +26,9 @@ worker-shell:
 
 ping-worker:
 	$(COMPOSE_FULL) exec worker celery -A jober_worker.celery_app call jober_worker.tasks.ping
+
+tui:
+	cd apps/tui && pip install -e . -q && python -m jober_tui
 
 fmt:
 	cd apps/api && ruff format src tests && ruff check --fix src tests
