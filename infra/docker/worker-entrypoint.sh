@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+celery -A jober_worker.celery_app beat --loglevel=warning &
+BEAT_PID=$!
 celery -A jober_worker.celery_app worker --loglevel=info &
 WORKER_PID=$!
 
@@ -23,3 +25,4 @@ else
 fi
 
 wait $WORKER_PID
+kill $BEAT_PID 2>/dev/null || true

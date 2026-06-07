@@ -65,3 +65,18 @@ def fill_form(
         job_target_id=uuid.UUID(job_target_id),
         url=url,
     )
+
+
+@celery_app.task(name="jober_worker.tasks.batch_orchestrator_tick")
+def batch_orchestrator_tick(batch_id: str | None = None) -> dict[str, object]:
+    from jober_worker.batch_orchestrator import run_orchestrator_tick
+
+    return run_orchestrator_tick(batch_id)
+
+
+@celery_app.task(name="jober_worker.tasks.execute_batch_item", bind=True)
+def execute_batch_item(self: object, item_id: str) -> dict[str, object]:
+    del self
+    from jober_worker.batch_runner import run_batch_item
+
+    return run_batch_item(uuid.UUID(item_id))

@@ -16,4 +16,10 @@ celery_app.conf.update(
     timezone="UTC",
     enable_utc=True,
     task_track_started=True,
+    beat_schedule={
+        "batch-orchestrator-tick": {
+            "task": "jober_worker.tasks.batch_orchestrator_tick",
+            "schedule": float(settings.batch_tick_seconds),
+        },
+    },
 )

@@ -55,7 +55,14 @@ packages = ["jober_worker"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*", "jober_forms.*", "jober_extraction.*", "playwright.*"]
+module = [
+    "celery",
+    "celery.*",
+    "jober_forms.*",
+    "jober_extraction.*",
+    "playwright.*",
+    "jober_api.*",
+]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
