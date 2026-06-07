@@ -17,6 +17,14 @@ from jober_schemas.form_field import (
 from jober_schemas.job_profile import JobExtractionRead, JobProfileRead, PlatformDetectionRead
 from jober_schemas.job_target import JobTargetCreate, JobTargetRead, JobTargetUpdate
 from jober_schemas.user_profile import UserProfileCreate, UserProfileRead
+from jober_schemas.verification import (
+    FillDiffItemRead,
+    ReadinessCheckRead,
+    ReadinessReportRead,
+    ReviewPackageRead,
+    SubmitResultRead,
+    VerifyReadyRead,
+)
 
 __all__ = [
     "ApplicationRunCreate",
@@ -40,4 +48,10 @@ __all__ = [
     "RunStatus",
     "UserProfileCreate",
     "UserProfileRead",
+    "FillDiffItemRead",
+    "ReadinessCheckRead",
+    "ReadinessReportRead",
+    "ReviewPackageRead",
+    "SubmitResultRead",
+    "VerifyReadyRead",
 ]
