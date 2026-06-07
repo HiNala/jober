@@ -1,4 +1,7 @@
-import { AlertCircle, Inbox, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Inbox } from "lucide-react";
+
+import { motionFadeIn } from "@/lib/design/motion";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -6,19 +9,40 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function PageLoading({ label = "Loading…" }: { label?: string }) {
   return (
     <div
-      className="flex flex-col gap-4 p-6"
+      className={cn("flex flex-col gap-4 p-6", motionFadeIn)}
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
       <span className="sr-only">{label}</span>
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden />
-        {label}
+      <Skeleton className="h-7 w-56" />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
       </div>
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full max-w-xl" />
+      <Skeleton className="h-48 w-full" />
+      <Skeleton className="h-32 w-full max-w-2xl" />
+    </div>
+  );
+}
+
+export function RunConsoleSkeleton() {
+  return (
+    <div className="space-y-4" role="status" aria-live="polite" aria-busy="true">
+      <span className="sr-only">Loading run console</span>
+      <div className="flex justify-between gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-64" />
+          <Skeleton className="h-4 w-40" />
+        </div>
+        <Skeleton className="h-8 w-28" />
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Skeleton className="aspect-video w-full rounded-lg" />
+        <Skeleton className="min-h-[240px] w-full rounded-lg" />
+      </div>
     </div>
   );
 }
@@ -33,7 +57,12 @@ export function PageEmpty({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 px-6 py-16 text-center",
+        motionFadeIn,
+      )}
+    >
       <div className="flex size-12 items-center justify-center rounded-full bg-muted">
         <Inbox className="size-5 text-muted-foreground" aria-hidden />
       </div>
@@ -55,7 +84,10 @@ export function PageError({
 }) {
   return (
     <div
-      className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center"
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 px-6 py-16 text-center",
+        motionFadeIn,
+      )}
       role="alert"
     >
       <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
@@ -68,6 +100,35 @@ export function PageError({
           Try again
         </Button>
       ) : null}
+    </div>
+  );
+}
+
+export function PageSuccess({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 px-6 py-12 text-center",
+        motionFadeIn,
+      )}
+      role="status"
+    >
+      <div className="flex size-12 items-center justify-center rounded-full bg-accent/15">
+        <CheckCircle2 className="size-5 text-accent" aria-hidden />
+      </div>
+      <h2 className="text-lg font-medium">{title}</h2>
+      {description ? (
+        <p className="max-w-md text-sm text-muted-foreground">{description}</p>
+      ) : null}
+      {action}
     </div>
   );
 }

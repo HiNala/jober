@@ -73,6 +73,14 @@
   --chart-4: oklch(0.65 0.08 200);
   --chart-5: oklch(0.5 0.06 250);
   --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px oklch(0.18 0.02 250 / 6%);
+  --shadow-md: 0 4px 12px oklch(0.18 0.02 250 / 8%);
+  --motion-micro: 150ms;
+  --motion-view: 300ms;
+  --ease-organic: cubic-bezier(0.22, 1, 0.36, 1);
+  --terminal-bg: oklch(0.16 0.02 250);
+  --terminal-fg: oklch(0.92 0.01 250);
+  --terminal-muted: oklch(0.55 0.02 250);
   --sidebar: oklch(0.97 0.01 250);
   --sidebar-foreground: oklch(0.2 0.02 250);
   --sidebar-primary: oklch(0.45 0.12 250);
@@ -107,6 +115,14 @@
   --chart-3: oklch(0.58 0.1 280);
   --chart-4: oklch(0.68 0.08 200);
   --chart-5: oklch(0.48 0.06 250);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 25%);
+  --shadow-md: 0 4px 16px oklch(0 0 0 / 35%);
+  --motion-micro: 150ms;
+  --motion-view: 300ms;
+  --ease-organic: cubic-bezier(0.22, 1, 0.36, 1);
+  --terminal-bg: oklch(0.12 0.02 250);
+  --terminal-fg: oklch(0.94 0.01 250);
+  --terminal-muted: oklch(0.58 0.02 250);
   --sidebar: oklch(0.16 0.02 250);
   --sidebar-foreground: oklch(0.96 0.01 250);
   --sidebar-primary: oklch(0.72 0.12 250);
@@ -124,6 +140,17 @@
   }
   50% {
     transform: translate(6%, 4%) scale(1.05);
+  }
+}
+
+@keyframes jober-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
