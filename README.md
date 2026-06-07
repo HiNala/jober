@@ -228,6 +228,20 @@ Queue batches of applications with Redis-backed pacing: global pause/resume, per
 
 After pulling Mission 13+, run `make migrate` once (adds `application_batches`, `batch_items`).
 
+## Security & privacy (Mission 14)
+
+Write-time redaction masks secrets and PII in run events, browser events, and LLM audit rows. Set `JOBER_ENV=production` and real `VAULT_ENCRYPTION_KEY` / `SECRET_KEY` before deploying; use `REQUIRE_SECRETS=true` to enforce locally.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/privacy/runs/{id}/purge` | Delete run + MinIO artifacts |
+| `POST /api/privacy/cleanup` | Purge runs by date/status filters |
+| `GET /api/privacy/export-all` | Export profiles, jobs, run metadata |
+| `DELETE /api/privacy/delete-all` | Wipe local data (`confirm: DELETE ALL MY DATA`) |
+| `PUT /api/application-runs/{id}/browser-storage-state` | Save encrypted Playwright session after human login |
+
+Env: `LOG_MODE=redacted` (default) or `debug` (more detail, still scrubs secrets), `PRESIGNED_URL_TTL_MINUTES=15`. See [`docs/architecture/threat-model.md`](docs/architecture/threat-model.md).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).

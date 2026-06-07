@@ -470,6 +470,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 14 — Observability, security & privacy (2026-06-07)
+
+**Scope:** Central redaction, retention APIs, encrypted browser storage state, threat model, startup guards.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One redaction chokepoint; default redacted log mode |
+| Kare | 2 | Delete-all requires explicit confirmation phrase |
+| Norman | 2 | Purge/export endpoints with clear names |
+| Nielsen | 2 | Threat model states non-goals plainly |
+| Tufte | 2 | Export-all metadata-only; no vault plaintext dump |
+| Vignelli | 2 | `/api/privacy/*` grouped under one router |
+| Rand | 1 | Infra mission; no new marketing surfaces |
+| Maeda | 2 | Debug mode adds detail without exposing secrets |
+| Wroblewski | 1 | API-only; dashboard wiring deferred |
+| Ive | 2 | Write-time scrub feels deliberate, not per-call habit |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 13) — improvements logged
 
 | Change | Why |
