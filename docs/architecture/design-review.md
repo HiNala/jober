@@ -504,6 +504,39 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 15 — Multi-tenant auth, billing & compliance APIs (2026-06-07)
+
+**Scope:** Auth middleware, tenant-scoped data layer, billing/usage/settings APIs, privacy export/delete per tenant, README + product positioning.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Dev headers for local; Clerk path for prod; no hidden defaults |
+| Kare | 2 | Settings API surfaces honest `auto_submit` disclosure + usage guidance |
+| Norman | 2 | 404 on cross-tenant reads; delete-all requires explicit phrase |
+| Nielsen | 2 | Usage dashboard shows limits vs consumption clearly |
+| Tufte | 2 | Billing usage JSON is dense, comparable fields |
+| Vignelli | 2 | `/api/billing`, `/api/settings`, `/api/privacy` grouped consistently |
+| Rand | 2 | `product.md` differentiates from spray-and-pray tools |
+| Maeda | 2 | Free vs Pro limits are simple, not tier soup |
+| Wroblewski | 1 | API-first; settings UI wiring deferred |
+| Ive | 2 | Tenant isolation at repository layer feels deliberate |
+
+**Total: 19/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 15) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Tenant-scoped run console + recent events | Cross-tenant run snapshot was the weakest isolation gap after M15 |
+| `test_cross_tenant_run_console_blocked` | Adversarial fixture for console 404 on foreign `run_id` |
+| `test_stripe_subscription_active_upgrades_plan` | Proves webhook-driven entitlement lift (upgrade path) |
+| `stripe_verify.construct_stripe_event` wrapper | Single justified `type: ignore` for untyped Stripe SDK |
+| Conftest seeds tenant/user after `TRUNCATE` | Auth middleware broke tests that truncated without re-seed |
+
+---
+
 ## Mission 99 (post–Mission 13) — improvements logged
 
 | Change | Why |

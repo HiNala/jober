@@ -242,6 +242,22 @@ Write-time redaction masks secrets and PII in run events, browser events, and LL
 
 Env: `LOG_MODE=redacted` (default) or `debug` (more detail, still scrubs secrets), `PRESIGNED_URL_TTL_MINUTES=15`. See [`docs/architecture/threat-model.md`](docs/architecture/threat-model.md).
 
+## Multi-tenant & billing (Mission 15)
+
+API routes under `/api/*` require authentication. Local dev uses headers `X-Jober-Tenant-Id` / `X-Jober-User-Id` (defaults seeded by migration). Production: set `AUTH_MODE=clerk` with Clerk JWT issuer/secret.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/billing/usage` | Monthly runs, documents, LLM cost vs plan limits |
+| `GET/PUT /api/settings/policy` | `review_before_submit` default, opt-in `auto_submit`, retention |
+| `POST /api/webhooks/stripe` | Subscription-driven plan upgrades/downgrades |
+| `GET /api/privacy/export-all` | Tenant-scoped data export (audit logged) |
+| `DELETE /api/privacy/delete-all` | Tenant-scoped wipe (`confirm: DELETE ALL MY DATA`) |
+
+Plans: **Free** (5 jobs/batch, 20 runs/mo) vs **Pro** (100/batch, 500 runs/mo). MinIO keys are prefixed `tenants/{id}/`. Workers: set `BROWSERLESS_URL` for headless servers; local `PLAYWRIGHT_HEADED=true` unchanged.
+
+Positioning: [`docs/architecture/product.md`](docs/architecture/product.md). Run `make migrate` after pull (adds `tenants`, `users`, `audit_log_entries`, `tenant_id` columns).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).
