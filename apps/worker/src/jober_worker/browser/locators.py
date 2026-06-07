@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -128,10 +129,19 @@ def resolve_file_input(
     control: str,
     field_key: str,
 ) -> ResolvedLocator:
-    resolvers = (
-        lambda: resolve_by_label(page, control),
-        lambda: resolve_by_role(page, "button", name=control),
-        lambda: resolve_by_stable_attrs(page, field_key=field_key, label=control),
+    def by_label() -> ResolvedLocator | None:
+        return resolve_by_label(page, control)
+
+    def by_button() -> ResolvedLocator | None:
+        return resolve_by_role(page, "button", name=control)
+
+    def by_attrs() -> ResolvedLocator | None:
+        return resolve_by_stable_attrs(page, field_key=field_key, label=control)
+
+    resolvers: tuple[Callable[[], ResolvedLocator | None], ...] = (
+        by_label,
+        by_button,
+        by_attrs,
     )
     for resolve in resolvers:
         resolved = resolve()

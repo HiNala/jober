@@ -19,6 +19,7 @@ dependencies = [
     "jober-extraction",
     "jober-forms",
     "jober-fill",
+    "jober-verify",
     "jober-schemas",
 ]
 

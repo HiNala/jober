@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { DiscoveredFieldsPanel } from "@/components/jobs/discovered-fields-panel";
+import { ReviewSubmitPanel } from "@/components/jobs/review-submit-panel";
 
 export interface JobDetailDrawerProps {
   job: JobTargetRead | null;
@@ -80,7 +81,15 @@ export function JobDetailDrawer({
               onBlur={(e) => onNotesChange?.(e.target.value)}
             />
           </div>
-          <div>
+          <ReviewSubmitPanel
+            jobTargetId={job.id}
+            onEditField={() => {
+              document.getElementById("discovered-fields-panel")?.scrollIntoView({
+                behavior: "smooth",
+              });
+            }}
+          />
+          <div id="discovered-fields-panel">
             <h3 className="mb-2 text-sm font-medium">Discovered fields</h3>
             <DiscoveredFieldsPanel jobTargetId={job.id} platform={job.ats_guess} />
           </div>

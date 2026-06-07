@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <form id="app-form">
+    <h2>Application</h2>
+    <label for="email">Email address</label>
+    <input id="email" name="email" type="email" required value="ada@example.com" />
+    <label for="name">Full name</label>
+    <input id="name" name="name" type="text" required value="Ada Lovelace" />
+    <button type="submit" id="submit-btn">Submit application</button>
+  </form>
+  <div id="confirmation" hidden>
+    <h2>Application received</h2>
+    <p>Thank you for applying to Acme Corp. We received your application.</p>
+  </div>
+  <script>
+    document.getElementById("app-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      document.getElementById("app-form").style.display = "none";
+      document.getElementById("confirmation").hidden = false;
+    });
+  </script>
+</body>
+</html>
