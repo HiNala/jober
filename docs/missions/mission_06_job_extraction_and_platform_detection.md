@@ -25,3 +25,7 @@
 ## Iteration (Mission 99)
 - [x] Per-adapter confidence + evidence on `PlatformDetectionRead`
 - [x] Company/product summary extractor feeds cover letter `company_summary`
+- [x] CAPTCHA gate API test + `force` cache bypass test
+- [x] Celery dispatch warning when worker not reachable
+- [x] README local install order for schemas + extraction packages
+- [x] Full gates green (61 API + 3 worker tests; web build)

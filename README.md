@@ -130,6 +130,15 @@ Platform detection uses URL + DOM signatures (Ashby, Lever, Greenhouse, Workday,
 
 After pulling Mission 06+, run `make migrate` once (adds `extracted_job_profile` columns on `job_targets`).
 
+Local API dev (install shared packages before the API wheel):
+
+```bash
+pip install "./packages/schemas" "./packages/extraction"
+pip install "./apps/api[dev]"
+```
+
+Browser extraction requires the worker (`make up` or `celery -A jober_worker.celery_app worker`). Use `fixture_html` in the extract body for CI-safe tests without Playwright.
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).

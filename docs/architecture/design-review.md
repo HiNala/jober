@@ -184,6 +184,38 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 06 — Job extraction (API + worker)
+
+**Scope:** Extraction package, job-profile API, Playwright worker runner. No queue UI yet (M11).
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Fixture path for CI; browser path isolated in worker |
+| Kare | 1 | API-only; human checkpoint copy is clear but no UI yet |
+| Norman | 2 | 409 gate vs 422 missing URL; cache vs `force` semantics |
+| Nielsen | 2 | `PlatformDetectionRead.evidence` aids misdetection debug |
+| Tufte | 2 | JobProfile fields map 1:1 to cover letter inputs |
+| Vignelli | 2 | Shared schemas across API, worker, extraction package |
+| Rand | 1 | Infra mission; visual identity N/A |
+| Maeda | 2 | Deterministic action API — no model-driven browser chaos |
+| Wroblewski | 1 | No mobile UI; API contract is the surface |
+| Ive | 2 | Trace/video/screenshot keys follow existing MinIO conventions |
+
+**Total: 18/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 06) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| CAPTCHA fixture API test (409 + gate) | Login was covered; CAPTCHA acceptance criterion needed parity |
+| `force` bypasses daily cache test | Prevents accidental stale profile on intentional re-fetch |
+| Celery dispatch `warning` when `task_id` is null | Silent queue failures were the weakest operator path |
+| README pip install order for extraction packages | Windows `pip install -e apps/api` alone misses local packages |
+
+---
+
 ## Mission 99 (post–Mission 05) — improvements logged
 
 | Change | Why |
