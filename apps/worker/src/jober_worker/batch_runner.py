@@ -11,6 +11,7 @@ import httpx
 from jober_api.models.application_run import ApplicationRun
 from jober_api.models.batch_item import BatchItem
 from jober_api.models.enums import BatchItemStatus, RunPolicy, RunStatus
+from jober_api.privacy.redaction import scrub_dict, scrub_event_message
 from jober_api.services.batch import redis_control
 from jober_api.services.batch.domain import job_apply_url
 from sqlalchemy import select, text
@@ -49,8 +50,8 @@ def _sync_append_run_event(
             "seq": int(seq_row),
             "ts": datetime.now(UTC),
             "event_type": event_type,
-            "message": message,
-            "payload": json.dumps(payload or {}),
+            "message": scrub_event_message(message),
+            "payload": json.dumps(scrub_dict(payload)),
         },
     )
 

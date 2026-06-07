@@ -7,7 +7,9 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.config import settings
 from jober_api.models.run_event import RunEvent
+from jober_api.privacy.redaction import scrub_dict, scrub_event_message
 from jober_api.repositories.base import Repository
 
 
@@ -31,6 +33,7 @@ class RunEventRepository(Repository[RunEvent]):
         screenshot_key: str | None = None,
         attempt_index: int | None = None,
     ) -> RunEvent:
+        debug = settings.log_mode == "debug"
         now = datetime.now(UTC)
         seq = await self.next_seq(run_id)
         row = await self.create(
@@ -39,8 +42,8 @@ class RunEventRepository(Repository[RunEvent]):
             ts=now,
             event_type=event_type,
             level=level,
-            message=message,
-            payload=payload,
+            message=scrub_event_message(message, debug=debug),
+            payload=scrub_dict(payload, debug=debug),
             screenshot_key=screenshot_key,
             attempt_index=attempt_index,
         )

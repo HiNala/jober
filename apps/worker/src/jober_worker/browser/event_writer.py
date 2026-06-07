@@ -4,6 +4,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
+from jober_api.privacy.redaction import scrub_dict, scrub_event_message
 from sqlalchemy import text
 
 from jober_worker.browser.actions import Observation
@@ -38,11 +39,11 @@ def persist_browser_event(
                 "ts": now,
                 "level": level,
                 "event_type": observation.event_type,
-                "message": observation.message,
+                "message": scrub_event_message(observation.message),
                 "selector": selector,
                 "url": observation.url,
                 "screenshot_key": screenshot_key,
-                "metadata": _json_dumps(metadata),
+                "metadata": _json_dumps(scrub_dict(metadata)),
             },
         )
         session.commit()

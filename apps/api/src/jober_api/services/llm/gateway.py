@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.config import settings
 from jober_api.models.llm_call import LlmCall
+from jober_api.privacy.redaction import scrub_text
 
 
 class BudgetExceededError(Exception):
@@ -48,10 +49,9 @@ def _estimate_cost(model: str, prompt_tokens: int, completion_tokens: int) -> fl
 
 
 def redact_text(text: str, limit: int = 400) -> str:
-    trimmed = text.strip()
-    if len(trimmed) <= limit:
-        return trimmed
-    return f"{trimmed[:limit]}…"
+    """Mask secrets/PII before persisting LLM audit rows."""
+    debug = settings.log_mode == "debug"
+    return scrub_text(text, debug=debug, limit=2000 if debug else limit)
 
 
 def _resume_block_from_prompt(user: str) -> str:
