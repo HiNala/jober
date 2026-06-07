@@ -11,9 +11,7 @@ from jober_api.models.mixins import UUIDPrimaryKeyMixin
 
 class FailureEvent(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "failure_events"
-    __table_args__ = (
-        Index("ix_failure_events_platform_class", "platform", "failure_class"),
-    )
+    __table_args__ = (Index("ix_failure_events_platform_class", "platform", "failure_class"),)
 
     job_target_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),

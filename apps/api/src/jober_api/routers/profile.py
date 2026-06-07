@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.middleware import require_auth
 from jober_api.db.session import get_session
 from jober_api.repositories.profile_common_answer import ProfileCommonAnswerRepository
 from jober_api.repositories.resume_asset import ResumeAssetRepository
@@ -34,27 +36,34 @@ _PREFERENCE_PATCH_KEYS = {
 }
 
 
-async def _load_profile_context(session: AsyncSession) -> tuple[Any, Any, Any]:
-    profiles = UserProfileRepository(session)
+async def _load_profile_context(
+    session: AsyncSession, tenant_id: uuid.UUID
+) -> tuple[Any, Any, Any]:
+    profiles = UserProfileRepository(session, tenant_id)
     resumes = ResumeAssetRepository(session)
-    profile = await profiles.get_or_create_singleton()
+    profile = await profiles.get_or_create_for_tenant()
     active = await resumes.get_active()
     return profiles, profile, active
 
 
 @router.get("")
-async def get_profile(session: AsyncSession = Depends(get_session)) -> dict[str, object]:
-    _profiles, profile, active = await _load_profile_context(session)
+async def get_profile(
+    request: Request, session: AsyncSession = Depends(get_session)
+) -> dict[str, object]:
+    auth = require_auth(request)
+    _profiles, profile, active = await _load_profile_context(session, auth.tenant_id)
     await _ensure_default_answers(session, profile.id)
     return serialize_profile(profile, active_resume=active, include_sensitive=True)
 
 
 @router.patch("")
 async def patch_profile(
+    request: Request,
     body: dict[str, object],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
-    profiles, profile, active = await _load_profile_context(session)
+    auth = require_auth(request)
+    profiles, profile, active = await _load_profile_context(session, auth.tenant_id)
     allowed = _PUBLIC_PATCH_KEYS | _PREFERENCE_PATCH_KEYS
     updates = {k: v for k, v in body.items() if k in allowed}
     if not updates:
@@ -68,10 +77,12 @@ async def patch_profile(
 
 @router.patch("/vault")
 async def patch_vault(
+    request: Request,
     body: dict[str, object],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
-    profiles, profile, active = await _load_profile_context(session)
+    auth = require_auth(request)
+    profiles, profile, active = await _load_profile_context(session, auth.tenant_id)
     sensitive_updates: dict[str, str | None] = {}
     for key in SENSITIVE_EEO_KEYS:
         if key in body:
@@ -106,9 +117,10 @@ async def patch_vault(
 
 @router.get("/common-answers")
 async def list_common_answers(
-    session: AsyncSession = Depends(get_session),
+    request: Request, session: AsyncSession = Depends(get_session)
 ) -> dict[str, object]:
-    profiles, profile, _active = await _load_profile_context(session)
+    auth = require_auth(request)
+    profiles, profile, _active = await _load_profile_context(session, auth.tenant_id)
     await _ensure_default_answers(session, profile.id)
     repo = ProfileCommonAnswerRepository(session)
     rows = await repo.list_for_profile(profile.id)
@@ -118,10 +130,12 @@ async def list_common_answers(
 @router.put("/common-answers/{answer_key}")
 async def upsert_common_answer(
     answer_key: str,
+    request: Request,
     body: dict[str, object],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
-    _profiles, profile, _active = await _load_profile_context(session)
+    auth = require_auth(request)
+    _profiles, profile, _active = await _load_profile_context(session, auth.tenant_id)
     label = str(body.get("label") or answer_key.replace("_", " ").title())
     text = body.get("body")
     if not isinstance(text, str) or not text.strip():

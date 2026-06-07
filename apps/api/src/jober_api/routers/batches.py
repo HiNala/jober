@@ -4,11 +4,13 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.middleware import require_auth
 from jober_api.config import settings
 from jober_api.db.session import get_session
+from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.services.batch import redis_control
 from jober_api.services.batch.daily_plan import generate_daily_plan
 from jober_api.services.batch.service import (
@@ -32,29 +34,39 @@ router = APIRouter(tags=["batches"])
 
 
 @router.get("/dashboard/summary")
-async def get_dashboard_summary(session: AsyncSession = Depends(get_session)) -> dict[str, Any]:
-    return await dashboard_summary(session)
+async def get_dashboard_summary(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    auth = require_auth(request)
+    return await dashboard_summary(session, auth.tenant_id)
 
 
 @router.post("/batches/preview")
 async def post_batch_preview(
+    request: Request,
     body: dict[str, Any],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, Any]:
+    auth = require_auth(request)
     filters = body.get("filters") or {}
-    return await preview_batch(session, filters)
+    return await preview_batch(session, filters, auth.tenant_id)
 
 
 @router.post("/batches")
 async def post_create_batch(
+    request: Request,
     body: dict[str, Any],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, Any]:
+    auth = require_auth(request)
     try:
         scheduled_raw = body.get("scheduled_at")
         scheduled_at = datetime.fromisoformat(str(scheduled_raw)) if scheduled_raw else None
         batch = await create_batch(
             session,
+            tenant_id=auth.tenant_id,
+            plan=auth.plan,
             name=str(body.get("name") or "Batch"),
             policy=str(body.get("policy") or "review_before_submit"),
             filters=body.get("filters") or {},
@@ -65,7 +77,7 @@ async def post_create_batch(
             else None,
         )
         await session.commit()
-        return await serialize_batch(session, batch.id)
+        return await serialize_batch(session, batch.id, auth.tenant_id)
     except BatchValidationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
@@ -73,16 +85,23 @@ async def post_create_batch(
 
 
 @router.get("/batches/daily-plan")
-async def get_daily_plan(session: AsyncSession = Depends(get_session)) -> dict[str, Any]:
-    return await generate_daily_plan(session)
+async def get_daily_plan(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    auth = require_auth(request)
+    return await generate_daily_plan(session, auth.tenant_id)
 
 
 @router.get("/batches/{batch_id}")
 async def get_batch(
-    batch_id: uuid.UUID, session: AsyncSession = Depends(get_session)
+    batch_id: uuid.UUID,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
 ) -> dict[str, Any]:
+    auth = require_auth(request)
     try:
-        return await serialize_batch(session, batch_id)
+        return await serialize_batch(session, batch_id, auth.tenant_id)
     except BatchValidationError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
@@ -90,9 +109,11 @@ async def get_batch(
 @router.post("/batches/{batch_id}/enqueue")
 async def post_enqueue_batch(
     batch_id: uuid.UUID,
+    request: Request,
     body: dict[str, Any] | None = None,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, Any]:
+    require_auth(request)
     payload = body or {}
     try:
         run_at_raw = payload.get("run_at")
@@ -109,23 +130,27 @@ async def post_enqueue_batch(
 
 
 @router.post("/queue/pause-all")
-async def post_pause_all() -> dict[str, str]:
+async def post_pause_all(request: Request) -> dict[str, str]:
+    require_auth(request)
     return await pause_all_batches()
 
 
 @router.post("/queue/resume-all")
-async def post_resume_all() -> dict[str, str]:
+async def post_resume_all(request: Request) -> dict[str, str]:
+    require_auth(request)
     return await resume_all_batches()
 
 
 @router.post("/batches/{batch_id}/pause")
-async def post_pause_batch(batch_id: uuid.UUID) -> dict[str, str]:
+async def post_pause_batch(batch_id: uuid.UUID, request: Request) -> dict[str, str]:
+    require_auth(request)
     await pause_batch(batch_id)
     return {"status": "paused", "batch_id": str(batch_id)}
 
 
 @router.post("/batches/{batch_id}/resume")
-async def post_resume_batch(batch_id: uuid.UUID) -> dict[str, str]:
+async def post_resume_batch(batch_id: uuid.UUID, request: Request) -> dict[str, str]:
+    require_auth(request)
     await resume_batch(batch_id)
     return {"status": "resumed", "batch_id": str(batch_id)}
 
@@ -133,8 +158,13 @@ async def post_resume_batch(batch_id: uuid.UUID) -> dict[str, str]:
 @router.post("/application-runs/{run_id}/cancel")
 async def post_cancel_run(
     run_id: uuid.UUID,
+    request: Request,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, str]:
+    auth = require_auth(request)
+    runs_repo = ApplicationRunRepository(session, auth.tenant_id)
+    if await runs_repo.get(run_id) is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Run not found")
     await cancel_run(session, run_id)
     await session.commit()
     return {"status": "cancelled", "run_id": str(run_id)}
@@ -143,9 +173,11 @@ async def post_cancel_run(
 @router.post("/batch-items/{item_id}/skip")
 async def post_skip_batch_item(
     item_id: uuid.UUID,
+    request: Request,
     body: dict[str, Any] | None = None,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, str]:
+    require_auth(request)
     reason = (body or {}).get("reason", "skipped_by_user")
     try:
         await skip_batch_item(session, item_id, reason=str(reason))
@@ -158,9 +190,11 @@ async def post_skip_batch_item(
 @router.patch("/batches/{batch_id}/reorder")
 async def patch_reorder_batch(
     batch_id: uuid.UUID,
+    request: Request,
     body: dict[str, Any],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, str]:
+    require_auth(request)
     ordered = [uuid.UUID(str(value)) for value in body.get("ordered_item_ids", [])]
     await reorder_batch_items(session, batch_id, ordered)
     await session.commit()
@@ -168,7 +202,8 @@ async def patch_reorder_batch(
 
 
 @router.patch("/queue/concurrency")
-async def patch_queue_concurrency(body: dict[str, Any]) -> dict[str, Any]:
+async def patch_queue_concurrency(request: Request, body: dict[str, Any]) -> dict[str, Any]:
+    require_auth(request)
     value = int(body.get("max_concurrency", settings.batch_max_concurrency))
     redis_control.set_max_concurrency(value)
     return {"max_concurrency": value}

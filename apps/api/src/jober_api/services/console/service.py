@@ -99,14 +99,18 @@ def _coalesce_screenshot_events(events: list[RunEvent]) -> list[RunEvent]:
     return out
 
 
-async def get_console_snapshot(session: AsyncSession, run_id: uuid.UUID) -> dict[str, Any]:
-    runs = ApplicationRunRepository(session)
+async def get_console_snapshot(
+    session: AsyncSession,
+    run_id: uuid.UUID,
+    tenant_id: uuid.UUID | None = None,
+) -> dict[str, Any]:
+    runs = ApplicationRunRepository(session, tenant_id)
     run = await runs.get(run_id)
     if run is None:
         msg = "Run not found"
         raise ValueError(msg)
 
-    jobs = JobTargetRepository(session)
+    jobs = JobTargetRepository(session, tenant_id)
     job = await jobs.get(run.job_target_id)
     if job is None:
         msg = "Job target not found"
@@ -188,8 +192,7 @@ async def get_console_snapshot(session: AsyncSession, run_id: uuid.UUID) -> dict
                 ),
                 "screenshot_url": await _presign(
                     storage,
-                    attempt.final_screenshot_object_key
-                    or run_attempt_screenshot_key(run_id, idx),
+                    attempt.final_screenshot_object_key or run_attempt_screenshot_key(run_id, idx),
                 ),
                 "dom_url": await _presign(
                     storage,
@@ -256,12 +259,17 @@ async def stream_run_events(
 async def resolve_checkpoint(
     session: AsyncSession,
     *,
+    tenant_id: uuid.UUID | None = None,
     run_id: uuid.UUID,
     checkpoint_id: uuid.UUID,
     action: str,
     value: str | None = None,
     fixture_html: str | None = None,
 ) -> dict[str, Any]:
+    run_row = await ApplicationRunRepository(session, tenant_id).get(run_id)
+    if run_row is None:
+        msg = "Run not found"
+        raise ValueError(msg)
     stmt = select(HumanCheckpoint).where(
         HumanCheckpoint.id == checkpoint_id,
         HumanCheckpoint.run_id == run_id,
@@ -353,16 +361,14 @@ async def resolve_checkpoint(
     # Generic gate checkpoints (captcha, login, sensitive, etc.)
     if action_norm == "approve":
         checkpoint.status = CheckpointStatus.RESOLVED
-        checkpoint.resolved_value = (
-            scrub_event_message(str(value)) if value is not None else None
-        )
+        checkpoint.resolved_value = scrub_event_message(str(value)) if value is not None else None
         await runs.update_fields(run_id, status=RunStatus.FILL_FORM)
         await append_run_event(
             session,
             run_id=run_id,
             event_type=RunEventType.STATE_CHANGED,
             message="Human gate cleared — resuming run",
-             payload={"checkpoint_type": checkpoint.checkpoint_type.value, "action": "approve"},
+            payload={"checkpoint_type": checkpoint.checkpoint_type.value, "action": "approve"},
         )
         await session.commit()
         return {
@@ -392,7 +398,12 @@ async def artifact_url_for_key(session: AsyncSession, key: str) -> str:
     return url
 
 
-async def get_recent_events(session: AsyncSession, *, limit: int = 25) -> list[dict[str, Any]]:
+async def get_recent_events(
+    session: AsyncSession,
+    *,
+    tenant_id: uuid.UUID | None = None,
+    limit: int = 25,
+) -> list[dict[str, Any]]:
     stmt = (
         select(RunEvent, JobTarget.company, JobTarget.role)
         .join(ApplicationRun, RunEvent.run_id == ApplicationRun.id)
@@ -400,6 +411,8 @@ async def get_recent_events(session: AsyncSession, *, limit: int = 25) -> list[d
         .order_by(RunEvent.ts.desc())
         .limit(limit)
     )
+    if tenant_id is not None:
+        stmt = stmt.where(ApplicationRun.tenant_id == tenant_id)
     rows = (await session.execute(stmt)).all()
     items: list[dict[str, Any]] = []
     for event, company, role in reversed(rows):
@@ -417,5 +430,3 @@ async def get_recent_events(session: AsyncSession, *, limit: int = 25) -> list[d
             }
         )
     return items
-
-

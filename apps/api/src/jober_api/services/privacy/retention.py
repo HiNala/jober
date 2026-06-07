@@ -8,12 +8,13 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.models.application_run import ApplicationRun
-from jober_api.models.enums import JobTargetStatus, RunStatus
+from jober_api.models.enums import AuditAction, JobTargetStatus, RunStatus
 from jober_api.models.job_target import JobTarget
 from jober_api.models.user_profile import UserProfile
 from jober_api.privacy.browser_state import delete_run_storage_state
 from jober_api.repositories.application_run import ApplicationRunRepository
-from jober_api.storage.keys import run_prefix
+from jober_api.services.audit.service import record_audit
+from jober_api.storage.keys import run_prefix, tenant_root
 from jober_api.storage.minio_client import ObjectStorage
 
 _DELETE_CONFIRM_PHRASE = "DELETE ALL MY DATA"
@@ -23,15 +24,16 @@ async def purge_run(
     session: AsyncSession,
     run_id: uuid.UUID,
     *,
+    tenant_id: uuid.UUID,
     commit: bool = True,
 ) -> dict[str, Any]:
-    runs = ApplicationRunRepository(session)
+    runs = ApplicationRunRepository(session, tenant_id)
     run = await runs.get(run_id)
     if run is None:
         msg = "Run not found"
         raise ValueError(msg)
     storage = ObjectStorage()
-    removed_objects = await storage.remove_prefix(run_prefix(run_id))
+    removed_objects = await storage.remove_prefix(run_prefix(run_id, tenant_id=tenant_id))
     await delete_run_storage_state(run_id)
     await session.delete(run)
     if commit:
@@ -42,11 +44,16 @@ async def purge_run(
 async def cleanup_runs(
     session: AsyncSession,
     *,
+    tenant_id: uuid.UUID,
     before: datetime | None = None,
     run_status: RunStatus | None = None,
     job_status: JobTargetStatus | None = None,
 ) -> dict[str, Any]:
-    stmt = select(ApplicationRun).join(JobTarget)
+    stmt = (
+        select(ApplicationRun)
+        .join(JobTarget)
+        .where(ApplicationRun.tenant_id == tenant_id, JobTarget.tenant_id == tenant_id)
+    )
     if before is not None:
         stmt = stmt.where(ApplicationRun.created_at < before)
     if run_status is not None:
@@ -57,7 +64,7 @@ async def cleanup_runs(
     purged = 0
     removed_objects = 0
     for run in runs:
-        result = await purge_run(session, run.id, commit=False)
+        result = await purge_run(session, run.id, tenant_id=tenant_id, commit=False)
         purged += 1
         removed_objects += int(result["removed_objects"])
     await session.commit()
@@ -72,12 +79,39 @@ async def cleanup_runs(
     }
 
 
-async def export_all_data(session: AsyncSession) -> dict[str, Any]:
-    profiles = list((await session.execute(select(UserProfile))).scalars())
-    all_jobs = list((await session.execute(select(JobTarget))).scalars())
-    runs = list((await session.execute(select(ApplicationRun))).scalars())
+async def export_all_data(
+    session: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    user_id: uuid.UUID | None = None,
+) -> dict[str, Any]:
+    profiles = list(
+        (
+            await session.execute(select(UserProfile).where(UserProfile.tenant_id == tenant_id))
+        ).scalars()
+    )
+    all_jobs = list(
+        (await session.execute(select(JobTarget).where(JobTarget.tenant_id == tenant_id))).scalars()
+    )
+    runs = list(
+        (
+            await session.execute(
+                select(ApplicationRun).where(ApplicationRun.tenant_id == tenant_id)
+            )
+        ).scalars()
+    )
+    await record_audit(
+        session,
+        tenant_id=tenant_id,
+        user_id=user_id,
+        action=AuditAction.DATA_EXPORT,
+        message="Full tenant data export requested",
+        details={"job_count": len(all_jobs), "run_count": len(runs)},
+    )
+    await session.flush()
     return {
         "exported_at": datetime.now(UTC).isoformat(),
+        "tenant_id": str(tenant_id),
         "profiles": [
             {
                 "id": str(p.id),
@@ -112,20 +146,32 @@ async def export_all_data(session: AsyncSession) -> dict[str, Any]:
     }
 
 
-async def delete_all_data(session: AsyncSession, *, confirm: str) -> dict[str, Any]:
+async def delete_all_data(
+    session: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    user_id: uuid.UUID | None,
+    confirm: str,
+) -> dict[str, Any]:
     if confirm.strip() != _DELETE_CONFIRM_PHRASE:
         msg = f"Confirmation phrase must be exactly: {_DELETE_CONFIRM_PHRASE}"
         raise ValueError(msg)
     storage = ObjectStorage()
-    removed_objects = 0
-    for prefix in ("runs/", "resumes/", "documents/"):
-        removed_objects += await storage.remove_prefix(prefix)
-    await session.execute(delete(ApplicationRun))
-    await session.execute(delete(JobTarget))
-    await session.execute(delete(UserProfile))
+    removed_objects = await storage.remove_prefix(tenant_root(tenant_id))
+    await session.execute(delete(ApplicationRun).where(ApplicationRun.tenant_id == tenant_id))
+    await session.execute(delete(JobTarget).where(JobTarget.tenant_id == tenant_id))
+    await session.execute(delete(UserProfile).where(UserProfile.tenant_id == tenant_id))
+    await record_audit(
+        session,
+        tenant_id=tenant_id,
+        user_id=user_id,
+        action=AuditAction.DATA_DELETE,
+        message="Tenant data deletion completed",
+    )
     await session.commit()
     return {
         "status": "deleted",
+        "tenant_id": str(tenant_id),
         "removed_objects": removed_objects,
         "deleted_at": datetime.now(UTC).isoformat(),
     }

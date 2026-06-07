@@ -8,11 +8,30 @@ from jober_api.models.application_run import ApplicationRun
 from jober_api.models.enums import CheckpointType, RunStatus
 from jober_api.models.human_checkpoint import HumanCheckpoint
 from jober_api.repositories.base import Repository
+from jober_api.repositories.tenant_scope import belongs_to_tenant
 
 
 class ApplicationRunRepository(Repository[ApplicationRun]):
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, tenant_id: uuid.UUID | None = None) -> None:
         super().__init__(session, ApplicationRun)
+        self._tenant_id = tenant_id
+
+    async def create(self, **fields: object) -> ApplicationRun:
+        if "tenant_id" not in fields and fields.get("job_target_id") is not None:
+            from jober_api.models.job_target import JobTarget
+
+            job = await self._session.get(JobTarget, fields["job_target_id"])
+            if job is not None:
+                fields = {**fields, "tenant_id": job.tenant_id}
+        elif "tenant_id" not in fields and self._tenant_id is not None:
+            fields = {**fields, "tenant_id": self._tenant_id}
+        return await super().create(**fields)
+
+    async def get(self, entity_id: uuid.UUID) -> ApplicationRun | None:
+        row = await super().get(entity_id)
+        if not belongs_to_tenant(row, self._tenant_id):
+            return None
+        return row
 
     async def list_for_job(self, job_target_id: UUID) -> list[ApplicationRun]:
         stmt = (

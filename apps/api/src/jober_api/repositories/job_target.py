@@ -6,11 +6,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from jober_api.models.enums import JobTargetStatus
 from jober_api.models.job_target import JobTarget
 from jober_api.repositories.base import Repository
+from jober_api.repositories.tenant_scope import belongs_to_tenant, scope_stmt
 
 
 class JobTargetRepository(Repository[JobTarget]):
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, tenant_id: uuid.UUID | None = None) -> None:
         super().__init__(session, JobTarget)
+        self._tenant_id = tenant_id
+
+    async def get(self, entity_id: uuid.UUID) -> JobTarget | None:
+        row = await super().get(entity_id)
+        if not belongs_to_tenant(row, self._tenant_id):
+            return None
+        return row
 
     async def find_by_upsert_key(
         self,
@@ -30,6 +38,7 @@ class JobTargetRepository(Repository[JobTarget]):
                 JobTarget.role == role,
                 or_(JobTarget.direct_apply_url.is_(None), JobTarget.direct_apply_url == ""),
             )
+        stmt = scope_stmt(stmt, JobTarget, self._tenant_id)
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -44,7 +53,7 @@ class JobTargetRepository(Repository[JobTarget]):
         limit: int = 500,
         offset: int = 0,
     ) -> list[JobTarget]:
-        stmt = select(JobTarget)
+        stmt = scope_stmt(select(JobTarget), JobTarget, self._tenant_id)
         if status is not None:
             stmt = stmt.where(JobTarget.status == status)
         if priority:
@@ -83,8 +92,11 @@ class JobTargetRepository(Repository[JobTarget]):
         limit: int = 100,
     ) -> list[JobTarget]:
         stmt = (
-            select(JobTarget)
-            .where(JobTarget.status == status)
+            scope_stmt(
+                select(JobTarget).where(JobTarget.status == status),
+                JobTarget,
+                self._tenant_id,
+            )
             .order_by(JobTarget.rank.asc().nulls_last())
             .limit(limit)
         )

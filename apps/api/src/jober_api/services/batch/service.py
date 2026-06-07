@@ -16,6 +16,7 @@ from jober_api.models.enums import (
     BatchItemStatus,
     BatchStatus,
     JobTargetStatus,
+    PlanTier,
     RunPolicy,
     RunStatus,
 )
@@ -26,6 +27,10 @@ from jober_api.services.ats_guess import guess_ats
 from jober_api.services.batch import redis_control
 from jober_api.services.batch.domain import extract_domain, job_apply_url
 from jober_api.services.batch.quiet_hours import in_quiet_hours
+from jober_api.services.billing.entitlement_check import (
+    EntitlementExceededError,
+    assert_batch_entitlements,
+)
 
 
 class BatchValidationError(ValueError):
@@ -46,8 +51,12 @@ def _parse_policy(raw: str | None) -> RunPolicy:
     return policy
 
 
-async def _eligible_jobs(session: AsyncSession, filters: dict[str, Any]) -> list[Any]:
-    repo = JobTargetRepository(session)
+async def _eligible_jobs(
+    session: AsyncSession,
+    filters: dict[str, Any],
+    tenant_id: uuid.UUID,
+) -> list[Any]:
+    repo = JobTargetRepository(session, tenant_id)
     status_raw = filters.get("status")
     status = JobTargetStatus(status_raw) if status_raw else None
     rows = await repo.list_filtered(
@@ -76,8 +85,12 @@ async def _skip_reason(session: AsyncSession, job: Any) -> str | None:
     return None
 
 
-async def preview_batch(session: AsyncSession, filters: dict[str, Any]) -> dict[str, Any]:
-    jobs = await _eligible_jobs(session, filters)
+async def preview_batch(
+    session: AsyncSession,
+    filters: dict[str, Any],
+    tenant_id: uuid.UUID,
+) -> dict[str, Any]:
+    jobs = await _eligible_jobs(session, filters, tenant_id)
     included: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
     domains: set[str] = set()
@@ -111,6 +124,8 @@ async def preview_batch(session: AsyncSession, filters: dict[str, Any]) -> dict[
 async def create_batch(
     session: AsyncSession,
     *,
+    tenant_id: uuid.UUID,
+    plan: PlanTier,
     name: str,
     policy: str,
     filters: dict[str, Any],
@@ -118,12 +133,22 @@ async def create_batch(
     max_concurrency: int | None = None,
     site_cooldown_seconds: float | None = None,
 ) -> ApplicationBatch:
-    preview = await preview_batch(session, filters)
+    preview = await preview_batch(session, filters, tenant_id)
     if not preview["included"]:
         msg = "No eligible jobs for batch"
         raise BatchValidationError(msg)
+    try:
+        await assert_batch_entitlements(
+            session,
+            tenant_id=tenant_id,
+            plan=plan,
+            batch_item_count=len(preview["included"]),
+        )
+    except EntitlementExceededError as exc:
+        raise BatchValidationError(str(exc)) from exc
     parsed_policy = _parse_policy(policy)
     batch = ApplicationBatch(
+        tenant_id=tenant_id,
         name=name,
         status=BatchStatus.SCHEDULED if scheduled_at else BatchStatus.DRAFT,
         policy=parsed_policy,
@@ -237,8 +262,10 @@ async def reorder_batch_items(
     await session.flush()
 
 
-async def dashboard_summary(session: AsyncSession) -> dict[str, Any]:
-    priority_a = await JobTargetRepository(session).list_filtered(priority="A", limit=2000)
+async def dashboard_summary(session: AsyncSession, tenant_id: uuid.UUID) -> dict[str, Any]:
+    priority_a = await JobTargetRepository(session, tenant_id).list_filtered(
+        priority="A", limit=2000
+    )
     queue_depth = len(
         [
             j
@@ -250,6 +277,7 @@ async def dashboard_summary(session: AsyncSession) -> dict[str, Any]:
         select(func.count())
         .select_from(ApplicationRun)
         .where(
+            ApplicationRun.tenant_id == tenant_id,
             ApplicationRun.status.notin_(
                 [
                     RunStatus.SUCCEEDED,
@@ -257,7 +285,7 @@ async def dashboard_summary(session: AsyncSession) -> dict[str, Any]:
                     RunStatus.FAILED_RETRYABLE,
                     RunStatus.SKIPPED,
                 ]
-            )
+            ),
         )
     )
     active_runs = int((await session.execute(active_stmt)).scalar_one())
@@ -266,12 +294,15 @@ async def dashboard_summary(session: AsyncSession) -> dict[str, Any]:
             await session.execute(
                 select(func.count())
                 .select_from(ApplicationRun)
-                .where(ApplicationRun.status == RunStatus.NEEDS_HUMAN)
+                .where(
+                    ApplicationRun.tenant_id == tenant_id,
+                    ApplicationRun.status == RunStatus.NEEDS_HUMAN,
+                )
             )
         ).scalar_one()
     )
     queue = redis_control.queue_snapshot(settings.batch_max_concurrency)
-    batches = ApplicationBatchRepository(session)
+    batches = ApplicationBatchRepository(session, tenant_id)
     running_batches = await batches.list_running()
     batch_summaries = []
     for batch in running_batches:
@@ -294,8 +325,12 @@ async def dashboard_summary(session: AsyncSession) -> dict[str, Any]:
     }
 
 
-async def serialize_batch(session: AsyncSession, batch_id: uuid.UUID) -> dict[str, Any]:
-    batches = ApplicationBatchRepository(session)
+async def serialize_batch(
+    session: AsyncSession,
+    batch_id: uuid.UUID,
+    tenant_id: uuid.UUID,
+) -> dict[str, Any]:
+    batches = ApplicationBatchRepository(session, tenant_id)
     batch = await batches.get_with_items(batch_id)
     if batch is None:
         msg = "Batch not found"

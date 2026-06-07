@@ -1,9 +1,10 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.middleware import require_auth
 from jober_api.db.session import get_session
 from jober_api.models.enums import JobTargetStatus
 from jober_api.repositories.job_target import JobTargetRepository
@@ -14,6 +15,7 @@ router = APIRouter(prefix="/job-targets", tags=["job-targets"])
 
 @router.get("")
 async def list_job_targets(
+    request: Request,
     session: AsyncSession = Depends(get_session),
     status_filter: JobTargetStatus | None = Query(None, alias="status"),
     priority: str | None = None,
@@ -24,7 +26,8 @@ async def list_job_targets(
     limit: int = Query(500, ge=1, le=2000),
     offset: int = Query(0, ge=0),
 ) -> dict[str, object]:
-    repo = JobTargetRepository(session)
+    auth = require_auth(request)
+    repo = JobTargetRepository(session, auth.tenant_id)
     rows = await repo.list_filtered(
         status=status_filter,
         priority=priority,
@@ -43,9 +46,11 @@ async def list_job_targets(
 @router.patch("/{job_target_id}")
 async def patch_job_target(
     job_target_id: UUID,
+    request: Request,
     body: dict[str, object],
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
     allowed = {"status", "applied_date", "follow_up_date", "notes", "priority"}
     updates = {k: v for k, v in body.items() if k in allowed and v is not None}
     if not updates:
@@ -71,7 +76,7 @@ async def patch_job_target(
                     detail=f"Invalid {date_field}",
                 ) from exc
 
-    repo = JobTargetRepository(session)
+    repo = JobTargetRepository(session, auth.tenant_id)
     updated = await repo.update_fields(job_target_id, **updates)
     if updated is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
@@ -82,9 +87,11 @@ async def patch_job_target(
 @router.get("/{job_target_id}")
 async def get_job_target(
     job_target_id: UUID,
+    request: Request,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
-    repo = JobTargetRepository(session)
+    auth = require_auth(request)
+    repo = JobTargetRepository(session, auth.tenant_id)
     row = await repo.get(job_target_id)
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")

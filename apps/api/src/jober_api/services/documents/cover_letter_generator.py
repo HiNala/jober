@@ -167,7 +167,7 @@ async def generate_cover_letter(
     )
     score_completion = await provider.complete(
         model=settings.llm_scoring_model,
-        system="Return JSON: {\"notes\": \"brief ATS commentary\"}",
+        system='Return JSON: {"notes": "brief ATS commentary"}',
         user=scoring_prompt,
         temperature=0.0,
     )
@@ -230,9 +230,7 @@ def _extraction_context(job: JobTarget) -> tuple[str, str, str]:
     description = str(raw.get("description") or "")
     requirements_list = raw.get("requirements")
     requirements = (
-        "\n".join(str(r) for r in requirements_list)
-        if isinstance(requirements_list, list)
-        else ""
+        "\n".join(str(r) for r in requirements_list) if isinstance(requirements_list, list) else ""
     )
     summary = str(raw.get("company_product_summary") or "")
     return description, requirements, summary

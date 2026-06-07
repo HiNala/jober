@@ -311,9 +311,7 @@ async def get_failure_report(session: AsyncSession, run_id: uuid.UUID) -> dict[s
     assessments = [a.self_assessment for a in attempts if a.self_assessment]
     last = attempts[-1] if attempts else None
     failure_class = (
-        FailureClass(last.failure_class)
-        if last and last.failure_class
-        else FailureClass.UNKNOWN
+        FailureClass(last.failure_class) if last and last.failure_class else FailureClass.UNKNOWN
     )
 
     report = build_failure_report(
@@ -403,9 +401,7 @@ async def get_failure_analytics(session: AsyncSession) -> dict[str, Any]:
                     "failure_class": failure_class,
                     "count": int(count),
                     "threshold": threshold,
-                    "message": (
-                        f"Circuit breaker: {count} {failure_class} failures on {platform}"
-                    ),
+                    "message": (f"Circuit breaker: {count} {failure_class} failures on {platform}"),
                 }
             )
     return {"buckets": buckets, "alerts": alerts}
