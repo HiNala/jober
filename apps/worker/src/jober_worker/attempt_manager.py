@@ -210,6 +210,7 @@ def persist_final_failure_report(
     *,
     run_id: uuid.UUID,
     report: FailureReport,
+    run_status: str = "failed_final",
 ) -> None:
     now = datetime.now(UTC)
     with get_sync_session() as session:
@@ -217,7 +218,7 @@ def persist_final_failure_report(
             text(
                 """
                 UPDATE application_runs
-                SET status = 'failed_final',
+                SET status = :status,
                     failure_reason = :reason,
                     checkpoint_data = COALESCE(checkpoint_data, '{}'::jsonb)
                         || CAST(:report AS jsonb),
@@ -227,6 +228,7 @@ def persist_final_failure_report(
                 """
             ),
             {
+                "status": run_status,
                 "reason": report.inferred_reason[:1000],
                 "report": json.dumps({"failure_report": report.to_dict()}),
                 "now": now,

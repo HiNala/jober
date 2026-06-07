@@ -37,6 +37,11 @@ async def recovery_fill(
             fixture_html=str(fixture_html),
             platform=str(payload.get("platform") or "greenhouse"),
             force_brittle=bool(payload.get("force_brittle")),
+            simulate_failure_class=(
+                str(payload["simulate_failure_class"])
+                if payload.get("simulate_failure_class")
+                else None
+            ),
         )
         await session.commit()
         return result

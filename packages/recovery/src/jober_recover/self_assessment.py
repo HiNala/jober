@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from jober_recover.strategy import RecoveryStrategy
-from jober_recover.taxonomy import FailureClass
+from jober_recover.taxonomy import FailureClass, is_human_only
 
 
 @dataclass(frozen=True)
@@ -35,11 +35,12 @@ def build_self_assessment(
     error_message: str,
     next_strategy: RecoveryStrategy | None,
 ) -> SelfAssessment:
-    next_change = (
-        f"Switch to {next_strategy.name}: {next_strategy.description}"
-        if next_strategy
-        else "Budget exhausted — produce failure report for human review"
-    )
+    if is_human_only(failure_class):
+        next_change = "Human handoff required — do not retry automatically"
+    elif next_strategy:
+        next_change = f"Switch to {next_strategy.name}: {next_strategy.description}"
+    else:
+        next_change = "Budget exhausted — produce failure report for human review"
     return SelfAssessment(
         attempt_index=attempt_index,
         strategy_name=strategy.name,

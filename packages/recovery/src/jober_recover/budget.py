@@ -31,6 +31,8 @@ class AttemptBudget:
         return attempt_index < self.max_attempts
 
     def next_status(self, attempt_index: int, *, failure_class: FailureClass) -> str:
+        if is_human_only(failure_class):
+            return "needs_human"
         if self.can_retry(attempt_index, failure_class=failure_class):
             return "failed_retryable"
         return "failed_final"

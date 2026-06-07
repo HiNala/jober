@@ -14,6 +14,7 @@ def test_classify_selector_failure() -> None:
 def test_budget_blocks_captcha_retry() -> None:
     budget = AttemptBudget()
     assert budget.can_retry(1, failure_class=FailureClass.CAPTCHA) is False
+    assert budget.next_status(1, failure_class=FailureClass.CAPTCHA) == "needs_human"
 
 
 def test_selector_recovery_strategy_escalates() -> None:

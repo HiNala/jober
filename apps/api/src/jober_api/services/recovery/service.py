@@ -10,7 +10,7 @@ from jober_recover.circuit_breaker import CircuitBreaker
 from jober_recover.failure_report import build_failure_report
 from jober_recover.self_assessment import build_self_assessment
 from jober_recover.strategy import RecoveryStrategy, propose_recovery_strategy
-from jober_recover.taxonomy import FailureClass
+from jober_recover.taxonomy import FailureClass, is_human_only
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -81,6 +81,7 @@ async def recovery_fill_from_fixture(
     fixture_html: str,
     platform: str = "greenhouse",
     force_brittle: bool = False,
+    simulate_failure_class: str | None = None,
 ) -> dict[str, Any]:
     jobs = JobTargetRepository(session)
     job = await jobs.get(job_target_id)
@@ -140,15 +141,24 @@ async def recovery_fill_from_fixture(
         )
         attempted_actions.append(f"{strategy.name}:{strategy.locator_mode}")
 
-        result = await asyncio.to_thread(
-            run_fixture_recovery_fill,
-            run_id=run_id,
-            attempt_id=attempt_id,
-            fixture_html=fixture_html,
-            observations=observations,
-            profile_values=profile_values,
-            strategy=strategy,
-        )
+        if simulate_failure_class:
+            failure_class = FailureClass(simulate_failure_class)
+            result = {
+                "status": "failed",
+                "failure_class": failure_class.value,
+                "error": f"Simulated {failure_class.value} for fixture test",
+                "artifact_keys": {},
+            }
+        else:
+            result = await asyncio.to_thread(
+                run_fixture_recovery_fill,
+                run_id=run_id,
+                attempt_id=attempt_id,
+                fixture_html=fixture_html,
+                observations=observations,
+                profile_values=profile_values,
+                strategy=strategy,
+            )
 
         if result.get("status") == "succeeded":
             if strategy.remember_mapping:
@@ -217,6 +227,10 @@ async def recovery_fill_from_fixture(
         if not budget.can_retry(attempt_index, failure_class=last_failure_class):
             break
 
+    final_status = (
+        RunStatus.NEEDS_HUMAN if is_human_only(last_failure_class) else RunStatus.FAILED_FINAL
+    )
+    attempt_total = len(assessments) if is_human_only(last_failure_class) else budget.max_attempts
     report = build_failure_report(
         job_target_id=str(job_target_id),
         company=job.company,
@@ -225,18 +239,23 @@ async def recovery_fill_from_fixture(
         failed_step=RunStatus.FILL_FORM.value,
         failure_class=last_failure_class,
         error_message=last_error,
-        attempt_count=budget.max_attempts,
+        attempt_count=attempt_total,
         artifact_keys={k: v for k, v in last_keys.items()},
         attempted_actions=attempted_actions,
         self_assessments=assessments,
     )
-    await asyncio.to_thread(persist_final_failure_report, run_id=run_id, report=report)
+    await asyncio.to_thread(
+        persist_final_failure_report,
+        run_id=run_id,
+        report=report,
+        run_status=final_status.value,
+    )
     await session.commit()
 
     circuit_state = _circuit_breaker.state_for(platform, last_failure_class)
     return {
         "run_id": str(run_id),
-        "status": RunStatus.FAILED_FINAL.value,
+        "status": final_status.value,
         "failure_report": report.to_dict(),
         "circuit_alert": circuit_state.to_dict() if circuit_state.tripped else None,
     }
