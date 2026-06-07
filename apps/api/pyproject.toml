@@ -26,6 +26,7 @@ dependencies = [
     "reportlab>=4.2.5",
     "jober-schemas",
     "jober-extraction",
+    "jober-forms",
 ]
 
 [tool.hatch.metadata]
@@ -70,6 +71,7 @@ module = [
     "docx.*",
     "reportlab.*",
     "jober_extraction.*",
+    "jober_forms.*",
     "jober_schemas.*",
     "celery",
     "celery.*",

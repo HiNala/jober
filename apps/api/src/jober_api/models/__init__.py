@@ -3,6 +3,7 @@ from jober_api.models.application_run import ApplicationRun
 from jober_api.models.browser_event import BrowserEvent
 from jober_api.models.company_board import CompanyBoard
 from jober_api.models.cover_letter_angle import CoverLetterAngle
+from jober_api.models.field_mapping_memory import FieldMappingMemory
 from jober_api.models.form_field_observation import FormFieldObservation
 from jober_api.models.generated_document import GeneratedDocument
 from jober_api.models.human_checkpoint import HumanCheckpoint
@@ -18,6 +19,7 @@ __all__ = [
     "BrowserEvent",
     "CompanyBoard",
     "CoverLetterAngle",
+    "FieldMappingMemory",
     "FormFieldObservation",
     "GeneratedDocument",
     "HumanCheckpoint",

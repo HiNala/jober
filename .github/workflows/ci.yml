@@ -84,6 +84,7 @@ jobs:
         run: |
           pip install "./packages/schemas"
           pip install "./packages/extraction"
+          pip install "./packages/forms"
           pip install "./apps/api[dev]"
 
       - name: Export shared TypeScript types

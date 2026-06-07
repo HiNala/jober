@@ -19,6 +19,7 @@ from jober_api.models import (  # noqa: F401 — register metadata
     BrowserEvent,
     CompanyBoard,
     CoverLetterAngle,
+    FieldMappingMemory,
     FormFieldObservation,
     GeneratedDocument,
     HumanCheckpoint,
