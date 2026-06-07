@@ -24,6 +24,7 @@ import {
   generateCoverLetter,
   type GeneratedDocumentRead,
 } from "@/lib/api/documents";
+import { formatApiError } from "@/lib/api/errors";
 import { fetchProfile } from "@/lib/api/vault";
 
 export function DocumentStudio() {
@@ -43,7 +44,7 @@ export function DocumentStudio() {
       setLetterText(doc.text);
       toast.success(doc.cached ? "Loaded cached letter" : "Cover letter generated");
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Cover letter generation failed")),
   });
 
   const selectedJob = useMemo(
