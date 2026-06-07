@@ -8,31 +8,31 @@ from datetime import UTC, datetime
 from typing import Any
 
 import httpx
-from sqlalchemy import select, text
-from sqlalchemy.orm import joinedload
-
 from jober_api.models.application_run import ApplicationRun
 from jober_api.models.batch_item import BatchItem
 from jober_api.models.enums import BatchItemStatus, RunPolicy, RunStatus
 from jober_api.services.batch import redis_control
 from jober_api.services.batch.domain import job_apply_url
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session, joinedload
+
 from jober_worker.config import settings as worker_settings
 from jober_worker.db import get_sync_session
 
 
 def _sync_append_run_event(
-    session: object,
+    session: Session,
     *,
     run_id: uuid.UUID,
     event_type: str,
     message: str,
     payload: dict[str, Any] | None = None,
 ) -> None:
-    seq_row = session.execute(  # type: ignore[union-attr]
+    seq_row = session.execute(
         text("SELECT COALESCE(MAX(seq), 0) + 1 FROM run_events WHERE run_id = :run_id"),
         {"run_id": str(run_id)},
     ).scalar_one()
-    session.execute(  # type: ignore[union-attr]
+    session.execute(
         text(
             """
             INSERT INTO run_events (
@@ -61,10 +61,9 @@ async def _run_fixture_pipeline(
     html: str,
     platform: str,
 ) -> dict[str, Any]:
-    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
     from jober_api.services.form_discovery.service import discover_from_fixture_html
     from jober_api.services.form_fill.service import fill_from_fixture_html
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
     engine = create_async_engine(worker_settings.database_url, connect_args={"ssl": False})
     factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -155,12 +154,18 @@ def run_batch_item(item_id: uuid.UUID) -> dict[str, Any]:
                 from jober_api.services.batch.cost_governor import assert_generation_budget
 
                 async def _budget() -> None:
-                    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+                    from sqlalchemy.ext.asyncio import (
+                        AsyncSession,
+                        async_sessionmaker,
+                        create_async_engine,
+                    )
 
                     engine = create_async_engine(
                         worker_settings.database_url, connect_args={"ssl": False}
                     )
-                    factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+                    factory = async_sessionmaker(
+                        engine, class_=AsyncSession, expire_on_commit=False
+                    )
                     try:
                         async with factory() as async_session:
                             await assert_generation_budget(async_session, projected_cost=0.2)

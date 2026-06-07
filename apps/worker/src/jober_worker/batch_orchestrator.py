@@ -3,20 +3,20 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import select
-from sqlalchemy.orm import joinedload
-
 from jober_api.config import settings
 from jober_api.models.application_batch import ApplicationBatch
 from jober_api.models.batch_item import BatchItem
 from jober_api.models.enums import BatchItemStatus, BatchStatus
 from jober_api.services.batch import redis_control
 from jober_api.services.batch.quiet_hours import in_quiet_hours
+from sqlalchemy import select
+from sqlalchemy.orm import Session, joinedload
+
 from jober_worker.db import get_sync_session
 
 
-def _complete_batch_if_done(session: object, batch: ApplicationBatch) -> None:
-    pending = session.execute(  # type: ignore[union-attr]
+def _complete_batch_if_done(session: Session, batch: ApplicationBatch) -> None:
+    pending = session.execute(
         select(BatchItem).where(
             BatchItem.batch_id == batch.id,
             BatchItem.status.in_([BatchItemStatus.PENDING, BatchItemStatus.RUNNING]),

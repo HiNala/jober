@@ -3,9 +3,23 @@
 FROM python:3.12-slim AS builder
 
 WORKDIR /build
-COPY apps/worker /build
+COPY packages/schemas /build/packages/schemas
+COPY packages/extraction /build/packages/extraction
+COPY packages/forms /build/packages/forms
+COPY packages/fill /build/packages/fill
+COPY packages/verification /build/packages/verification
+COPY packages/recovery /build/packages/recovery
+COPY apps/api /build/apps/api
+COPY apps/worker /build/apps/worker
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir --prefix=/install .
+    && pip install --no-cache-dir --prefix=/install /build/packages/schemas \
+    && pip install --no-cache-dir --prefix=/install /build/packages/extraction \
+    && pip install --no-cache-dir --prefix=/install /build/packages/forms \
+    && pip install --no-cache-dir --prefix=/install /build/packages/fill \
+    && pip install --no-cache-dir --prefix=/install /build/packages/verification \
+    && pip install --no-cache-dir --prefix=/install /build/packages/recovery \
+    && pip install --no-cache-dir --prefix=/install /build/apps/api \
+    && pip install --no-cache-dir --prefix=/install /build/apps/worker
 
 FROM python:3.12-slim AS runtime
 
