@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     quiet_hours_end: str = "07:00"
     quiet_hours_timezone: str = "UTC"
     auto_submit_opt_in: bool = False
+    jober_env: str = "development"
+    log_mode: str = "redacted"
+    presigned_url_ttl_minutes: int = 15
+    require_secrets: bool = False
 
 
 settings = Settings()

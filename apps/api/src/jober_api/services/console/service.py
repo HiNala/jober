@@ -4,7 +4,6 @@ import asyncio
 import json
 import uuid
 from collections.abc import AsyncIterator
-from datetime import timedelta
 from typing import Any
 
 from jober_schemas.run_console import RunEventType
@@ -74,7 +73,7 @@ async def _presign(storage: ObjectStorage, key: str | None) -> str | None:
     if not key:
         return None
     try:
-        return await storage.presigned_get(key, expires=timedelta(hours=1))
+        return await storage.presigned_get(key)
     except Exception:  # noqa: BLE001
         return None
 
@@ -386,7 +385,7 @@ async def resolve_checkpoint(
 async def artifact_url_for_key(session: AsyncSession, key: str) -> str:
     del session
     storage = ObjectStorage()
-    url = await storage.presigned_get(key, expires=timedelta(hours=1))
+    url = await storage.presigned_get(key)
     return url
 
 

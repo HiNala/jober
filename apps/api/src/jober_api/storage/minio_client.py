@@ -73,7 +73,13 @@ class ObjectStorage:
 
         return await asyncio.to_thread(_put)
 
-    async def presigned_get(self, key: str, expires: timedelta = timedelta(hours=1)) -> str:
+    async def presigned_get(
+        self,
+        key: str,
+        expires: timedelta | None = None,
+    ) -> str:
+        if expires is None:
+            expires = timedelta(minutes=settings.presigned_url_ttl_minutes)
         return await asyncio.to_thread(
             self._client.presigned_get_object,
             self._bucket,
@@ -84,8 +90,10 @@ class ObjectStorage:
     async def presigned_put(
         self,
         key: str,
-        expires: timedelta = timedelta(hours=1),
+        expires: timedelta | None = None,
     ) -> str:
+        if expires is None:
+            expires = timedelta(minutes=settings.presigned_url_ttl_minutes)
         return await asyncio.to_thread(
             self._client.presigned_put_object,
             self._bucket,
@@ -109,6 +117,19 @@ class ObjectStorage:
 
     async def bucket_exists(self) -> bool:
         return await asyncio.to_thread(self._client.bucket_exists, self._bucket)
+
+    async def list_object_keys(self, prefix: str) -> list[str]:
+        def _list() -> list[str]:
+            objects = self._client.list_objects(self._bucket, prefix=prefix)
+            return [obj.object_name for obj in objects]
+
+        return await asyncio.to_thread(_list)
+
+    async def remove_prefix(self, prefix: str) -> int:
+        keys = await self.list_object_keys(prefix)
+        for key in keys:
+            await self.remove_object(key)
+        return len(keys)
 
 
 def new_upload_key(prefix: str, suffix: str = "") -> str:
