@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+  <form id="apply-form">
+    <h2>Workday-style application</h2>
+    <label for="full-name">Full name</label>
+    <input id="full-name" name="fullName" type="text" required />
+    <label>
+      <input id="needs-relocation" type="checkbox" />
+      Willing to relocate
+    </label>
+    <div id="relocation-panel" hidden>
+      <label for="relocation-city">Preferred relocation city</label>
+      <input id="relocation-city" name="relocationCity" type="text" />
+    </div>
+    <button type="submit">Submit application</button>
+  </form>
+  <script>
+    document.getElementById("needs-relocation").addEventListener("change", (e) => {
+      document.getElementById("relocation-panel").hidden = !e.target.checked;
+    });
+  </script>
+</body>
+</html>
