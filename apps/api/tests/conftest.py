@@ -1,6 +1,12 @@
 import os
 from collections.abc import AsyncGenerator
 
+# Worker sync sessions read DATABASE_URL via pydantic-settings (Playwright fill tests).
+os.environ.setdefault(
+    "DATABASE_URL",
+    "postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable",
+)
+
 import pytest
 import pytest_asyncio
 from cryptography.fernet import Fernet

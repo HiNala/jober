@@ -57,6 +57,10 @@ async def test_fill_single_step_fixture(db_session, truncate_tables) -> None:
             assert body.get("fill_diffs")
             assert "email" in body["fill_diffs"]
             assert body["fill_diffs"]["email"]["matched"] is True
+            email_row = next(i for i in body["items"] if i["field_key"] == "email")
+            assert email_row["status"] == "filled"
+            assert isinstance(email_row.get("evidence"), dict)
+            assert "fill_diff" in (email_row["evidence"] or {})
     finally:
         app.dependency_overrides.clear()
 
