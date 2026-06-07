@@ -14,6 +14,7 @@ from jober_worker.browser.session import browser_session
 from jober_worker.browser.typed_actions import TypedBrowserActions
 from jober_worker.db import get_sync_session
 from jober_worker.fill_runner import _attempt_keys
+from jober_worker.run_event_writer import persist_run_event
 from jober_worker.storage import ObjectStorage
 
 
@@ -150,6 +151,22 @@ def persist_verify_result(
             },
         )
         if passed:
+            persist_run_event(
+                run_id=run_id,
+                event_type="human.required",
+                message="HUMAN CHECKPOINT: review_and_submit",
+                attempt_index=1,
+                payload={"checkpoint_type": "review_submit", "readiness": readiness},
+                screenshot_key=artifact_keys.get("screenshot"),
+            )
+            persist_run_event(
+                run_id=run_id,
+                event_type="state.changed",
+                message="Run awaiting review and submit",
+                attempt_index=1,
+                payload={"status": status, "step": step},
+                screenshot_key=artifact_keys.get("screenshot"),
+            )
             session.execute(
                 text(
                     """
@@ -168,5 +185,22 @@ def persist_verify_result(
                     "options": json.dumps({"human_summary": human_summary, "readiness": readiness}),
                     "now": now,
                 },
+            )
+        else:
+            persist_run_event(
+                run_id=run_id,
+                event_type="verification.warning",
+                message=reason or "Readiness check failed",
+                attempt_index=1,
+                payload={"readiness": readiness},
+                screenshot_key=artifact_keys.get("screenshot"),
+            )
+            persist_run_event(
+                run_id=run_id,
+                event_type="state.changed",
+                message="Verification needs human review",
+                attempt_index=1,
+                payload={"status": status, "step": step},
+                screenshot_key=artifact_keys.get("screenshot"),
             )
         session.commit()

@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from jober_api.models.human_checkpoint import HumanCheckpoint
     from jober_api.models.job_target import JobTarget
     from jober_api.models.llm_call import LlmCall
+    from jober_api.models.run_event import RunEvent
 
 
 class ApplicationRun(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -52,3 +53,4 @@ class ApplicationRun(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     checkpoints: Mapped[list["HumanCheckpoint"]] = relationship(back_populates="run")
     llm_calls: Mapped[list["LlmCall"]] = relationship(back_populates="run")
     generated_documents: Mapped[list["GeneratedDocument"]] = relationship(back_populates="run")
+    run_events: Mapped[list["RunEvent"]] = relationship(back_populates="run")

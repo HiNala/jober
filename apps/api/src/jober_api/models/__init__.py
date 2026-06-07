@@ -12,6 +12,7 @@ from jober_api.models.job_target import JobTarget
 from jober_api.models.llm_call import LlmCall
 from jober_api.models.profile_common_answer import ProfileCommonAnswer
 from jober_api.models.resume_asset import ResumeAsset
+from jober_api.models.run_event import RunEvent
 from jober_api.models.user_profile import UserProfile
 
 __all__ = [
@@ -29,5 +30,6 @@ __all__ = [
     "ProfileCommonAnswer",
     "LlmCall",
     "ResumeAsset",
+    "RunEvent",
     "UserProfile",
 ]

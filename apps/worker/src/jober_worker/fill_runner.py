@@ -16,6 +16,7 @@ from jober_worker.browser.session import browser_session
 from jober_worker.browser.typed_actions import TypedBrowserActions
 from jober_worker.db import get_sync_session
 from jober_worker.fill_context import is_sensitive_observation, load_fill_context
+from jober_worker.run_event_writer import persist_observation_as_run_event, persist_run_event
 from jober_worker.storage import ObjectStorage
 
 
@@ -63,6 +64,14 @@ def run_fixture_form_fill(
         for o in observations
     ]
 
+    persist_run_event(
+        run_id=run_id,
+        event_type="run.started",
+        message="Fixture fill run started",
+        attempt_index=attempt_index,
+        payload={"job_target_id": str(job_target_id)},
+    )
+
     with browser_session(run_id=run_id, attempt_index=attempt_index) as session:
 
         def _on_event(obs: Any, selector: str | None, screenshot_key: str | None) -> None:
@@ -71,6 +80,14 @@ def run_fixture_form_fill(
                 observation=obs,
                 selector=selector,
                 screenshot_key=screenshot_key,
+            )
+            persist_observation_as_run_event(
+                run_id=run_id,
+                attempt_index=attempt_index,
+                event_type=obs.event_type,
+                message=obs.message,
+                screenshot_key=screenshot_key,
+                payload={"url": obs.url, "selector": selector},
             )
 
         actions = TypedBrowserActions(
@@ -101,6 +118,14 @@ def run_fixture_form_fill(
                 gate=gate,
                 prompt=checkpoint["prompt"],
             )
+            persist_run_event(
+                run_id=run_id,
+                event_type="human.required",
+                message=checkpoint["prompt"],
+                attempt_index=attempt_index,
+                payload={"gate": gate.value},
+                screenshot_key=keys["screenshot"],
+            )
             return {
                 "status": "needs_human",
                 "gate": gate.value,
@@ -116,6 +141,13 @@ def run_fixture_form_fill(
                 "Resolve sensitive fields before auto-fill.",
             )
             _persist_sensitive_checkpoint(run_id=run_id, prompt="Sensitive fields require review")
+            persist_run_event(
+                run_id=run_id,
+                event_type="human.required",
+                message="Sensitive fields require review",
+                attempt_index=attempt_index,
+                payload={"gate": "sensitive_field"},
+            )
             _update_observation_statuses(obs_attempt, outcomes, obs_inputs)
             return {
                 "status": "needs_human",
@@ -130,6 +162,23 @@ def run_fixture_form_fill(
 
         _update_observation_statuses(obs_attempt, outcomes, obs_inputs)
         _persist_fill_success(run_id, attempt_id, keys)
+        for outcome in outcomes:
+            if outcome.status == "filled":
+                persist_run_event(
+                    run_id=run_id,
+                    event_type="field.filled",
+                    message=f'filled field="{outcome.field_key}" status=ok',
+                    attempt_index=attempt_index,
+                    payload={"field_key": outcome.field_key},
+                )
+        persist_run_event(
+            run_id=run_id,
+            event_type="state.changed",
+            message="Fill step completed",
+            attempt_index=attempt_index,
+            payload={"status": "fill_form", "step": "fill_form"},
+            screenshot_key=keys["screenshot"],
+        )
 
         return {
             "status": "succeeded",

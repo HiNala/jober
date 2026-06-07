@@ -22,6 +22,7 @@ from jober_api.models import (  # noqa: F401 — register metadata
     JobTarget,
     LlmCall,
     ResumeAsset,
+    RunEvent,
     UserProfile,
 )
 
