@@ -17,6 +17,8 @@ dependencies = [
     "minio>=7.2.12",
     "cryptography>=43.0.0",
     "jober-extraction",
+    "jober-forms",
+    "jober-fill",
     "jober-schemas",
 ]
 
@@ -50,7 +52,7 @@ packages = ["jober_worker"]
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["celery", "celery.*"]
+module = ["celery", "celery.*", "jober_fill.*", "jober_forms.*", "jober_extraction.*", "playwright.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

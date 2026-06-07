@@ -153,6 +153,18 @@ Sensitive EEO/salary fields always surface as `needs_review`. High-confidence pu
 
 After pulling Mission 07+, run `make migrate` once (adds `field_mapping_memory`).
 
+## Form filling (Mission 08)
+
+Fill discovered fields via typed Playwright actions (label/role locators first) and attach resume + cover letter from MinIO.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/job-targets/{id}/fill-form` | Fill via `fixture_html` (CI) or enqueue browser worker |
+
+Each filled field stores a masked `fill_diff` (`proposed_redacted` vs `actual_redacted`) in observation evidence for Mission 09 review. Login/CAPTCHA/sensitive fields create human checkpoints — never bypassed.
+
+Local install also needs `packages/fill` and Playwright Chromium (`playwright install chromium`).
+
 ## Cover letters (Mission 05)
 
 Generate grounded cover letters at `/documents` (Document Studio).

@@ -27,6 +27,7 @@ dependencies = [
     "jober-schemas",
     "jober-extraction",
     "jober-forms",
+    "jober-fill",
 ]
 
 [tool.hatch.metadata]
@@ -39,6 +40,7 @@ dev = [
     "ruff>=0.8.0",
     "mypy==2.1.0",
     "types-redis>=4.6.0",
+    "playwright==1.49.1",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -72,6 +74,8 @@ module = [
     "reportlab.*",
     "jober_extraction.*",
     "jober_forms.*",
+    "jober_fill.*",
+    "jober_worker.*",
     "jober_schemas.*",
     "celery",
     "celery.*",

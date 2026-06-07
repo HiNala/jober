@@ -32,3 +32,11 @@ class ObjectStorage:
             length=len(data),
             content_type=content_type,
         )
+
+    def get_bytes(self, key: str) -> bytes:
+        response = self.client.get_object(self.bucket, key)
+        try:
+            return response.read()
+        finally:
+            response.close()
+            response.release_conn()

@@ -85,7 +85,10 @@ jobs:
           pip install "./packages/schemas"
           pip install "./packages/extraction"
           pip install "./packages/forms"
+          pip install "./packages/fill"
+          pip install "./apps/worker[dev]"
           pip install "./apps/api[dev]"
+          playwright install chromium
 
       - name: Export shared TypeScript types
         run: python packages/schemas/scripts/export_typescript.py
@@ -111,7 +114,10 @@ jobs:
         run: pytest -q
 
       - name: Install worker dependencies
-        run: pip install "./apps/worker[dev]"
+        run: |
+          pip install "./packages/fill"
+          pip install "./apps/worker[dev]"
+          playwright install chromium
 
       - name: Ruff (worker)
         working-directory: apps/worker
