@@ -172,6 +172,11 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
+      MINIO_ENDPOINT: localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: jober-artifacts
+      MINIO_SECURE: "false"
       VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
       CI: "true"
       FIXTURE_ATS_PORT: "8765"
@@ -181,6 +186,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Start MinIO
+        run: |
+          docker run -d --name minio \
+            -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e \
+            server /data
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:9000/minio/health/live && exit 0
+            sleep 1
+          done
+          echo "MinIO failed to become healthy" >&2
+          exit 1
+      - name: Install MinIO client and create bucket
+        run: |
+          curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
+          chmod +x mc
+          ./mc alias set local http://localhost:9000 minioadmin minioadmin
+          ./mc mb local/jober-artifacts --ignore-existing
       - name: Install dependencies
         run: |
           pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
@@ -231,7 +256,7 @@ jobs:
         run: alembic upgrade head
       - name: Quarantined flaky tests (non-blocking)
         working-directory: apps/api
-        run: pytest -q -m quarantine
+        run: pytest -q -m quarantine || test $? -eq 5
 
   web:
     runs-on: ubuntu-latest
