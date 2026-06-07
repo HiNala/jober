@@ -205,6 +205,36 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 07 — Discovered fields panel (job detail drawer)
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Table columns map 1:1 to observation schema; no chart junk |
+| Kare | 2 | Review vs auto-fill badges; Approve affordance on flagged rows |
+| Norman | 2 | Empty state explains when discovery runs; masked preview only |
+| Nielsen | 2 | Confidence color + summary counts at a glance |
+| Tufte | 2 | Redacted preview column; no raw vault values in UI |
+| Vignelli | 2 | Shared table/select primitives with queue and vault |
+| Rand | 2 | Amber review badge without alarmist copy |
+| Maeda | 2 | Panel nested in drawer — justified detail surface |
+| Wroblewski | 2 | Horizontal scroll on narrow viewports; drawer scroll |
+| Ive | 2 | Monospace preview; restrained confidence tones |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 07) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `test_discover_form_requires_fixture_html` | Clear 422 when browser path not yet wired |
+| README form discovery section + `packages/forms` in pip install | Cold-start path for M07 local dev |
+| `FormFieldObservationRead` TypeScript export | Job drawer panel types align with API |
+| `FieldMappingMemory` in Alembic metadata imports | Migration drift check covers new table |
+
+---
+
 ## Mission 99 (post–Mission 06) — improvements logged
 
 | Change | Why |

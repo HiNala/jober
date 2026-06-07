@@ -133,11 +133,25 @@ After pulling Mission 06+, run `make migrate` once (adds `extracted_job_profile`
 Local API dev (install shared packages before the API wheel):
 
 ```bash
-pip install "./packages/schemas" "./packages/extraction"
+pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
 pip install "./apps/api[dev]"
 ```
 
 Browser extraction requires the worker (`make up` or `celery -A jober_worker.celery_app worker`). Use `fixture_html` in the extract body for CI-safe tests without Playwright.
+
+## Form discovery (Mission 07)
+
+Scan apply forms into typed field observations with confidence scores and redacted value previews.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/job-targets/{id}/discover-form` | Scan fixture HTML → `FormFieldObservation` rows |
+| `GET /api/job-targets/{id}/field-observations` | Latest discovery inventory for review |
+| `PATCH /api/job-targets/field-observations/{id}` | Edit mapping/status; `remember: true` stores label→field memory |
+
+Sensitive EEO/salary fields always surface as `needs_review`. High-confidence public fields are eligible for auto-fill (`skipped` status). Review mapped fields in the job detail drawer before Mission 08 fill.
+
+After pulling Mission 07+, run `make migrate` once (adds `field_mapping_memory`).
 
 ## Cover letters (Mission 05)
 
