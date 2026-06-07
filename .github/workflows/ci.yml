@@ -45,6 +45,7 @@ jobs:
       CELERY_RESULT_BACKEND: redis://localhost:6379/1
       VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
       CI: "true"
+      FIXTURE_ATS_PORT: "8765"
 
     steps:
       - uses: actions/checkout@v4
@@ -80,12 +81,15 @@ jobs:
           pip install detect-secrets==1.5.0
           detect-secrets scan --baseline .secrets.baseline
 
-      - name: Install shared packages and API dependencies
+      - name: Install shared packages and dependencies
         run: |
           pip install "./packages/schemas"
           pip install "./packages/extraction"
           pip install "./packages/forms"
           pip install "./packages/fill"
+          pip install "./packages/verification"
+          pip install "./packages/recovery"
+          pip install "./fixtures/ats"
           pip install "./apps/worker[dev]"
           pip install "./apps/api[dev]"
           playwright install chromium
@@ -109,15 +113,15 @@ jobs:
         working-directory: apps/api
         run: mypy src
 
-      - name: Pytest (api)
-        working-directory: apps/api
-        run: pytest -q
-
-      - name: Install worker dependencies
+      - name: Pytest packages
         run: |
-          pip install "./packages/fill"
-          pip install "./apps/worker[dev]"
-          playwright install chromium
+          pytest -q packages/verification/tests
+          pytest -q packages/recovery/tests
+          pytest -q fixtures/ats/tests
+
+      - name: Pytest (api) with coverage
+        working-directory: apps/api
+        run: pytest -q --cov=jober_api --cov-report=xml --cov-report=term-missing
 
       - name: Ruff (worker)
         working-directory: apps/worker
@@ -130,6 +134,100 @@ jobs:
       - name: Pytest (worker)
         working-directory: apps/worker
         run: pytest -q
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage
+          path: apps/api/coverage.xml
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: |
+            apps/worker/test-results
+            apps/api/test-results
+          if-no-files-found: ignore
+
+  policy:
+    runs-on: ubuntu-latest
+    needs: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: jober
+          POSTGRES_PASSWORD: jober
+          POSTGRES_DB: jober
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jober -d jober"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
+      VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
+      CI: "true"
+      FIXTURE_ATS_PORT: "8765"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
+          pip install "./packages/fill" "./fixtures/ats" "./apps/api[dev]"
+          playwright install chromium
+      - name: Alembic migrate
+        working-directory: apps/api
+        run: alembic upgrade head
+      - name: Policy tests (blocking)
+        working-directory: apps/api
+        run: pytest -q -m policy
+
+  quarantine:
+    runs-on: ubuntu-latest
+    needs: backend
+    continue-on-error: true
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: jober
+          POSTGRES_PASSWORD: jober
+          POSTGRES_DB: jober
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jober -d jober"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
+      VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
+          pip install "./packages/fill" "./fixtures/ats" "./apps/api[dev]"
+      - name: Alembic migrate
+        working-directory: apps/api
+        run: alembic upgrade head
+      - name: Quarantined flaky tests (non-blocking)
+        working-directory: apps/api
+        run: pytest -q -m quarantine
 
   web:
     runs-on: ubuntu-latest

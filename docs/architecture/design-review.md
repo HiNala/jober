@@ -410,3 +410,26 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Seed stores work authorization in encrypted vault only | Plaintext column must not be a bypass path |
 | `test_vault_security` + PDF route test | Fixture for legacy-column bypass + upload format routing |
 | README `make migrate` note for M04 schema | Cold-start contributor path |
+
+---
+
+## Mission 12 — Test fixtures & CI hardening (2026-06-06)
+
+**Scope:** `fixtures/ats/` synthetic ATS server, test pyramid, blocking policy CI job, coverage gate.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Fixtures are minimal synthetic HTML; no scraped ATS markup |
+| Kare | 1 | Developer-facing; no end-user UI in this mission |
+| Norman | 2 | Catalog + outcomes manifest make fixture intent explicit |
+| Nielsen | 2 | `docs/architecture/testing.md` documents pyramid and markers |
+| Tufte | 2 | Outcome table maps route → expected gate/fill/discovery |
+| Vignelli | 2 | Consistent slug layout under `behaviors/`, `gates/`, `platforms/` |
+| Rand | 1 | Infra mission; brand N/A |
+| Maeda | 2 | Policy lane separated from default pytest for clarity |
+| Wroblewski | 1 | N/A for test infra |
+| Ive | 2 | Deterministic offline CI; no live submissions in tests |
+
+**Total: 19/20** — passes gate.
+
+**Follow-ups:** add browser worker E2E that asserts DB state per fixture when worker fill path stabilizes.

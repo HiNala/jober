@@ -4,7 +4,7 @@ COMPOSE := docker compose $(COMPOSE_ENV) -f $(COMPOSE_FILE)
 COMPOSE_FULL := COMPOSE_PROFILES=full $(COMPOSE)
 COMPOSE_INFRA := COMPOSE_PROFILES=infra $(COMPOSE)
 
-.PHONY: up down logs infra api-shell worker-shell fmt lint test web-lint web-build migrate migrate-check seed schemas-export backup restore doctor ping-worker tui
+.PHONY: up down logs infra api-shell worker-shell fmt lint test test-fixtures test-policy fixture-serve web-lint web-build migrate migrate-check seed schemas-export backup restore doctor ping-worker tui
 
 up:
 	$(COMPOSE_FULL) up -d --build
@@ -42,6 +42,19 @@ lint:
 test:
 	cd apps/api && pytest -q
 	cd apps/worker && pytest -q
+
+test-fixtures:
+	pip install -e ./fixtures/ats -q
+	python -m pytest -q fixtures/ats/tests
+	cd apps/api && pytest -q tests/test_fixture_pipeline.py
+	cd apps/worker && pytest -q tests/test_fixture_browser.py
+
+test-policy:
+	cd apps/api && pytest -q -m policy
+
+fixture-serve:
+	pip install -e ./fixtures/ats -q
+	python -m jober_fixtures.server --port $${FIXTURE_ATS_PORT:-8765}
 
 web-lint:
 	cd apps/web && pnpm lint:strict && pnpm typecheck && pnpm test

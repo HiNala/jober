@@ -43,6 +43,9 @@ make infra
 | `make logs` | Tail service logs |
 | `make lint` | Ruff + mypy (api + worker) |
 | `make test` | Pytest (api + worker) |
+| `make test-fixtures` | Fixture catalog + pipeline + browser tests |
+| `make test-policy` | Blocking policy suite (`pytest -m policy`) |
+| `make fixture-serve` | Local ATS fixture server on :8765 |
 | `make fmt` | Format + auto-fix |
 | `make doctor` | Check tools and port conflicts |
 | `make ping-worker` | Dispatch Celery ping task |
@@ -82,6 +85,8 @@ apps/
   web/      Next.js app shell + design system (Mission 02)
 packages/
   schemas/  Shared Pydantic types + `generated/types.ts` for the web app
+fixtures/
+  ats/      Synthetic ATS pages for offline CI (see `docs/architecture/testing.md`)
 infra/
   compose.yaml
   docker/   Dockerfiles

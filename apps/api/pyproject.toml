@@ -39,10 +39,12 @@ allow-direct-references = true
 dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
     "ruff>=0.8.0",
     "mypy==2.1.0",
     "types-redis>=4.6.0",
     "playwright==1.49.1",
+    "httpx>=0.28.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -89,3 +91,16 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "policy: blocking safety invariant tests",
+    "quarantine: flaky tests excluded from default CI",
+]
+addopts = "-m 'not quarantine'"
+
+[tool.coverage.run]
+source = ["jober_api"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+fail_under = 55
+show_missing = true
