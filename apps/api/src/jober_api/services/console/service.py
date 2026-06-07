@@ -16,6 +16,7 @@ from jober_api.models.enums import CheckpointStatus, CheckpointType, RunStatus
 from jober_api.models.human_checkpoint import HumanCheckpoint
 from jober_api.models.job_target import JobTarget
 from jober_api.models.run_event import RunEvent
+from jober_api.privacy.redaction import scrub_event_message
 from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.repositories.run_event import RunEventRepository
@@ -352,7 +353,9 @@ async def resolve_checkpoint(
     # Generic gate checkpoints (captcha, login, sensitive, etc.)
     if action_norm == "approve":
         checkpoint.status = CheckpointStatus.RESOLVED
-        checkpoint.resolved_value = value
+        checkpoint.resolved_value = (
+            scrub_event_message(str(value)) if value is not None else None
+        )
         await runs.update_fields(run_id, status=RunStatus.FILL_FORM)
         await append_run_event(
             session,

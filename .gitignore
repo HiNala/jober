@@ -52,6 +52,9 @@ playwright-report/
 test-results/
 *.zip
 .blob_storage/
+**/storage-state.enc
+*.storage-state.json
+jober-artifacts/
 
 # OS cruft
 .DS_Store

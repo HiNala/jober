@@ -491,6 +491,19 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 14) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `sk-` regex allows hyphens in API key pattern | OpenAI-style test keys with hyphens slipped through scrubber |
+| Scrub `HumanCheckpoint.resolved_value` on approve | Operator notes could persist secrets outside run-event chokepoint |
+| `make test` installs `jober-api` before worker pytest | Worker imports `jober_api.privacy`; local `make test` failed while CI passed |
+| `.gitignore` for `storage-state.enc` / `jober-artifacts/` | Mission 14 artifact types must not land in git |
+| `test_browser_storage_state_encrypted_in_minio` | Fixture proves cookie values are ciphertext at rest in MinIO |
+| `test_checkpoint_resolved_value_scrubbed` | Policy test for checkpoint DB column scrub path |
+
+---
+
 ## Mission 99 (post–Mission 13) — improvements logged
 
 | Change | Why |

@@ -6,7 +6,7 @@ from typing import Any
 _EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 _PHONE_RE = re.compile(r"\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b")
 _BEARER_RE = re.compile(r"Bearer\s+[A-Za-z0-9._\-]+", re.I)
-_SK_KEY_RE = re.compile(r"\bsk-[A-Za-z0-9]{16,}\b")
+_SK_KEY_RE = re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b")
 _API_KEY_PAIR_RE = re.compile(
     r"(?i)(api[_-]?key|password|secret|token|authorization)\s*[:=]\s*['\"]?([^\s'\",;]+)",
 )

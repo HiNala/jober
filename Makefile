@@ -40,6 +40,7 @@ lint:
 	$(MAKE) web-lint
 
 test:
+	pip install -q "./apps/api[dev]" "./apps/worker[dev]"
 	cd apps/api && pytest -q
 	cd apps/worker && pytest -q
 

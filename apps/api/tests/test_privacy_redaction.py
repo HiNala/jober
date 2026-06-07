@@ -88,3 +88,24 @@ async def test_run_event_persistence_scrubs_secrets(db_session, truncate_tables)
     stored = f"{row.message} {row[1]}"
     assert secret not in stored
     assert "nalamaui30@gmail.com" not in stored
+
+
+@pytest.mark.asyncio
+async def test_browser_storage_state_encrypted_in_minio() -> None:
+    if os.getenv("CI") != "true" and os.getenv("RUN_INTEGRATION") != "1":
+        pytest.skip("requires MinIO")
+
+    import uuid
+
+    from jober_api.privacy.browser_state import load_run_storage_state, save_run_storage_state
+    from jober_api.storage.keys import run_storage_state_key
+    from jober_api.storage.minio_client import ObjectStorage
+
+    run_id = uuid.uuid4()
+    state = {"cookies": [{"name": "session", "value": "top-secret-cookie"}]}
+    await save_run_storage_state(run_id, state)
+    raw = await ObjectStorage().get_bytes(run_storage_state_key(run_id))
+    assert b"top-secret-cookie" not in raw
+    restored = await load_run_storage_state(run_id)
+    assert restored == state
+    await ObjectStorage().remove_object(run_storage_state_key(run_id))
