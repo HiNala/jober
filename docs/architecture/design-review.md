@@ -606,6 +606,25 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Run console `dynamic()` import | Route-level code-split for faster dashboard first paint |
 | Vault masked sensitive reveal | Wroblewski pass — values never shown raw by default |
 | Skip links on landing + app shell | Keyboard path into main content |
+| Settings panel wired to M15 APIs | Stub settings page was weakest surface; shows usage + policy guidance |
+| `settings.test.ts` | Fixture for policy fetch success path |
+
+### Settings (M99 addendum)
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Usage + policy only; no decorative chrome |
+| Kare | 2 | auto_submit disclosure highlighted |
+| Norman | 2 | Retry on API failure |
+| Nielsen | 2 | Plan limits scannable in three cards |
+| Tufte | 2 | Tabular nums, no chartjunk |
+| Vignelli | 2 | Matches dashboard card grid |
+| Rand | 1 | Utility surface |
+| Maeda | 2 | Guidance list is the content |
+| Wroblewski | 2 | Stacked mobile layout |
+| Ive | 2 | Coherent with M16 tokens |
+
+**Total: 19/20** — passes gate.
 
 ---
 

@@ -1,10 +1,11 @@
-import { PageEmpty } from "@/components/states/page-states";
+import { SettingsPanel } from "@/components/settings/settings-panel";
+import { spacing } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   return (
-    <PageEmpty
-      title="Settings"
-      description="Run policy defaults, LLM budgets, and notification preferences arrive in later missions."
-    />
+    <div className={cn(spacing.page, "mx-auto max-w-3xl")}>
+      <SettingsPanel />
+    </div>
   );
 }

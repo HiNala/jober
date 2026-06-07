@@ -25,4 +25,8 @@
 - [x] `lint:strict` / `typecheck` / `build` green
 
 ## Mission 99
-- [x] Gates green; design scores recorded; release tagged `v0.16.0-design`
+- [x] Settings panel wired to `/api/settings/policy` + `/api/billing/usage` (was stub)
+- [x] Web gates green (`lint:strict`, `typecheck`, `build`, vitest 12)
+- [x] API `ruff` + `mypy` green; full pytest requires CI Postgres locally
+- [x] Design Council scores in `design-review.md` (incl. settings addendum 19/20)
+- [x] Release tagged `v0.16.0-design`; M99 commit pushed to `origin/main`
