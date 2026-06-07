@@ -91,8 +91,8 @@ jobs:
           pip install "./packages/verification"
           pip install "./packages/recovery"
           pip install "./fixtures/ats"
-          pip install "./apps/worker[dev]"
           pip install "./apps/api[dev]"
+          pip install "./apps/worker[dev]"
           playwright install chromium
 
       - name: Export shared TypeScript types
