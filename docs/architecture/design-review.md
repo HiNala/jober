@@ -445,3 +445,4 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Pushed 3 Mission 12 commits + M99 fix to `origin/main` | Mission boundary hygiene — remote was 3 commits behind |
 | `RunEvent` index aligned with migration (`ix_run_events_run_id_seq`) | CI migrate-check was failing on model vs migration drift |
 | `PLAYWRIGHT_HEADED=false` in CI + headless fixture browser tests | Playwright fill tests launched headed browsers on Linux runners without X11 |
+| Policy CI job provisions MinIO + full package install | Gate/fill policy tests upload screenshot artifacts; job was missing `jober-recover` and MinIO |
