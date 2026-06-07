@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     vault_encryption_key: str = ""
     playwright_headed: bool = True
     playwright_slow_mo_ms: int = 0
+    browserless_url: str = ""
     redis_url: str = "redis://localhost:6379/0"
     batch_tick_seconds: int = 5
 

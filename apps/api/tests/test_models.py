@@ -37,7 +37,7 @@ async def test_application_run_defaults(db_session, truncate_tables) -> None:
 
     from jober_api.models.application_run import ApplicationRun
 
-    run = ApplicationRun(job_target_id=job.id)
+    run = ApplicationRun(job_target_id=job.id, tenant_id=job.tenant_id)
     db_session.add(run)
     await db_session.commit()
     await db_session.refresh(run)

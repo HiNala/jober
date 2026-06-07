@@ -53,10 +53,13 @@ def browser_session(
     video_dir = artifacts / "video"
 
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(
-            headless=not settings.playwright_headed,
-            slow_mo=settings.playwright_slow_mo_ms,
-        )
+        if settings.browserless_url:
+            browser = playwright.chromium.connect_over_cdp(settings.browserless_url)
+        else:
+            browser = playwright.chromium.launch(
+                headless=not settings.playwright_headed,
+                slow_mo=settings.playwright_slow_mo_ms,
+            )
         video_dir.mkdir(parents=True, exist_ok=True)
         context = browser.new_context(
             storage_state=cast(Any, storage_state),

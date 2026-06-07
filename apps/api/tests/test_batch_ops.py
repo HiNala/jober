@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID
 from jober_api.config import settings
 from jober_api.main import app
 from jober_api.models.application_batch import ApplicationBatch
@@ -58,7 +59,7 @@ async def test_preview_excludes_already_applied(db_session, truncate_tables) -> 
         direct_apply_url="http://fixtures.local/behaviors/single-step",
     )
     await db_session.commit()
-    preview = await preview_batch(db_session, {"priority": "A"})
+    preview = await preview_batch(db_session, {"priority": "A"}, DEFAULT_DEV_TENANT_ID)
     assert len(preview["included"]) == 1
     assert preview["excluded"][0]["reason"] == "already_applied"
 
@@ -76,7 +77,7 @@ async def test_preview_excludes_prior_successful_run(db_session, truncate_tables
     runs = ApplicationRunRepository(db_session)
     await runs.create(job_target_id=job.id, status=RunStatus.SUCCEEDED)
     await db_session.commit()
-    preview = await preview_batch(db_session, {"priority": "A"})
+    preview = await preview_batch(db_session, {"priority": "A"}, DEFAULT_DEV_TENANT_ID)
     assert preview["included"] == []
     assert preview["excluded"][0]["reason"] == "prior_successful_run"
 
@@ -102,6 +103,7 @@ async def test_orchestrator_defers_when_domain_locked(db_session, truncate_table
         direct_apply_url="https://boards.greenhouse.io/acme/jobs/1",
     )
     batch = ApplicationBatch(
+        tenant_id=DEFAULT_DEV_TENANT_ID,
         name="domain-lock test",
         status=BatchStatus.RUNNING,
         policy=RunPolicy.DRY_RUN,

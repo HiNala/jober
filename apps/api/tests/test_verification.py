@@ -230,9 +230,7 @@ async def test_auto_submit_requires_explicit_opt_in(db_session, truncate_tables)
 
 
 @pytest.mark.asyncio
-async def test_uncertain_submission_needs_human_verification(
-    db_session, truncate_tables
-) -> None:
+async def test_uncertain_submission_needs_human_verification(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 
     job = await _seed_job(db_session)

@@ -160,10 +160,14 @@ async def test_login_fixture_creates_human_checkpoint(db_session, truncate_table
             assert run.status == RunStatus.NEEDS_HUMAN
 
             checkpoints = (
-                await db_session.execute(
-                    select(HumanCheckpoint).where(HumanCheckpoint.run_id == run.id)
+                (
+                    await db_session.execute(
+                        select(HumanCheckpoint).where(HumanCheckpoint.run_id == run.id)
+                    )
                 )
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
             assert len(checkpoints) == 1
             assert checkpoints[0].status == CheckpointStatus.OPEN
     finally:

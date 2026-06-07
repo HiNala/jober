@@ -64,6 +64,7 @@ async def test_reimport_preserves_app_status_when_runs_exist(db_session, truncat
     target.status = JobTargetStatus.IN_PROGRESS
     db_session.add(
         ApplicationRun(
+            tenant_id=target.tenant_id,
             job_target_id=target.id,
             status=RunStatus.QUEUED,
             policy=RunPolicy.REVIEW_BEFORE_SUBMIT,
