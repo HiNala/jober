@@ -23,6 +23,15 @@ class Settings(BaseSettings):
     llm_scoring_model: str = "gpt-4o-mini"
     llm_embedding_model: str = "text-embedding-3-small"
     llm_monthly_budget_usd: float = 25.0
+    llm_budget_soft_warn_ratio: float = 0.8
+    batch_max_concurrency: int = 1
+    batch_site_cooldown_seconds: float = 30.0
+    batch_action_delay_ms: int = 500
+    batch_tick_seconds: int = 5
+    quiet_hours_start: str = "22:00"
+    quiet_hours_end: str = "07:00"
+    quiet_hours_timezone: str = "UTC"
+    auto_submit_opt_in: bool = False
 
 
 settings = Settings()

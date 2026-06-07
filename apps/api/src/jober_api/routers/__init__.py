@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from jober_api.routers.batches import router as batches_router
 from jober_api.routers.documents import router as documents_router
 from jober_api.routers.exports import router as exports_router
 from jober_api.routers.form_discovery import router as form_discovery_router
@@ -26,3 +27,4 @@ api_router.include_router(form_fill_router)
 api_router.include_router(verification_router)
 api_router.include_router(recovery_router)
 api_router.include_router(run_console_router)
+api_router.include_router(batches_router)
