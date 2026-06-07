@@ -15,7 +15,9 @@ from jober_api.db.base import Base
 from jober_api.db.migration_drift import material_diffs
 from jober_api.models import (  # noqa: F401 — register metadata
     ApplicationAttempt,
+    ApplicationBatch,
     ApplicationRun,
+    BatchItem,
     BrowserEvent,
     CompanyBoard,
     CoverLetterAngle,

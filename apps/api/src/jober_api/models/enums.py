@@ -69,3 +69,21 @@ class JobTargetStatus(StrEnum):
     REJECTED = "rejected"
     WITHDRAWN = "withdrawn"
     SKIPPED = "skipped"
+
+
+class BatchStatus(StrEnum):
+    DRAFT = "draft"
+    SCHEDULED = "scheduled"
+    RUNNING = "running"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class BatchItemStatus(StrEnum):
+    PENDING = "pending"
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+    CANCELLED = "cancelled"

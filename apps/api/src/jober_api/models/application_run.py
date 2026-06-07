@@ -13,6 +13,7 @@ from jober_api.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from jober_api.models.application_attempt import ApplicationAttempt
+    from jober_api.models.application_batch import ApplicationBatch
     from jober_api.models.generated_document import GeneratedDocument
     from jober_api.models.human_checkpoint import HumanCheckpoint
     from jober_api.models.job_target import JobTarget
@@ -47,8 +48,13 @@ class ApplicationRun(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     failure_reason: Mapped[str | None] = mapped_column(Text)
     human_review_required_reason: Mapped[str | None] = mapped_column(Text)
     checkpoint_data: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
-
+    batch_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("application_batches.id", ondelete="SET NULL"),
+        index=True,
+    )
     job_target: Mapped["JobTarget"] = relationship(back_populates="application_runs")
+    batch: Mapped["ApplicationBatch | None"] = relationship(back_populates="runs")
     attempts: Mapped[list["ApplicationAttempt"]] = relationship(back_populates="run")
     checkpoints: Mapped[list["HumanCheckpoint"]] = relationship(back_populates="run")
     llm_calls: Mapped[list["LlmCall"]] = relationship(back_populates="run")
