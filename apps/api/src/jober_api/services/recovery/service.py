@@ -141,6 +141,7 @@ async def recovery_fill_from_fixture(
         )
         attempted_actions.append(f"{strategy.name}:{strategy.locator_mode}")
 
+        result: dict[str, Any]
         if simulate_failure_class:
             failure_class = FailureClass(simulate_failure_class)
             result = {
@@ -186,7 +187,8 @@ async def recovery_fill_from_fixture(
 
         last_error = str(result.get("error", "unknown failure"))
         last_failure_class = FailureClass(result.get("failure_class", FailureClass.UNKNOWN.value))
-        last_keys = result.get("artifact_keys", {})
+        raw_keys = result.get("artifact_keys", {})
+        last_keys = {k: str(v) for k, v in dict(raw_keys).items()}
         next_strategy = (
             propose_recovery_strategy(
                 last_failure_class,

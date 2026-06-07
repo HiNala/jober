@@ -10,6 +10,7 @@ from jober_api.routers.job_targets import router as job_targets_router
 from jober_api.routers.profile import router as profile_router
 from jober_api.routers.recovery import router as recovery_router
 from jober_api.routers.resumes import router as resumes_router
+from jober_api.routers.run_console import router as run_console_router
 from jober_api.routers.verification import router as verification_router
 
 api_router = APIRouter(prefix="/api")
@@ -24,3 +25,4 @@ api_router.include_router(form_discovery_router)
 api_router.include_router(form_fill_router)
 api_router.include_router(verification_router)
 api_router.include_router(recovery_router)
+api_router.include_router(run_console_router)
