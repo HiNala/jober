@@ -1,11 +1,10 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, CheckCircle2, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -65,26 +64,6 @@ function confidenceTone(confidence: number | null | undefined): string {
   if (confidence >= 0.82) return "text-emerald-600";
   if (confidence >= 0.65) return "text-amber-600";
   return "text-rose-600";
-}
-
-function statusBadge(status: FieldObservationStatus) {
-  if (status === "skipped") {
-    return (
-      <Badge variant="secondary" className="gap-1">
-        <CheckCircle2 className="size-3" aria-hidden />
-        Auto-fill
-      </Badge>
-    );
-  }
-  if (status === "needs_review") {
-    return (
-      <Badge variant="outline" className="gap-1 border-amber-500/50 text-amber-700">
-        <AlertCircle className="size-3" aria-hidden />
-        Review
-      </Badge>
-    );
-  }
-  return <Badge variant="outline">{status}</Badge>;
 }
 
 export interface DiscoveredFieldsPanelProps {
@@ -239,7 +218,27 @@ function FieldRow({ row, platform, disabled, onPatch }: FieldRowProps) {
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          {statusBadge(row.status)}
+          <Select
+            value={row.status}
+            disabled={disabled}
+            onValueChange={(value) =>
+              onPatch({
+                status: value as FieldObservationStatus,
+                platform: platform ?? "generic",
+              })
+            }
+          >
+            <SelectTrigger className="h-8 w-[130px]" aria-label={`Status for ${row.label ?? row.field_key}`}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_OPTIONS.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status === "skipped" ? "Auto-fill" : status.replace("_", " ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {row.status === "needs_review" && (
             <Button
               size="sm"
