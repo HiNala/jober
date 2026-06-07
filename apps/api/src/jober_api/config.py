@@ -17,7 +17,12 @@ class Settings(BaseSettings):
     secret_key: str = ""
     vault_encryption_key: str = ""
     llm_api_key: str = ""
+    llm_provider: str = "openai"
+    llm_base_url: str = "https://api.openai.com/v1"
+    llm_draft_model: str = "gpt-4o-mini"
+    llm_scoring_model: str = "gpt-4o-mini"
     llm_embedding_model: str = "text-embedding-3-small"
+    llm_monthly_budget_usd: float = 25.0
 
 
 settings = Settings()
