@@ -22,3 +22,9 @@
 - Resume continues from checkpoint (not attempt 1)
 - Circuit breaker trips at 5 same-class failures
 - Gates green
+
+## Mission 99 (post–Mission 10)
+- [x] Confirmed label recoveries persist to `FieldMappingMemory`
+- [x] Circuit breaker no double-record on final report
+- [x] Web `recovery.test.ts` + job-target failure-report API test
+- [x] Gates green (90 API, 5 recovery pkg, web lint/typecheck/build)

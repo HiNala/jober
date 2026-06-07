@@ -226,6 +226,18 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 10) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `FieldMappingMemory.remember` on label recovery success | Confirmed recoveries feed Mission 07 mapping memory |
+| `CircuitBreaker.state_for` without double-count | Final failure report reused loop-recorded events |
+| `recovery.test.ts` 404 → null | Job drawer failure panel without throwing on clean jobs |
+| Job-target `GET /failure-report` acceptance test | Drawer uses job id, not run id |
+| Selector recovery asserts memory lookup | Fixture-for-bug: label strategy must persist mapping |
+
+---
+
 ## Mission 99 (post–Mission 09) — improvements logged
 
 | Change | Why |

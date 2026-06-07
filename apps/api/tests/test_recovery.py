@@ -64,6 +64,12 @@ async def test_selector_failure_recovers_on_label_attempt(db_session, truncate_t
             assert body["status"] == "succeeded"
             assert body["attempt_count"] == 2
             assert "email" in body["filled"]
+
+            from jober_api.repositories.field_mapping_memory import FieldMappingMemoryRepository
+
+            memory = FieldMappingMemoryRepository(db_session)
+            mapped = await memory.lookup("greenhouse", "Email address")
+            assert mapped == "email"
     finally:
         app.dependency_overrides.clear()
 
@@ -104,6 +110,10 @@ async def test_unrecoverable_failure_produces_report(db_session, truncate_tables
             detail = await client.get(f"/api/application-runs/{body['run_id']}/failure-report")
             assert detail.status_code == 200
             assert detail.json()["company"] == "Acme"
+
+            by_job = await client.get(f"/api/job-targets/{job.id}/failure-report")
+            assert by_job.status_code == 200
+            assert by_job.json()["safe_to_retry"] is True
     finally:
         app.dependency_overrides.clear()
 
