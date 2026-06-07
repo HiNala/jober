@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,13 +15,15 @@ if TYPE_CHECKING:
 
 class RunEvent(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "run_events"
-    __table_args__ = (UniqueConstraint("run_id", "seq", name="uq_run_events_run_seq"),)
+    __table_args__ = (
+        UniqueConstraint("run_id", "seq", name="uq_run_events_run_seq"),
+        Index("ix_run_events_run_id_seq", "run_id", "seq"),
+    )
 
     run_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("application_runs.id", ondelete="CASCADE"),
         nullable=False,
-        index=True,
     )
     seq: Mapped[int] = mapped_column(BigInteger, nullable=False)
     ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
