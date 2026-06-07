@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from jober_api.models.user_profile import UserProfile
@@ -9,7 +9,7 @@ from jober_api.vault.field_registry import FIELD_BY_KEY, FieldTier, VaultFieldSp
 from jober_api.vault.sensitive_store import get_consent_flags, load_sensitive_answers
 
 
-class FillOutcome(str, Enum):
+class FillOutcome(StrEnum):
     VALUE = "value"
     NEEDS_HUMAN = "needs_human"
 

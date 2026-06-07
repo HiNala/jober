@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class FieldTier(str, Enum):
+class FieldTier(StrEnum):
     PUBLIC = "public"
     PREFERENCE = "preference"
     SENSITIVE = "sensitive"
