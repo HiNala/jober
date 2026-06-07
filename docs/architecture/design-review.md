@@ -525,6 +525,90 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 16 — World-class design pass (2026-06-07)
+
+### Landing & marketing hero
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Motion isolated to hero; in-app stays quiet |
+| Kare | 2 | Honest pillars: you choose, review, handoffs |
+| Norman | 2 | Clear CTAs; skip link |
+| Nielsen | 2 | Product promise readable in one screen |
+| Tufte | 2 | Three pillars, no chartjunk |
+| Vignelli | 2 | Grid-aligned feature row |
+| Rand | 2 | Distinct voice vs auto-submitters |
+| Maeda | 2 | One hero animation surface |
+| Wroblewski | 2 | Mobile-friendly stack |
+| Ive | 2 | Backdrop blur cards feel crafted |
+
+**Total: 20/20**
+
+### Dashboard
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Needs-attention banner only when signal exists |
+| Kare | 1 | Functional tone (appropriate) |
+| Norman | 2 | Metric emphasis on review count |
+| Nielsen | 2 | “What needs me now” hierarchy |
+| Tufte | 2 | High signal density, skeletons not spinners |
+| Vignelli | 2 | Consistent card grid |
+| Rand | 1 | In-app chrome |
+| Maeda | 2 | No decorative charts |
+| Wroblewski | 2 | Responsive grid |
+| Ive | 2 | Tabular nums on metrics |
+
+**Total: 19/20**
+
+### Run console
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Single status badge + stream badge |
+| Kare | 2 | Calm checkpoint card copy |
+| Norman | 2 | Screenshot + timeline + log layout |
+| Nielsen | 2 | Reconnect affordance |
+| Tufte | 2 | Terminal uses tokens, not raw zinc |
+| Vignelli | 2 | Two-column grid |
+| Rand | 1 | Utility surface |
+| Maeda | 2 | Event stream clarifies state |
+| Wroblewski | 1 | Dense on mobile; scroll works |
+| Ive | 2 | Authoritative, not noisy |
+
+**Total: 19/20**
+
+### Profile vault & review-submit
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Masked sensitive values by default |
+| Kare | 2 | Consent copy plain and direct |
+| Norman | 2 | Fieldsets, labels, `htmlFor` |
+| Nielsen | 2 | Review readable in five seconds |
+| Tufte | 2 | Fill diff table with caption |
+| Vignelli | 2 | Tier grouping |
+| Rand | 1 | Forms-heavy |
+| Maeda | 2 | Wroblewski grouping |
+| Wroblewski | 2 | Highest-stakes forms polished |
+| Ive | 2 | Mask + reveal pattern |
+
+**Total: 19/20**
+
+---
+
+## Mission 99 (post–Mission 16) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `lib/design/tokens.ts` + `motion.ts` | Single documented source; purge one-off motion classes |
+| `NeedsAttentionBanner` | Dashboard Tufte pass — “what needs me now” |
+| Run console `dynamic()` import | Route-level code-split for faster dashboard first paint |
+| Vault masked sensitive reveal | Wroblewski pass — values never shown raw by default |
+| Skip links on landing + app shell | Keyboard path into main content |
+
+---
+
 ## Mission 99 (post–Mission 15) — improvements logged
 
 | Change | Why |
