@@ -105,7 +105,7 @@ pnpm install
 pnpm dev                     # http://localhost:3000
 ```
 
-Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/settings`, `/kitchen-sink` (component catalog).
+Routes: `/` (landing), `/dashboard`, `/queue`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
 
 **Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
 

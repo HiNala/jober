@@ -41,9 +41,12 @@
 
 ## Notes
 - Delete account confirm phrase: `DELETE ALL MY DATA`
-- Partial UI: resume version history preview, job list reorder/archive UI, 2FA setup stub
+- Partial UI: resume version history preview, 2FA setup stub (job list archive/reorder UI added in M99)
 - Iteration clause: global search — done
 
 ## Mission 99 (post–Mission 22)
 - [x] Search lint fix; BYOK gateway wiring; API tests for prefs/BYOK
 - [x] Design review 20/20 logged
+- [x] Job list archive/reorder UI; library search + archive API tests
+- [x] Provider-key PUT never returns full secret (test)
+- [x] README updated for `/library`, `/search`, Mission 22 prefs/BYOK

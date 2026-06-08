@@ -733,6 +733,9 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `buttonVariants` on library links | Base UI `Button` has no `asChild` |
 | `resolve_llm_runtime` + user BYOK | Gateway reads encrypted per-user keys at generation time |
 | Preferences/BYOK API tests | Locks server-side persistence and no-secret-in-response |
+| Job list archive + reorder in Library UI | Mission 22 partial task; API existed without affordances |
+| `test_library_api` search + archive fixtures | Regression coverage for cross-library search and list lifecycle |
+| README Mission 22 routes + prefs/BYOK note | New contributors can find Library/Settings without mission history |
 
 ---
 
