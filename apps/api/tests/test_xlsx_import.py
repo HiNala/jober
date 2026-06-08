@@ -5,6 +5,7 @@ import os
 import pytest
 from sqlalchemy import func, select
 
+from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID
 from jober_api.models.company_board import CompanyBoard
 from jober_api.models.cover_letter_angle import CoverLetterAngle
 from jober_api.models.job_target import JobTarget
@@ -40,11 +41,15 @@ def test_parse_workbook_mapping_preview() -> None:
 async def test_import_upsert_and_export(db_session, truncate_tables) -> None:
     data = build_sample_workbook(job_count=3, board_count=2, angle_count=2)
 
-    preview = await import_jobs_workbook(db_session, data, dry_run=True)
+    preview = await import_jobs_workbook(
+        db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=True
+    )
     assert preview.dry_run is True
     assert preview.job_targets.created == 3
 
-    first = await import_jobs_workbook(db_session, data, dry_run=False)
+    first = await import_jobs_workbook(
+        db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False
+    )
     assert first.job_targets.created == 3
     assert first.company_boards.created == 2
     assert first.cover_letter_angles.created == 2
@@ -52,13 +57,15 @@ async def test_import_upsert_and_export(db_session, truncate_tables) -> None:
     job_count = await db_session.scalar(select(func.count()).select_from(JobTarget))
     assert job_count == 3
 
-    second = await import_jobs_workbook(db_session, data, dry_run=False)
+    second = await import_jobs_workbook(
+        db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False
+    )
     assert second.job_targets.created == 0
     assert second.job_targets.updated == 3
     job_count_after = await db_session.scalar(select(func.count()).select_from(JobTarget))
     assert job_count_after == 3
 
-    exported = await export_jobs_workbook(db_session)
+    exported = await export_jobs_workbook(db_session, DEFAULT_DEV_TENANT_ID)
     assert exported.startswith(b"PK")
 
     board_count = await db_session.scalar(select(func.count()).select_from(CompanyBoard))

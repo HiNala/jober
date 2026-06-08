@@ -7,6 +7,7 @@ import pytest
 from openpyxl import load_workbook
 from sqlalchemy import select
 
+from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID
 from jober_api.models.enums import JobTargetStatus
 from jober_api.models.job_target import JobTarget
 from jober_api.repositories.job_target import JobTargetRepository
@@ -36,7 +37,7 @@ def _status_for_company(exported: bytes, company: str) -> str | None:
 @pytest.mark.asyncio
 async def test_export_reflects_app_status_after_update(db_session, truncate_tables) -> None:
     data = build_sample_workbook(job_count=2, board_count=1, angle_count=1)
-    await import_jobs_workbook(db_session, data, dry_run=False)
+    await import_jobs_workbook(db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False)
 
     target = (
         await db_session.execute(select(JobTarget).where(JobTarget.company == "Company 1"))
@@ -45,7 +46,7 @@ async def test_export_reflects_app_status_after_update(db_session, truncate_tabl
     target.notes = "Submitted via Jober"
     await db_session.commit()
 
-    exported = await export_jobs_workbook(db_session)
+    exported = await export_jobs_workbook(db_session, DEFAULT_DEV_TENANT_ID)
     assert _status_for_company(exported, "Company 1") == "Applied"
     assert _status_for_company(exported, "Company 2") == "Not started"
 
@@ -56,7 +57,7 @@ async def test_reimport_preserves_app_status_when_runs_exist(db_session, truncat
     from jober_api.models.enums import RunPolicy, RunStatus
 
     data = build_sample_workbook(job_count=1, board_count=0, angle_count=0)
-    await import_jobs_workbook(db_session, data, dry_run=False)
+    await import_jobs_workbook(db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False)
 
     target = (
         await db_session.execute(select(JobTarget).where(JobTarget.company == "Company 1"))
@@ -73,7 +74,7 @@ async def test_reimport_preserves_app_status_when_runs_exist(db_session, truncat
     await db_session.commit()
 
     # Workbook still says "Not started" for Company 1
-    report = await import_jobs_workbook(db_session, data, dry_run=False)
+    report = await import_jobs_workbook(db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False)
     assert report.job_targets.updated == 1
     repo = JobTargetRepository(db_session)
     refreshed = await repo.get(target.id)

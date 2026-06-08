@@ -120,6 +120,54 @@ async def test_cross_tenant_export_and_purge_blocked(db_session, truncate_tables
 
 
 @pytest.mark.asyncio
+async def test_cross_tenant_documents_blocked(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+    from jober_api.models.enums import DocumentType
+    from jober_api.models.generated_document import GeneratedDocument
+
+    db_session.add(
+        Tenant(
+            id=TENANT_B,
+            name="Tenant B",
+            plan=PlanTier.FREE,
+            policy={},
+        )
+    )
+    db_session.add(
+        User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B")
+    )
+    jobs = JobTargetRepository(db_session, DEFAULT_DEV_TENANT_ID)
+    job = await jobs.create(company="Doc Co", role="Eng", status=JobTargetStatus.NEW)
+    db_session.add(
+        GeneratedDocument(
+            job_target_id=job.id,
+            document_type=DocumentType.COVER_LETTER,
+            text="Hello",
+        )
+    )
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    headers_b = {
+        "X-Jober-Tenant-Id": str(TENANT_B),
+        "X-Jober-User-Id": str(USER_B),
+    }
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            listing = await client.get(
+                f"/api/documents?job_target_id={job.id}",
+                headers=headers_b,
+            )
+            assert listing.status_code == 404
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_cross_tenant_run_console_blocked(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 

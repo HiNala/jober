@@ -66,6 +66,7 @@ async def generate_cover_letter(
     session: AsyncSession,
     storage: ObjectStorage,
     *,
+    tenant_id: uuid.UUID,
     job_target_id: uuid.UUID,
     force: bool = False,
     include_docx: bool = True,
@@ -73,15 +74,15 @@ async def generate_cover_letter(
     job_requirements: str = "",
     company_summary: str = "",
 ) -> dict[str, Any]:
-    jobs = JobTargetRepository(session)
+    jobs = JobTargetRepository(session, tenant_id)
     job = await jobs.get(job_target_id)
     if job is None:
         msg = "Job target not found"
         raise ValueError(msg)
 
-    profiles = UserProfileRepository(session)
+    profiles = UserProfileRepository(session, tenant_id)
     profile = await profiles.get_singleton()
-    resumes = ResumeAssetRepository(session)
+    resumes = ResumeAssetRepository(session, tenant_id)
     resume = await resumes.get_active()
     if resume is None or not resume.extracted_text:
         msg = "Upload a canonical resume before generating a cover letter"

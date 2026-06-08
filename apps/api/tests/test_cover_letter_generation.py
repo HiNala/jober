@@ -7,6 +7,7 @@ from io import BytesIO
 import pytest
 from docx import Document
 
+from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID
 from jober_api.config import settings
 from jober_api.models.enums import DocumentType, JobTargetStatus
 from jober_api.models.llm_call import LlmCall
@@ -128,6 +129,7 @@ async def test_generate_cover_letter_persists_document(
     result = await generate_cover_letter(
         db_session,
         storage,
+        tenant_id=DEFAULT_DEV_TENANT_ID,
         job_target_id=job.id,
         force=True,
     )
@@ -203,6 +205,7 @@ async def test_generation_rejects_unsupported_claims_after_retries(
         await generate_cover_letter(
             db_session,
             ObjectStorage(),
+            tenant_id=DEFAULT_DEV_TENANT_ID,
             job_target_id=job.id,
             force=True,
         )

@@ -115,6 +115,7 @@ async def import_jobs_workbook(
     session: AsyncSession,
     data: bytes,
     *,
+    tenant_id: uuid.UUID,
     dry_run: bool = False,
     import_id: str | None = None,
 ) -> ImportReport:
@@ -164,7 +165,7 @@ async def import_jobs_workbook(
             report.cover_letter_angles.created = len(parsed.cover_letter_angles.records)
         return report
 
-    job_repo = JobTargetRepository(session)
+    job_repo = JobTargetRepository(session, tenant_id)
     board_repo = CompanyBoardRepository(session)
     angle_repo = CoverLetterAngleRepository(session)
 
@@ -233,7 +234,7 @@ async def import_jobs_workbook(
 
             existing_job = await job_repo.find_by_upsert_key(company, role, direct_url)
             sheet_status = parse_status(raw.get("status"))
-            fields = {
+            fields: dict[str, object] = {
                 "rank": parse_int(raw.get("rank")),
                 "priority": normalize_priority(raw.get("priority")),
                 "company": company,
@@ -256,6 +257,7 @@ async def import_jobs_workbook(
 
             if existing_job is None:
                 fields["status"] = sheet_status
+                fields["tenant_id"] = tenant_id
                 await job_repo.create(**fields)
                 report.job_targets.created += 1
             else:

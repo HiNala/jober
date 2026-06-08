@@ -50,9 +50,10 @@ async def upload_resume(
     skills_index: dict[str, Any] = parse_skills_index(text)
     skills_index["claims_index"] = build_claims_index(text, skills_index)
 
-    repo = ResumeAssetRepository(session)
+    repo = ResumeAssetRepository(session, profile.tenant_id)
     asset = await repo.create(
         id=asset_id,
+        tenant_id=profile.tenant_id,
         object_key=key,
         original_filename=filename,
         extracted_text=text,

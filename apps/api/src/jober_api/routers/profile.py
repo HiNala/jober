@@ -40,7 +40,7 @@ async def _load_profile_context(
     session: AsyncSession, tenant_id: uuid.UUID
 ) -> tuple[Any, Any, Any]:
     profiles = UserProfileRepository(session, tenant_id)
-    resumes = ResumeAssetRepository(session)
+    resumes = ResumeAssetRepository(session, tenant_id)
     profile = await profiles.get_or_create_for_tenant()
     active = await resumes.get_active()
     return profiles, profile, active

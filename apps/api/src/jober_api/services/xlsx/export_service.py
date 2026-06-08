@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from io import BytesIO
 
 from openpyxl import Workbook
@@ -16,8 +17,8 @@ from jober_api.services.xlsx.sheet_specs import (
 )
 
 
-async def export_jobs_workbook(session: AsyncSession) -> bytes:
-    job_repo = JobTargetRepository(session)
+async def export_jobs_workbook(session: AsyncSession, tenant_id: uuid.UUID) -> bytes:
+    job_repo = JobTargetRepository(session, tenant_id)
     board_repo = CompanyBoardRepository(session)
     angle_repo = CoverLetterAngleRepository(session)
 
