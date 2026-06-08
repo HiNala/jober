@@ -23,6 +23,9 @@ PUBLIC_API_PREFIXES = (
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
     "/api/auth/refresh",
+    "/api/auth/google/start",
+    "/api/auth/google/callback",
+    "/api/auth/google/confirm-link",
 )
 
 

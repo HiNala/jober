@@ -59,3 +59,19 @@ class SessionListResponse(BaseModel):
 class TotpSetupResponse(BaseModel):
     enabled: bool
     message: str
+
+
+class AuthIdentityResponse(BaseModel):
+    provider: str
+    provider_email: str | None
+    display_name: str | None
+    linked_at: datetime
+
+
+class IdentityListResponse(BaseModel):
+    items: list[AuthIdentityResponse]
+
+
+class ConfirmOAuthLinkRequest(BaseModel):
+    token: str
+    password: str = Field(min_length=1, max_length=128)

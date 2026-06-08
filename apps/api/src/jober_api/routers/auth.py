@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.cookies import clear_auth_cookies, set_auth_cookies
 from jober_api.auth.csrf import verify_csrf
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.oauth.state_store import consume_oauth_state
+from jober_api.auth.oauth.types import OAuthIntent
 from jober_api.auth.rate_limit import check_rate_limit
 from jober_api.auth.sessions import (
     create_session,
@@ -17,12 +22,15 @@ from jober_api.auth.sessions import (
 )
 from jober_api.config import settings
 from jober_api.db.session import get_session
+from jober_api.models.enums import AuthProvider
 from jober_api.models.user import User
 from jober_api.schemas.auth import (
     AuthMessageResponse,
     AuthUserResponse,
     ChangePasswordRequest,
+    ConfirmOAuthLinkRequest,
     ForgotPasswordRequest,
+    IdentityListResponse,
     LoginRequest,
     RegisterRequest,
     ResetPasswordRequest,
@@ -30,6 +38,7 @@ from jober_api.schemas.auth import (
     TotpSetupResponse,
     VerifyEmailRequest,
 )
+from jober_api.services.auth import oauth_service
 from jober_api.services.auth import service as auth_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -217,3 +226,135 @@ async def totp_setup() -> TotpSetupResponse:
         enabled=False,
         message="TOTP 2FA scaffolding — enable in a future mission",
     )
+
+
+def _web_redirect(path: str) -> str:
+    base = settings.web_app_url.rstrip("/")
+    if not path.startswith("/"):
+        path = f"/{path}"
+    return f"{base}{path}"
+
+
+async def _issue_session(response: Response, user_id: uuid.UUID, tenant_id: uuid.UUID) -> None:
+    session_id, refresh_id, csrf = await create_session(user_id, tenant_id)
+    set_auth_cookies(response, session_id, refresh_id, csrf)
+
+
+@router.get("/google/start")
+async def google_oauth_start(
+    request: Request,
+    next_path: str = Query("/dashboard"),
+    _: None = Depends(_require_rate_limit),
+) -> RedirectResponse:
+    start = await oauth_service.start_oauth_flow(
+        AuthProvider.GOOGLE,
+        intent=OAuthIntent.SIGN_IN,
+        next_path=next_path,
+    )
+    return RedirectResponse(start.authorization_url, status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/google/link/start")
+async def google_link_start(
+    request: Request,
+    next_path: str = Query("/settings"),
+) -> RedirectResponse:
+    auth = require_auth(request)
+    start = await oauth_service.start_oauth_flow(
+        AuthProvider.GOOGLE,
+        intent=OAuthIntent.LINK,
+        link_user_id=auth.user_id,
+        next_path=next_path,
+    )
+    return RedirectResponse(start.authorization_url, status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/google/callback")
+async def google_oauth_callback(
+    code: str = Query(...),
+    state: str = Query(...),
+    session: AsyncSession = Depends(get_session),
+) -> RedirectResponse:
+    stored = await consume_oauth_state(state)
+    if stored is None:
+        return RedirectResponse(
+            _web_redirect("/login?error=oauth_state"),
+            status_code=status.HTTP_302_FOUND,
+        )
+
+    response = RedirectResponse(
+        _web_redirect(stored.next_path),
+        status_code=status.HTTP_302_FOUND,
+    )
+    try:
+        user_response, redirect_path, _pending = await oauth_service.complete_oauth_callback(
+            session,
+            AuthProvider.GOOGLE,
+            code=code,
+            stored=stored,
+        )
+    except HTTPException as exc:
+        detail = exc.detail if isinstance(exc.detail, str) else "oauth_failed"
+        return RedirectResponse(
+            _web_redirect(f"/login?error={detail}"),
+            status_code=status.HTTP_302_FOUND,
+        )
+
+    if user_response is None:
+        return RedirectResponse(_web_redirect(redirect_path), status_code=status.HTTP_302_FOUND)
+
+    await _issue_session(response, user_response.id, user_response.tenant_id)
+    response.headers["location"] = _web_redirect(redirect_path)
+    return response
+
+
+@router.post("/google/confirm-link", response_model=AuthUserResponse)
+async def google_confirm_link(
+    body: ConfirmOAuthLinkRequest,
+    response: Response,
+    session: AsyncSession = Depends(get_session),
+    _: None = Depends(_require_rate_limit),
+) -> AuthUserResponse:
+    user_response = await oauth_service.confirm_oauth_link(
+        session,
+        link_token=body.token,
+        password=body.password,
+    )
+    await _issue_session(response, user_response.id, user_response.tenant_id)
+    return user_response
+
+
+@router.get("/identities", response_model=IdentityListResponse)
+async def list_identities(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> IdentityListResponse:
+    auth = require_auth(request)
+    items = await oauth_service.list_identities(session, auth.user_id)
+    return IdentityListResponse(items=items)
+
+
+@router.delete("/identities/{provider}", response_model=AuthMessageResponse)
+async def unlink_identity(
+    provider: str,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> AuthMessageResponse:
+    auth = require_auth(request)
+    pair = await _session_from_request(request)
+    if pair:
+        verify_csrf(request, pair[1])
+    if provider == "native":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Native password cannot be unlinked here",
+        )
+    try:
+        provider_enum = AuthProvider(provider)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unknown provider",
+        ) from exc
+    await oauth_service.unlink_provider(session, auth.user_id, provider_enum)
+    return AuthMessageResponse(message="Provider unlinked")
