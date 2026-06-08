@@ -2,6 +2,7 @@ from jober_api.models.application_attempt import ApplicationAttempt
 from jober_api.models.application_batch import ApplicationBatch
 from jober_api.models.application_run import ApplicationRun
 from jober_api.models.audit_log import AuditLogEntry
+from jober_api.models.auth_token import AuthToken
 from jober_api.models.batch_item import BatchItem
 from jober_api.models.browser_event import BrowserEvent
 from jober_api.models.company_board import CompanyBoard
@@ -21,6 +22,7 @@ from jober_api.models.user import User
 from jober_api.models.user_profile import UserProfile
 
 __all__ = [
+    "AuthToken",
     "ApplicationAttempt",
     "AuditLogEntry",
     "ApplicationBatch",

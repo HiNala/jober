@@ -15,7 +15,7 @@ dependencies = [
     "redis>=5.2.0",
     "minio>=7.2.12",
     "pydantic-settings>=2.6.0",
-    "pydantic>=2.9.0",
+    "pydantic[email]>=2.9.0",
     "httpx>=0.28.0",
     "alembic>=1.14.0",
     "cryptography>=43.0.0",
@@ -31,6 +31,7 @@ dependencies = [
     "jober-verify",
     "jober-recover",
     "PyJWT>=2.9.0",
+    "argon2-cffi>=23.1.0",
     "stripe>=11.0.0",
 ]
 

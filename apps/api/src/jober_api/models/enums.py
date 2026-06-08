@@ -94,6 +94,23 @@ class PlanTier(StrEnum):
     PRO = "pro"
 
 
+class UserStatus(StrEnum):
+    PENDING_VERIFICATION = "pending_verification"
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+    LOCKED = "locked"
+
+
+class UserRole(StrEnum):
+    USER = "user"
+    ADMIN = "admin"
+
+
+class AuthTokenType(StrEnum):
+    EMAIL_VERIFY = "email_verify"
+    PASSWORD_RESET = "password_reset"
+
+
 class AuditAction(StrEnum):
     DATA_EXPORT = "data_export"
     DATA_DELETE = "data_delete"
