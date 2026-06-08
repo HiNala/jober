@@ -72,7 +72,12 @@ jobs:
 
       - name: Install MinIO client and create bucket
         run: |
-          curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
+          for i in $(seq 1 5); do
+            curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc && break
+            echo "mc download attempt $i failed, retrying..." >&2
+            sleep 3
+          done
+          test -f mc || (echo "mc download failed after retries" >&2; exit 1)
           chmod +x mc
           ./mc alias set local http://localhost:9000 minioadmin minioadmin
           ./mc mb local/jober-artifacts --ignore-existing
@@ -202,7 +207,12 @@ jobs:
           exit 1
       - name: Install MinIO client and create bucket
         run: |
-          curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc
+          for i in $(seq 1 5); do
+            curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc && break
+            echo "mc download attempt $i failed, retrying..." >&2
+            sleep 3
+          done
+          test -f mc || (echo "mc download failed after retries" >&2; exit 1)
           chmod +x mc
           ./mc alias set local http://localhost:9000 minioadmin minioadmin
           ./mc mb local/jober-artifacts --ignore-existing
