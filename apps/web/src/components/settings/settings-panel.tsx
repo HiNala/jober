@@ -3,8 +3,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Sparkles } from "lucide-react";
 
+import { AiSettingsSection } from "@/components/settings/ai-settings-section";
+import { AppearanceSettingsSection } from "@/components/settings/appearance-settings-section";
+import { ApplicationDefaultsSection } from "@/components/settings/application-defaults-section";
 import { AuthSecuritySection } from "@/components/settings/auth-security-section";
+import { NotificationsSettingsSection } from "@/components/settings/notifications-settings-section";
+import { PrivacyAccountSection } from "@/components/settings/privacy-account-section";
 import { PageError, PageLoading } from "@/components/states/page-states";
+import { ProfileVault } from "@/components/vault/profile-vault";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchUsageDashboard } from "@/lib/api/billing";
@@ -21,7 +27,7 @@ const GUIDANCE_LABELS: Record<string, string> = {
   auto_submit_disclosure: "auto_submit disclosure",
 };
 
-export function SettingsPanel() {
+function SettingsPanelInner() {
   const policyQuery = useQuery({
     queryKey: ["tenant-policy"],
     queryFn: fetchTenantPolicy,
@@ -39,7 +45,7 @@ export function SettingsPanel() {
     return (
       <PageError
         title="Settings unavailable"
-        message="Could not load plan and policy. Ensure the API is running and auth headers are set."
+        message="Could not load plan and policy. Ensure the API is running and you are signed in."
         onRetry={() => {
           void policyQuery.refetch();
           void usageQuery.refetch();
@@ -57,11 +63,29 @@ export function SettingsPanel() {
       <header>
         <h1 className="text-lg font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Plan limits, run policy defaults, and responsible-use guidance.
+          Profile vault, application behavior, AI, appearance, and account security.
         </p>
       </header>
 
+      <section aria-labelledby="vault-settings-heading" className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Shield className="size-4 text-primary" aria-hidden />
+          <h2 id="vault-settings-heading" className="text-sm font-medium">
+            Profile & vault
+          </h2>
+        </div>
+        <ProfileVault />
+      </section>
+
+      <AppearanceSettingsSection />
+      <ApplicationDefaultsSection
+        defaultRunPolicy={policy.policy.default_run_policy}
+        autoSubmitOptIn={policy.policy.auto_submit_opt_in}
+      />
+      <AiSettingsSection />
+      <NotificationsSettingsSection />
       <AuthSecuritySection />
+      <PrivacyAccountSection />
 
       <section aria-labelledby="usage-heading">
         <h2 id="usage-heading" className="mb-3 text-sm font-medium">
@@ -115,37 +139,9 @@ export function SettingsPanel() {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Plan: <Badge variant="secondary">{usage.plan}</Badge> · Batch limit:{" "}
-          {usage.limits.max_batch_items} jobs
+          {usage.limits.max_batch_items} jobs · Default policy:{" "}
+          <span className="capitalize">{defaultPolicy}</span>
         </p>
-      </section>
-
-      <section aria-labelledby="policy-heading" className={cn(surface.card, "rounded-lg p-4")}>
-        <div className="mb-3 flex items-center gap-2">
-          <Shield className="size-4 text-primary" aria-hidden />
-          <h2 id="policy-heading" className="text-sm font-medium">
-            Run policy defaults
-          </h2>
-        </div>
-        <dl className="grid gap-2 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-muted-foreground">Default policy</dt>
-            <dd className="font-medium capitalize">{defaultPolicy}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground">auto_submit opt-in</dt>
-            <dd className="font-medium">
-              {policy.policy.auto_submit_opt_in ? "Enabled" : "Off (recommended)"}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground">Data retention</dt>
-            <dd className="font-medium">
-              {policy.policy.retention_days
-                ? `${policy.policy.retention_days} days`
-                : "Account default"}
-            </dd>
-          </div>
-        </dl>
       </section>
 
       <section aria-labelledby="guidance-heading">
@@ -172,4 +168,8 @@ export function SettingsPanel() {
       </section>
     </div>
   );
+}
+
+export function SettingsPanel() {
+  return <SettingsPanelInner />;
 }
