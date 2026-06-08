@@ -369,7 +369,9 @@ async def resume_from_checkpoint(session: AsyncSession, run_id: uuid.UUID) -> di
     }
 
 
-async def get_failure_analytics(session: AsyncSession) -> dict[str, Any]:
+async def get_failure_analytics(session: AsyncSession, tenant_id: uuid.UUID) -> dict[str, Any]:
+    from jober_api.models.job_target import JobTarget
+
     threshold = _circuit_breaker.threshold
     stmt = (
         select(
@@ -377,6 +379,8 @@ async def get_failure_analytics(session: AsyncSession) -> dict[str, Any]:
             FailureEvent.failure_class,
             func.count(FailureEvent.id),
         )
+        .join(JobTarget, FailureEvent.job_target_id == JobTarget.id)
+        .where(JobTarget.tenant_id == tenant_id)
         .group_by(FailureEvent.platform, FailureEvent.failure_class)
         .order_by(func.count(FailureEvent.id).desc())
     )

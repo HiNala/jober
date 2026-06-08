@@ -7,10 +7,10 @@ from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.models.generated_document import GeneratedDocument
 from jober_api.repositories.generated_document import GeneratedDocumentRepository
-from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.services.documents.cover_letter_generator import (
     ClaimsRejectedError,
     generate_cover_letter,
@@ -25,16 +25,6 @@ def get_storage() -> ObjectStorage:
     return ObjectStorage()
 
 
-async def _require_job_for_tenant(
-    session: AsyncSession,
-    tenant_id: uuid.UUID,
-    job_target_id: uuid.UUID,
-) -> None:
-    jobs = JobTargetRepository(session, tenant_id)
-    if await jobs.get(job_target_id) is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job target not found")
-
-
 async def _document_for_tenant(
     session: AsyncSession,
     tenant_id: uuid.UUID,
@@ -44,7 +34,7 @@ async def _document_for_tenant(
     row = await repo.get(document_id)
     if row is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
-    await _require_job_for_tenant(session, tenant_id, row.job_target_id)
+    await require_job_for_tenant(session, tenant_id, row.job_target_id)
     return row
 
 
@@ -108,7 +98,7 @@ async def list_documents(
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
     auth = require_auth(request)
-    await _require_job_for_tenant(session, auth.tenant_id, job_target_id)
+    await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     repo = GeneratedDocumentRepository(session)
     rows = await repo.list_for_job(job_target_id)
     return {

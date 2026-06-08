@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.middleware import require_auth
+from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.job_extraction.service import (
     ExtractionBlockedError,
@@ -18,9 +20,12 @@ router = APIRouter(prefix="/job-targets", tags=["job-extraction"])
 
 @router.get("/{job_target_id}/job-profile")
 async def get_job_profile(
+    request: Request,
     job_target_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     cached = await get_cached_extraction(session, job_target_id)
     if cached is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No extracted profile")
@@ -29,10 +34,13 @@ async def get_job_profile(
 
 @router.post("/{job_target_id}/extract")
 async def extract_job_profile(
+    request: Request,
     job_target_id: uuid.UUID,
     body: dict[str, object] | None = None,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     payload = body or {}
     force = bool(payload.get("force", False))
     fixture_html = payload.get("fixture_html")

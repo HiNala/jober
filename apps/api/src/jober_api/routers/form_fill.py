@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.middleware import require_auth
+from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.form_fill.service import (
     FillBlockedError,
@@ -17,10 +19,13 @@ router = APIRouter(prefix="/job-targets", tags=["form-fill"])
 
 @router.post("/{job_target_id}/fill-form")
 async def fill_form(
+    request: Request,
     job_target_id: uuid.UUID,
     body: dict[str, object] | None = None,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     payload = body or {}
     fixture_html = payload.get("fixture_html")
 

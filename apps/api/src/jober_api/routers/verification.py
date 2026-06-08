@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from jober_schemas.enums import RunPolicy
 from jober_schemas.verification import ReviewPackageRead, SubmitResultRead, VerifyReadyRead
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.middleware import require_auth
+from jober_api.auth.tenant_guard import require_job_for_tenant, require_run_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.verification.service import (
     SubmitPolicyError,
@@ -23,10 +25,13 @@ router = APIRouter(tags=["verification"])
 
 @router.post("/job-targets/{job_target_id}/verify-ready", response_model=VerifyReadyRead)
 async def verify_ready(
+    request: Request,
     job_target_id: uuid.UUID,
     body: dict[str, object] | None = None,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     payload = body or {}
     fixture_html = payload.get("fixture_html")
     if not fixture_html:
@@ -80,9 +85,12 @@ async def verify_ready(
 
 @router.get("/job-targets/{job_target_id}/review", response_model=ReviewPackageRead)
 async def review_package_for_job(
+    request: Request,
     job_target_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     result = await get_review_package_for_job(session, job_target_id)
     if result is None:
         raise HTTPException(
@@ -94,9 +102,12 @@ async def review_package_for_job(
 
 @router.get("/application-runs/{run_id}/review", response_model=ReviewPackageRead)
 async def review_package(
+    request: Request,
     run_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_run_for_tenant(session, auth.tenant_id, run_id)
     try:
         result = await get_review_package(session, run_id)
         return result
@@ -109,10 +120,13 @@ async def review_package(
 
 @router.post("/application-runs/{run_id}/submit", response_model=SubmitResultRead)
 async def submit_run(
+    request: Request,
     run_id: uuid.UUID,
     body: dict[str, object] | None = None,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_run_for_tenant(session, auth.tenant_id, run_id)
     payload = body or {}
     fixture_html = payload.get("fixture_html")
     try:
@@ -138,9 +152,12 @@ async def submit_run(
 
 @router.post("/application-runs/{run_id}/skip-submit")
 async def skip_run_submit(
+    request: Request,
     run_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
+    auth = require_auth(request)
+    await require_run_for_tenant(session, auth.tenant_id, run_id)
     try:
         result = await skip_submit(session, run_id)
         await session.commit()
