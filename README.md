@@ -105,7 +105,7 @@ pnpm install
 pnpm dev                     # http://localhost:3000
 ```
 
-Routes: `/` (landing), `/dashboard`, `/queue`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
+Routes: `/` (landing), `/dashboard`, `/queue`, `/discover`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
 
 **Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
 
@@ -114,6 +114,8 @@ Routes: `/` (landing), `/dashboard`, `/queue`, `/library`, `/search`, `/settings
 **Auth (Mission 20):** native email/password with Argon2id, Redis cookie sessions, and CSRF. Set `AUTH_MODE=native` for real auth; `DEV_AUTH_BYPASS=true` (API) + `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` (web) for frictionless local dev. Production refuses `DEV_AUTH_BYPASS`. See `docs/missions/mission_20_native_auth.md`.
 
 **Google OAuth (Mission 21):** optional “Continue with Google” alongside native auth. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` (API callback), then `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED=true` on the web app to show provider buttons. Linking a verified native account requires password confirmation at `/link-google`. Manage linked methods in Settings. See `docs/missions/mission_21_google_oauth.md`.
+
+**Discover (Mission 23):** `/discover` unifies board search and XLSX import into named target lists with dedupe, fit signals, saved searches, list refresh, and batch launch (`filters.job_list_id`). See `docs/missions/mission_23_unified_job_discovery.md`.
 
 **Workspace shell (Mission 17):** three-pane layout in `components/workspace/` — collapsible nav, center work column with command bar, resizable right canvas (browser/doc preview). Layout prefs persist in `localStorage`. Shortcuts: ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas), ⌘/Ctrl-/ (command input).
 

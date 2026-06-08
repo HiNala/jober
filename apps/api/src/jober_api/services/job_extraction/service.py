@@ -4,6 +4,7 @@ import uuid
 from datetime import UTC, date, datetime
 from typing import Any
 
+import httpx
 from jober_extraction.a11y import extract_visible_text_from_html
 from jober_extraction.gates import GateKind, detect_access_gates
 from jober_extraction.intelligence import build_job_profile
@@ -184,6 +185,53 @@ async def extract_from_fixture_html(
     )
     await runs.update_fields(run.id, status=RunStatus.SUCCEEDED)
     return result
+
+
+async def enrich_job_target_inline(
+    session: AsyncSession,
+    *,
+    tenant_id: uuid.UUID,
+    job_target_id: uuid.UUID,
+    fixture_html: str | None = None,
+    force: bool = False,
+) -> JobExtractionRead | None:
+    if not force:
+        cached = await get_cached_extraction(session, job_target_id)
+        if cached is not None:
+            return cached
+
+    jobs = JobTargetRepository(session, tenant_id)
+    job = await jobs.get(job_target_id)
+    if job is None:
+        return None
+    url = (job.direct_apply_url or job.company_careers_url or "").strip()
+    if not url:
+        return None
+
+    html = fixture_html
+    if html is None:
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+            html = response.text
+
+    resumes = ResumeAssetRepository(session, tenant_id)
+    resume = await resumes.get_active()
+    visible = extract_visible_text_from_html(html)
+    platform, profile = extract_from_page_content(
+        url=url,
+        html=html,
+        visible_text=visible,
+        accessibility_tree=None,
+        company_hint=job.company,
+        resume_skills=_resume_skills(resume),
+    )
+    return await persist_extraction(
+        session,
+        job_target_id=job_target_id,
+        platform=platform,
+        profile=profile,
+    )
 
 
 async def enqueue_browser_extraction(

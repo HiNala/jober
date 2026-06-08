@@ -725,6 +725,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 23 — Unified Job Discovery & List Building
+
+**Scope:** `/discover`, discovery API, saved searches, list refresh, batch from list.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One surface; search + upload as equal tabs |
+| Kare | 2 | Fit badges advisory; clear source labels |
+| Norman | 2 | List panel always visible; select-all review |
+| Nielsen | 2 | Saved search + refresh without duplicate rows |
+| Tufte | 2 | Candidate table scannable; fit score inline |
+| Vignelli | 2 | Matches Library/Queue tokens |
+| Rand | 2 | Discover vs Queue vs Library roles distinct |
+| Maeda | 2 | Upload reuses import wizard — not a second tool |
+| Wroblewski | 2 | Sticky list panel on wide screens |
+| Ive | 2 | Unified hand-off to batch launch |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 22) — improvements logged
 
 | Change | Why |

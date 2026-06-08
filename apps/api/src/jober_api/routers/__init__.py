@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from jober_api.routers.auth import router as auth_router
 from jober_api.routers.batches import router as batches_router
 from jober_api.routers.billing import router as billing_router
+from jober_api.routers.discovery import router as discovery_router
 from jober_api.routers.documents import router as documents_router
 from jober_api.routers.exports import router as exports_router
 from jober_api.routers.form_discovery import router as form_discovery_router
@@ -27,6 +28,7 @@ api_router.include_router(auth_router)
 api_router.include_router(imports_router)
 api_router.include_router(exports_router)
 api_router.include_router(job_targets_router)
+api_router.include_router(discovery_router)
 api_router.include_router(job_lists_router)
 api_router.include_router(library_router)
 api_router.include_router(job_extraction_router)

@@ -38,6 +38,7 @@ from jober_api.models import (  # noqa: F401 — register mappers
     LlmCall,
     ProfileCommonAnswer,
     ResumeAsset,
+    SavedSearch,
     RunEvent,
     Tenant,
     User,

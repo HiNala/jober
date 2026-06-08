@@ -166,7 +166,7 @@ async def import_jobs_workbook(
         return report
 
     job_repo = JobTargetRepository(session, tenant_id)
-    board_repo = CompanyBoardRepository(session)
+    board_repo = CompanyBoardRepository(session, tenant_id)
     angle_repo = CoverLetterAngleRepository(session)
 
     seen_job_keys: dict[tuple[str, str, str | None], int] = {}
@@ -307,7 +307,7 @@ async def import_jobs_workbook(
             }
             existing_board = await board_repo.find_by_company_board(name)
             if existing_board is None:
-                await board_repo.create(**fields)
+                await board_repo.create(tenant_id=tenant_id, **fields)
                 report.company_boards.created += 1
             else:
                 for attr, value in fields.items():

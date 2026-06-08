@@ -22,6 +22,7 @@ from jober_api.models.enums import (
 )
 from jober_api.repositories.application_batch import ApplicationBatchRepository, BatchItemRepository
 from jober_api.repositories.application_run import ApplicationRunRepository
+from jober_api.repositories.job_list import JobListRepository
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.services.ats_guess import guess_ats
 from jober_api.services.batch import redis_control
@@ -56,17 +57,25 @@ async def _eligible_jobs(
     filters: dict[str, Any],
     tenant_id: uuid.UUID,
 ) -> list[Any]:
-    repo = JobTargetRepository(session, tenant_id)
-    status_raw = filters.get("status")
-    status = JobTargetStatus(status_raw) if status_raw else None
-    rows = await repo.list_filtered(
-        status=status,
-        priority=str(filters["priority"]) if filters.get("priority") else None,
-        company=str(filters["company"]) if filters.get("company") else None,
-        role=str(filters["role"]) if filters.get("role") else None,
-        location=str(filters["location"]) if filters.get("location") else None,
-        limit=int(filters.get("limit", 500)),
-    )
+    list_raw = filters.get("job_list_id")
+    if list_raw:
+        list_repo = JobListRepository(session, tenant_id)
+        job_list = await list_repo.get(uuid.UUID(str(list_raw)))
+        if job_list is None:
+            return []
+        rows = [item.job_target for item in job_list.items if item.job_target is not None]
+    else:
+        repo = JobTargetRepository(session, tenant_id)
+        status_raw = filters.get("status")
+        status = JobTargetStatus(status_raw) if status_raw else None
+        rows = await repo.list_filtered(
+            status=status,
+            priority=str(filters["priority"]) if filters.get("priority") else None,
+            company=str(filters["company"]) if filters.get("company") else None,
+            role=str(filters["role"]) if filters.get("role") else None,
+            location=str(filters["location"]) if filters.get("location") else None,
+            limit=int(filters.get("limit", 500)),
+        )
     ats = filters.get("ats_guess")
     if ats:
         rows = [job for job in rows if guess_ats(job_apply_url(job)) == ats]
