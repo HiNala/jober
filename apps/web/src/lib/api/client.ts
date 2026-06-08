@@ -54,6 +54,15 @@ export async function apiFetch<T>(
     cache: "no-store",
   });
 
+  if (res.status === 401 && !DEV_BYPASS && !path.startsWith("/api/auth/")) {
+    const { tryRecoverSession, markSessionExpired } = await import("./session-recovery");
+    const recovered = await tryRecoverSession();
+    if (recovered) {
+      return apiFetch<T>(path, init);
+    }
+    markSessionExpired();
+  }
+
   if (!res.ok) {
     const body = await res.text().catch(() => undefined);
     throw new ApiError(`API ${res.status}: ${path}`, res.status, body);

@@ -685,6 +685,17 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 20) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Tenant-scope documents/imports/exports/resumes | M20 gap: artifact routes ignored `auth.tenant_id` |
+| Redis client reset between pytest cases | Flaky `Event loop is closed` in native auth tests |
+| `ReAuthDialog` + `apiFetch` 401 recovery | Session expiry should re-auth in place, not lose page state |
+| Settings session management UI | M20 iteration: active sessions + sign out everywhere |
+
+---
+
 ## Mission 99 (post–Mission 19) — improvements logged
 
 | Change | Why |

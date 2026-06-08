@@ -1,9 +1,11 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { ReAuthDialog } from "@/components/auth/re-auth-dialog";
 import { type AuthUser, fetchMe, logout as apiLogout, refreshSession } from "@/lib/api/auth";
+import { registerSessionHandlers } from "@/lib/api/session-recovery";
 
 type AuthContextValue = {
   user: AuthUser | null;
@@ -20,8 +22,11 @@ const BYPASS =
   process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true" ||
   process.env.NEXT_PUBLIC_AUTH_MODE === "dev";
 
+const SILENT_REFRESH_MS = 30 * 60 * 1000;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
+  const [sessionExpired, setSessionExpired] = useState(false);
   const meQuery = useQuery({
     queryKey: ["auth", "me"],
     queryFn: fetchMe,
@@ -48,9 +53,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await refreshSession();
       await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
     } catch {
-      await signOut();
+      setSessionExpired(true);
     }
-  }, [queryClient, signOut]);
+  }, [queryClient]);
+
+  useEffect(() => {
+    if (BYPASS) return;
+    registerSessionHandlers(
+      async () => {
+        try {
+          await refreshSession();
+          await queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      () => setSessionExpired(true),
+    );
+  }, [queryClient]);
+
+  useEffect(() => {
+    if (BYPASS || !meQuery.data) return;
+    const timer = window.setInterval(() => {
+      void refresh();
+    }, SILENT_REFRESH_MS);
+    return () => window.clearInterval(timer);
+  }, [meQuery.data, refresh]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -76,7 +105,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [meQuery.data, meQuery.isLoading, refresh, signOut],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      {!BYPASS ? (
+        <ReAuthDialog
+          open={sessionExpired}
+          emailHint={meQuery.data?.email}
+          onSuccess={() => {
+            setSessionExpired(false);
+            void queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+          }}
+        />
+      ) : null}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

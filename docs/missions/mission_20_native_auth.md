@@ -20,6 +20,12 @@
 - [x] `DEV_AUTH_BYPASS` production guard test
 - [x] Lockout test after repeated failures
 
+## Mission 99 (post–Mission 20)
+- [x] Tenant-scope remaining artifact routers (documents, imports, exports, resumes)
+- [x] Fix flaky Redis session tests in CI
+- [x] Re-auth modal on session expiry; silent refresh interval
+- [x] Settings UI for active sessions and sign-out-everywhere
+
 ## Configuration
 | Variable | Purpose |
 |----------|---------|
