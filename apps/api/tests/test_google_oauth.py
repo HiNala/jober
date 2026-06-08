@@ -342,8 +342,9 @@ async def test_unverified_google_email_does_not_merge_verified_native(
         finally:
             app.dependency_overrides.clear()
 
+    # Seeded dev user + native account + separate unverified OAuth account
     user_count = await db_session.scalar(select(func.count()).select_from(User))
-    assert user_count == 2
+    assert user_count == 3
     repo = AuthIdentityRepository(db_session)
     identity = await repo.find_by_provider_subject(AuthProvider.GOOGLE, "google-sub-unverified")
     assert identity is not None
@@ -399,8 +400,9 @@ async def test_google_returning_user_signs_in_without_duplicate(
         finally:
             app.dependency_overrides.clear()
 
+    # Seeded dev user + one OAuth user (returning sign-in must not add another)
     user_count = await db_session.scalar(select(func.count()).select_from(User))
-    assert user_count == 1
+    assert user_count == 2
     identity_count = await db_session.scalar(select(func.count()).select_from(AuthIdentity))
     assert identity_count == 1
 

@@ -219,12 +219,29 @@ async def _sign_in_with_profile(
     return user_to_response(user, tenant), next_path, None
 
 
+async def _resolve_oauth_email(
+    session: AsyncSession,
+    provider: AuthProvider,
+    profile: OAuthProfile,
+) -> str:
+    """Pick a unique login email; unverified Google emails never claim an existing address."""
+    preferred = (profile.email or f"{profile.provider_user_id}@{provider.value}.oauth").lower()
+    if profile.email_verified:
+        return preferred
+    taken = (
+        await session.execute(select(User.id).where(User.email == preferred).limit(1))
+    ).scalar_one_or_none()
+    if taken is None:
+        return preferred
+    return f"{profile.provider_user_id}@{provider.value}.oauth"
+
+
 async def _create_oauth_user(
     session: AsyncSession,
     provider: AuthProvider,
     profile: OAuthProfile,
 ) -> tuple[User, Tenant]:
-    email = (profile.email or f"{profile.provider_user_id}@{provider.value}.oauth").lower()
+    email = await _resolve_oauth_email(session, provider, profile)
     existing = (await session.execute(select(User).where(User.email == email))).scalar_one_or_none()
     if existing is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
