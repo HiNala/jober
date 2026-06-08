@@ -6,12 +6,14 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import func, select
 
 from jober_api.auth.oauth.state_store import StoredOAuthState, consume_oauth_state, save_oauth_state
 from jober_api.auth.oauth.types import OAuthIntent, OAuthProfile
 from jober_api.auth.password import hash_password
 from jober_api.config import settings
 from jober_api.main import app
+from jober_api.models.auth_identity import AuthIdentity
 from jober_api.models.enums import AuthProvider, PlanTier, UserStatus
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
@@ -221,7 +223,6 @@ async def test_cannot_unlink_only_google_credential(
 
     from jober_api.auth.sessions import create_session
     from jober_api.db import session as db_session_module
-    from jober_api.models.auth_identity import AuthIdentity
 
     tenant_id = uuid.uuid4()
     user_id = uuid.uuid4()
@@ -273,6 +274,135 @@ async def test_cannot_unlink_only_google_credential(
             assert "only sign-in" in res.json()["detail"].lower()
     finally:
         app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_unverified_google_email_does_not_merge_verified_native(
+    db_session, truncate_tables, google_configured, monkeypatch
+) -> None:
+    from datetime import UTC, datetime
+
+    from jober_api.db import session as db_session_module
+
+    tenant_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+    db_session.add(
+        Tenant(id=tenant_id, name="Native", plan=PlanTier.FREE, policy={}),
+    )
+    db_session.add(
+        User(
+            id=user_id,
+            tenant_id=tenant_id,
+            email="oauth@example.com",
+            password_hash=hash_password("Str0ng!Passw0rd"),
+            email_verified_at=datetime.now(UTC),
+            status=UserStatus.ACTIVE,
+        )
+    )
+    await db_session.commit()
+
+    unverified_profile = OAuthProfile(
+        provider_user_id="google-sub-unverified",
+        email="oauth@example.com",
+        email_verified=False,
+        display_name="Unverified OAuth",
+        avatar_url=None,
+    )
+
+    state = "test-state-unverified"
+    await save_oauth_state(
+        state,
+        StoredOAuthState(code_verifier="verifier", intent=OAuthIntent.SIGN_IN),
+    )
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+
+    with patch(
+        "jober_api.auth.oauth.google.GoogleOAuthProvider.exchange_code",
+        new=AsyncMock(return_value=unverified_profile),
+    ):
+        transport = ASGITransport(app=app)
+        try:
+            async with AsyncClient(
+                transport=transport,
+                base_url="http://test",
+                follow_redirects=False,
+            ) as client:
+                res = await client.get(
+                    "/api/auth/google/callback",
+                    params={"code": "auth-code", "state": state},
+                )
+                assert res.status_code == 302
+                assert "/link-google" not in res.headers["location"]
+                assert res.headers["location"].endswith("/dashboard")
+                assert settings.session_cookie_name in res.cookies
+        finally:
+            app.dependency_overrides.clear()
+
+    user_count = await db_session.scalar(select(func.count()).select_from(User))
+    assert user_count == 2
+    repo = AuthIdentityRepository(db_session)
+    identity = await repo.find_by_provider_subject(AuthProvider.GOOGLE, "google-sub-unverified")
+    assert identity is not None
+    assert identity.user_id != user_id
+
+
+@pytest.mark.asyncio
+async def test_google_returning_user_signs_in_without_duplicate(
+    db_session, truncate_tables, google_configured, monkeypatch
+) -> None:
+    from jober_api.db import session as db_session_module
+
+    state = "test-state-returning"
+    await save_oauth_state(
+        state,
+        StoredOAuthState(code_verifier="verifier", intent=OAuthIntent.SIGN_IN),
+    )
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+
+    with patch(
+        "jober_api.auth.oauth.google.GoogleOAuthProvider.exchange_code",
+        new=AsyncMock(return_value=MOCK_PROFILE),
+    ):
+        transport = ASGITransport(app=app)
+        try:
+            async with AsyncClient(
+                transport=transport,
+                base_url="http://test",
+                follow_redirects=False,
+            ) as client:
+                first = await client.get(
+                    "/api/auth/google/callback",
+                    params={"code": "auth-code", "state": state},
+                )
+                assert first.status_code == 302
+                assert settings.session_cookie_name in first.cookies
+
+                state2 = "test-state-returning-2"
+                await save_oauth_state(
+                    state2,
+                    StoredOAuthState(code_verifier="verifier2", intent=OAuthIntent.SIGN_IN),
+                )
+                second = await client.get(
+                    "/api/auth/google/callback",
+                    params={"code": "auth-code-2", "state": state2},
+                )
+                assert second.status_code == 302
+                assert settings.session_cookie_name in second.cookies
+        finally:
+            app.dependency_overrides.clear()
+
+    user_count = await db_session.scalar(select(func.count()).select_from(User))
+    assert user_count == 1
+    identity_count = await db_session.scalar(select(func.count()).select_from(AuthIdentity))
+    assert identity_count == 1
 
 
 @pytest.mark.asyncio
