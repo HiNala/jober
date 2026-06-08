@@ -37,6 +37,16 @@ export function RunCanvasProvider({ children }: { children: React.ReactNode }) {
     }
   }, [stream.isReviewState]);
 
+  useEffect(() => {
+    if (artifacts.length === 0) {
+      return;
+    }
+    const { selectedArtifactId, setSelectedArtifactId } = useWorkspaceStore.getState();
+    if (!selectedArtifactId || !artifacts.some((item) => item.id === selectedArtifactId)) {
+      setSelectedArtifactId(artifacts[artifacts.length - 1]!.id);
+    }
+  }, [artifacts]);
+
   const value = useMemo(
     () => ({
       runId,

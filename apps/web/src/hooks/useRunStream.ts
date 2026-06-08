@@ -8,32 +8,10 @@ import {
   type RunConsoleSnapshot,
   type RunStreamEvent,
 } from "@/lib/api/run-console";
+import { applyStreamEvent } from "@/lib/run-stream/apply-stream-event";
 import { RUN_SSE_EVENT_TYPES } from "@/lib/run-stream/event-types";
 
 export type RunStreamStatus = "idle" | "connecting" | "open" | "closed" | "error";
-
-function applyStreamEvent(
-  prev: RunConsoleSnapshot | null,
-  parsed: RunStreamEvent,
-): RunConsoleSnapshot | null {
-  if (!prev) {
-    return prev;
-  }
-  return {
-    ...prev,
-    last_event_seq: parsed.seq,
-    latest_screenshot_url: parsed.screenshot_url ?? prev.latest_screenshot_url,
-    latest_screenshot_key: parsed.screenshot_key ?? prev.latest_screenshot_key,
-    status:
-      parsed.event_type === "state.changed"
-        ? String(parsed.payload?.status ?? prev.status)
-        : prev.status,
-    current_step:
-      parsed.event_type === "state.changed"
-        ? String(parsed.payload?.step ?? prev.current_step ?? "")
-        : prev.current_step,
-  };
-}
 
 export function useRunStream(runId: string | null) {
   const [status, setStatus] = useState<RunStreamStatus>(runId ? "connecting" : "idle");
@@ -42,8 +20,13 @@ export function useRunStream(runId: string | null) {
   const [lastSeq, setLastSeq] = useState(0);
   const [selectedTimelineSeq, setSelectedTimelineSeq] = useState<number | null>(null);
   const [liveFollow, setLiveFollow] = useState(true);
+  const liveFollowRef = useRef(liveFollow);
   const lastSeqRef = useRef(0);
   const sourceRef = useRef<EventSource | null>(null);
+
+  useEffect(() => {
+    liveFollowRef.current = liveFollow;
+  }, [liveFollow]);
 
   const mergeEvents = useCallback((incoming: RunStreamEvent[]) => {
     if (incoming.length === 0) {
@@ -69,14 +52,14 @@ export function useRunStream(runId: string | null) {
         const parsed = JSON.parse(raw) as RunStreamEvent;
         mergeEvents([parsed]);
         setSnapshot((prev) => applyStreamEvent(prev, parsed));
-        if (liveFollow && parsed.screenshot_url) {
+        if (liveFollowRef.current && parsed.screenshot_url) {
           setSelectedTimelineSeq(null);
         }
       } catch {
         // ignore malformed chunks
       }
     },
-    [liveFollow, mergeEvents],
+    [mergeEvents],
   );
 
   const openStream = useCallback(
