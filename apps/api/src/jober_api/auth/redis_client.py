@@ -4,10 +4,10 @@ import redis.asyncio as aioredis
 
 from jober_api.config import settings
 
-_client: aioredis.Redis | None = None
+_client: aioredis.Redis[str] | None = None
 
 
-def get_redis() -> aioredis.Redis:
+def get_redis() -> aioredis.Redis[str]:
     global _client
     if _client is None:
         _client = aioredis.from_url(settings.redis_url, decode_responses=True)

@@ -90,11 +90,8 @@ async def authenticate_user(
 
     stmt = select(User).where(User.email == normalized)
     user = (await session.execute(stmt)).scalar_one_or_none()
-    password_ok = user is not None and user.password_hash and verify_password(
-        password,
-        user.password_hash,
-    )
-    if not password_ok:
+    password_hash = user.password_hash if user is not None else None
+    if user is None or not password_hash or not verify_password(password, password_hash):
         if user is not None:
             failures = await record_failed_login(normalized)
             if failures >= settings.auth_lockout_threshold:
