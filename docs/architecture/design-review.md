@@ -666,6 +666,16 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 18) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `applyStreamEvent` extracted + tested | Named SSE events must update snapshot; regression guard |
+| `liveFollowRef` in `useRunStream` | Scrubbing snapped to live — stale closure in EventSource listeners |
+| Filmstrip auto-select latest artifact | Empty selection on first run load was weakest UX |
+
+---
+
 ## Mission 99 (post–Mission 17) — improvements logged
 
 | Change | Why |

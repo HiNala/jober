@@ -18,4 +18,8 @@
 - [x] Design Council scores in `design-review.md`
 
 ## Mission 99
-- [ ] Run iteration loop after M18
+- [x] `apply-stream-event.test.ts` — fixture for named SSE screenshot/state updates
+- [x] `liveFollowRef` — scrub no longer snaps back when new frames arrive
+- [x] Filmstrip auto-selects latest artifact when run loads
+- [x] Web gates + CI green (backend, web, policy)
+- [x] Design Council M99 addendum in `design-review.md`
