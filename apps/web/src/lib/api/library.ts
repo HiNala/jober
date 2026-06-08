@@ -58,14 +58,32 @@ export function fetchLibraryRuns() {
   return apiFetch<{ items: LibraryRunItem[] }>("/api/library/runs");
 }
 
-export function fetchJobLists() {
-  return apiFetch<{ items: JobListItem[] }>("/api/job-lists");
+export function fetchJobLists(includeArchived = false) {
+  const params = includeArchived ? "?include_archived=true" : "";
+  return apiFetch<{ items: JobListItem[] }>(`/api/job-lists${params}`);
 }
 
 export function createJobList(name: string, description?: string) {
   return apiFetch<JobListItem>("/api/job-lists", {
     method: "POST",
     body: JSON.stringify({ name, description }),
+  });
+}
+
+export function updateJobList(
+  listId: string,
+  patch: { name?: string; description?: string; archived?: boolean },
+) {
+  return apiFetch<JobListItem>(`/api/job-lists/${listId}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
+export function reorderJobList(listId: string, itemIds: string[]) {
+  return apiFetch<JobListItem>(`/api/job-lists/${listId}/reorder`, {
+    method: "POST",
+    body: JSON.stringify({ item_ids: itemIds }),
   });
 }
 
