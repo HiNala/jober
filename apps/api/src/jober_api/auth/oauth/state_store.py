@@ -64,15 +64,27 @@ async def save_pending_link(token: str, payload: PendingOAuthLink) -> None:
     )
 
 
-async def consume_pending_link(token: str) -> PendingOAuthLink | None:
+async def fetch_pending_link(token: str) -> PendingOAuthLink | None:
     redis = get_redis()
     key = f"{PENDING_LINK_PREFIX}{token}"
     raw = await redis.get(key)
     if raw is None:
         return None
-    await redis.delete(key)
     data = json.loads(raw)
     return PendingOAuthLink(**data)
+
+
+async def delete_pending_link(token: str) -> None:
+    redis = get_redis()
+    await redis.delete(f"{PENDING_LINK_PREFIX}{token}")
+
+
+async def consume_pending_link(token: str) -> PendingOAuthLink | None:
+    pending = await fetch_pending_link(token)
+    if pending is None:
+        return None
+    await delete_pending_link(token)
+    return pending
 
 
 def new_link_token() -> str:

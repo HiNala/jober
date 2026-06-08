@@ -12,7 +12,8 @@ from jober_api.auth.oauth.registry import get_oauth_provider
 from jober_api.auth.oauth.state_store import (
     PendingOAuthLink,
     StoredOAuthState,
-    consume_pending_link,
+    delete_pending_link,
+    fetch_pending_link,
     new_link_token,
     save_oauth_state,
     save_pending_link,
@@ -88,7 +89,7 @@ async def confirm_oauth_link(
     link_token: str,
     password: str,
 ) -> AuthUserResponse:
-    pending = await consume_pending_link(link_token)
+    pending = await fetch_pending_link(link_token)
     if pending is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -101,6 +102,8 @@ async def confirm_oauth_link(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Password confirmation failed",
         )
+
+    await delete_pending_link(link_token)
 
     provider = AuthProvider(pending.provider)
     profile = OAuthProfile(

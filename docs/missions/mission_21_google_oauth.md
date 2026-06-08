@@ -42,3 +42,4 @@ Register redirect URIs in Google Cloud Console for local, staging, and productio
 - [x] Document Google OAuth env vars in `.env.example`
 - [x] Quality gates: ruff, mypy, web lint/typecheck; OAuth tests run in CI with Postgres + Redis
 - [x] CI: retry MinIO `mc` download on transient CDN failures
+- [x] Fix confirm-link token consumed before password verification

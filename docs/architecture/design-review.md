@@ -710,6 +710,7 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 |--------|-----|
 | `.env.example` Google OAuth + `WEB_APP_URL` | Operators need documented callback and redirect base without reading mission docs |
 | CI retry on MinIO `mc` client download | Transient 504 from dl.min.io was failing backend job before tests ran |
+| Pending link token survives wrong password | Confirm-link consumed Redis token before password check, breaking retry |
 
 ---
 
