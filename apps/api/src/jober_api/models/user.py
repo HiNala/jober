@@ -31,7 +31,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         index=True,
     )
     clerk_user_id: Mapped[str | None] = mapped_column(String(255))
-    email: Mapped[str] = mapped_column(String(320), nullable=False)
+    email: Mapped[str] = mapped_column(CITEXT, nullable=False)
     display_name: Mapped[str | None] = mapped_column(String(255))
     password_hash: Mapped[str | None] = mapped_column(String(255))
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

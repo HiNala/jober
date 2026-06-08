@@ -17,6 +17,7 @@ from jober_api.models import (  # noqa: F401 — register metadata
     ApplicationAttempt,
     ApplicationBatch,
     ApplicationRun,
+    AuthToken,
     BatchItem,
     BrowserEvent,
     CompanyBoard,
@@ -29,6 +30,8 @@ from jober_api.models import (  # noqa: F401 — register metadata
     LlmCall,
     ResumeAsset,
     RunEvent,
+    Tenant,
+    User,
     UserProfile,
 )
 
