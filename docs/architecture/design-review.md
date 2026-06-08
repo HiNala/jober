@@ -752,6 +752,9 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 |--------|-----|
 | `board_listing.html` in `jober_fixtures/pages/jobs` | `load_ats_fixture("board_listing")` failed in CI — fixture lived only under `apps/api/tests` |
 | `_LEGACY_ATS_PATHS` maps `board_listing` → `jobs/board_listing` | Keeps discovery tests on shared fixture loader contract |
+| `accept_candidates` dedupes by `candidate_key` in one request | `accepted` count was inflated when UI sent duplicate rows; now returns `skipped_duplicates` |
+| Tests: refresh, saved-search link, attach-import, batch `job_list_id` | Mission 23 iteration paths had only search+accept coverage |
+| `test_discovery_board_parser.py` | Parser regressions caught without Postgres |
 | Mission 23 deferred notes (cooldown Redis, enrich fallback) | Explicit non-blocking gaps before Mission 24 |
 
 ---

@@ -33,9 +33,16 @@
 - Company boards are tenant-scoped after migration `l4h1i2d23e47`
 
 ## Mission 99 (post–Mission 23)
-- [x] Run full CI gates and iteration sweep
-- [x] `board_listing` fixture registered in `jober_fixtures` (discovery test path)
-- [x] Design review + README verified; web lint/typecheck green locally
+- [x] Finish leftovers — all task + acceptance criteria verified
+- [x] Gates green — CI backend, policy, web (lint, typecheck, build, test)
+- [x] Full suite green — discovery + board parser + batch list filter tests added
+- [x] Policy invariants — discovery does not touch fill/submit/CAPTCHA paths; policy job blocking in CI
+- [x] Secrets — `detect-secrets` baseline clean in CI
+- [x] File hygiene — discover modules under 500 lines; per-task commits on `main`
+- [x] Design Council — 20/20 on `/discover` (see `design-review.md`)
+- [x] Self-improvement — accept dedupes duplicate rows in one request; returns `skipped_duplicates`
+- [x] Docs — README `/discover` blurb; mission + design-review updated
+- [x] Fixture-for-every-bug — `board_listing` in `jober_fixtures`; parser unit tests
 
 ## Deferred (non-blocking)
 - Redis-backed per-board cooldown enforcement (httpx fetch only today)
