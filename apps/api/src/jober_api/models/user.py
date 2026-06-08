@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from jober_api.models.auth_identity import AuthIdentity
     from jober_api.models.auth_token import AuthToken
     from jober_api.models.job_list import JobList
+    from jober_api.models.saved_search import SavedSearch
     from jober_api.models.tenant import Tenant
     from jober_api.models.user_preferences import UserPreferences
     from jober_api.models.user_provider_key import UserProviderKey
@@ -57,3 +58,4 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     provider_keys: Mapped[list[UserProviderKey]] = relationship(back_populates="user")
     job_lists: Mapped[list[JobList]] = relationship(back_populates="user")
+    saved_searches: Mapped[list[SavedSearch]] = relationship(back_populates="user")

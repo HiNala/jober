@@ -19,6 +19,7 @@ from jober_api.models.llm_call import LlmCall
 from jober_api.models.profile_common_answer import ProfileCommonAnswer
 from jober_api.models.resume_asset import ResumeAsset
 from jober_api.models.run_event import RunEvent
+from jober_api.models.saved_search import SavedSearch
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
 from jober_api.models.user_preferences import UserPreferences
@@ -47,6 +48,7 @@ __all__ = [
     "ProfileCommonAnswer",
     "LlmCall",
     "ResumeAsset",
+    "SavedSearch",
     "RunEvent",
     "Tenant",
     "User",

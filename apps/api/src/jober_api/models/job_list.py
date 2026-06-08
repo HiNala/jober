@@ -33,6 +33,11 @@ class JobList(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(String(512))
     archived: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    saved_search_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("saved_searches.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
     items: Mapped[list[JobListItem]] = relationship(
         back_populates="job_list",
