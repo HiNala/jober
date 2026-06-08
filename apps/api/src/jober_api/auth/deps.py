@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
 from jober_api.auth.context import AuthContext
+from jober_api.auth.sessions import load_session
 from jober_api.config import settings
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
@@ -16,6 +17,12 @@ from jober_api.models.user import User
 PUBLIC_API_PREFIXES = (
     "/api/webhooks/",
     "/api/health",
+    "/api/auth/register",
+    "/api/auth/login",
+    "/api/auth/verify-email",
+    "/api/auth/forgot-password",
+    "/api/auth/reset-password",
+    "/api/auth/refresh",
 )
 
 
@@ -23,9 +30,34 @@ async def get_auth_context(
     request: Request,
     session: AsyncSession,
 ) -> AuthContext:
+    if settings.dev_auth_bypass and settings.jober_env in ("development", "test"):
+        return await _auth_from_dev_headers(request, session)
+    if settings.auth_mode == "native":
+        return await _auth_from_session_cookie(request, session)
     if settings.auth_mode == "clerk" and settings.clerk_jwt_issuer:
         return await _auth_from_clerk_jwt(request, session)
     return await _auth_from_dev_headers(request, session)
+
+
+async def _auth_from_session_cookie(request: Request, session: AsyncSession) -> AuthContext:
+    session_id = request.cookies.get(settings.session_cookie_name)
+    if not session_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    data = await load_session(session_id)
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
+    user = await session.get(User, data.user_id)
+    if user is None or user.tenant_id != data.tenant_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session")
+    tenant = await session.get(Tenant, user.tenant_id)
+    if tenant is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session")
+    return AuthContext(
+        user_id=user.id,
+        tenant_id=tenant.id,
+        email=user.email,
+        plan=tenant.plan,
+    )
 
 
 async def _auth_from_dev_headers(request: Request, session: AsyncSession) -> AuthContext:

@@ -36,6 +36,12 @@ def register_secrets_for_redaction() -> None:
 def validate_startup_secrets() -> None:
     """Refuse boot when required secrets are missing or placeholder (non-dev)."""
     register_secrets_for_redaction()
+    if settings.dev_auth_bypass and settings.jober_env not in ("development", "test"):
+        msg = "DEV_AUTH_BYPASS is only allowed in development or test environments"
+        raise RuntimeError(msg)
+    if settings.jober_env == "production" and settings.dev_auth_bypass:
+        msg = "DEV_AUTH_BYPASS must be disabled in production"
+        raise RuntimeError(msg)
     if os.getenv("CI") == "true":
         return
     if settings.jober_env == "development" and not settings.require_secrets:
