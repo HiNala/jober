@@ -19,6 +19,11 @@
 - [x] Design Council ≥18/20 in `design-review.md`
 - [x] Vocabulary documented in `docs/architecture/motion.md`
 
+## Mission 99
+- [x] `EventStreamRevealTracker` — historical lines static; only new SSE lines animate
+- [x] `StreamingText` + `ContentReveal` wired in run console
+- [x] Web gates + CI green
+
 ## Iteration clause
 - Screenshot crossfade uses opacity-only keyframe to avoid jank during live SSE.
-- Run Mission 99 before Mission 20.
+- Advance to Mission 20 after M99.

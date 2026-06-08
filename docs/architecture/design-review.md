@@ -666,6 +666,16 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 19) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `EventStreamRevealTracker` + test | Initial batch was re-animating every line — jank during SSE catch-up |
+| `StreamingText` wired in event terminal | Component existed but was unused after lint fix |
+| `ContentReveal` on run console | Skeleton → content cross-fade was spec’d but not connected |
+
+---
+
 ## Mission 19 — Motion & micro-interactions
 
 | Criterion | Score | Notes |

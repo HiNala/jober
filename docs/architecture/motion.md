@@ -54,6 +54,8 @@ Jober uses a **CSS-first motion vocabulary** — no framer-motion. All feature s
 
 Screenshot frames use `jober-screenshot-frame` (opacity-only, 150ms) keyed by URL — no layout animation during SSE bursts. Filmstrip uses `max-height` transition (layout token) which is acceptable off the hot path.
 
+Event terminal lines use `shouldRevealStreamLine()` (`lib/motion/event-stream-reveal.ts`): per `runId`, the first populated batch sets a seq baseline; only lines with `seq > baseline` play `motionStreamReveal`. Historical catch-up stays static.
+
 ## Status tone map
 
 `runStatusTone()` maps API statuses → visual tones: `queued`, `running`, `review`, `submitted`, `failed`, `idle`. `StatusPill` re-animates on tone change via React `key`.
