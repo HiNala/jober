@@ -685,6 +685,33 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 21 — Google OAuth & account linking
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Google button is additive; native form unchanged |
+| Kare | 2 | Provider labels in settings; link/unlink affordances clear |
+| Norman | 2 | Verified-email merge requires password; unlink guard explicit |
+| Nielsen | 2 | PKCE + single-use state; secrets env-only |
+| Tufte | 2 | Minimal scopes (openid email profile) |
+| Vignelli | 2 | Auth divider + outline button match shell |
+| Rand | 1 | Standard OAuth UX |
+| Maeda | 2 | Same motion tokens on Google CTA |
+| Wroblewski | 2 | Full-width provider button on mobile |
+| Ive | 2 | Reuses cookie session flow — no parallel auth stack |
+
+**Total: 19/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 21) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `.env.example` Google OAuth + `WEB_APP_URL` | Operators need documented callback and redirect base without reading mission docs |
+
+---
+
 ## Mission 99 (post–Mission 20) — improvements logged
 
 | Change | Why |
