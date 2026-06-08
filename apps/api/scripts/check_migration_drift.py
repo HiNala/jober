@@ -17,6 +17,7 @@ from jober_api.models import (  # noqa: F401 — register metadata
     ApplicationAttempt,
     ApplicationBatch,
     ApplicationRun,
+    AuthIdentity,
     AuthToken,
     BatchItem,
     BrowserEvent,

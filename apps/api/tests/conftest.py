@@ -23,6 +23,7 @@ from jober_api.models import (  # noqa: F401 — register mappers
     ApplicationBatch,
     ApplicationRun,
     AuditLogEntry,
+    AuthIdentity,
     AuthToken,
     BatchItem,
     BrowserEvent,

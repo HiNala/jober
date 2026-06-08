@@ -13,6 +13,7 @@ from jober_api.models.enums import UserRole, UserStatus
 from jober_api.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from jober_api.models.auth_identity import AuthIdentity
     from jober_api.models.auth_token import AuthToken
     from jober_api.models.tenant import Tenant
 
@@ -46,3 +47,4 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     tenant: Mapped[Tenant] = relationship(back_populates="users")
     auth_tokens: Mapped[list[AuthToken]] = relationship(back_populates="user")
+    auth_identities: Mapped[list[AuthIdentity]] = relationship(back_populates="user")

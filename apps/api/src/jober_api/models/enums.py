@@ -109,6 +109,12 @@ class UserRole(StrEnum):
 class AuthTokenType(StrEnum):
     EMAIL_VERIFY = "email_verify"
     PASSWORD_RESET = "password_reset"
+    OAUTH_LINK = "oauth_link"
+
+
+class AuthProvider(StrEnum):
+    GOOGLE = "google"
+    GITHUB = "github"
 
 
 class AuditAction(StrEnum):
