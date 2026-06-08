@@ -20,7 +20,8 @@ class ResumeAssetRepository(Repository[ResumeAsset]):
         return row
 
     async def list_all(self, limit: int = 100, offset: int = 0) -> list[ResumeAsset]:
-        stmt = scope_stmt(select(ResumeAsset), ResumeAsset, self._tenant_id).limit(limit).offset(offset)
+        stmt = scope_stmt(select(ResumeAsset), ResumeAsset, self._tenant_id)
+        stmt = stmt.limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 

@@ -74,7 +74,9 @@ async def test_reimport_preserves_app_status_when_runs_exist(db_session, truncat
     await db_session.commit()
 
     # Workbook still says "Not started" for Company 1
-    report = await import_jobs_workbook(db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False)
+    report = await import_jobs_workbook(
+        db_session, data, tenant_id=DEFAULT_DEV_TENANT_ID, dry_run=False
+    )
     assert report.job_targets.updated == 1
     repo = JobTargetRepository(db_session)
     refreshed = await repo.get(target.id)

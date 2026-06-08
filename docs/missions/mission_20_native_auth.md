@@ -6,11 +6,12 @@
 - [x] Redis sessions: httpOnly cookies, CSRF on state-changing routes, refresh rotation
 - [x] Flows: sign up, verify, sign in, sign out, forgot/reset, change password
 - [x] Rate limiting + lockout on auth endpoints
-- [x] Tenant-scoped data access via session (cross-account tests)
+- [x] Tenant-scoped data access via session (jobs, runs, documents, vault, resumes, imports/exports)
+- [x] Cross-account tests for cookie sessions and document routes
 - [x] `DEV_AUTH_BYPASS` (dev/test only; production boot guard)
 - [x] Auth UI: sign in/up/forgot/reset + password meter + show password
 - [x] Session UX: nav identity pill, cookie sessions for SSE, refresh endpoint
-- [x] Iteration: sessions list + logout-all; TOTP scaffolding endpoint
+- [x] Iteration: sessions list + logout-all (settings UI); TOTP scaffolding endpoint
 
 ## Acceptance criteria
 - [x] Argon2id hashes in DB; no plaintext passwords in logs
