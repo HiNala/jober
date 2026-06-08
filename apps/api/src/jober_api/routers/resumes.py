@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -60,4 +62,25 @@ async def upload_resume_file(
         ) from exc
 
     await session.commit()
+    return serialize_resume(asset)
+
+
+@router.post("/{resume_id}/activate")
+async def activate_resume(
+    resume_id: UUID,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, object]:
+    auth = require_auth(request)
+    repo = ResumeAssetRepository(session, auth.tenant_id)
+    asset = await repo.get(resume_id)
+    if asset is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    profiles = UserProfileRepository(session, auth.tenant_id)
+    profile = await profiles.get_or_create_for_tenant()
+    await repo.deactivate_except(asset.id)
+    asset.is_active = True
+    profile.default_resume_asset_id = asset.id
+    await session.commit()
+    await session.refresh(asset)
     return serialize_resume(asset)

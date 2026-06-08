@@ -6,7 +6,6 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from jober_api.config import settings
 from jober_api.models.enums import DocumentType
 from jober_api.models.generated_document import GeneratedDocument
 from jober_api.models.job_target import JobTarget
@@ -35,8 +34,8 @@ from jober_api.services.documents.variant_mapping import (
 )
 from jober_api.services.llm.gateway import (
     assert_budget,
-    get_llm_provider,
     log_llm_call,
+    resolve_llm_runtime,
 )
 from jober_api.storage.keys import document_docx_key, document_pdf_key
 from jober_api.storage.minio_client import ObjectStorage
@@ -67,6 +66,7 @@ async def generate_cover_letter(
     storage: ObjectStorage,
     *,
     tenant_id: uuid.UUID,
+    user_id: uuid.UUID,
     job_target_id: uuid.UUID,
     force: bool = False,
     include_docx: bool = True,
@@ -119,7 +119,7 @@ async def generate_cover_letter(
         voice_notes="direct, founder/operator, product-minded, technically credible",
     )
     user_prompt = pack_user_prompt(ctx)
-    provider = get_llm_provider()
+    provider, llm_runtime = await resolve_llm_runtime(session, user_id)
 
     claims_index = _claims_index_from_resume(resume)
     guard_result: ClaimsGuardResult | None = None
@@ -127,7 +127,7 @@ async def generate_cover_letter(
 
     for attempt in range(3):
         completion = await provider.complete(
-            model=settings.llm_draft_model,
+            model=llm_runtime.draft_model,
             system=SYSTEM_INSTRUCTIONS,
             user=user_prompt
             if attempt == 0
@@ -167,7 +167,7 @@ async def generate_cover_letter(
         f"Missing: {coverage.missing}"
     )
     score_completion = await provider.complete(
-        model=settings.llm_scoring_model,
+        model=llm_runtime.scoring_model,
         system='Return JSON: {"notes": "brief ATS commentary"}',
         user=scoring_prompt,
         temperature=0.0,

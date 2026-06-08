@@ -10,9 +10,14 @@ from jober_api.auth.middleware import require_auth
 from jober_api.db.session import get_session
 from jober_api.models.enums import AuditAction, RunPolicy
 from jober_api.models.tenant import Tenant
+from jober_api.repositories.user_preferences import UserPreferencesRepository
+from jober_api.repositories.user_provider_key import UserProviderKeyRepository
 from jober_api.services.audit.service import record_audit
+from jober_api.services.preferences.defaults import deep_merge, merged_preferences
 
 router = APIRouter(prefix="/settings", tags=["settings"])
+
+_ALLOWED_PROVIDERS = frozenset({"openai", "anthropic"})
 
 _USAGE_GUIDANCE = {
     "apply_only_chosen_jobs": (
@@ -101,3 +106,114 @@ async def update_policy(
         )
     await session.commit()
     return {"status": "updated", "policy": tenant.policy, "retention_days": tenant.retention_days}
+
+
+@router.get("/preferences")
+async def get_preferences(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    auth = require_auth(request)
+    repo = UserPreferencesRepository(session)
+    row = await repo.get_or_create(auth.user_id)
+    return {"preferences": merged_preferences(row.prefs)}
+
+
+@router.patch("/preferences")
+async def patch_preferences(
+    request: Request,
+    body: dict[str, Any],
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    auth = require_auth(request)
+    repo = UserPreferencesRepository(session)
+    row = await repo.get_or_create(auth.user_id)
+    row.prefs = deep_merge(merged_preferences(row.prefs), body)
+    await record_audit(
+        session,
+        tenant_id=auth.tenant_id,
+        user_id=auth.user_id,
+        action=AuditAction.POLICY_UPDATE,
+        message="User preferences updated",
+        details={"keys": list(body.keys())},
+    )
+    await session.commit()
+    return {"preferences": merged_preferences(row.prefs)}
+
+
+class ProviderKeyUpdate(BaseModel):
+    api_key: str = Field(..., min_length=8, max_length=512)
+
+
+@router.get("/provider-keys")
+async def list_provider_keys(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    auth = require_auth(request)
+    repo = UserProviderKeyRepository(session)
+    rows = await repo.list_for_user(auth.user_id)
+    return {
+        "items": [
+            {
+                "provider": row.provider,
+                "configured": bool(row.encrypted_api_key),
+                "key_hint": row.key_hint,
+            }
+            for row in rows
+        ]
+    }
+
+
+@router.put("/provider-keys/{provider}")
+async def upsert_provider_key(
+    provider: str,
+    request: Request,
+    body: ProviderKeyUpdate,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, Any]:
+    auth = require_auth(request)
+    if provider not in _ALLOWED_PROVIDERS:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported provider")
+    repo = UserProviderKeyRepository(session)
+    row = await repo.get_for_provider(auth.user_id, provider)
+    hint = body.api_key[-4:] if len(body.api_key) >= 4 else "****"
+    if row is None:
+        from jober_api.models.user_provider_key import UserProviderKey
+
+        row = UserProviderKey(
+            user_id=auth.user_id,
+            provider=provider,
+            encrypted_api_key=body.api_key,
+            key_hint=hint,
+        )
+        session.add(row)
+    else:
+        row.encrypted_api_key = body.api_key
+        row.key_hint = hint
+    await record_audit(
+        session,
+        tenant_id=auth.tenant_id,
+        user_id=auth.user_id,
+        action=AuditAction.POLICY_UPDATE,
+        message=f"Provider key updated for {provider}",
+        details={"provider": provider},
+    )
+    await session.commit()
+    return {"provider": provider, "configured": True, "key_hint": hint}
+
+
+@router.delete("/provider-keys/{provider}")
+async def delete_provider_key(
+    provider: str,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, str]:
+    auth = require_auth(request)
+    repo = UserProviderKeyRepository(session)
+    row = await repo.get_for_provider(auth.user_id, provider)
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not configured")
+    await session.delete(row)
+    await session.commit()
+    return {"status": "deleted"}

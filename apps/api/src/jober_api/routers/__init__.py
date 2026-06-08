@@ -9,7 +9,9 @@ from jober_api.routers.form_discovery import router as form_discovery_router
 from jober_api.routers.form_fill import router as form_fill_router
 from jober_api.routers.imports import router as imports_router
 from jober_api.routers.job_extraction import router as job_extraction_router
+from jober_api.routers.job_lists import router as job_lists_router
 from jober_api.routers.job_targets import router as job_targets_router
+from jober_api.routers.library import router as library_router
 from jober_api.routers.llm import router as llm_router
 from jober_api.routers.privacy import router as privacy_router
 from jober_api.routers.profile import router as profile_router
@@ -25,6 +27,8 @@ api_router.include_router(auth_router)
 api_router.include_router(imports_router)
 api_router.include_router(exports_router)
 api_router.include_router(job_targets_router)
+api_router.include_router(job_lists_router)
+api_router.include_router(library_router)
 api_router.include_router(job_extraction_router)
 api_router.include_router(profile_router)
 api_router.include_router(resumes_router)

@@ -174,6 +174,17 @@ class TemplateLlmProvider:
 
 
 class HttpLlmProvider:
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        provider: str | None = None,
+        base_url: str | None = None,
+    ) -> None:
+        self._api_key = api_key
+        self._provider = provider or settings.llm_provider
+        self._base_url = (base_url or settings.llm_base_url).rstrip("/")
+
     async def complete(
         self,
         *,
@@ -182,15 +193,14 @@ class HttpLlmProvider:
         user: str,
         temperature: float = 0.4,
     ) -> LlmCompletion:
-        if not settings.llm_api_key:
-            msg = "LLM_API_KEY is not configured"
+        if not self._api_key:
+            msg = "LLM API key is not configured"
             raise ValueError(msg)
-        base_url = settings.llm_base_url.rstrip("/")
         started = time.perf_counter()
         async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
-                f"{base_url}/chat/completions",
-                headers={"Authorization": f"Bearer {settings.llm_api_key}"},
+                f"{self._base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {self._api_key}"},
                 json={
                     "model": model,
                     "temperature": temperature,
@@ -210,7 +220,7 @@ class HttpLlmProvider:
         content = data["choices"][0]["message"]["content"]
         return LlmCompletion(
             content=content,
-            provider=settings.llm_provider,
+            provider=self._provider,
             model=model,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
@@ -219,10 +229,47 @@ class HttpLlmProvider:
         )
 
 
-def get_llm_provider() -> LlmProvider:
-    if settings.llm_provider == "template" or not settings.llm_api_key:
+def get_llm_provider(*, api_key: str | None = None) -> LlmProvider:
+    effective_key = settings.llm_api_key if api_key is None else api_key
+    if settings.llm_provider == "template" or not effective_key:
         return TemplateLlmProvider()
-    return HttpLlmProvider()
+    return HttpLlmProvider(api_key=effective_key)
+
+
+@dataclass(frozen=True)
+class LlmRuntime:
+    draft_model: str
+    scoring_model: str
+    using_byok: bool
+
+
+async def resolve_llm_runtime(
+    session: AsyncSession,
+    user_id: Any,
+) -> tuple[LlmProvider, LlmRuntime]:
+    from jober_api.repositories.user_preferences import UserPreferencesRepository
+    from jober_api.repositories.user_provider_key import UserProviderKeyRepository
+    from jober_api.services.preferences.defaults import merged_preferences
+
+    prefs_row = await UserPreferencesRepository(session).get_or_create(user_id)
+    prefs = merged_preferences(prefs_row.prefs)
+    draft_model = prefs["ai"]["preferred_draft_model"] or settings.llm_draft_model
+    scoring_model = prefs["ai"]["preferred_scoring_model"] or settings.llm_scoring_model
+
+    provider_name = settings.llm_provider
+    api_key: str | None = settings.llm_api_key or None
+    using_byok = False
+    key_row = await UserProviderKeyRepository(session).get_for_provider(user_id, provider_name)
+    if key_row and key_row.encrypted_api_key:
+        api_key = key_row.encrypted_api_key
+        using_byok = True
+
+    runtime = LlmRuntime(
+        draft_model=draft_model,
+        scoring_model=scoring_model,
+        using_byok=using_byok,
+    )
+    return get_llm_provider(api_key=api_key), runtime
 
 
 async def monthly_llm_spend(session: AsyncSession) -> float:

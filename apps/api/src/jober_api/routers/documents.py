@@ -67,6 +67,7 @@ async def generate_cover_letter_endpoint(
             session,
             storage,
             tenant_id=auth.tenant_id,
+            user_id=auth.user_id,
             job_target_id=job_target_id,
             force=force,
             include_docx=include_docx,
@@ -127,6 +128,26 @@ async def download_pdf(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     data = await storage.get_bytes(row.object_key_pdf)
     return Response(content=data, media_type="application/pdf")
+
+
+@router.patch("/{document_id}")
+async def patch_document(
+    document_id: uuid.UUID,
+    request: Request,
+    body: dict[str, object],
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, object]:
+    auth = require_auth(request)
+    row = await _document_for_tenant(session, auth.tenant_id, document_id)
+    meta = dict(row.keyword_coverage or {})
+    if "locked_template" in body:
+        meta["locked_template"] = bool(body["locked_template"])
+        row.keyword_coverage = meta
+    await session.commit()
+    return {
+        "id": str(row.id),
+        "locked_template": bool(meta.get("locked_template")),
+    }
 
 
 @router.get("/{document_id}/download/docx")
