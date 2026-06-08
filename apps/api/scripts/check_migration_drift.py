@@ -27,13 +27,17 @@ from jober_api.models import (  # noqa: F401 — register metadata
     FormFieldObservation,
     GeneratedDocument,
     HumanCheckpoint,
+    JobList,
+    JobListItem,
     JobTarget,
     LlmCall,
     ResumeAsset,
     RunEvent,
     Tenant,
     User,
+    UserPreferences,
     UserProfile,
+    UserProviderKey,
 )
 
 

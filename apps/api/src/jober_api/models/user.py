@@ -15,7 +15,10 @@ from jober_api.models.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 if TYPE_CHECKING:
     from jober_api.models.auth_identity import AuthIdentity
     from jober_api.models.auth_token import AuthToken
+    from jober_api.models.job_list import JobList
     from jober_api.models.tenant import Tenant
+    from jober_api.models.user_preferences import UserPreferences
+    from jober_api.models.user_provider_key import UserProviderKey
 
 
 class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -48,3 +51,9 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     tenant: Mapped[Tenant] = relationship(back_populates="users")
     auth_tokens: Mapped[list[AuthToken]] = relationship(back_populates="user")
     auth_identities: Mapped[list[AuthIdentity]] = relationship(back_populates="user")
+    preferences: Mapped[UserPreferences | None] = relationship(
+        back_populates="user",
+        uselist=False,
+    )
+    provider_keys: Mapped[list[UserProviderKey]] = relationship(back_populates="user")
+    job_lists: Mapped[list[JobList]] = relationship(back_populates="user")

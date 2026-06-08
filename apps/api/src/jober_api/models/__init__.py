@@ -13,6 +13,7 @@ from jober_api.models.field_mapping_memory import FieldMappingMemory
 from jober_api.models.form_field_observation import FormFieldObservation
 from jober_api.models.generated_document import GeneratedDocument
 from jober_api.models.human_checkpoint import HumanCheckpoint
+from jober_api.models.job_list import JobList, JobListItem
 from jober_api.models.job_target import JobTarget
 from jober_api.models.llm_call import LlmCall
 from jober_api.models.profile_common_answer import ProfileCommonAnswer
@@ -20,7 +21,9 @@ from jober_api.models.resume_asset import ResumeAsset
 from jober_api.models.run_event import RunEvent
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
+from jober_api.models.user_preferences import UserPreferences
 from jober_api.models.user_profile import UserProfile
+from jober_api.models.user_provider_key import UserProviderKey
 
 __all__ = [
     "AuthIdentity",
@@ -38,6 +41,8 @@ __all__ = [
     "FormFieldObservation",
     "GeneratedDocument",
     "HumanCheckpoint",
+    "JobList",
+    "JobListItem",
     "JobTarget",
     "ProfileCommonAnswer",
     "LlmCall",
@@ -45,5 +50,7 @@ __all__ = [
     "RunEvent",
     "Tenant",
     "User",
+    "UserPreferences",
     "UserProfile",
+    "UserProviderKey",
 ]
