@@ -108,3 +108,37 @@ export function fetchSessions() {
 export function logoutAll() {
   return authFetch<{ message: string }>("/api/auth/logout-all", { method: "POST" });
 }
+
+export type AuthIdentity = {
+  provider: string;
+  provider_email: string | null;
+  display_name: string | null;
+  linked_at: string;
+};
+
+export function getGoogleOAuthStartUrl(nextPath = "/dashboard"): string {
+  const params = new URLSearchParams({ next_path: nextPath });
+  return `${getApiBaseUrl()}/api/auth/google/start?${params.toString()}`;
+}
+
+export function getGoogleLinkStartUrl(nextPath = "/settings"): string {
+  const params = new URLSearchParams({ next_path: nextPath });
+  return `${getApiBaseUrl()}/api/auth/google/link/start?${params.toString()}`;
+}
+
+export function fetchIdentities() {
+  return authFetch<{ items: AuthIdentity[] }>("/api/auth/identities");
+}
+
+export function confirmGoogleLink(token: string, password: string) {
+  return authFetch<AuthUser>("/api/auth/google/confirm-link", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
+}
+
+export function unlinkIdentity(provider: string) {
+  return authFetch<{ message: string }>(`/api/auth/identities/${provider}`, {
+    method: "DELETE",
+  });
+}
