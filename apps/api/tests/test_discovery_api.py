@@ -213,6 +213,7 @@ async def test_discovery_saved_search_linked_to_list_refresh(
             tenant_id=DEFAULT_DEV_TENANT_ID,
             company_board="Beacon Labs",
             company_careers_url="https://example.com/careers/beacon",
+            representative_roles="Staff Engineer",
         )
     )
     await db_session.commit()
