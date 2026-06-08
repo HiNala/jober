@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { KeyRound, Link2, LogOut, Unlink } from "lucide-react";
 
 import { useAuth } from "@/contexts/auth-context";
+import { isGoogleOAuthEnabled } from "@/lib/auth/google-oauth";
 import { Button } from "@/components/ui/button";
 import {
   fetchIdentities,
@@ -56,6 +57,7 @@ export function AuthSecuritySection() {
 
   const activeCount = sessionsQuery.data?.active_sessions ?? 0;
   const identities = identitiesQuery.data?.items ?? [];
+  const googleOAuthEnabled = isGoogleOAuthEnabled();
   const hasGoogle = identities.some((item) => item.provider === "google");
   const oauthCount = identities.filter((item) => item.provider !== "native").length;
   const hasPassword = identities.some((item) => item.provider === "native");
@@ -114,7 +116,7 @@ export function AuthSecuritySection() {
             ))
           )}
         </ul>
-        {!hasGoogle ? (
+        {googleOAuthEnabled && !hasGoogle ? (
           <Button
             type="button"
             variant="outline"

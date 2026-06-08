@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { AuthDivider } from "@/components/auth/auth-divider";
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { GoogleSignInBlock } from "@/components/auth/google-sign-in-block";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,8 +33,7 @@ export default function SignupPage() {
         </>
       }
     >
-      <GoogleSignInButton label="Sign up with Google" />
-      <AuthDivider />
+      <GoogleSignInBlock label="Sign up with Google" />
       <form
         className="space-y-4"
         onSubmit={(event) => {
