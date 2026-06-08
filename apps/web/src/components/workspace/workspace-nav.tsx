@@ -171,7 +171,7 @@ export function WorkspaceNav() {
           {navCollapsed ? <span className="sr-only">New run</span> : null}
         </Link>
         <Link
-          href="/queue"
+          href="/search"
           className={cn(
             buttonVariants({ variant: "ghost", size: navCollapsed ? "icon-sm" : "sm" }),
             !navCollapsed && "w-full justify-start",
@@ -182,7 +182,7 @@ export function WorkspaceNav() {
           {navCollapsed ? <span className="sr-only">Search</span> : null}
         </Link>
         <Link
-          href="/documents"
+          href="/library"
           className={cn(
             buttonVariants({ variant: "ghost", size: navCollapsed ? "icon-sm" : "sm" }),
             !navCollapsed && "w-full justify-start",

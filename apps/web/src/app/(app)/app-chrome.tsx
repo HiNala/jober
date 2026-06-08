@@ -8,8 +8,8 @@ import { RunCanvasProvider } from "@/contexts/run-canvas-context";
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/queue": "Queue",
-  "/documents": "Documents",
-  "/vault": "Vault",
+  "/library": "Library",
+  "/search": "Search",
   "/settings": "Settings",
 };
 

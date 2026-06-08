@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FileText,
+  BookOpen,
   LayoutDashboard,
   ListTodo,
+  Search,
   Settings,
-  Shield,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,8 +20,8 @@ export const APP_NAV: {
 }[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/queue", label: "Queue", icon: ListTodo },
-  { href: "/documents", label: "Documents", icon: FileText },
-  { href: "/vault", label: "Vault", icon: Shield },
+  { href: "/library", label: "Library", icon: BookOpen },
+  { href: "/search", label: "Search", icon: Search },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
