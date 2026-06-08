@@ -39,6 +39,15 @@ export async function authFetch<T>(path: string, init?: RequestInit): Promise<T>
     cache: "no-store",
   });
 
+  if (res.status === 401 && !path.startsWith("/api/auth/")) {
+    const { tryRecoverSession, markSessionExpired } = await import("./session-recovery");
+    const recovered = await tryRecoverSession();
+    if (recovered) {
+      return authFetch<T>(path, init);
+    }
+    markSessionExpired();
+  }
+
   if (!res.ok) {
     const body = await res.text().catch(() => undefined);
     throw new Error(body || `Auth ${res.status}`);
