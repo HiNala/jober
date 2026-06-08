@@ -33,4 +33,10 @@
 - Company boards are tenant-scoped after migration `l4h1i2d23e47`
 
 ## Mission 99 (post–Mission 23)
-- [ ] Run full CI gates and iteration sweep
+- [x] Run full CI gates and iteration sweep
+- [x] `board_listing` fixture registered in `jober_fixtures` (discovery test path)
+- [x] Design review + README verified; web lint/typecheck green locally
+
+## Deferred (non-blocking)
+- Redis-backed per-board cooldown enforcement (httpx fetch only today)
+- Worker fallback when inline enrich fails on live ATS pages

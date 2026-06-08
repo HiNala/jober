@@ -746,6 +746,16 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 23) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `board_listing.html` in `jober_fixtures/pages/jobs` | `load_ats_fixture("board_listing")` failed in CI — fixture lived only under `apps/api/tests` |
+| `_LEGACY_ATS_PATHS` maps `board_listing` → `jobs/board_listing` | Keeps discovery tests on shared fixture loader contract |
+| Mission 23 deferred notes (cooldown Redis, enrich fallback) | Explicit non-blocking gaps before Mission 24 |
+
+---
+
 ## Mission 99 (post–Mission 22) — improvements logged
 
 | Change | Why |
