@@ -2,27 +2,31 @@
 
 import * as React from "react";
 import {
-  AlertCircle,
   Eye,
   EyeOff,
   Grid2x2,
   Layers,
-  Pencil,
   PanelRightClose,
   Square,
 } from "lucide-react";
 
+import { ArtifactGridView } from "@/components/canvas/artifact-grid-view";
+import { CanvasFilmstrip } from "@/components/canvas/canvas-filmstrip";
+import { CanvasStatusBadge } from "@/components/canvas/canvas-status-badge";
+import { CanvasSurfaceTabs } from "@/components/canvas/canvas-surface-tabs";
+import { DocumentView } from "@/components/canvas/document-view";
+import { FillDiffView } from "@/components/canvas/fill-diff-view";
+import { LayersView } from "@/components/canvas/layers-view";
+import { LiveBrowserView } from "@/components/canvas/live-browser-view";
+import { ReviewCanvasView } from "@/components/canvas/review-canvas-view";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useRunCanvas } from "@/contexts/run-canvas-context";
+import { findCanvasArtifact } from "@/lib/canvas/artifacts";
 import { motionFadeIn, motionView } from "@/lib/design/motion";
-import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
-import {
-  type CanvasViewMode,
-  WORKSPACE_DEMO_ARTIFACTS,
-  useWorkspaceStore,
-} from "@/stores/workspace-store";
+import { type CanvasViewMode, useWorkspaceStore } from "@/stores/workspace-store";
 
 function ViewModeToggle({
   mode,
@@ -63,102 +67,42 @@ function ViewModeToggle({
   );
 }
 
-function CanvasSurface({ mode }: { mode: CanvasViewMode }) {
-  if (mode === "grid") {
-    return (
-      <div className="grid h-full grid-cols-2 gap-2 p-2">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className={cn("flex items-center justify-center rounded-md", surface.inset)}
-          >
-            <span className="text-xs text-muted-foreground">Surface {index + 1}</span>
-          </div>
-        ))}
-      </div>
-    );
+function SingleSurface() {
+  const runCanvas = useRunCanvas();
+  const { canvasSurface } = useWorkspaceStore();
+
+  if (canvasSurface === "review" || runCanvas?.isReviewState) {
+    return <ReviewCanvasView />;
   }
 
-  if (mode === "layers") {
-    return (
-      <div className="relative h-full p-4">
-        {[0, 1, 2].map((layer) => (
-          <div
-            key={layer}
-            className={cn(
-              "absolute inset-4 rounded-lg border",
-              surface.card,
-              motionFadeIn,
-            )}
-            style={{
-              transform: `translate(${layer * 10}px, ${layer * 10}px)`,
-              opacity: 1 - layer * 0.18,
-              zIndex: 3 - layer,
-            }}
-          >
-            <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-              Layer {layer + 1}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
+  switch (canvasSurface) {
+    case "document":
+      return <DocumentView />;
+    case "fill-diff":
+      return <FillDiffView />;
+    case "browser":
+    default:
+      return <LiveBrowserView />;
   }
-
-  return (
-    <div
-      className="flex h-full min-h-[min(720px,70vh)] flex-col items-center justify-center bg-[var(--terminal-bg)] p-4 text-[var(--terminal-fg)]"
-      data-testid="workspace-browser-canvas"
-    >
-      <p className="text-sm font-medium">Live browser canvas</p>
-      <p className="mt-1 max-w-sm text-center text-xs text-muted-foreground">
-        Reserved for embedded browser and document preview. Sized for a 1280×720 viewport.
-      </p>
-      <div className="mt-4 w-full max-w-4xl rounded border border-border/40 bg-black/20 p-2">
-        <div className="aspect-video w-full rounded bg-gradient-to-br from-muted/20 to-muted/5" />
-      </div>
-    </div>
-  );
 }
 
-function Filmstrip() {
-  const { filmstripVisible, selectedArtifactId, setSelectedArtifactId } = useWorkspaceStore();
-
-  if (!filmstripVisible) {
-    return null;
+function CanvasSurface({ mode }: { mode: CanvasViewMode }) {
+  if (mode === "grid") {
+    return <ArtifactGridView />;
   }
-
-  return (
-    <div className="shrink-0 border-t bg-muted/20 px-2 py-2">
-      <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Artifact versions">
-        {WORKSPACE_DEMO_ARTIFACTS.map((artifact) => {
-          const selected = selectedArtifactId === artifact.id;
-          return (
-            <button
-              key={artifact.id}
-              type="button"
-              onClick={() => setSelectedArtifactId(artifact.id)}
-              className={cn(
-                "flex w-20 shrink-0 flex-col gap-1 rounded-md border p-1.5 text-left",
-                motionView,
-                selected ? "border-primary bg-primary/5" : "border-border/60 hover:bg-muted/40",
-              )}
-              aria-pressed={selected}
-            >
-              <div className="aspect-video w-full rounded bg-[var(--terminal-bg)]" />
-              <span className="text-[0.65rem] font-medium tabular-nums">{artifact.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
+  if (mode === "layers") {
+    return <LayersView />;
+  }
+  return <SingleSurface />;
 }
 
 function CanvasChrome({ onClose }: { onClose?: () => void }) {
+  const runCanvas = useRunCanvas();
   const {
     canvasViewMode,
     setCanvasViewMode,
+    canvasSurface,
+    setCanvasSurface,
     filmstripVisible,
     setFilmstripVisible,
     selectedArtifactId,
@@ -166,19 +110,25 @@ function CanvasChrome({ onClose }: { onClose?: () => void }) {
   } = useWorkspaceStore();
 
   const versionLabel =
-    WORKSPACE_DEMO_ARTIFACTS.find((item) => item.id === selectedArtifactId)?.label ?? "v1";
+    findCanvasArtifact(runCanvas?.artifacts ?? [], selectedArtifactId)?.label ?? "live";
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 items-center justify-between gap-2 border-b px-3 py-2">
-        <ViewModeToggle mode={canvasViewMode} onChange={setCanvasViewMode} />
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <ViewModeToggle mode={canvasViewMode} onChange={setCanvasViewMode} />
+          {canvasViewMode === "single" ? (
+            <CanvasSurfaceTabs
+              value={canvasSurface}
+              onChange={setCanvasSurface}
+              showReview={runCanvas?.isReviewState}
+            />
+          ) : null}
+        </div>
         <div className="flex items-center gap-1">
           <Badge variant="outline" className="tabular-nums">
             {versionLabel}
           </Badge>
-          <Button variant="ghost" size="icon-sm" aria-label="Edit artifact" disabled title="Coming soon">
-            <Pencil className="size-3.5" />
-          </Button>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -203,14 +153,11 @@ function CanvasChrome({ onClose }: { onClose?: () => void }) {
       <div className="relative min-h-0 flex-1 overflow-auto">
         <CanvasSurface mode={canvasViewMode} />
         <div className="absolute right-3 top-3">
-          <Badge variant="secondary" className="gap-1 shadow-sm">
-            <AlertCircle className="size-3" aria-hidden />
-            Preview
-          </Badge>
+          <CanvasStatusBadge />
         </div>
       </div>
 
-      <Filmstrip />
+      <CanvasFilmstrip />
     </div>
   );
 }

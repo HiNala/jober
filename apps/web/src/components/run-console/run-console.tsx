@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { motionFadeIn } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
+import { useRunCanvas } from "@/contexts/run-canvas-context";
 import { useRunStream } from "@/hooks/useRunStream";
 
 import { ArtifactLinks } from "./artifact-links";
@@ -20,13 +21,17 @@ export interface RunConsoleProps {
 }
 
 function streamStatusLabel(status: string): string {
-  if (status === "live") return "Live";
-  if (status === "reconnecting") return "Reconnecting";
+  if (status === "open") return "Live";
+  if (status === "connecting") return "Connecting";
   if (status === "error") return "Disconnected";
   return status;
 }
 
 export function RunConsole({ runId }: RunConsoleProps) {
+  const runCanvas = useRunCanvas();
+  const useSharedStream = runCanvas?.runId === runId;
+  const fallback = useRunStream(useSharedStream ? null : runId);
+  const stream = useSharedStream ? runCanvas! : fallback;
   const {
     status,
     events,
@@ -35,7 +40,7 @@ export function RunConsole({ runId }: RunConsoleProps) {
     selectedTimelineSeq,
     setSelectedTimelineSeq,
     displayScreenshotUrl,
-  } = useRunStream(runId);
+  } = stream;
 
   if (status === "error" && !snapshot) {
     return (

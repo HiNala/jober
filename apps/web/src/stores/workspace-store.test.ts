@@ -33,9 +33,10 @@ describe("useWorkspaceStore", () => {
     expect(useWorkspaceStore.getState().canvasOpen).toBe(true);
   });
 
-  it("does not persist ephemeral command draft or focus mode", () => {
+  it("does not persist ephemeral command draft, focus mode, or active run", () => {
     useWorkspaceStore.getState().setCommandDraft("draft text");
     expect(WORKSPACE_PERSISTED_KEYS).not.toContain("commandDraft");
     expect(WORKSPACE_PERSISTED_KEYS).not.toContain("focusMode");
+    expect(WORKSPACE_PERSISTED_KEYS).not.toContain("activeRunId");
   });
 });

@@ -57,6 +57,17 @@ export async function fetchReviewPackage(jobTargetId: string): Promise<ReviewPac
   }
 }
 
+export async function fetchReviewPackageByRun(runId: string): Promise<ReviewPackage | null> {
+  try {
+    return await apiFetch<ReviewPackage>(`/api/application-runs/${runId}/review`);
+  } catch (err: unknown) {
+    if (err instanceof ApiError && err.status === 404) {
+      return null;
+    }
+    throw err;
+  }
+}
+
 export async function submitApplicationRun(
   runId: string,
   fixtureHtml?: string,

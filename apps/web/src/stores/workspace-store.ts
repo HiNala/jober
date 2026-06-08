@@ -2,23 +2,20 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type CanvasViewMode = "single" | "grid" | "layers";
+export type CanvasSurface = "browser" | "document" | "fill-diff" | "review";
 export type CommandMode = "plan" | "execute";
-
-export type WorkspaceArtifact = {
-  id: string;
-  label: string;
-  kind: "screenshot" | "pdf" | "trace";
-};
 
 interface WorkspaceState {
   navCollapsed: boolean;
   canvasOpen: boolean;
   focusMode: boolean;
   canvasViewMode: CanvasViewMode;
+  canvasSurface: CanvasSurface;
   filmstripVisible: boolean;
   commandMode: CommandMode;
   selectedModel: string | null;
   selectedArtifactId: string | null;
+  activeRunId: string | null;
   commandDraft: string;
   setNavCollapsed: (collapsed: boolean) => void;
   toggleNav: () => void;
@@ -26,6 +23,7 @@ interface WorkspaceState {
   toggleCanvas: () => void;
   toggleFocusMode: () => void;
   setCanvasViewMode: (mode: CanvasViewMode) => void;
+  setCanvasSurface: (surface: CanvasSurface) => void;
   setFilmstripVisible: (visible: boolean) => void;
   setCommandMode: (mode: CommandMode) => void;
   setSelectedModel: (model: string) => void;
@@ -37,6 +35,7 @@ export const WORKSPACE_PERSISTED_KEYS = [
   "navCollapsed",
   "canvasOpen",
   "canvasViewMode",
+  "canvasSurface",
   "filmstripVisible",
   "commandMode",
   "selectedModel",
@@ -50,10 +49,12 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       canvasOpen: true,
       focusMode: false,
       canvasViewMode: "single",
+      canvasSurface: "browser",
       filmstripVisible: true,
       commandMode: "plan",
       selectedModel: null,
-      selectedArtifactId: "v1",
+      selectedArtifactId: null,
+      activeRunId: null,
       commandDraft: "",
       setNavCollapsed: (navCollapsed) => set({ navCollapsed }),
       toggleNav: () => set((state) => ({ navCollapsed: !state.navCollapsed })),
@@ -64,6 +65,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           focusMode: !state.focusMode,
         })),
       setCanvasViewMode: (canvasViewMode) => set({ canvasViewMode }),
+      setCanvasSurface: (canvasSurface) => set({ canvasSurface }),
       setFilmstripVisible: (filmstripVisible) => set({ filmstripVisible }),
       setCommandMode: (commandMode) => set({ commandMode }),
       setSelectedModel: (selectedModel) => set({ selectedModel }),
@@ -79,10 +81,3 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     },
   ),
 );
-
-/** Placeholder artifacts until run console streams into the canvas. */
-export const WORKSPACE_DEMO_ARTIFACTS: WorkspaceArtifact[] = [
-  { id: "v1", label: "v1", kind: "screenshot" },
-  { id: "v2", label: "v2", kind: "screenshot" },
-  { id: "v3", label: "v3", kind: "pdf" },
-];

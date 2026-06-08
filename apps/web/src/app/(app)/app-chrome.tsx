@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell/app-shell";
+import { RunCanvasProvider } from "@/contexts/run-canvas-context";
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -19,5 +20,9 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
     title = "Run console";
   }
 
-  return <AppShell title={title}>{children}</AppShell>;
+  return (
+    <RunCanvasProvider>
+      <AppShell title={title}>{children}</AppShell>
+    </RunCanvasProvider>
+  );
 }

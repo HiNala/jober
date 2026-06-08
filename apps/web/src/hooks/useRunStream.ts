@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   fetchRunConsoleSnapshot,
@@ -8,8 +8,32 @@ import {
   type RunConsoleSnapshot,
   type RunStreamEvent,
 } from "@/lib/api/run-console";
+import { RUN_SSE_EVENT_TYPES } from "@/lib/run-stream/event-types";
 
 export type RunStreamStatus = "idle" | "connecting" | "open" | "closed" | "error";
+
+function applyStreamEvent(
+  prev: RunConsoleSnapshot | null,
+  parsed: RunStreamEvent,
+): RunConsoleSnapshot | null {
+  if (!prev) {
+    return prev;
+  }
+  return {
+    ...prev,
+    last_event_seq: parsed.seq,
+    latest_screenshot_url: parsed.screenshot_url ?? prev.latest_screenshot_url,
+    latest_screenshot_key: parsed.screenshot_key ?? prev.latest_screenshot_key,
+    status:
+      parsed.event_type === "state.changed"
+        ? String(parsed.payload?.status ?? prev.status)
+        : prev.status,
+    current_step:
+      parsed.event_type === "state.changed"
+        ? String(parsed.payload?.step ?? prev.current_step ?? "")
+        : prev.current_step,
+  };
+}
 
 export function useRunStream(runId: string | null) {
   const [status, setStatus] = useState<RunStreamStatus>(runId ? "connecting" : "idle");
@@ -17,6 +41,7 @@ export function useRunStream(runId: string | null) {
   const [snapshot, setSnapshot] = useState<RunConsoleSnapshot | null>(null);
   const [lastSeq, setLastSeq] = useState(0);
   const [selectedTimelineSeq, setSelectedTimelineSeq] = useState<number | null>(null);
+  const [liveFollow, setLiveFollow] = useState(true);
   const lastSeqRef = useRef(0);
   const sourceRef = useRef<EventSource | null>(null);
 
@@ -38,34 +63,39 @@ export function useRunStream(runId: string | null) {
     }
   }, []);
 
-  const openStream = useCallback((id: string, afterSeq: number) => {
-    sourceRef.current?.close();
-    const source = new EventSource(runEventsStreamUrl(id, afterSeq));
-    sourceRef.current = source;
-    source.onopen = () => setStatus("open");
-    source.onerror = () => setStatus("error");
-    source.onmessage = (message) => {
+  const handleStreamPayload = useCallback(
+    (raw: string) => {
       try {
-        const parsed = JSON.parse(message.data) as RunStreamEvent;
+        const parsed = JSON.parse(raw) as RunStreamEvent;
         mergeEvents([parsed]);
-        setSnapshot((prev) =>
-          prev
-            ? {
-                ...prev,
-                last_event_seq: parsed.seq,
-                latest_screenshot_url: parsed.screenshot_url ?? prev.latest_screenshot_url,
-                status:
-                  parsed.event_type === "state.changed"
-                    ? String(parsed.payload?.status ?? prev.status)
-                    : prev.status,
-              }
-            : prev,
-        );
+        setSnapshot((prev) => applyStreamEvent(prev, parsed));
+        if (liveFollow && parsed.screenshot_url) {
+          setSelectedTimelineSeq(null);
+        }
       } catch {
         // ignore malformed chunks
       }
-    };
-  }, [mergeEvents]);
+    },
+    [liveFollow, mergeEvents],
+  );
+
+  const openStream = useCallback(
+    (id: string, afterSeq: number) => {
+      sourceRef.current?.close();
+      const source = new EventSource(runEventsStreamUrl(id, afterSeq));
+      sourceRef.current = source;
+      source.onopen = () => setStatus("open");
+      source.onerror = () => setStatus("error");
+      source.onmessage = (message) => handleStreamPayload(message.data);
+      for (const eventType of RUN_SSE_EVENT_TYPES) {
+        source.addEventListener(eventType, (message) => {
+          const event = message as MessageEvent<string>;
+          handleStreamPayload(event.data);
+        });
+      }
+    },
+    [handleStreamPayload],
+  );
 
   const reconnect = useCallback(async () => {
     if (!runId) {
@@ -118,10 +148,49 @@ export function useRunStream(runId: string | null) {
     };
   }, [mergeEvents, openStream, runId]);
 
+  const scrubToTimeline = useCallback((seq: number | null) => {
+    setSelectedTimelineSeq(seq);
+    setLiveFollow(seq === null);
+  }, []);
+
+  const catchUpToLive = useCallback(() => {
+    setSelectedTimelineSeq(null);
+    setLiveFollow(true);
+  }, []);
+
   const scrubScreenshotUrl =
     selectedTimelineSeq !== null
-      ? snapshot?.timeline.find((item) => item.seq === selectedTimelineSeq)?.screenshot_url
+      ? snapshot?.timeline.find((item) => item.seq === selectedTimelineSeq)?.screenshot_url ??
+        events.find((event) => event.seq === selectedTimelineSeq)?.screenshot_url ??
+        null
       : null;
+
+  const latestBrowserContext = useMemo(() => {
+    let url: string | null = null;
+    let action: string | null = null;
+    const relevant = [...events].reverse();
+    for (const event of relevant) {
+      if (!action && event.event_type === "browser.action") {
+        action = event.message;
+      }
+      if (!url && event.event_type === "browser.navigated") {
+        url = String(event.payload?.url ?? event.message);
+      }
+      if (url && action) {
+        break;
+      }
+    }
+    return { url, action };
+  }, [events]);
+
+  const warningCount = useMemo(
+    () =>
+      events.filter(
+        (event) =>
+          event.event_type === "verification.warning" || event.event_type === "human.required",
+      ).length,
+    [events],
+  );
 
   return {
     status: runId ? status : "idle",
@@ -130,9 +199,17 @@ export function useRunStream(runId: string | null) {
     lastSeq,
     reconnect,
     selectedTimelineSeq,
-    setSelectedTimelineSeq,
+    setSelectedTimelineSeq: scrubToTimeline,
+    liveFollow,
+    catchUpToLive,
     scrubScreenshotUrl,
     displayScreenshotUrl:
       scrubScreenshotUrl ?? snapshot?.latest_screenshot_url ?? null,
+    latestUrl: latestBrowserContext.url,
+    latestAction: latestBrowserContext.action,
+    warningCount,
+    isReviewState:
+      snapshot?.status === "review_and_submit" ||
+      snapshot?.open_checkpoint?.checkpoint_type === "review_submit",
   };
 }
