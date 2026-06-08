@@ -704,6 +704,38 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 22 — User Settings, Library & Preferences
+
+**Scope:** `/library`, `/search`, expanded `/settings`, user preferences sync, BYOK storage.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One Library surface; Settings grouped by intent |
+| Kare | 2 | Empty states; vault stays in Settings home |
+| Norman | 2 | Tabs + sections; prefs apply without reload |
+| Nielsen | 2 | Search debounced; delete requires confirm phrase |
+| Tufte | 2 | Lists scannable; usage in AI section |
+| Vignelli | 2 | Shared tokens; nav Library/Search/Settings |
+| Rand | 2 | Library vs Settings mental model is distinct |
+| Maeda | 2 | Documents/Vault redirects avoid fragmentation |
+| Wroblewski | 2 | Library tabs work on narrow viewports |
+| Ive | 2 | Reduced-motion + density hooks cohesive |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 22) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Search page uses React Query + `key` remount for `?q=` | Avoids `set-state-in-effect` lint; nav deep-links work |
+| `buttonVariants` on library links | Base UI `Button` has no `asChild` |
+| `resolve_llm_runtime` + user BYOK | Gateway reads encrypted per-user keys at generation time |
+| Preferences/BYOK API tests | Locks server-side persistence and no-secret-in-response |
+
+---
+
 ## Mission 99 (post–Mission 21) — improvements logged
 
 | Change | Why |
