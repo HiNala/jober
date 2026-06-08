@@ -13,13 +13,28 @@ export function getApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 }
 
+const DEV_BYPASS =
+  process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true" ||
+  process.env.NEXT_PUBLIC_AUTH_MODE === "dev";
+
 function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
-  const tenantId = process.env.NEXT_PUBLIC_JOBER_TENANT_ID;
-  const userId = process.env.NEXT_PUBLIC_JOBER_USER_ID;
-  if (tenantId) headers["X-Jober-Tenant-Id"] = tenantId;
-  if (userId) headers["X-Jober-User-Id"] = userId;
+  if (DEV_BYPASS) {
+    const tenantId = process.env.NEXT_PUBLIC_JOBER_TENANT_ID;
+    const userId = process.env.NEXT_PUBLIC_JOBER_USER_ID;
+    if (tenantId) headers["X-Jober-Tenant-Id"] = tenantId;
+    if (userId) headers["X-Jober-User-Id"] = userId;
+  }
   return headers;
+}
+
+function csrfHeader(init?: RequestInit): Record<string, string> {
+  if (typeof document === "undefined") return {};
+  const method = init?.method?.toUpperCase() ?? "GET";
+  if (method === "GET" || method === "HEAD") return {};
+  const match = document.cookie.match(/(?:^|;\s*)jober_csrf=([^;]+)/);
+  const token = match?.[1] ? decodeURIComponent(match[1]) : undefined;
+  return token ? { "X-CSRF-Token": token } : {};
 }
 
 export async function apiFetch<T>(
@@ -29,9 +44,11 @@ export async function apiFetch<T>(
   const url = `${getApiBaseUrl()}${path}`;
   const res = await fetch(url, {
     ...init,
+    credentials: "include",
     headers: {
       Accept: "application/json",
       ...authHeaders(),
+      ...csrfHeader(init),
       ...init?.headers,
     },
     cache: "no-store",

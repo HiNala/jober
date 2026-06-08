@@ -25,6 +25,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { fetchDashboardSummary } from "@/lib/api/batches";
+import { useAuth } from "@/contexts/auth-context";
 import { motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -107,7 +108,12 @@ function NavSection({
 }
 
 export function WorkspaceNav() {
+  const { user, signOut } = useAuth();
   const { navCollapsed, toggleNav } = useWorkspaceStore();
+  const initials =
+    user?.display_name?.slice(0, 2).toUpperCase() ??
+    user?.email?.slice(0, 2).toUpperCase() ??
+    "??";
   const summaryQuery = useQuery({
     queryKey: ["dashboard-summary"],
     queryFn: fetchDashboardSummary,
@@ -251,24 +257,27 @@ export function WorkspaceNav() {
             </Link>
           </div>
         ) : null}
-        <div
+        <button
+          type="button"
+          onClick={() => void signOut().then(() => window.location.assign("/login"))}
           className={cn(
-            "flex items-center gap-2 rounded-md px-2 py-1.5",
+            "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-sidebar-accent/50",
             navCollapsed && "justify-center px-0",
           )}
+          title="Sign out"
         >
           <Avatar className="size-7">
-            <AvatarFallback className="text-xs">JD</AvatarFallback>
+            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
           {!navCollapsed ? (
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">Local Dev</p>
-              <p className="truncate text-xs text-muted-foreground">dev@jober.local</p>
+              <p className="truncate text-sm font-medium">{user?.display_name ?? "Signed in"}</p>
+              <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
             </div>
           ) : (
-            <span className="sr-only">Local Dev</span>
+            <span className="sr-only">{user?.email}</span>
           )}
-        </div>
+        </button>
       </div>
     </aside>
   );
