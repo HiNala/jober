@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCircle2, Inbox } from "lucide-react";
 
-import { motionFadeIn } from "@/lib/design/motion";
+import { motionEmptyPulse, motionFadeIn } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -63,7 +63,12 @@ export function PageEmpty({
         motionFadeIn,
       )}
     >
-      <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+      <div
+        className={cn(
+          "flex size-12 items-center justify-center rounded-full bg-muted",
+          motionEmptyPulse,
+        )}
+      >
         <Inbox className="size-5 text-muted-foreground" aria-hidden />
       </div>
       <h2 className="text-lg font-medium">{title}</h2>

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchLlmConfig } from "@/lib/api/llm";
-import { motionMicro } from "@/lib/design/motion";
+import { motionMicro, motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { type CommandMode, useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -39,6 +39,7 @@ function ModeToggle({
           className={cn(
             buttonVariants({ variant: mode === value ? "secondary" : "ghost", size: "xs" }),
             motionMicro,
+            motionPress,
             "capitalize",
           )}
           aria-pressed={mode === value}
@@ -83,6 +84,7 @@ export function WorkspaceCommandBar() {
             type="button"
             variant="outline"
             size="icon-sm"
+            className={motionPress}
             aria-label="Attach context"
             disabled
             title="Attachments arrive in a later mission"
@@ -103,7 +105,13 @@ export function WorkspaceCommandBar() {
             className="min-h-[2.75rem] flex-1 resize-none"
             aria-label="Workspace command input"
           />
-          <Button type="submit" size="icon-sm" aria-label="Send command" disabled={!commandDraft.trim()}>
+          <Button
+            type="submit"
+            size="icon-sm"
+            className={motionPress}
+            aria-label="Send command"
+            disabled={!commandDraft.trim()}
+          >
             <Send className="size-4" />
           </Button>
         </div>

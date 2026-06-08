@@ -3,7 +3,7 @@
 import { FileJson, Film, Image as ImageIcon, ScrollText } from "lucide-react";
 
 import { useRunCanvas } from "@/contexts/run-canvas-context";
-import { motionView } from "@/lib/design/motion";
+import { motionLayout, motionPress, motionSpringSettle, motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -31,22 +31,20 @@ export function CanvasFilmstrip() {
     setCanvasSurface,
   } = useWorkspaceStore();
 
-  if (!filmstripVisible) {
-    return null;
-  }
-
   const artifacts = runCanvas?.artifacts ?? [];
 
-  if (artifacts.length === 0) {
-    return (
-      <div className="shrink-0 border-t px-3 py-2 text-xs text-muted-foreground">
-        No artifacts yet
-      </div>
-    );
-  }
-
   return (
-    <div className="shrink-0 border-t bg-muted/20 px-2 py-2">
+    <div
+      className={cn(
+        "shrink-0 overflow-hidden border-t bg-muted/20",
+        motionLayout,
+        filmstripVisible ? "max-h-40 opacity-100" : "max-h-0 border-t-transparent opacity-0",
+      )}
+    >
+      {!filmstripVisible ? null : artifacts.length === 0 ? (
+        <div className="px-3 py-2 text-xs text-muted-foreground">No artifacts yet</div>
+      ) : (
+    <div className="px-2 py-2">
       <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Artifact versions">
         {artifacts.map((artifact) => {
           const selected = selectedArtifactId === artifact.id;
@@ -72,6 +70,8 @@ export function CanvasFilmstrip() {
               className={cn(
                 "flex w-20 shrink-0 flex-col gap-1 rounded-md border p-1.5 text-left",
                 motionView,
+                motionPress,
+                selected && motionSpringSettle,
                 selected ? "border-primary bg-primary/5" : "border-border/60 hover:bg-muted/40",
               )}
               aria-pressed={selected}
@@ -91,6 +91,8 @@ export function CanvasFilmstrip() {
           );
         })}
       </div>
+    </div>
+      )}
     </div>
   );
 }

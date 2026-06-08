@@ -1,9 +1,10 @@
 "use client";
 
-import { AlertCircle, Hand } from "lucide-react";
+import { AlertCircle, Hand, Radio } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { StatusPill } from "@/components/motion/status-pill";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
+import { cn } from "@/lib/utils";
 
 export function CanvasStatusBadge() {
   const runCanvas = useRunCanvas();
@@ -11,34 +12,40 @@ export function CanvasStatusBadge() {
   const needsHuman = runCanvas?.snapshot?.open_checkpoint != null;
 
   if (!runCanvas?.runId) {
-    return (
-      <Badge variant="secondary" className="gap-1 shadow-sm">
-        Idle
-      </Badge>
-    );
+    return <StatusPill status="idle" label="Idle" />;
   }
 
   if (needsHuman) {
     return (
-      <Badge variant="destructive" className="gap-1 shadow-sm">
-        <Hand className="size-3" aria-hidden />
-        Needs you
-      </Badge>
+      <StatusPill
+        status="review_and_submit"
+        label="Needs you"
+        icon={<Hand className="size-3" aria-hidden />}
+        className="shadow-sm"
+      />
     );
   }
 
   if (warnings > 0) {
     return (
-      <Badge variant="secondary" className="gap-1 border-amber-500/40 bg-amber-500/10 shadow-sm">
+      <span
+        className={cn(
+          "inline-flex h-5 items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-800 shadow-sm dark:text-amber-200",
+        )}
+      >
         <AlertCircle className="size-3" aria-hidden />
         {warnings} warning{warnings === 1 ? "" : "s"}
-      </Badge>
+      </span>
     );
   }
 
+  const streaming = runCanvas.status === "open";
   return (
-    <Badge variant="secondary" className="gap-1 shadow-sm">
-      {runCanvas.status === "open" ? "Streaming" : runCanvas.status}
-    </Badge>
+    <StatusPill
+      status={streaming ? "in_progress" : runCanvas.snapshot?.status ?? "idle"}
+      label={streaming ? "Streaming" : runCanvas.status}
+      icon={streaming ? <Radio className="size-3" aria-hidden /> : undefined}
+      className="shadow-sm"
+    />
   );
 }

@@ -13,6 +13,7 @@ import { WorkspaceCenterHeader } from "@/components/workspace/workspace-center-h
 import { WorkspaceCommandBar } from "@/components/workspace/workspace-command-bar";
 import { WorkspaceNav } from "@/components/workspace/workspace-nav";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { RouteTransition } from "@/components/motion/route-transition";
 import { motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -116,7 +117,7 @@ export function WorkspaceShellPanels({
               tabIndex={-1}
               className="min-h-0 flex-1 overflow-auto focus:outline-none"
             >
-              {children}
+              <RouteTransition>{children}</RouteTransition>
             </main>
             <WorkspaceCommandBar />
           </div>

@@ -2,10 +2,11 @@
 
 import { Radio, SkipForward } from "lucide-react";
 
+import { ReasoningShimmer } from "@/components/motion/reasoning-shimmer";
 import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
-import { motionFadeIn } from "@/lib/design/motion";
+import { motionFadeIn, motionMicro, motionPress } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +54,7 @@ export function LiveBrowserView() {
           <span
             className={cn(
               "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium uppercase tracking-wide",
+              motionMicro,
               liveFollow
                 ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                 : "bg-muted text-muted-foreground",
@@ -62,7 +64,7 @@ export function LiveBrowserView() {
             {liveFollow ? "Live" : "Scrubbing"}
           </span>
           {!liveFollow ? (
-            <Button type="button" size="xs" variant="secondary" onClick={catchUpToLive}>
+            <Button type="button" size="xs" variant="secondary" className={motionPress} onClick={catchUpToLive}>
               <SkipForward className="mr-1 size-3" aria-hidden />
               Catch up to live
             </Button>
@@ -107,14 +109,15 @@ export function LiveBrowserView() {
         {displayScreenshotUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
+            key={displayScreenshotUrl}
             src={displayScreenshotUrl}
             alt={`Browser frame for ${snapshot?.company ?? "run"}`}
-            className="h-full w-full bg-[var(--terminal-bg)] object-contain"
+            className="jober-screenshot-frame h-full w-full bg-[var(--terminal-bg)] object-contain"
             data-testid="workspace-browser-canvas"
           />
         ) : (
-          <figcaption className="flex h-full items-center justify-center p-6 text-sm text-muted-foreground">
-            Waiting for browser frame…
+          <figcaption className="flex h-full flex-col items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
+            <ReasoningShimmer label="Waiting for browser frame…" />
           </figcaption>
         )}
       </figure>

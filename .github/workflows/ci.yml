@@ -283,7 +283,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Lint (strict)
-        run: pnpm lint:strict
+        run: pnpm lint:strict && pnpm check:motion
 
       - name: Test
         run: pnpm test

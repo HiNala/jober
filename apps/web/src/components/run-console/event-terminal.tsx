@@ -1,6 +1,8 @@
 "use client";
 
+import { ReasoningShimmer } from "@/components/motion/reasoning-shimmer";
 import type { RunStreamEvent } from "@/lib/api/run-console";
+import { motionStreamReveal } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +10,7 @@ export interface EventTerminalProps {
   events: RunStreamEvent[];
   company?: string;
   role?: string;
+  isConnecting?: boolean;
 }
 
 function formatLine(event: RunStreamEvent): string {
@@ -23,7 +26,7 @@ function formatLine(event: RunStreamEvent): string {
   return `${prefix} ${event.event_type.replace(/\./g, " ")} — ${event.message}`;
 }
 
-export function EventTerminal({ events, company, role }: EventTerminalProps) {
+export function EventTerminal({ events, company, role, isConnecting }: EventTerminalProps) {
   return (
     <section aria-labelledby="run-event-stream-heading">
       <h2 id="run-event-stream-heading" className="mb-2 text-sm font-medium">
@@ -44,11 +47,18 @@ export function EventTerminal({ events, company, role }: EventTerminalProps) {
           </p>
         )}
         {events.length === 0 ? (
-          <p className="text-[var(--terminal-muted)]">Waiting for run events…</p>
+          isConnecting ? (
+            <ReasoningShimmer label="Connecting to stream…" />
+          ) : (
+            <ReasoningShimmer label="Waiting for run events…" />
+          )
         ) : (
           <ol className="space-y-0.5">
             {events.map((event) => (
-              <li key={event.seq} className="whitespace-pre-wrap break-words">
+              <li
+                key={event.seq}
+                className={cn("whitespace-pre-wrap break-words", motionStreamReveal)}
+              >
                 {formatLine(event)}
               </li>
             ))}

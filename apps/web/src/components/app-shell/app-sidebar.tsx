@@ -7,6 +7,7 @@ import { NavLinks } from "@/components/app-shell/nav-links";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui-store";
 
@@ -16,7 +17,8 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "hidden h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex",
+        "hidden h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] motion-safe:duration-[var(--motion-fast)] md:flex",
+        motionView,
         sidebarCollapsed ? "w-16" : "w-56",
       )}
       aria-label="Main navigation"

@@ -4,6 +4,7 @@ import * as React from "react";
 import { GripVertical } from "lucide-react";
 import { Group, Panel, Separator } from "react-resizable-panels";
 
+import { motionDragHandle, motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 function ResizablePanelGroup({
@@ -21,7 +22,11 @@ function ResizablePanelGroup({
 
 function ResizablePanel({ className, ...props }: React.ComponentProps<typeof Panel>) {
   return (
-    <Panel data-slot="resizable-panel" className={cn("min-h-0", className)} {...props} />
+    <Panel
+      data-slot="resizable-panel"
+      className={cn("min-h-0", motionView, className)}
+      {...props}
+    />
   );
 }
 
@@ -37,12 +42,18 @@ function ResizableHandle({
         "relative flex w-px items-center justify-center bg-border",
         "after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        motionDragHandle,
         className,
       )}
       {...props}
     >
       {withHandle ? (
-        <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
+        <div
+          className={cn(
+            "z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border",
+            motionView,
+          )}
+        >
           <GripVertical className="size-2.5 text-muted-foreground" aria-hidden />
         </div>
       ) : null}

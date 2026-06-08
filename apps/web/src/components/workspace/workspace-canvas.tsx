@@ -24,7 +24,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
 import { findCanvasArtifact } from "@/lib/canvas/artifacts";
-import { motionFadeIn, motionView } from "@/lib/design/motion";
+import { MotionCrossfade } from "@/components/motion/motion-crossfade";
+import { motionFadeIn, motionPress, motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { type CanvasViewMode, useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -54,6 +55,7 @@ function ViewModeToggle({
           className={cn(
             "inline-flex items-center gap-1 rounded px-2 py-1 text-xs",
             motionView,
+            motionPress,
             mode === id
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
@@ -151,7 +153,9 @@ function CanvasChrome({ onClose }: { onClose?: () => void }) {
       </div>
 
       <div className="relative min-h-0 flex-1 overflow-auto">
-        <CanvasSurface mode={canvasViewMode} />
+        <MotionCrossfade motionKey={`${canvasViewMode}-${canvasSurface}`}>
+          <CanvasSurface mode={canvasViewMode} />
+        </MotionCrossfade>
         <div className="absolute right-3 top-3">
           <CanvasStatusBadge />
         </div>

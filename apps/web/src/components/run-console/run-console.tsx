@@ -2,10 +2,10 @@
 
 import { RefreshCw } from "lucide-react";
 
+import { StatusPill } from "@/components/motion/status-pill";
 import { PageError, RunConsoleSkeleton } from "@/components/states/page-states";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { motionFadeIn } from "@/lib/design/motion";
+import { motionFadeIn, motionPress } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
@@ -71,13 +71,12 @@ export function RunConsole({ runId }: RunConsoleProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="tabular-nums">
-            {snapshot.status.replace(/_/g, " ")}
-          </Badge>
-          <Badge variant="outline">{streamStatusLabel(status)}</Badge>
+          <StatusPill status={snapshot.status} />
+          <StatusPill status={status === "open" ? "in_progress" : status} label={streamStatusLabel(status)} />
           <Button
             size="sm"
             variant="outline"
+            className={motionPress}
             onClick={() => void reconnect()}
             aria-label="Reconnect event stream"
           >
@@ -93,9 +92,10 @@ export function RunConsole({ runId }: RunConsoleProps) {
             {displayScreenshotUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
+                key={displayScreenshotUrl}
                 src={displayScreenshotUrl}
                 alt={`Latest browser frame for ${snapshot.company}`}
-                className="aspect-video w-full bg-[var(--terminal-bg)] object-contain"
+                className="jober-screenshot-frame aspect-video w-full bg-[var(--terminal-bg)] object-contain"
               />
             ) : (
               <figcaption className="flex aspect-video items-center justify-center text-sm text-muted-foreground">
@@ -111,7 +111,12 @@ export function RunConsole({ runId }: RunConsoleProps) {
           <CheckpointCard runId={runId} snapshot={snapshot} />
           <ArtifactLinks artifacts={snapshot.artifacts} />
         </div>
-        <EventTerminal events={events} company={snapshot.company} role={snapshot.role} />
+        <EventTerminal
+          events={events}
+          company={snapshot.company}
+          role={snapshot.role}
+          isConnecting={status === "connecting"}
+        />
       </div>
     </div>
   );

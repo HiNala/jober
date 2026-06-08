@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { resolveRunCheckpoint, type RunConsoleSnapshot } from "@/lib/api/run-console";
 import { formatApiError } from "@/lib/api/errors";
-import { motionFadeIn } from "@/lib/design/motion";
+import { motionAttentionEnter, motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 export interface CheckpointCardProps {
@@ -41,7 +41,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
     <section
       className={cn(
         "space-y-3 rounded-lg border border-amber-500/35 bg-amber-500/5 p-4",
-        motionFadeIn,
+        motionAttentionEnter,
       )}
       aria-labelledby="open-checkpoint-heading"
     >
@@ -58,6 +58,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
           <>
             <Button
               size="sm"
+              className={motionPress}
               onClick={() => resolveMutation.mutate("approve")}
               disabled={resolveMutation.isPending}
             >
@@ -66,6 +67,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
             <Button
               size="sm"
               variant="secondary"
+              className={motionPress}
               onClick={() => resolveMutation.mutate("edit")}
               disabled={resolveMutation.isPending}
             >
@@ -74,6 +76,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
             <Button
               size="sm"
               variant="outline"
+              className={motionPress}
               onClick={() => resolveMutation.mutate("skip")}
               disabled={resolveMutation.isPending}
             >
@@ -82,6 +85,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
             <Button
               size="sm"
               variant="destructive"
+              className={motionPress}
               onClick={() => resolveMutation.mutate("deny")}
               disabled={resolveMutation.isPending}
             >
@@ -92,6 +96,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
           <>
             <Button
               size="sm"
+              className={motionPress}
               onClick={() => resolveMutation.mutate("approve")}
               disabled={resolveMutation.isPending}
             >
@@ -100,6 +105,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
             <Button
               size="sm"
               variant="outline"
+              className={motionPress}
               onClick={() => resolveMutation.mutate("skip")}
               disabled={resolveMutation.isPending}
             >

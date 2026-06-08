@@ -11,6 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { StatusPill } from "@/components/motion/status-pill";
+import { motionMicro, motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -23,23 +25,29 @@ export function WorkspaceCenterHeader({ title }: { title: string }) {
         <MobileNav />
         <button
           type="button"
-          className="flex min-w-0 items-center gap-1.5 rounded-md px-1 py-0.5 text-left hover:bg-muted/60"
+          className={cn(
+            "flex min-w-0 items-center gap-1.5 rounded-md px-1 py-0.5 text-left hover:bg-muted/60",
+            motionMicro,
+          )}
           aria-haspopup="listbox"
           aria-label={`${title} context`}
         >
           <h1 className="truncate text-sm font-semibold tracking-tight">{title}</h1>
           <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
         </button>
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
-          <Radio className="size-3 fill-current" aria-hidden />
-          Live
-        </span>
+        <StatusPill
+          status="in_progress"
+          label="Live"
+          icon={<Radio className="size-3 fill-current" aria-hidden />}
+          className="text-[0.65rem] uppercase tracking-wide"
+        />
       </div>
       <div className="flex items-center gap-1">
         <WorkerHealthPill />
         <Button
           variant="ghost"
           size="icon-sm"
+          className={motionPress}
           onClick={toggleCanvas}
           aria-label={canvasOpen ? "Hide canvas" : "Show canvas"}
           aria-pressed={canvasOpen}
@@ -50,6 +58,7 @@ export function WorkspaceCenterHeader({ title }: { title: string }) {
         <Button
           variant="ghost"
           size="icon-sm"
+          className={motionPress}
           onClick={toggleFocusMode}
           aria-label={focusMode ? "Exit focus mode" : "Enter focus mode"}
           aria-pressed={focusMode}

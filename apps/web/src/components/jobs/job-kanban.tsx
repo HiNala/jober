@@ -5,6 +5,7 @@ import type { JobTargetRead } from "@jober/schemas";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { motionDragItem, motionMicro, motionSpringSettle } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 const LANES = [
@@ -37,7 +38,7 @@ export function JobKanban({ rows = [], className, onSelect }: JobKanbanProps) {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between gap-2">
                   <CardTitle className="text-sm font-medium">{lane.title}</CardTitle>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className={cn("text-xs", motionMicro)}>
                     {cards.length}
                   </Badge>
                 </div>
@@ -50,7 +51,11 @@ export function JobKanban({ rows = [], className, onSelect }: JobKanbanProps) {
                     <button
                       key={job.id}
                       type="button"
-                      className="w-full rounded-md border border-border/50 bg-background/60 p-2 text-left text-xs transition-colors hover:bg-muted/50"
+                      className={cn(
+                        "w-full rounded-md border border-border/50 bg-background/60 p-2 text-left text-xs hover:bg-muted/50",
+                        motionDragItem,
+                        motionSpringSettle,
+                      )}
                       onClick={() => onSelect?.(job)}
                     >
                       <p className="font-medium leading-snug">{job.company}</p>

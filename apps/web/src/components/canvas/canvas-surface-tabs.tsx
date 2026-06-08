@@ -2,6 +2,7 @@
 
 import { buttonVariants } from "@/components/ui/button";
 import type { CanvasSurface } from "@/stores/workspace-store";
+import { motionMicro, motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 const SURFACES: { id: CanvasSurface; label: string }[] = [
@@ -33,6 +34,8 @@ export function CanvasSurfaceTabs({
           onClick={() => onChange(tab.id)}
           className={cn(
             buttonVariants({ variant: value === tab.id ? "secondary" : "ghost", size: "xs" }),
+            motionMicro,
+            motionPress,
           )}
         >
           {tab.label}
