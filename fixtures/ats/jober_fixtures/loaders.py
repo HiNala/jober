@@ -30,6 +30,7 @@ _LEGACY_ATS_PATHS: dict[str, tuple[str, ...]] = {
     "login_gate": ("gates", "login_gate"),
     "captcha_gate": ("gates", "captcha_gate"),
     "injection": ("security", "injection"),
+    "board_listing": ("jobs", "board_listing"),
 }
 
 
