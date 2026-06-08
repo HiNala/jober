@@ -340,7 +340,21 @@ async def accept_candidates(
     fixture_html: str | None = None,
 ) -> dict[str, Any]:
     accepted_ids: list[str] = []
+    seen_keys: set[str] = set()
+    skipped_duplicates = 0
     for candidate in candidates:
+        key = str(
+            candidate.get("candidate_key")
+            or candidate_key(
+                str(candidate["company"]),
+                str(candidate["role"]),
+                candidate.get("direct_apply_url"),
+            )
+        )
+        if key in seen_keys:
+            skipped_duplicates += 1
+            continue
+        seen_keys.add(key)
         job = await upsert_job_from_candidate(
             session,
             tenant_id=tenant_id,
@@ -363,7 +377,13 @@ async def accept_candidates(
                 fixture_html=fixture_html,
             )
         accepted_ids.append(str(job.id))
-    return {"accepted": len(accepted_ids), "job_target_ids": accepted_ids}
+    result: dict[str, Any] = {
+        "accepted": len(accepted_ids),
+        "job_target_ids": accepted_ids,
+    }
+    if skipped_duplicates:
+        result["skipped_duplicates"] = skipped_duplicates
+    return result
 
 
 async def attach_import_to_list(
