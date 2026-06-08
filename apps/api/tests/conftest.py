@@ -41,7 +41,9 @@ from jober_api.models import (  # noqa: F401 — register mappers
     RunEvent,
     Tenant,
     User,
+    UserPreferences,
     UserProfile,
+    UserProviderKey,
 )
 from jober_api.models.enums import PlanTier, UserStatus
 from jober_api.repositories.base import Repository

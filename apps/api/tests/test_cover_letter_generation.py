@@ -7,7 +7,7 @@ from io import BytesIO
 import pytest
 from docx import Document
 
-from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID
+from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
 from jober_api.config import settings
 from jober_api.models.enums import DocumentType, JobTargetStatus
 from jober_api.models.llm_call import LlmCall
@@ -22,7 +22,12 @@ from jober_api.services.documents.cover_letter_generator import (
     generate_cover_letter,
 )
 from jober_api.services.documents.render_pdf import render_cover_letter_pdf
-from jober_api.services.llm.gateway import BudgetExceededError, TemplateLlmProvider, assert_budget
+from jober_api.services.llm.gateway import (
+    BudgetExceededError,
+    LlmRuntime,
+    TemplateLlmProvider,
+    assert_budget,
+)
 from jober_api.storage.minio_client import ObjectStorage
 
 pytestmark = pytest.mark.skipif(
@@ -130,6 +135,7 @@ async def test_generate_cover_letter_persists_document(
         db_session,
         storage,
         tenant_id=DEFAULT_DEV_TENANT_ID,
+        user_id=DEFAULT_DEV_USER_ID,
         job_target_id=job.id,
         force=True,
     )
@@ -183,7 +189,14 @@ async def test_generation_rejects_unsupported_claims_after_retries(
 
     import jober_api.services.documents.cover_letter_generator as gen_mod
 
-    monkeypatch.setattr(gen_mod, "get_llm_provider", lambda: _BadFactsProvider())
+    async def _fake_resolve(_session, _user_id):
+        return _BadFactsProvider(), LlmRuntime(
+            draft_model="template",
+            scoring_model="template",
+            using_byok=False,
+        )
+
+    monkeypatch.setattr(gen_mod, "resolve_llm_runtime", _fake_resolve)
 
     jobs = JobTargetRepository(db_session)
     job = await jobs.create(company="Acme", role="Eng", status=JobTargetStatus.NEW)
@@ -206,6 +219,7 @@ async def test_generation_rejects_unsupported_claims_after_retries(
             db_session,
             ObjectStorage(),
             tenant_id=DEFAULT_DEV_TENANT_ID,
+            user_id=DEFAULT_DEV_USER_ID,
             job_target_id=job.id,
             force=True,
         )
