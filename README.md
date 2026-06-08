@@ -254,7 +254,7 @@ Env: `LOG_MODE=redacted` (default) or `debug` (more detail, still scrubs secrets
 
 ## Multi-tenant & billing (Mission 15)
 
-API routes under `/api/*` require authentication. Local dev uses headers `X-Jober-Tenant-Id` / `X-Jober-User-Id` (defaults seeded by migration). Production: set `AUTH_MODE=clerk` with Clerk JWT issuer/secret.
+API routes under `/api/*` require authentication. **Native auth (Mission 20):** set `AUTH_MODE=native` for cookie sessions; use `DEV_AUTH_BYPASS=true` locally to skip sign-in. **Header dev mode:** `X-Jober-Tenant-Id` / `X-Jober-User-Id` (defaults seeded by migration). **Clerk (optional):** `AUTH_MODE=clerk` with JWT issuer/secret.
 
 | Endpoint | Purpose |
 |----------|---------|

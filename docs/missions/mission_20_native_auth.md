@@ -22,9 +22,12 @@
 
 ## Mission 99 (post–Mission 20)
 - [x] Tenant-scope remaining artifact routers (documents, imports, exports, resumes)
+- [x] Tenant-scope job-target sub-routes (extract, fill, discover, verify, recovery)
+- [x] Shared `tenant_guard` helpers for job/run/observation checks
 - [x] Fix flaky Redis session tests in CI
-- [x] Re-auth modal on session expiry; silent refresh interval
+- [x] Re-auth modal on session expiry; silent refresh interval; `authFetch` recovery
 - [x] Settings UI for active sessions and sign-out-everywhere
+- [x] Cross-tenant tests for documents and job-profile routes
 
 ## Configuration
 | Variable | Purpose |
