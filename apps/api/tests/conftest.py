@@ -153,6 +153,15 @@ async def seed_default_tenant(
     yield
 
 
+@pytest_asyncio.fixture(autouse=True)
+async def reset_redis_client_between_tests() -> AsyncGenerator[None, None]:
+    from jober_api.auth.redis_client import close_redis
+
+    await close_redis()
+    yield
+    await close_redis()
+
+
 @pytest.fixture
 def auth_headers() -> dict[str, str]:
     return {
