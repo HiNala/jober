@@ -111,6 +111,8 @@ Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/setting
 
 **Workspace shell (Mission 17):** three-pane layout in `components/workspace/` — collapsible nav, center work column with command bar, resizable right canvas (browser/doc preview). Layout prefs persist in `localStorage`. Shortcuts: ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas), ⌘/Ctrl-/ (command input).
 
+**Live canvas (Mission 18):** on `/runs/[id]`, the right canvas streams screenshots via SSE, shows artifact grid/layers, document and fill-diff views, and a combined review-and-submit surface. Components live in `components/canvas/`.
+
 ## Profile vault (Mission 04)
 
 Upload a canonical resume (PDF/DOCX) and manage tiered profile fields at `/vault`.

@@ -647,6 +647,25 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 18 — Live canvas
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Browser frame is hero; chrome is thin |
+| Kare | 2 | Filmstrip thumbs + grid tiles scan fast |
+| Norman | 2 | Live/scrubbing/catch-up states explicit |
+| Nielsen | 2 | Trace opens externally; no mystery meat |
+| Tufte | 2 | Fill diff table, no chartjunk |
+| Vignelli | 2 | Surface tabs align with M17 shell |
+| Rand | 1 | Utility preview surface |
+| Maeda | 2 | Terminal bg for browser only |
+| Wroblewski | 2 | Review layout stacks on narrow canvas |
+| Ive | 2 | Shared stream — no duplicate SSE |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 17) — improvements logged
 
 | Change | Why |
