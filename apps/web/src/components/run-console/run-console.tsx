@@ -2,6 +2,7 @@
 
 import { RefreshCw } from "lucide-react";
 
+import { ContentReveal } from "@/components/motion/content-reveal";
 import { StatusPill } from "@/components/motion/status-pill";
 import { PageError, RunConsoleSkeleton } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
@@ -52,11 +53,13 @@ export function RunConsole({ runId }: RunConsoleProps) {
     );
   }
 
-  if (!snapshot) {
-    return <RunConsoleSkeleton />;
-  }
-
   return (
+    <ContentReveal
+      ready={snapshot != null}
+      skeleton={<RunConsoleSkeleton />}
+      className="space-y-5"
+    >
+      {snapshot ? (
     <div className={cn("space-y-5", motionFadeIn)}>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -112,6 +115,7 @@ export function RunConsole({ runId }: RunConsoleProps) {
           <ArtifactLinks artifacts={snapshot.artifacts} />
         </div>
         <EventTerminal
+          streamKey={runId}
           events={events}
           company={snapshot.company}
           role={snapshot.role}
@@ -119,5 +123,7 @@ export function RunConsole({ runId }: RunConsoleProps) {
         />
       </div>
     </div>
+      ) : null}
+    </ContentReveal>
   );
 }
