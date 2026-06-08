@@ -666,6 +666,25 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 20 — Native authentication
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Auth forms minimal; nav identity pill is the chrome |
+| Kare | 2 | Password meter + show/hide; status pills unchanged |
+| Norman | 2 | Generic errors; lockout vs invalid login distinct |
+| Nielsen | 2 | CSRF + rate limit; dev bypass documented |
+| Tufte | 2 | No security theater UI |
+| Vignelli | 2 | Auth shell matches M16/M19 tokens |
+| Rand | 1 | Utility auth screens |
+| Maeda | 2 | Calm motion on submit buttons |
+| Wroblewski | 2 | Mobile-friendly auth forms |
+| Ive | 2 | Cookie sessions enable SSE without header hacks |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 19) — improvements logged
 
 | Change | Why |

@@ -111,6 +111,8 @@ Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/setting
 
 **Motion (Mission 19):** central vocabulary in `apps/web/src/lib/design/motion.ts` — see `docs/architecture/motion.md`. Feature components must use motion tokens (`pnpm check:motion`); `prefers-reduced-motion` is honored globally.
 
+**Auth (Mission 20):** native email/password with Argon2id, Redis cookie sessions, and CSRF. Set `AUTH_MODE=native` for real auth; `DEV_AUTH_BYPASS=true` (API) + `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` (web) for frictionless local dev. Production refuses `DEV_AUTH_BYPASS`. See `docs/missions/mission_20_native_auth.md`.
+
 **Workspace shell (Mission 17):** three-pane layout in `components/workspace/` — collapsible nav, center work column with command bar, resizable right canvas (browser/doc preview). Layout prefs persist in `localStorage`. Shortcuts: ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas), ⌘/Ctrl-/ (command input).
 
 **Live canvas (Mission 18):** on `/runs/[id]`, the right canvas streams screenshots via SSE, shows artifact grid/layers, document and fill-diff views, and a combined review-and-submit surface. Components live in `components/canvas/`.
