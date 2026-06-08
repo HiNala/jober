@@ -16,12 +16,12 @@ if TYPE_CHECKING:
 
 class UserPreferences(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "user_preferences"
+    __table_args__ = (UniqueConstraint("user_id"),)
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
-        unique=True,
         index=True,
     )
     prefs: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
