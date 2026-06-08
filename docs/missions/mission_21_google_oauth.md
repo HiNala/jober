@@ -41,5 +41,5 @@ Register redirect URIs in Google Cloud Console for local, staging, and productio
 ## Mission 99 (post–Mission 21)
 - [x] Document Google OAuth env vars in `.env.example`
 - [x] Quality gates: ruff, mypy, web lint/typecheck; OAuth tests run in CI with Postgres + Redis
-- [x] CI: retry MinIO `mc` download on transient CDN failures
+- [x] CI: create MinIO bucket via `minio/mc` Docker image (avoid dl.min.io CDN)
 - [x] Fix confirm-link token consumed before password verification

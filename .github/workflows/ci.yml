@@ -70,17 +70,10 @@ jobs:
           echo "MinIO failed to become healthy" >&2
           exit 1
 
-      - name: Install MinIO client and create bucket
+      - name: Create MinIO bucket
         run: |
-          for i in $(seq 1 5); do
-            curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc && break
-            echo "mc download attempt $i failed, retrying..." >&2
-            sleep 3
-          done
-          test -f mc || (echo "mc download failed after retries" >&2; exit 1)
-          chmod +x mc
-          ./mc alias set local http://localhost:9000 minioadmin minioadmin
-          ./mc mb local/jober-artifacts --ignore-existing
+          docker run --rm --network host --entrypoint /bin/sh minio/mc \
+            -c "mc alias set local http://127.0.0.1:9000 minioadmin minioadmin && mc mb local/jober-artifacts --ignore-existing"
 
       - name: detect-secrets
         run: |
@@ -205,17 +198,10 @@ jobs:
           done
           echo "MinIO failed to become healthy" >&2
           exit 1
-      - name: Install MinIO client and create bucket
+      - name: Create MinIO bucket
         run: |
-          for i in $(seq 1 5); do
-            curl -fsSL https://dl.min.io/client/mc/release/linux-amd64/mc -o mc && break
-            echo "mc download attempt $i failed, retrying..." >&2
-            sleep 3
-          done
-          test -f mc || (echo "mc download failed after retries" >&2; exit 1)
-          chmod +x mc
-          ./mc alias set local http://localhost:9000 minioadmin minioadmin
-          ./mc mb local/jober-artifacts --ignore-existing
+          docker run --rm --network host --entrypoint /bin/sh minio/mc \
+            -c "mc alias set local http://127.0.0.1:9000 minioadmin minioadmin && mc mb local/jober-artifacts --ignore-existing"
       - name: Install dependencies
         run: |
           pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
