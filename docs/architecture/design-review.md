@@ -647,6 +647,17 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 17) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `test_llm_config` uses ASGITransport + seeded DB | CI ERROR: undefined `client` fixture |
+| `workspace-store.test.ts` | Fixture for toggle/persist behavior |
+| Command bar gateway retry | Weakest UX: silent failure when `/api/llm/config` down |
+| `test_llm_config` asserts no `api_key` in JSON | Secrets gate for new endpoint |
+
+---
+
 ## Mission 99 (post–Mission 15) — improvements logged
 
 | Change | Why |

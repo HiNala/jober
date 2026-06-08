@@ -18,4 +18,8 @@
 - [x] Design Council scores in `design-review.md`
 
 ## Mission 99
-- [ ] Run iteration loop after M17
+- [x] Fixed `test_llm_config` missing fixture (CI ERROR → green)
+- [x] `workspace-store.test.ts` — nav/canvas/focus toggles + persist partialization
+- [x] Command bar shows retry when LLM gateway config fetch fails
+- [x] Web gates green; API ruff/mypy; CI pytest + policy
+- [x] Design Council M99 addendum in `design-review.md`

@@ -109,24 +109,39 @@ export function WorkspaceCommandBar() {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 px-1">
           <ModeToggle mode={commandMode} onChange={setCommandMode} />
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-muted-foreground">Model</span>
-            <Select
-              value={activeModel}
-              onValueChange={(value) => setSelectedModel(value ?? activeModel)}
-              disabled={models.length === 0}
-            >
-              <SelectTrigger size="sm" className="w-[min(12rem,40vw)]" aria-label="LLM model">
-                <SelectValue placeholder="Loading models…" />
-              </SelectTrigger>
-              <SelectContent>
-                {models.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {llmQuery.data?.provider}/{model.id}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {llmQuery.isError ? (
+              <div className="flex items-center gap-2 text-xs text-destructive">
+                <span>Gateway unavailable</span>
+                <button
+                  type="button"
+                  className="underline underline-offset-2 hover:no-underline"
+                  onClick={() => void llmQuery.refetch()}
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (
+              <Select
+                value={activeModel}
+                onValueChange={(value) => setSelectedModel(value ?? activeModel)}
+                disabled={models.length === 0 || llmQuery.isLoading}
+              >
+                <SelectTrigger size="sm" className="w-[min(12rem,40vw)]" aria-label="LLM model">
+                  <SelectValue
+                    placeholder={llmQuery.isLoading ? "Loading models…" : "No models"}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {models.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {llmQuery.data?.provider}/{model.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
       </form>

@@ -33,6 +33,16 @@ interface WorkspaceState {
   setCommandDraft: (draft: string) => void;
 }
 
+export const WORKSPACE_PERSISTED_KEYS = [
+  "navCollapsed",
+  "canvasOpen",
+  "canvasViewMode",
+  "filmstripVisible",
+  "commandMode",
+  "selectedModel",
+  "selectedArtifactId",
+] as const satisfies ReadonlyArray<keyof WorkspaceState>;
+
 export const useWorkspaceStore = create<WorkspaceState>()(
   persist(
     (set) => ({
@@ -62,15 +72,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     }),
     {
       name: "jober-workspace-v1",
-      partialize: (state) => ({
-        navCollapsed: state.navCollapsed,
-        canvasOpen: state.canvasOpen,
-        canvasViewMode: state.canvasViewMode,
-        filmstripVisible: state.filmstripVisible,
-        commandMode: state.commandMode,
-        selectedModel: state.selectedModel,
-        selectedArtifactId: state.selectedArtifactId,
-      }),
+      partialize: (state) =>
+        Object.fromEntries(
+          WORKSPACE_PERSISTED_KEYS.map((key) => [key, state[key]]),
+        ) as Pick<WorkspaceState, (typeof WORKSPACE_PERSISTED_KEYS)[number]>,
     },
   ),
 );
