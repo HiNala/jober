@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Sparkles } from "lucide-react";
 
+import { AuthSecuritySection } from "@/components/settings/auth-security-section";
 import { PageError, PageLoading } from "@/components/states/page-states";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,6 +60,8 @@ export function SettingsPanel() {
           Plan limits, run policy defaults, and responsible-use guidance.
         </p>
       </header>
+
+      <AuthSecuritySection />
 
       <section aria-labelledby="usage-heading">
         <h2 id="usage-heading" className="mb-3 text-sm font-medium">

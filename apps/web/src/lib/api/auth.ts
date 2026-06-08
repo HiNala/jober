@@ -86,3 +86,16 @@ export function resetPassword(token: string, newPassword: string) {
 export function refreshSession() {
   return authFetch<{ message: string }>("/api/auth/refresh", { method: "POST" });
 }
+
+export type SessionList = {
+  active_sessions: number;
+  session_ids: string[];
+};
+
+export function fetchSessions() {
+  return authFetch<SessionList>("/api/auth/sessions");
+}
+
+export function logoutAll() {
+  return authFetch<{ message: string }>("/api/auth/logout-all", { method: "POST" });
+}
