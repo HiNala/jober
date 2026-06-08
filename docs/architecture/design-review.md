@@ -711,6 +711,9 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `.env.example` Google OAuth + `WEB_APP_URL` | Operators need documented callback and redirect base without reading mission docs |
 | CI uses `minio/mc` Docker image for bucket init | dl.min.io CDN 504s were failing policy/backend jobs even with retries |
 | Pending link token survives wrong password | Confirm-link consumed Redis token before password check, breaking retry |
+| Login `AuthOAuthAlert` for callback errors | OAuth failures redirected to `/login?error=…` with no feedback |
+| `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED` gate | Avoid broken Google CTA when API credentials are unset |
+| OAuth edge-case tests (unverified email, returning user) | Mission 21 acceptance paths lacked fixture coverage |
 
 ---
 

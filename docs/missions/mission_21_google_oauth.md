@@ -24,6 +24,7 @@
 | `GOOGLE_REDIRECT_URI` | Callback URL, e.g. `http://localhost:8000/api/auth/google/callback` |
 | `WEB_APP_URL` | Post-auth redirect base, e.g. `http://localhost:3000` |
 | `OAUTH_STATE_TTL_SECONDS` | PKCE/state Redis TTL (default 600) |
+| `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED` | Web: show Google sign-in / link UI (`true` when API credentials are set) |
 
 Register redirect URIs in Google Cloud Console for local, staging, and production API hosts.
 
@@ -43,3 +44,6 @@ Register redirect URIs in Google Cloud Console for local, staging, and productio
 - [x] Quality gates: ruff, mypy, web lint/typecheck; OAuth tests run in CI with Postgres + Redis
 - [x] CI: create MinIO bucket via `minio/mc` Docker image (avoid dl.min.io CDN)
 - [x] Fix confirm-link token consumed before password verification
+- [x] Login OAuth error banner (`?error=oauth_state` etc.)
+- [x] Hide Google UI unless `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED=true`
+- [x] Tests: unverified Google email separate account; returning user no duplicate
