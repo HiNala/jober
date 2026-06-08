@@ -23,6 +23,7 @@ from jober_api.models import (  # noqa: F401 — register mappers
     ApplicationBatch,
     ApplicationRun,
     AuditLogEntry,
+    AuthToken,
     BatchItem,
     BrowserEvent,
     CompanyBoard,
@@ -41,7 +42,7 @@ from jober_api.models import (  # noqa: F401 — register mappers
     User,
     UserProfile,
 )
-from jober_api.models.enums import PlanTier
+from jober_api.models.enums import PlanTier, UserStatus
 from jober_api.repositories.base import Repository
 
 requires_db = pytest.mark.skipif(
@@ -137,6 +138,7 @@ async def _seed_default_tenant(engine) -> None:
                 tenant_id=DEFAULT_DEV_TENANT_ID,
                 email="dev@test.local",
                 display_name="Test User",
+                status=UserStatus.ACTIVE,
             )
         )
         await session.commit()
