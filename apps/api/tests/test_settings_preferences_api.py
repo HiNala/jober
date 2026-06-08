@@ -67,3 +67,29 @@ async def test_provider_keys_never_return_full_secret(
         assert item["configured"] is True
         assert item["key_hint"] == "ef12"
         assert secret not in resp.text
+
+
+@pytest.mark.asyncio
+async def test_provider_keys_put_never_returns_full_secret(
+    db_session,
+    truncate_tables,
+    auth_headers,
+    vault_key,
+    monkeypatch,
+) -> None:
+    del db_session
+    monkeypatch.setattr(settings, "vault_encryption_key", vault_key)
+    secret = "sk-put-test-key-abcdef12"
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        resp = await client.put(
+            "/api/settings/provider-keys/openai",
+            headers=auth_headers,
+            json={"api_key": secret},
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["configured"] is True
+        assert body["key_hint"] == "ef12"
+        assert secret not in resp.text
