@@ -28,6 +28,7 @@ def register_secrets_for_redaction() -> None:
         settings.vault_encryption_key,
         settings.llm_api_key,
         settings.secret_key,
+        settings.google_client_secret,
         settings.minio_access_key,
         settings.minio_secret_key,
     )

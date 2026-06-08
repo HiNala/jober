@@ -54,6 +54,11 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""
     stripe_price_pro_monthly: str = ""
     browserless_url: str = ""
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    google_redirect_uri: str = "http://localhost:8000/api/auth/google/callback"
+    oauth_state_ttl_seconds: int = 600
+    web_app_url: str = "http://localhost:3000"
 
 
 settings = Settings()
