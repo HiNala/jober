@@ -1,0 +1,59 @@
+# Motion system
+
+Jober uses a **CSS-first motion vocabulary** — no framer-motion. All feature surfaces import tokens from `apps/web/src/lib/design/motion.ts`; CSS variables and keyframes live in `apps/web/src/app/globals.css`.
+
+## Principles
+
+| Layer | Duration | Use |
+|-------|----------|-----|
+| Micro | 150ms (`--motion-micro`) | Hover, press, focus, pill color |
+| Fast | 200ms (`--motion-fast`) | Press settle, sidebar width |
+| View | 300ms (`--motion-view`) | Cross-fades, route enter, filmstrip |
+| Layout | 400ms (`--motion-layout`) | Filmstrip expand, pane chrome |
+| Max | 500ms (`--motion-max`) | Hard ceiling for view transitions |
+
+- **Easing:** `--ease-organic` (ease-out) for most; `--ease-spring` for drag release only.
+- **Properties:** Animate `opacity` and `transform` only — never layout properties during SSE screenshot bursts.
+- **Reduced motion:** `prefers-reduced-motion: reduce` collapses all durations globally; `motion-safe:` prefixes gate non-essential animation.
+
+## Token exports
+
+| Export | Purpose |
+|--------|---------|
+| `motionMicro` | Color/border/opacity/transform transitions |
+| `motionPress` | Active scale feedback (0.97) |
+| `motionView` | Panel/cross-fade transitions |
+| `motionLayout` | max-height / chrome expand |
+| `motionFadeIn` | Enter (4px translateY) |
+| `motionShimmer` | Agent “Reasoning…” state |
+| `motionStreamReveal` | New terminal line |
+| `motionStatusEnter` | Status pill lifecycle change |
+| `motionSpringSettle` | Kanban card / filmstrip select |
+| `motionAttentionEnter` | Checkpoint + toast enter |
+| `motionEmptyPulse` | Empty-state icon (once, no loop) |
+| `motionDragHandle` | Resize separator affordance |
+| `motionDragItem` | Grab cursor + lift on drag |
+
+## Components
+
+| Component | Path |
+|-----------|------|
+| `ReasoningShimmer` | `components/motion/reasoning-shimmer.tsx` |
+| `StreamingText` | `components/motion/streaming-text.tsx` |
+| `StatusPill` | `components/motion/status-pill.tsx` |
+| `MotionCrossfade` | `components/motion/motion-crossfade.tsx` |
+| `RouteTransition` | `components/motion/route-transition.tsx` |
+
+## Lint / CI
+
+- ESLint rule `joberMotion/no-raw-motion-duration` on `src/**` except `ui/`, `marketing/`, and `motion.ts`.
+- `pnpm check:motion` — script duplicate guard for CI.
+- Run both via `pnpm lint:strict && pnpm check:motion`.
+
+## Live-run profiling note
+
+Screenshot frames use `jober-screenshot-frame` (opacity-only, 150ms) keyed by URL — no layout animation during SSE bursts. Filmstrip uses `max-height` transition (layout token) which is acceptable off the hot path.
+
+## Status tone map
+
+`runStatusTone()` maps API statuses → visual tones: `queued`, `running`, `review`, `submitted`, `failed`, `idle`. `StatusPill` re-animates on tone change via React `key`.

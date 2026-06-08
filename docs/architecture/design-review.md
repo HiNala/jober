@@ -666,6 +666,25 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 19 — Motion & micro-interactions
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Motion clarifies state; no decorative loops |
+| Kare | 2 | Status pills + filmstrip thumbs animate coherently |
+| Norman | 2 | Reasoning shimmer = working; scrub vs live distinct |
+| Nielsen | 2 | Reduced-motion fully honored; press feedback on actions |
+| Tufte | 2 | No chartjunk motion; terminal lines reveal subtly |
+| Vignelli | 2 | Single easing vocabulary via CSS vars |
+| Rand | 1 | Utility polish layer |
+| Maeda | 2 | Calm 150–300ms; shimmer stops when idle ends |
+| Wroblewski | 2 | Touch targets keep press scale without layout shift |
+| Ive | 2 | Opacity-only screenshot swap during SSE — no jank |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 18) — improvements logged
 
 | Change | Why |

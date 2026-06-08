@@ -107,7 +107,9 @@ pnpm dev                     # http://localhost:3000
 
 Routes: `/` (landing), `/dashboard`, `/queue`, `/documents`, `/vault`, `/settings`, `/kitchen-sink` (component catalog).
 
-**Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts` and `motion.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
+**Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
+
+**Motion (Mission 19):** central vocabulary in `apps/web/src/lib/design/motion.ts` — see `docs/architecture/motion.md`. Feature components must use motion tokens (`pnpm check:motion`); `prefers-reduced-motion` is honored globally.
 
 **Workspace shell (Mission 17):** three-pane layout in `components/workspace/` — collapsible nav, center work column with command bar, resizable right canvas (browser/doc preview). Layout prefs persist in `localStorage`. Shortcuts: ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas), ⌘/Ctrl-/ (command input).
 
