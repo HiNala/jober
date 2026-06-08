@@ -18,7 +18,11 @@ import {
 
 type Step = "upload" | "preview" | "done";
 
-export function ImportWizard() {
+type ImportWizardProps = {
+  onCommitted?: (report: ImportReportRead) => void | Promise<void>;
+};
+
+export function ImportWizard({ onCommitted }: ImportWizardProps) {
   const queryClient = useQueryClient();
   const [step, setStep] = useState<Step>("upload");
   const [file, setFile] = useState<File | null>(null);
@@ -36,11 +40,12 @@ export function ImportWizard() {
 
   const importMutation = useMutation({
     mutationFn: commitJobsImport,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setResult(data);
       setStep("done");
       void queryClient.invalidateQueries({ queryKey: ["job-targets"] });
       toast.success("Spreadsheet imported");
+      if (onCommitted) await onCommitted(data);
     },
     onError: (err: Error) => toast.error(err.message),
   });

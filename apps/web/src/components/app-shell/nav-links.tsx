@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookOpen,
+  Compass,
   LayoutDashboard,
   ListTodo,
   Search,
@@ -20,6 +21,7 @@ export const APP_NAV: {
 }[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/queue", label: "Queue", icon: ListTodo },
+  { href: "/discover", label: "Discover", icon: Compass },
   { href: "/library", label: "Library", icon: BookOpen },
   { href: "/search", label: "Search", icon: Search },
   { href: "/settings", label: "Settings", icon: Settings },

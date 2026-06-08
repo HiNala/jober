@@ -1,0 +1,193 @@
+"use client";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Compass, Upload } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { CandidateReview } from "@/components/discover/candidate-review";
+import { DiscoverSearchPanel } from "@/components/discover/discover-search-panel";
+import { DiscoverUploadPanel } from "@/components/discover/discover-upload-panel";
+import { ListBuilderPanel } from "@/components/discover/list-builder-panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  acceptDiscoveryCandidates,
+  refreshDiscoveryList,
+  type DiscoveryCandidate,
+  type DiscoverySearchQuery,
+} from "@/lib/api/discovery";
+import { createJobList, fetchJobLists } from "@/lib/api/library";
+import { createBatch, enqueueBatch, previewBatch } from "@/lib/api/batches";
+import { surface } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
+
+export function DiscoverShell() {
+  const queryClient = useQueryClient();
+  const [activeListId, setActiveListId] = useState<string | null>(null);
+  const [newListName, setNewListName] = useState("Priority A");
+  const [priority, setPriority] = useState("A");
+  const [fitLane, setFitLane] = useState("");
+  const [candidates, setCandidates] = useState<DiscoveryCandidate[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [lastQuery, setLastQuery] = useState<DiscoverySearchQuery>({});
+
+  const listsQuery = useQuery({
+    queryKey: ["library", "job-lists"],
+    queryFn: async () => (await fetchJobLists()).items,
+  });
+
+  const createListMutation = useMutation({
+    mutationFn: () => createJobList(newListName.trim()),
+    onSuccess: async (list) => {
+      setActiveListId(list.id);
+      await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
+      toast.success(`Created list “${list.name}”`);
+    },
+  });
+
+  const acceptMutation = useMutation({
+    mutationFn: async () => {
+      if (!activeListId) throw new Error("Select or create a target list first");
+      const selected = candidates.filter((c) => selectedKeys.has(c.candidate_key));
+      if (selected.length === 0) throw new Error("Select at least one candidate");
+      return acceptDiscoveryCandidates({
+        list_id: activeListId,
+        candidates: selected,
+        priority: priority || undefined,
+        fit_lane: fitLane || undefined,
+      });
+    },
+    onSuccess: async (result) => {
+      toast.success(`Added ${result.accepted} job${result.accepted === 1 ? "" : "s"} to your list`);
+      setSelectedKeys(new Set());
+      await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
+      await queryClient.invalidateQueries({ queryKey: ["job-targets"] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const refreshMutation = useMutation({
+    mutationFn: async () => {
+      if (!activeListId) throw new Error("Select a list to refresh");
+      return refreshDiscoveryList(activeListId);
+    },
+    onSuccess: (data) => {
+      setCandidates(data.candidates);
+      setSelectedKeys(new Set(data.candidates.map((c) => c.candidate_key)));
+      toast.success(
+        data.candidates.length
+          ? `Found ${data.candidates.length} new candidate${data.candidates.length === 1 ? "" : "s"}`
+          : "No new openings since your last check",
+      );
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const launchBatchMutation = useMutation({
+    mutationFn: async () => {
+      if (!activeListId) throw new Error("Select a list first");
+      const preview = (await previewBatch({
+        job_list_id: activeListId,
+        status: "new",
+        limit: 50,
+      })) as { included?: unknown[] };
+      const count = preview.included?.length ?? 0;
+      if (count === 0) throw new Error("No runnable jobs in this list yet");
+      const batch = (await createBatch({
+        name: `List batch — ${new Date().toLocaleDateString()}`,
+        policy: "review_before_submit",
+        filters: { job_list_id: activeListId, status: "new", limit: 50 },
+      })) as { id: string };
+      await enqueueBatch(batch.id);
+      return count;
+    },
+    onSuccess: (count) => toast.success(`Queued batch with ${count} job${count === 1 ? "" : "s"}`),
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const handleSearchResults = (rows: DiscoveryCandidate[], query: DiscoverySearchQuery) => {
+    setCandidates(rows);
+    setLastQuery(query);
+    setSelectedKeys(new Set());
+  };
+
+  return (
+    <div className="space-y-6 p-4 md:p-6">
+      <header className="space-y-1">
+        <h1 className="text-xl font-semibold tracking-tight">Discover & build lists</h1>
+        <p className="text-sm text-muted-foreground">
+          Search boards or upload your tracker — both paths feed the same target list for runs.
+        </p>
+      </header>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-4">
+          <Tabs defaultValue="search">
+            <TabsList>
+              <TabsTrigger value="search">
+                <Compass className="mr-1.5 size-4" aria-hidden />
+                Search for jobs
+              </TabsTrigger>
+              <TabsTrigger value="upload">
+                <Upload className="mr-1.5 size-4" aria-hidden />
+                Upload a list
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="search" className="mt-4">
+              <DiscoverSearchPanel
+                listId={activeListId}
+                onResults={handleSearchResults}
+                lastQuery={lastQuery}
+              />
+            </TabsContent>
+            <TabsContent value="upload" className="mt-4">
+              <DiscoverUploadPanel listId={activeListId} />
+            </TabsContent>
+          </Tabs>
+
+          <section className={cn(surface.card, "rounded-lg p-4")}>
+            <CandidateReview
+              candidates={candidates}
+              selectedKeys={selectedKeys}
+              onToggle={(key) => {
+                setSelectedKeys((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(key)) next.delete(key);
+                  else next.add(key);
+                  return next;
+                });
+              }}
+              onToggleAll={(checked) => {
+                setSelectedKeys(
+                  checked ? new Set(candidates.map((c) => c.candidate_key)) : new Set(),
+                );
+              }}
+            />
+          </section>
+        </div>
+
+        <ListBuilderPanel
+          lists={listsQuery.data ?? []}
+          activeListId={activeListId}
+          onSelectList={setActiveListId}
+          newListName={newListName}
+          onNewListNameChange={setNewListName}
+          onCreateList={() => {
+            if (newListName.trim()) void createListMutation.mutate();
+          }}
+          priority={priority}
+          onPriorityChange={setPriority}
+          fitLane={fitLane}
+          onFitLaneChange={setFitLane}
+          selectedCount={selectedKeys.size}
+          onAccept={() => acceptMutation.mutate()}
+          acceptPending={acceptMutation.isPending}
+          onRefresh={() => refreshMutation.mutate()}
+          refreshPending={refreshMutation.isPending}
+          onLaunchBatch={() => launchBatchMutation.mutate()}
+          launchPending={launchBatchMutation.isPending}
+        />
+      </div>
+    </div>
+  );
+}

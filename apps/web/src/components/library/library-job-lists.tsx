@@ -107,7 +107,7 @@ export function LibraryJobLists() {
       {visibleLists.length === 0 ? (
         <p className={cn(surface.card, "rounded-lg p-4 text-sm text-muted-foreground")}>
           {showArchived
-            ? "No lists yet. Create one to group targets from discovery or import."
+            ? "No lists yet. Create one in Discover or here."
             : "No active lists. Create one or enable “Show archived”."}
         </p>
       ) : null}
