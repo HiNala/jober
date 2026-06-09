@@ -15,6 +15,7 @@ from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
 
 PUBLIC_API_PREFIXES = (
+    "/api/events",
     "/api/webhooks/",
     "/api/health",
     "/api/auth/register",

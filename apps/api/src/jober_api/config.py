@@ -59,6 +59,11 @@ class Settings(BaseSettings):
     google_redirect_uri: str = "http://localhost:8000/api/auth/google/callback"
     oauth_state_ttl_seconds: int = 600
     web_app_url: str = "http://localhost:3000"
+    analytics_enabled: bool = True
+    analytics_session_timeout_minutes: int = 30
+    analytics_anon_rotation_days: int = 30
+    analytics_internal_user_ids: str = ""
+    analytics_retention_days: int = 365
 
 
 settings = Settings()
