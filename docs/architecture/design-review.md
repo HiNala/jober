@@ -788,6 +788,38 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 29 — Marketing landing (home)
+
+**Scope:** `/` landing page, marketing shell, product visual, pricing/legal stubs, SEO.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One hero animation surface; sections stay quiet |
+| Kare | 2 | Honest human-in-the-loop copy; no auto-submit promises |
+| Norman | 2 | Signup-primary CTAs; skip link + landmarks |
+| Nielsen | 2 | How-it-works scannable in four steps |
+| Tufte | 2 | Product visual shows stream + checkpoint, not chartjunk |
+| Vignelli | 2 | Shared marketing shell + token-aligned cards |
+| Rand | 2 | Distinct voice vs spray-and-pray tools |
+| Maeda | 2 | Reduced-motion static fallback on demo stream |
+| Wroblewski | 2 | Hero stacks on mobile; footer grid wraps |
+| Ive | 2 | Tracked CTAs; consent-gated analytics unchanged |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 29) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `trackMarketingCta` + vitest | CTA instrumentation had no regression fixture |
+| `getSiteUrl` tests | Sitemap/OG URLs must not silently break in deploy |
+| Mobile header Pricing link | Secondary nav was hidden below `md` — weakest Wroblewski gap |
+| README + `.env.example` `NEXT_PUBLIC_SITE_URL` | Cold-start SEO config was undocumented |
+
+---
+
 ## Mission 99 (post–Mission 28) — improvements logged
 
 | Change | Why |

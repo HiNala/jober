@@ -105,7 +105,9 @@ pnpm install
 pnpm dev                     # http://localhost:3000
 ```
 
-Routes: `/` (landing), `/dashboard`, `/queue`, `/discover`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
+Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/login`, `/dashboard`, `/queue`, `/discover`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
+
+**Marketing (Mission 29):** `/` is a public landing page with signup-primary CTAs, how-it-works sections, and a static product visual. CTA clicks emit `feature.use` (consent-gated); `page.view` is tracked by `AnalyticsProvider`. Set `NEXT_PUBLIC_SITE_URL` for production sitemap/OG URLs. See `docs/missions/mission_29_marketing_landing.md`.
 
 **Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
 
