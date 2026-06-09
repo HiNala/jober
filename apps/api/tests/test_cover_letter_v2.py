@@ -178,6 +178,14 @@ async def test_generate_stores_template_voice_and_run_id(
         },
     )
     run_id = uuid.uuid4()
+    db_session.add(
+        ApplicationRun(
+            id=run_id,
+            tenant_id=DEFAULT_DEV_TENANT_ID,
+            job_target_id=job.id,
+            status=RunStatus.GENERATE_DOCUMENTS,
+        )
+    )
     await db_session.commit()
 
     result = await generate_cover_letter(
