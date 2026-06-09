@@ -4,11 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from jober_api.auth.enforcement import (
-    PermissionMiddleware,
-    bind_route_permissions,
-    validate_rbac_coverage,
-)
+from jober_api.auth.enforcement import bind_route_permissions, validate_rbac_coverage
 from jober_api.auth.middleware import AuthMiddleware
 from jober_api.config import settings
 from jober_api.health import readiness_report
