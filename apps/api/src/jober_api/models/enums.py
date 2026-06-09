@@ -132,3 +132,6 @@ class AdminAuditAction(StrEnum):
     USER_SUSPENDED = "user_suspended"
     USER_ACTIVATED = "user_activated"
     ADMIN_DATA_ACCESS = "admin_data_access"
+    SUPPORT_VIEW_ACCESSED = "support_view_accessed"
+    CONFIG_CHANGED = "config_changed"
+    DATA_REQUEST_HANDLED = "data_request_handled"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.models.enum_utils import enum_value
@@ -15,17 +15,21 @@ from jober_api.services.admin.audit import record_admin_audit
 async def list_users_for_admin(
     session: AsyncSession,
     *,
+    q: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> list[dict[str, object]]:
     """Operational user list — email, role, status only (no vault/profile content)."""
-    stmt = (
-        select(User, Tenant.plan)
-        .join(Tenant, User.tenant_id == Tenant.id)
-        .order_by(User.created_at.desc())
-        .limit(limit)
-        .offset(offset)
-    )
+    stmt = select(User, Tenant.plan).join(Tenant, User.tenant_id == Tenant.id)
+    if q and q.strip():
+        needle = f"%{q.strip().lower()}%"
+        stmt = stmt.where(
+            or_(
+                func.lower(User.email).like(needle),
+                func.lower(User.display_name).like(needle),
+            )
+        )
+    stmt = stmt.order_by(User.created_at.desc()).limit(limit).offset(offset)
     rows = (await session.execute(stmt)).all()
     return [
         {
@@ -37,6 +41,7 @@ async def list_users_for_admin(
             "tenant_id": str(user.tenant_id),
             "plan": plan.value if hasattr(plan, "value") else str(plan),
             "last_login_at": user.last_login_at.isoformat() if user.last_login_at else None,
+            "created_at": user.created_at.isoformat(),
         }
         for user, plan in rows
     ]

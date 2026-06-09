@@ -18,6 +18,8 @@ class Permission(StrEnum):
     ADMIN_ANALYTICS_READ = "admin:analytics:read"
     ADMIN_USERS_MANAGE = "admin:users:manage"
     ADMIN_AUDIT_READ = "admin:audit:read"
+    ADMIN_OPS_READ = "admin:ops:read"
+    ADMIN_CONFIG_MANAGE = "admin:config:manage"
 
 
 class Resource(StrEnum):
@@ -37,6 +39,8 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
             Permission.ADMIN_ANALYTICS_READ,
             Permission.ADMIN_USERS_MANAGE,
             Permission.ADMIN_AUDIT_READ,
+            Permission.ADMIN_OPS_READ,
+            Permission.ADMIN_CONFIG_MANAGE,
         }
     ),
 }
