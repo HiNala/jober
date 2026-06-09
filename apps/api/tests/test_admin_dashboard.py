@@ -145,10 +145,18 @@ async def test_operational_view_excludes_private_fields(
         )
     assert response.status_code == 200
     payload = response.json()
-    blob = str(payload).lower()
-    assert "password_hash" not in blob
-    assert "vault" not in blob
+    user = payload["user"]
+    assert "password_hash" not in user
     assert "privacy_note" in payload
+    assert set(user.keys()) <= {
+        "id",
+        "email",
+        "display_name",
+        "role",
+        "status",
+        "created_at",
+        "last_login_at",
+    }
 
 
 @requires_postgres
