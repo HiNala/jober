@@ -8,7 +8,6 @@ import { DateRangeControls } from "@/components/analytics/date-range-controls";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageError, PageLoading } from "@/components/states/page-states";
 import {
-  exportCsvUrl,
   fetchUserAnalytics,
   rangeFromPreset,
   type AnalyticsRangePreset,
@@ -45,7 +44,9 @@ export function UserAnalyticsPanel() {
         onPresetChange={setPreset}
         comparePrevious={comparePrevious}
         onComparePreviousChange={setComparePrevious}
-        exportHref={exportCsvUrl("/api/analytics/me/export.csv", range)}
+        range={range}
+        exportPath="/api/analytics/me/export.csv"
+        exportFilename="user-analytics.csv"
       />
 
       {data.attention.length > 0 ? (
@@ -90,6 +91,7 @@ export function UserAnalyticsPanel() {
             <BigNumber
               label="Letters generated"
               value={String(data.summary.letters_generated)}
+              delta={deltaLabel(data.summary.letters_generated, data.previous?.letters_generated)}
             />
           </CardContent>
         </Card>
@@ -98,6 +100,11 @@ export function UserAnalyticsPanel() {
             <BigNumber
               label="LLM cost"
               value={`$${data.summary.llm_cost_usd.toFixed(2)}`}
+              delta={
+                data.previous
+                  ? `$${(data.summary.llm_cost_usd - data.previous.llm_cost_usd).toFixed(2)} vs previous`
+                  : undefined
+              }
               hint={`${Math.round(data.summary.budget_used_ratio * 100)}% of $${data.summary.llm_budget_usd} budget`}
             />
           </CardContent>

@@ -1,5 +1,6 @@
 "use client";
 
+import { ExportCsvButton } from "@/components/analytics/export-csv-button";
 import type { AnalyticsRangePreset } from "@/lib/api/analytics-dashboard";
 import { cn } from "@/lib/utils";
 
@@ -14,13 +15,17 @@ export function DateRangeControls({
   onPresetChange,
   comparePrevious,
   onComparePreviousChange,
-  exportHref,
+  exportPath,
+  exportFilename,
+  range,
 }: {
   preset: AnalyticsRangePreset;
   onPresetChange: (preset: AnalyticsRangePreset) => void;
   comparePrevious: boolean;
   onComparePreviousChange: (value: boolean) => void;
-  exportHref?: string;
+  exportPath?: string;
+  exportFilename?: string;
+  range: { start: string; end: string };
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -49,14 +54,8 @@ export function DateRangeControls({
         />
         Compare to previous period
       </label>
-      {exportHref ? (
-        <a
-          href={exportHref}
-          className="text-xs text-primary underline-offset-4 hover:underline"
-          download
-        >
-          Export CSV
-        </a>
+      {exportPath && exportFilename ? (
+        <ExportCsvButton path={exportPath} range={range} filename={exportFilename} />
       ) : null}
     </div>
   );

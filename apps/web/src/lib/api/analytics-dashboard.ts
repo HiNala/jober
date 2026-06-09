@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api/client";
+import { apiFetch, getApiBaseUrl } from "@/lib/api/client";
 
 export type DateRange = { start: string; end: string };
 
@@ -68,7 +68,7 @@ export function rangeFromPreset(preset: AnalyticsRangePreset): { start: string; 
   return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
 }
 
-function rangeQuery(
+export function rangeQuery(
   range: { start: string; end: string },
   comparePrevious?: boolean,
 ): string {
@@ -99,7 +99,22 @@ export function fetchAdminCost(range: { start: string; end: string }): Promise<C
   return apiFetch(`/api/analytics/admin/cost?${rangeQuery(range)}`);
 }
 
-export function exportCsvUrl(path: string, range: { start: string; end: string }): string {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  return `${base}${path}?${rangeQuery(range)}`;
+export async function downloadAnalyticsCsv(
+  path: string,
+  range: { start: string; end: string },
+  filename: string,
+): Promise<void> {
+  const res = await fetch(`${getApiBaseUrl()}${path}?${rangeQuery(range)}`, {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    throw new Error(`Export failed (${res.status})`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
