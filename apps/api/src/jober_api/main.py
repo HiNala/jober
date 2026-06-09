@@ -19,7 +19,6 @@ from jober_api.routers import api_router
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     validate_startup_secrets()
-    bind_route_permissions(_app)
     validate_rbac_coverage(_app)
     yield
 
@@ -33,8 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(AuthMiddleware)
 app.add_middleware(PermissionMiddleware)
+app.add_middleware(AuthMiddleware)
 
 app.include_router(api_router)
 bind_route_permissions(app)
