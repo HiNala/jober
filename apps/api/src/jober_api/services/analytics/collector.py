@@ -52,7 +52,7 @@ async def ingest_client_batch(
         return 0
 
     user_agent = request.headers.get("User-Agent")
-    if should_drop_event(auth=auth, user_agent=user_agent):
+    if should_drop_event(user_agent=user_agent):
         return 0
 
     is_bot, is_internal = mark_bot_and_internal(auth=auth, user_agent=user_agent)

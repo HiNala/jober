@@ -14,6 +14,8 @@ from jober_api.repositories.generated_document import GeneratedDocumentRepositor
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
+from jober_api.services.analytics.collector import emit_server_event
+from jober_api.services.analytics.rollups import server_session_id
 from jober_api.services.documents.ats_scoring import KeywordCoverageReport, score_keyword_coverage
 from jober_api.services.documents.claims_guard import (
     ClaimsGuardResult,
@@ -305,9 +307,6 @@ async def generate_cover_letter(
     )
     await session.flush()
     await session.refresh(row)
-
-    from jober_api.services.analytics.collector import emit_server_event
-    from jober_api.services.analytics.rollups import server_session_id
 
     await emit_server_event(
         session,

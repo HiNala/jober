@@ -24,6 +24,8 @@ from jober_api.models.auth_identity import AuthIdentity
 from jober_api.models.enums import AuthProvider, PlanTier, UserRole, UserStatus
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
+from jober_api.services.analytics.collector import emit_server_event
+from jober_api.services.analytics.rollups import server_session_id
 from jober_api.repositories.auth_identity import AuthIdentityRepository
 from jober_api.schemas.auth import AuthIdentityResponse, AuthUserResponse
 from jober_api.services.auth.service import user_to_response
@@ -267,9 +269,6 @@ async def _create_oauth_user(
     session.add(user)
     await session.flush()
     await _attach_identity(session, user, provider, profile)
-    from jober_api.services.analytics.collector import emit_server_event
-    from jober_api.services.analytics.rollups import server_session_id
-
     await emit_server_event(
         session,
         name="signup.complete",

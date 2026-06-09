@@ -11,6 +11,8 @@ from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.models.job_list import JobList, JobListItem
 from jober_api.repositories.job_list import JobListRepository
+from jober_api.services.analytics.collector import emit_server_event
+from jober_api.services.analytics.rollups import server_session_id
 from jober_api.services.library.service import serialize_job_list
 
 router = APIRouter(prefix="/job-lists", tags=["job-lists"])
@@ -68,9 +70,6 @@ async def create_job_list(
         description=body.description,
     )
     session.add(row)
-    from jober_api.services.analytics.collector import emit_server_event
-    from jober_api.services.analytics.rollups import server_session_id
-
     await emit_server_event(
         session,
         name="list.create",

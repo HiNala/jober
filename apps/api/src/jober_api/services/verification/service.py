@@ -19,6 +19,8 @@ from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.repositories.form_field_observation import FormFieldObservationRepository
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
+from jober_api.services.analytics.collector import emit_server_event
+from jober_api.services.analytics.rollups import server_session_id
 from jober_api.services.form_discovery.service import _serialize_observation
 from jober_api.vault.field_registry import FIELD_BY_KEY, FieldTier
 from jober_api.vault.fill_policy import resolve_field_fill
@@ -458,9 +460,6 @@ async def submit_application(
         verification=verification,
         prior_runs=prior,
     )
-
-    from jober_api.services.analytics.collector import emit_server_event
-    from jober_api.services.analytics.rollups import server_session_id
 
     await emit_server_event(
         session,

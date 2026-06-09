@@ -1,19 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { setAnalyticsConsent, trackPageView } from "@/lib/analytics/sdk";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
-export function AnalyticsConsentBanner() {
-  const [visible, setVisible] = useState(false);
+function consentUndecided(): boolean {
+  if (typeof document === "undefined") return false;
+  return !document.cookie.match(/(?:^|;\s*)jober_analytics_consent=/);
+}
 
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const decided = document.cookie.match(/(?:^|;\s*)jober_analytics_consent=/);
-    setVisible(!decided);
-  }, []);
+export function AnalyticsConsentBanner() {
+  const [visible, setVisible] = useState(consentUndecided);
 
   if (!visible) return null;
 

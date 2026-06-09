@@ -16,6 +16,8 @@ from jober_api.models.enums import AuthTokenType, PlanTier, UserRole, UserStatus
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
 from jober_api.schemas.auth import AuthUserResponse
+from jober_api.services.analytics.collector import emit_server_event
+from jober_api.services.analytics.rollups import server_session_id
 
 GENERIC_AUTH_MESSAGE = "If an account exists for that email, we sent instructions."
 INVALID_CREDENTIALS = "Invalid email or password"
@@ -69,9 +71,6 @@ async def register_user(
     await session.flush()
 
     raw_token = await _create_auth_token(session, user.id, AuthTokenType.EMAIL_VERIFY, hours=24)
-    from jober_api.services.analytics.collector import emit_server_event
-    from jober_api.services.analytics.rollups import server_session_id
-
     await emit_server_event(
         session,
         name="signup.complete",

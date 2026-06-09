@@ -10,7 +10,6 @@ from jober_schemas.analytics import AnalyticsBatchRequest, AnalyticsEventInput
 from sqlalchemy import func, select
 
 from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
-from jober_api.config import settings
 from jober_api.main import app
 from jober_api.models.analytics import (
     AnalyticsDailyActiveUsers,
@@ -18,9 +17,9 @@ from jober_api.models.analytics import (
     AnalyticsDailyPage,
     AnalyticsEvent,
 )
-from jober_api.services.analytics.collector import ingest_client_batch, emit_server_event
+from jober_api.services.analytics.collector import emit_server_event, ingest_client_batch
 from jober_api.services.analytics.consent import CONSENT_COOKIE
-from jober_api.services.analytics.rollups import rollup_analytics_day
+from jober_api.services.analytics.rollups import rollup_analytics_day, server_session_id
 from jober_api.services.analytics.sessionization import compute_page_metrics
 
 pytestmark = pytest.mark.skipif(
@@ -208,8 +207,6 @@ async def test_rollup_daily_summaries(db_session, truncate_tables) -> None:
 
 @pytest.mark.asyncio
 async def test_server_emit_signup_complete(db_session, truncate_tables) -> None:
-    from jober_api.services.analytics.rollups import server_session_id
-
     ok = await emit_server_event(
         db_session,
         name="signup.complete",

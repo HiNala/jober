@@ -21,7 +21,7 @@ type AnalyticsEventPayload = {
   props?: Record<string, string | number | boolean | null>;
 };
 
-let queue: AnalyticsEventPayload[] = [];
+const queue: AnalyticsEventPayload[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 export function isDoNotTrackEnabled(): boolean {
