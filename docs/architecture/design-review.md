@@ -809,6 +809,19 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 26) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `downloadAnalyticsCsv` + `ExportCsvButton` | Raw `<a href>` to API host could miss session cookies; fetch with `credentials: include` |
+| Admin traffic table (bounce, avg time, sessions) | API already returned metrics; UI only showed bar chart |
+| Funnel compare column + drop-off attention | `compare_previous` API existed but UI ignored `previous_steps` |
+| `test_admin_traffic_reads_page_rollups` | Traffic dashboard had no regression fixture |
+| `test_user_analytics_compare_previous` | Compare toggle was untested end-to-end |
+| `analytics/error.tsx` | Match other app routes' recoverable error boundary |
+
+---
+
 ## Mission 99 (post–Mission 25) — improvements logged
 
 | Change | Why |

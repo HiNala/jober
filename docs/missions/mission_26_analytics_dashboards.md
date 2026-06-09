@@ -37,3 +37,15 @@
 
 ## CI
 Green on [27186144157](https://github.com/HiNala/jober/actions/runs/27186144157) (`7fb9f47`).
+
+## Mission 99 (post–Mission 26)
+- [x] Finish leftovers — traffic detail table (bounce, time-on-page, sessions); traffic CSV export in UI
+- [x] Gates green — ruff, mypy, pytest, web lint:strict/typecheck/build, CI
+- [x] Full suite — traffic rollup, compare_previous, CSV export tests added
+- [x] Policy invariants unchanged (analytics dashboards do not touch autofill/submit paths)
+- [x] Secrets — detect-secrets clean in CI
+- [x] File hygiene — per-task commits; all modules under 2000 lines
+- [x] Design Council 19/20 on dashboard surfaces (unchanged; M99 polish documented)
+- [x] Self-improvement — credential-based CSV download; funnel compare drop-off attention + prior column
+- [x] Docs — mission M99 section, design-review improvements logged
+- [x] Fixture-for-bug — `test_user_analytics_compare_previous`, `test_admin_traffic_reads_page_rollups`, `rangeFromPreset` unit test
