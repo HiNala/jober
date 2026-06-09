@@ -798,6 +798,8 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `test_list_users_for_admin_serializes_string_role_status` | Regression for CI `AttributeError` on `.value` |
 | Admin mutation `onError` toasts | Promote/demote/suspend failures were silent — weakest UX on the admin surface |
 
+**CI:** [run 27199667593](https://github.com/HiNala/jober/actions/runs/27199667593) (green on `b1504e5`).
+
 ---
 
 ## Mission 27 — RBAC & admin users

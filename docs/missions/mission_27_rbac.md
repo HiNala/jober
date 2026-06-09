@@ -39,3 +39,5 @@ Impersonation **deferred** — documented in `docs/architecture/rbac.md` (consen
 - [x] Startup coverage + string-serialization regression fixtures
 - [x] Admin UI mutation error toasts
 - [x] Design Council addendum in `design-review.md`
+
+**M99 CI:** [run 27199667593](https://github.com/HiNala/jober/actions/runs/27199667593) (green on `b1504e5`).
