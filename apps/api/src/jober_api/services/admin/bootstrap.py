@@ -6,13 +6,19 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.config import settings
-from jober_api.models.enums import AdminAuditAction, UserRole
+from jober_api.models.enums import AdminAuditAction, UserRole, UserStatus
 from jober_api.models.user import User
 from jober_api.services.admin.audit import record_admin_audit
 
 
 class BootstrapError(Exception):
     pass
+
+
+def _enum_value(value: UserRole | UserStatus | str) -> str:
+    if isinstance(value, (UserRole, UserStatus)):
+        return value.value
+    return str(value)
 
 
 async def bootstrap_first_admin(
@@ -96,8 +102,8 @@ async def promote_user_to_admin(
         actor_user_id=actor_user_id,
         target_user_id=target.id,
         action=AdminAuditAction.ROLE_CHANGED,
-        message=f"Role changed from {previous.value} to {role.value}",
-        details={"previous_role": previous.value, "new_role": role.value},
+        message=f"Role changed from {_enum_value(previous)} to {_enum_value(role)}",
+        details={"previous_role": _enum_value(previous), "new_role": _enum_value(role)},
     )
     await session.flush()
     return target
