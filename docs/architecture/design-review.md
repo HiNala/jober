@@ -795,6 +795,9 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Mission doc + Design Council on remote | `89a38ca` shipped web UI but docs were local-only until follow-up commit |
 | `permissions.test.ts` covers `admin:ops:read` + `admin:config:manage` | New M28 permissions had no web fixture |
 | README admin dashboard section | Cold-start path for `/admin` was missing |
+| `AdminSupportView` structured panel | Raw JSON support dump was weakest UX / Norman feedback |
+| Audit log action filter (system page) | API supported filters but UI did not expose them |
+| `test_operational_view_excludes_private_fields` | Privacy boundary needed explicit regression lock |
 
 ---
 

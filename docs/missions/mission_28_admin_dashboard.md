@@ -34,3 +34,9 @@
 Saved admin views and daily/weekly digest **deferred** — overview attention banners are the v1 substitute.
 
 **CI:** [run 27225282196](https://github.com/HiNala/jober/actions/runs/27225282196) (green on `80d7f70`).
+
+## Mission 99
+- [x] Structured support view (replaces raw JSON dump)
+- [x] Audit log action filter on system page + API fixture
+- [x] M28 permission + privacy-boundary regression tests
+- [x] Design Council addendum in `design-review.md`
