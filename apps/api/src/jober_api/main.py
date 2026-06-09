@@ -37,6 +37,7 @@ app.add_middleware(AuthMiddleware)
 app.add_middleware(PermissionMiddleware)
 
 app.include_router(api_router)
+bind_route_permissions(app)
 
 
 @app.get("/healthz")
