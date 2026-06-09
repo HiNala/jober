@@ -31,6 +31,8 @@ Signup funnel: `signup.start` fires on `/signup` mount (existing).
 ## Iteration clause
 Interactive demo sandbox **deferred** — static product visual mock ships in v1.
 
+**CI:** [run 27238599456](https://github.com/HiNala/jober/actions/runs/27238599456) (green on `7e00eed`).
+
 ## Mission 99
 - [x] `trackMarketingCta` helper + vitest fixture (regression lock on `feature.use` shape)
 - [x] `getSiteUrl` unit tests for sitemap/OG base URL resolution
