@@ -33,4 +33,4 @@
 ## Iteration clause
 Saved admin views and daily/weekly digest **deferred** — overview attention banners are the v1 substitute.
 
-**CI:** [run 27204910495](https://github.com/HiNala/jober/actions/runs/27204910495) (green on `89a38ca`).
+**CI:** [run 27225282196](https://github.com/HiNala/jober/actions/runs/27225282196) (green on `80d7f70`).
