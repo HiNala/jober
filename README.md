@@ -302,6 +302,19 @@ No Google Analytics, Segment, or third-party trackers. Events land in Postgres v
 
 Privacy: no raw IP stored (coarse geo only at ingest), PII keys blocked in event props, opt-in consent banner. Config: `ANALYTICS_ENABLED`, `ANALYTICS_RETENTION_DAYS`. Weekly Celery `analytics_retention_purge` deletes events older than the retention window.
 
+## Analytics dashboards (Mission 26)
+
+Rollup-backed dashboards at `/analytics` — no synchronous scans of raw `AnalyticsEvent` rows.
+
+| Route | Who | Purpose |
+|-------|-----|---------|
+| `GET /api/analytics/me` | Signed-in user | Applications, letters, LLM cost vs budget, activity series |
+| `GET /api/analytics/admin/funnel` | Admin | Signup funnel with per-step drop-off |
+| `GET /api/analytics/admin/traffic` | Admin | Page views, DAU/WAU/MAU from daily rollups |
+| `GET /api/analytics/admin/cost` | Admin | LLM spend reconciled against `LlmCall` |
+
+Each view supports `start`/`end` query params, optional `compare_previous=true`, and `export.csv` download. Charts use Recharts with shared theme tokens (`apps/web/src/components/analytics/charts/`).
+
 ## Job spreadsheet import (Mission 03)
 
 Import Brian's tracker workbook into Postgres and round-trip status back to XLSX.

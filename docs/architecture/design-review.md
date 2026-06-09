@@ -788,6 +788,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 26 — Analytics dashboards (Tufte pass)
+
+**Scope:** `/analytics` page, Recharts components, date-range controls, user + admin panels.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Attention notes before vanity totals; no chart decoration |
+| Kare | 2 | Plain labels; workspace vs product tabs for admins |
+| Norman | 2 | Loading/error states; empty-range copy on charts |
+| Nielsen | 2 | Consistent 7d/30d/90d + compare toggle across panels |
+| Tufte | 2 | High data-ink: thin grid, no gradients, tabular nums on KPIs |
+| Vignelli | 2 | Shared `chart-theme` + `surface.card` grid |
+| Rand | 1 | Utility analytics surface |
+| Maeda | 2 | One chart type per question; funnel table for exact counts |
+| Wroblewski | 2 | Controls wrap; tables scroll on narrow viewports |
+| Ive | 2 | 60s API cache; rollup-only queries |
+
+**Total: 19/20** — passes gate (Tufte ≥18).
+
+---
+
 ## Mission 99 (post–Mission 25) — improvements logged
 
 | Change | Why |
