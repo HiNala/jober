@@ -2,6 +2,12 @@ from __future__ import annotations
 
 import ipaddress
 
+_EU_OCTETS = frozenset(
+    {2, 5, 31, 37, 46, 51, 62, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95}
+)
+_APAC_OCTETS = frozenset({103, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123})
+_SA_OCTETS = frozenset({177, 179, 186, 189, 200, 201})
+
 
 def coarse_geo_from_ip(client_ip: str) -> tuple[str | None, str | None]:
     """Derive coarse geo at ingest time. Raw IP is never stored."""
@@ -13,18 +19,17 @@ def coarse_geo_from_ip(client_ip: str) -> tuple[str | None, str | None]:
     if addr.is_private or addr.is_loopback or addr.is_link_local:
         return "XX", "private"
 
-    # RFC 5737 documentation ranges — treat as unknown
     if isinstance(addr, ipaddress.IPv4Address):
         if addr in ipaddress.IPv4Network("192.0.2.0/24"):
             return None, None
         first_octet = int(addr) >> 24
-        if first_octet in (1,):
+        if first_octet == 1:
             return "US", "na"
-        if first_octet in (2, 5, 31, 37, 46, 51, 62, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95):
+        if first_octet in _EU_OCTETS:
             return "EU", "eu"
-        if first_octet in (103, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123):
+        if first_octet in _APAC_OCTETS:
             return "AP", "apac"
-        if first_octet in (177, 179, 186, 189, 200, 201):
+        if first_octet in _SA_OCTETS:
             return "BR", "sa"
         return "US", "na"
 

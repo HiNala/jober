@@ -46,7 +46,11 @@ def _rows_to_dicts(rows: list[AnalyticsEvent]) -> list[dict[str, Any]]:
     ]
 
 
-async def _fetch_events(session: AsyncSession, start: datetime, end: datetime) -> list[dict[str, Any]]:
+async def _fetch_events(
+    session: AsyncSession,
+    start: datetime,
+    end: datetime,
+) -> list[dict[str, Any]]:
     stmt = (
         select(AnalyticsEvent)
         .where(AnalyticsEvent.ts >= start, AnalyticsEvent.ts < end)
@@ -141,7 +145,8 @@ def _rollup_llm_costs_sync(session: Session, day: date) -> None:
         .where(LlmCall.created_at >= start, LlmCall.created_at < end)
         .group_by(ApplicationRun.tenant_id, LlmCall.agent_role, LlmCall.model)
     )
-    for tenant_id, agent_role, model, prompt_t, completion_t, cost, count in session.execute(stmt).all():
+    rows = session.execute(stmt).all()
+    for tenant_id, agent_role, model, prompt_t, completion_t, cost, count in rows:
         session.add(
             AnalyticsDailyCost(
                 day=day,
@@ -156,10 +161,18 @@ def _rollup_llm_costs_sync(session: Session, day: date) -> None:
         )
 
 
-async def _upsert_product_rollups(session: AsyncSession, day: date, events: list[dict[str, Any]]) -> None:
-    await session.execute(delete(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day))
+async def _upsert_product_rollups(
+    session: AsyncSession,
+    day: date,
+    events: list[dict[str, Any]],
+) -> None:
+    await session.execute(
+        delete(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day)
+    )
     await session.execute(delete(AnalyticsDailyPage).where(AnalyticsDailyPage.day == day))
-    await session.execute(delete(AnalyticsDailyActiveUsers).where(AnalyticsDailyActiveUsers.day == day))
+    await session.execute(
+        delete(AnalyticsDailyActiveUsers).where(AnalyticsDailyActiveUsers.day == day)
+    )
 
     for metric in compute_funnel_metrics(events):
         session.add(

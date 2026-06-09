@@ -14,9 +14,5 @@ def tracking_suppressed(request: Request) -> bool:
     if gpc == "1":
         return True
     consent = request.cookies.get(CONSENT_COOKIE, "").strip()
-    if consent == "0":
-        return True
-    # Opt-in: no consent cookie means do not track client events.
-    if consent != "1":
-        return True
-    return False
+    # Opt-in: only track when consent cookie is explicitly "1".
+    return consent != "1"
