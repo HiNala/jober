@@ -49,3 +49,5 @@ Green on [27186144157](https://github.com/HiNala/jober/actions/runs/27186144157)
 - [x] Self-improvement — credential-based CSV download; funnel compare drop-off attention + prior column
 - [x] Docs — mission M99 section, design-review improvements logged
 - [x] Fixture-for-bug — `test_user_analytics_compare_previous`, `test_admin_traffic_reads_page_rollups`, `rangeFromPreset` unit test
+
+**CI (M99):** [27187665509](https://github.com/HiNala/jober/actions/runs/27187665509) (`ccf3b57`).
