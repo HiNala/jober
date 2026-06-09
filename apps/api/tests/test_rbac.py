@@ -49,6 +49,31 @@ def test_can_default_deny_unknown_permission() -> None:
     assert can(actor, Permission.ADMIN_USERS_MANAGE) is False
 
 
+def test_can_grants_m28_permissions_for_admin() -> None:
+    actor = AuthContext(
+        user_id=DEFAULT_DEV_USER_ID,
+        tenant_id=DEFAULT_DEV_TENANT_ID,
+        email="admin@test.local",
+        plan=PlanTier.PRO,
+        role=UserRole.ADMIN,
+    )
+    assert can(actor, Permission.ADMIN_OPS_READ) is True
+    assert can(actor, Permission.ADMIN_CONFIG_MANAGE) is True
+    assert can(actor, Permission.ADMIN_ANALYTICS_READ) is True
+
+
+def test_user_denied_m28_permissions() -> None:
+    actor = AuthContext(
+        user_id=DEFAULT_DEV_USER_ID,
+        tenant_id=DEFAULT_DEV_TENANT_ID,
+        email="u@test.local",
+        plan=PlanTier.PRO,
+        role=UserRole.USER,
+    )
+    assert can(actor, Permission.ADMIN_OPS_READ) is False
+    assert can(actor, Permission.ADMIN_CONFIG_MANAGE) is False
+
+
 def test_can_accepts_string_role_from_db_column() -> None:
     """User.role is a VARCHAR column — auth context may carry plain strings."""
     actor = AuthContext(

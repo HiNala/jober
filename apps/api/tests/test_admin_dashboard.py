@@ -123,6 +123,59 @@ async def test_admin_config_update_audited(
 
 @requires_postgres
 @pytest.mark.asyncio
+async def test_admin_config_forbidden_for_user(
+    db_session, truncate_tables, auth_headers
+) -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/api/admin/config/", headers=auth_headers)
+    assert response.status_code == 403
+
+
+@requires_postgres
+@pytest.mark.asyncio
+async def test_operational_view_excludes_private_fields(
+    db_session, truncate_tables, admin_user, auth_headers
+) -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(
+            f"/api/admin/users/{DEFAULT_DEV_USER_ID}/operational",
+            headers=auth_headers,
+        )
+    assert response.status_code == 200
+    payload = response.json()
+    blob = str(payload).lower()
+    assert "password_hash" not in blob
+    assert "vault" not in blob
+    assert "privacy_note" in payload
+
+
+@requires_postgres
+@pytest.mark.asyncio
+async def test_admin_audit_log_filters_by_action(
+    db_session, truncate_tables, admin_user, auth_headers
+) -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        await client.patch(
+            "/api/admin/config/feature_flags",
+            headers=auth_headers,
+            json={"value": {"discovery_enabled": True}},
+        )
+        filtered = await client.get(
+            "/api/admin/audit-log",
+            headers=auth_headers,
+            params={"action": "config_changed"},
+        )
+    assert filtered.status_code == 200
+    items = filtered.json()["items"]
+    assert items
+    assert all(row["action"] == "config_changed" for row in items)
+
+
+@requires_postgres
+@pytest.mark.asyncio
 async def test_admin_user_search(
     db_session, truncate_tables, admin_user, auth_headers
 ) -> None:
