@@ -26,5 +26,8 @@
 ## Retention
 `ANALYTICS_RETENTION_DAYS` (default 365) — purge job deferred to Mission 26 dashboards.
 
+## CI
+Green on [27183175386](https://github.com/HiNala/jober/actions/runs/27183175386) (`3349c35`).
+
 ## Mission 99
-Run iteration loop after CI green.
+Run iteration loop next.
