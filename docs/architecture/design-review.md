@@ -788,6 +788,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 27 — RBAC & admin users
+
+**Scope:** `/admin/users` page, admin nav guard, role/status actions, audit log panel.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Table + inline actions; no decorative chrome |
+| Kare | 2 | Copy explains operational-only boundary (no vault) |
+| Norman | 2 | Loading/error states; disabled self-suspend |
+| Nielsen | 2 | Promote/demote/suspend labels match API semantics |
+| Tufte | 2 | Audit log is scannable rows, not chart noise |
+| Vignelli | 2 | Reuses `surface.card` + app spacing tokens |
+| Rand | 1 | Internal admin utility |
+| Maeda | 2 | One screen for directory + audit tail |
+| Wroblewski | 2 | Table scrolls; actions stack on narrow widths |
+| Ive | 2 | Server-enforced guard; UI hide is secondary |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 26 — Analytics dashboards (Tufte pass)
 
 **Scope:** `/analytics` page, Recharts components, date-range controls, user + admin panels.

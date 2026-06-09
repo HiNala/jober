@@ -2,7 +2,7 @@
 
 ## Task list
 - [x] **Roles & permissions model:** `Permission`, `Resource`, `can()`, `ROLE_PERMISSIONS` in `auth/permissions.py`
-- [x] **Enforcement:** `RBACRouter`, `@requires`, `PermissionMiddleware`, startup `validate_rbac_coverage` (default-deny)
+- [x] **Enforcement:** `RBACRouter`, `@requires`, `Depends(require_permission)`, startup `validate_rbac_coverage` (default-deny)
 - [x] **Tenant + role:** tenant isolation unchanged in repos; admin boundaries in `docs/architecture/rbac.md`
 - [x] **Admin bootstrap:** `scripts/bootstrap_admin.py` + `ADMIN_BOOTSTRAP_SECRET` (no public escalation)
 - [x] **Audit log:** `admin_audit_logs` + `record_admin_audit` on role/status changes and bootstrap
@@ -31,3 +31,5 @@
 
 ## Iteration clause
 Impersonation **deferred** — documented in `docs/architecture/rbac.md` (consent + audit burden).
+
+**CI:** [run 27196521889](https://github.com/HiNala/jober/actions/runs/27196521889) (backend + web + policy green on `0a41bb0`).

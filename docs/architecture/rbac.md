@@ -16,7 +16,7 @@ Extensible via `ROLE_PERMISSIONS` in `apps/api/src/jober_api/auth/permissions.py
 | `admin:users:manage` | Admin | Email, role, status — no vault/profile body |
 | `admin:audit:read` | Admin | Admin audit log entries |
 
-`can(actor, action, resource)` is the single check — routes declare a permission; `PermissionMiddleware` default-denies undeclared routes.
+`can(actor, action, resource)` is the single check — routes declare a permission via `RBACRouter` / `@requires`; `Depends(require_permission)` enforces at runtime; startup `validate_rbac_coverage` default-denies undeclared routes.
 
 ## Admin must NOT
 - Read another tenant's job targets, vault, or documents via a blanket bypass.
