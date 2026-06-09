@@ -185,15 +185,15 @@ async def _upsert_product_rollups(
             )
         )
 
-    for metric in compute_page_metrics(events):
+    for page_metric in compute_page_metrics(events):
         session.add(
             AnalyticsDailyPage(
                 day=day,
-                page=metric.page,
-                page_views=metric.page_views,
-                unique_sessions=metric.unique_sessions,
-                total_time_on_page_sec=metric.total_time_on_page_sec,
-                bounces=metric.bounces,
+                page=page_metric.page,
+                page_views=page_metric.page_views,
+                unique_sessions=page_metric.unique_sessions,
+                total_time_on_page_sec=page_metric.total_time_on_page_sec,
+                bounces=page_metric.bounces,
             )
         )
 
@@ -229,15 +229,15 @@ def _upsert_product_rollups_sync(
             )
         )
 
-    for metric in compute_page_metrics(events):
+    for page_metric in compute_page_metrics(events):
         session.add(
             AnalyticsDailyPage(
                 day=day,
-                page=metric.page,
-                page_views=metric.page_views,
-                unique_sessions=metric.unique_sessions,
-                total_time_on_page_sec=metric.total_time_on_page_sec,
-                bounces=metric.bounces,
+                page=page_metric.page,
+                page_views=page_metric.page_views,
+                unique_sessions=page_metric.unique_sessions,
+                total_time_on_page_sec=page_metric.total_time_on_page_sec,
+                bounces=page_metric.bounces,
             )
         )
 
@@ -250,7 +250,7 @@ def _upsert_product_rollups_sync(
     session.add(AnalyticsDailyActiveUsers(day=day, dau=dau, wau=wau, mau=mau))
 
 
-async def rollup_analytics_day(session: AsyncSession, day: date) -> dict[str, int]:
+async def rollup_analytics_day(session: AsyncSession, day: date) -> dict[str, object]:
     start, end = _day_bounds(day)
     events = await _fetch_events(session, start, end)
     await _upsert_product_rollups(session, day, events)

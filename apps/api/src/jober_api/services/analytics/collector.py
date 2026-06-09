@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from fastapi import Request
 from jober_schemas.analytics import AnalyticsBatchRequest, AnalyticsEventInput
