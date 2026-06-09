@@ -40,3 +40,5 @@ Saved admin views and daily/weekly digest **deferred** — overview attention ba
 - [x] Audit log action filter on system page + API fixture
 - [x] M28 permission + privacy-boundary regression tests
 - [x] Design Council addendum in `design-review.md`
+
+**M99 CI:** [run 27229223560](https://github.com/HiNala/jober/actions/runs/27229223560) (green on `d519c4c`).
