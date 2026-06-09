@@ -19,6 +19,11 @@ from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
 from jober_api.config import settings
 from jober_api.db.base import Base
 from jober_api.models import (  # noqa: F401 — register mappers
+    AnalyticsDailyActiveUsers,
+    AnalyticsDailyCost,
+    AnalyticsDailyFunnel,
+    AnalyticsDailyPage,
+    AnalyticsEvent,
     ApplicationAttempt,
     ApplicationBatch,
     ApplicationRun,

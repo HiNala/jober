@@ -289,6 +289,19 @@ Mission 24: Settings global generate toggle + default template/voice; batch `fil
 
 Without `LLM_API_KEY`, the API uses a deterministic template provider (CI-safe). Optional env vars: `LLM_PROVIDER`, `LLM_BASE_URL`, `LLM_DRAFT_MODEL`, `LLM_SCORING_MODEL`, `LLM_MONTHLY_BUDGET_USD` (default $25). Calls log to `LlmCall`; exceeding the monthly cap returns HTTP 402.
 
+## First-party analytics (Mission 25)
+
+No Google Analytics, Segment, or third-party trackers. Events land in Postgres via same-origin `POST /api/events`.
+
+| Piece | Location |
+|-------|----------|
+| Collector | `POST /api/events` (public; requires `jober_analytics_consent=1` cookie; honors DNT) |
+| Client SDK | `apps/web/src/lib/analytics/sdk.ts` — batch + `sendBeacon`, anon id rotation |
+| Server events | `emit_server_event` on signup, list create, run start, submit, letter generate |
+| Rollups | Celery `analytics_daily_rollup` (02:15 UTC) → funnel, page, DAU/WAU/MAU, LLM cost tables |
+
+Privacy: no raw IP stored (coarse geo only at ingest), PII keys blocked in event props, opt-in consent banner. Config: `ANALYTICS_ENABLED`, `ANALYTICS_RETENTION_DAYS`.
+
 ## Job spreadsheet import (Mission 03)
 
 Import Brian's tracker workbook into Postgres and round-trip status back to XLSX.
