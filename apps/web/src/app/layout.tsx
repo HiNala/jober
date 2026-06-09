@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { Providers } from "@/components/providers";
+import { getSiteUrl } from "@/lib/site";
 
 import "./globals.css";
 
@@ -16,9 +17,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jober — Assisted job applications",
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: "Jober — Assisted job applications",
+    template: "%s | Jober",
+  },
   description:
-    "High-quality startup engineering applications with human review before submit.",
+    "High-quality job applications with human review before submit.",
 };
 
 export default function RootLayout({

@@ -1,33 +1,36 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 
-import { MarketingHero } from "@/components/marketing/hero";
+import { LandingPage } from "@/components/marketing/landing-page";
+import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { getSiteUrl } from "@/lib/site";
 
-export default function LandingPage() {
+const title = "Jober — Assisted job applications you approve";
+const description =
+  "High-quality job applications with human review before submit. Pick roles, watch the run console, and approve every submission.";
+
+export const metadata: Metadata = {
+  title: { absolute: title },
+  description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title,
+    description,
+    url: getSiteUrl(),
+    siteName: "Jober",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+};
+
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
-      >
-        Skip to main content
-      </a>
-      <header className="flex items-center justify-between px-6 py-4">
-        <span className="text-sm font-semibold tracking-tight">Jober</span>
-        <nav className="flex gap-4 text-sm text-muted-foreground" aria-label="Marketing">
-          <Link href="/dashboard" className="hover:text-foreground">
-            Dashboard
-          </Link>
-          <Link href="/vault" className="hover:text-foreground">
-            Vault
-          </Link>
-        </nav>
-      </header>
-      <main id="main-content">
-        <MarketingHero />
-      </main>
-      <footer className="border-t px-6 py-8 text-center text-xs text-muted-foreground">
-        Assisted applications with human review before submit. You stay in control.
-      </footer>
-    </div>
+    <MarketingShell>
+      <LandingPage />
+    </MarketingShell>
   );
 }

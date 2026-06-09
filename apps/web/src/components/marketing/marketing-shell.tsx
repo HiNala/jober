@@ -1,0 +1,64 @@
+import Link from "next/link";
+
+import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
+import { buttonVariants } from "@/components/ui/button";
+import { motionPress } from "@/lib/design/motion";
+import { cn } from "@/lib/utils";
+
+const navLinks = [
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+] as const;
+
+export function MarketingShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-full flex-col bg-background text-foreground">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+      >
+        Skip to main content
+      </a>
+
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
+          <Link href="/" className="text-sm font-semibold tracking-tight">
+            Jober
+          </Link>
+          <nav aria-label="Marketing" className="flex items-center gap-4 md:gap-6">
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "text-sm text-muted-foreground transition-colors hover:text-foreground",
+                  href.startsWith("/#") && "hidden md:inline",
+                )}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className={cn(buttonVariants({ variant: "ghost", size: "sm" }), motionPress)}
+            >
+              Sign in
+            </Link>
+            <MarketingCtaLink href="/signup" feature="landing_header_signup" size="sm">
+              Get started
+            </MarketingCtaLink>
+          </div>
+        </div>
+      </header>
+
+      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+        {children}
+      </main>
+
+      <MarketingFooter />
+    </div>
+  );
+}
