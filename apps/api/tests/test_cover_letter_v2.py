@@ -7,9 +7,9 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
+from jober_api.config import settings
 from jober_api.db import session as db_session_module
 from jober_api.main import app
-from jober_api.config import settings
 from jober_api.models.application_attempt import ApplicationAttempt
 from jober_api.models.application_run import ApplicationRun
 from jober_api.models.enums import AttemptStatus, FieldObservationStatus, JobTargetStatus, RunStatus
