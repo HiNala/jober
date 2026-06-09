@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { AttentionBanner } from "@/components/admin/attention-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +11,22 @@ import { fetchAdminDataRequests, fetchAdminSystem } from "@/lib/api/admin-dashbo
 import { surface, spacing } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
+const AUDIT_ACTIONS = [
+  { value: "", label: "All actions" },
+  { value: "role_changed", label: "Role changed" },
+  { value: "user_suspended", label: "User suspended" },
+  { value: "user_activated", label: "User activated" },
+  { value: "support_view_accessed", label: "Support view" },
+  { value: "config_changed", label: "Config changed" },
+];
+
 export function AdminSystemPanel() {
+  const [auditAction, setAuditAction] = useState("");
   const system = useQuery({ queryKey: ["admin-system"], queryFn: fetchAdminSystem });
-  const audit = useQuery({ queryKey: ["admin-audit"], queryFn: fetchAdminAuditLog });
+  const audit = useQuery({
+    queryKey: ["admin-audit", auditAction],
+    queryFn: () => fetchAdminAuditLog({ limit: 100, action: auditAction || undefined }),
+  });
   const dataRequests = useQuery({
     queryKey: ["admin-data-requests"],
     queryFn: fetchAdminDataRequests,
@@ -85,8 +99,20 @@ export function AdminSystemPanel() {
       </Card>
 
       <Card className={surface.card}>
-        <CardHeader>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <CardTitle className="text-sm font-medium">Admin audit log</CardTitle>
+          <select
+            value={auditAction}
+            onChange={(e) => setAuditAction(e.target.value)}
+            className="rounded-md border border-input bg-background px-2 py-1 text-xs"
+            aria-label="Filter audit by action"
+          >
+            {AUDIT_ACTIONS.map((opt) => (
+              <option key={opt.value || "all"} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </CardHeader>
         <CardContent className="space-y-2 text-xs">
           {audit.isLoading ? (

@@ -46,6 +46,13 @@ export function updateAdminUserStatus(
   });
 }
 
-export function fetchAdminAuditLog(): Promise<{ items: AdminAuditEntry[] }> {
-  return apiFetch("/api/admin/audit-log");
+export function fetchAdminAuditLog(params?: {
+  limit?: number;
+  action?: string;
+}): Promise<{ items: AdminAuditEntry[] }> {
+  const search = new URLSearchParams();
+  if (params?.limit) search.set("limit", String(params.limit));
+  if (params?.action) search.set("action", params.action);
+  const query = search.toString();
+  return apiFetch(`/api/admin/audit-log${query ? `?${query}` : ""}`);
 }

@@ -12,6 +12,7 @@ import {
   updateAdminUserRole,
   updateAdminUserStatus,
 } from "@/lib/api/admin";
+import { AdminSupportView } from "@/components/admin/admin-support-view";
 import { fetchUserOperational } from "@/lib/api/admin-dashboard";
 import { useAuth } from "@/contexts/auth-context";
 import { formatApiError } from "@/lib/api/errors";
@@ -159,21 +160,14 @@ export default function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      {supportUserId && support.data ? (
-        <Card className={surface.card}>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-medium">Support view (audited)</CardTitle>
-            <Button size="sm" variant="ghost" onClick={() => setSupportUserId(null)}>
-              Close
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-3 text-xs text-muted-foreground">{support.data.privacy_note}</p>
-            <pre className="overflow-x-auto rounded-md bg-muted/50 p-3 text-xs">
-              {JSON.stringify(support.data, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
+      {supportUserId ? (
+        <AdminSupportView
+          data={support.data}
+          isLoading={support.isLoading}
+          isError={support.isError}
+          onRetry={() => void support.refetch()}
+          onClose={() => setSupportUserId(null)}
+        />
       ) : null}
 
       <Card className={surface.card}>
