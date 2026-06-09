@@ -369,6 +369,21 @@ async def get_review_package(session: AsyncSession, run_id: uuid.UUID) -> dict[s
         "screenshot_object_key": screenshot_key,
         "resume_filename": "resume.pdf",
         "cover_letter_preview": (cover_doc.text[:500] if cover_doc and cover_doc.text else None),
+        "cover_letter": (
+            {
+                "id": str(cover_doc.id),
+                "text": cover_doc.text,
+                "ats_score": cover_doc.ats_score,
+                "keyword_coverage": cover_doc.keyword_coverage,
+                "template_style": (cover_doc.keyword_coverage or {}).get("template_style"),
+                "voice_preset": (cover_doc.keyword_coverage or {}).get("voice_preset"),
+                "locked_paragraphs": (cover_doc.keyword_coverage or {}).get("locked_paragraphs")
+                or [],
+                "pdf_download_path": f"/api/documents/{cover_doc.id}/download/pdf",
+            }
+            if cover_doc and cover_doc.text
+            else None
+        ),
         "checkpoint_id": str(checkpoint.id) if checkpoint else None,
         "policy": run.policy.value,
     }

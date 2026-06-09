@@ -18,7 +18,8 @@ DEFAULT_USER_PREFERENCES: dict[str, Any] = {
     },
     "application_defaults": {
         "generate_cover_letter_per_run": True,
-        "voice_preset": "professional",
+        "letter_template": "classic",
+        "voice_preset": "direct",
         "site_cooldown_seconds": None,
     },
     "ai": {

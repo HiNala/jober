@@ -21,6 +21,17 @@ from jober_api.services.documents.claims_guard import (
     parse_draft_payload,
     verify_draft_claims,
 )
+from jober_api.services.documents.generation_prefs import load_letter_defaults
+from jober_api.services.documents.letter_editor import (
+    join_paragraphs,
+    merge_paragraphs,
+    split_paragraphs,
+)
+from jober_api.services.documents.letter_styles import (
+    normalize_template,
+    normalize_voice_preset,
+    voice_prompt,
+)
 from jober_api.services.documents.prompt_pack import (
     SYSTEM_INSTRUCTIONS,
     GenerationContext,
@@ -73,6 +84,13 @@ async def generate_cover_letter(
     job_description: str = "",
     job_requirements: str = "",
     company_summary: str = "",
+    run_id: uuid.UUID | None = None,
+    template_style: str | None = None,
+    voice_preset: str | None = None,
+    locked_paragraphs: list[int] | None = None,
+    regenerate_paragraph_index: int | None = None,
+    parent_document_id: uuid.UUID | None = None,
+    seed_text: str | None = None,
 ) -> dict[str, Any]:
     jobs = JobTargetRepository(session, tenant_id)
     job = await jobs.get(job_target_id)
@@ -88,11 +106,21 @@ async def generate_cover_letter(
         msg = "Upload a canonical resume before generating a cover letter"
         raise ValueError(msg)
 
+    prefs = await load_letter_defaults(session, tenant_id=tenant_id, user_id=user_id)
+    resolved_template = normalize_template(template_style or prefs["template_style"])
+    resolved_voice = normalize_voice_preset(voice_preset or prefs["voice_preset"])
+    locked_set = {int(i) for i in (locked_paragraphs or [])}
+
     docs = GeneratedDocumentRepository(session)
-    if not force:
+    if not force and regenerate_paragraph_index is None and not seed_text:
         cached = await docs.find_cached_cover_letter(job_target_id, resume.id)
         if cached is not None:
-            return _serialize_document(cached, cached=True)
+            meta = dict(cached.keyword_coverage or {})
+            if (
+                meta.get("template_style") == resolved_template
+                and meta.get("voice_preset") == resolved_voice
+            ):
+                return _serialize_document(cached, cached=True)
 
     await assert_budget(session)
 
@@ -116,9 +144,20 @@ async def generate_cover_letter(
         job_requirements=job_requirements or extracted_reqs,
         company_summary=company_summary or extracted_summary,
         resume_variant=variant,
-        voice_notes="direct, founder/operator, product-minded, technically credible",
+        voice_notes=voice_prompt(resolved_voice),
     )
     user_prompt = pack_user_prompt(ctx)
+    if regenerate_paragraph_index is not None and seed_text:
+        user_prompt += (
+            f"\n\nREGENERATE ONLY paragraph index {regenerate_paragraph_index}. "
+            f"Keep other paragraphs unchanged in meaning. Current letter:\n{seed_text[:4000]}"
+        )
+    elif seed_text:
+        user_prompt += (
+            "\n\nSTART FROM THIS DRAFT (preserve facts, improve flow):\n"
+            f"{seed_text[:4000]}"
+        )
+
     provider, llm_runtime = await resolve_llm_runtime(session, user_id)
 
     claims_index = _claims_index_from_resume(resume)
@@ -140,6 +179,7 @@ async def generate_cover_letter(
             completion=completion,
             system=SYSTEM_INSTRUCTIONS,
             user=user_prompt,
+            run_id=run_id,
         )
         await assert_budget(session, completion.cost_usd)
 
@@ -152,18 +192,40 @@ async def generate_cover_letter(
         unsupported = guard_result.unsupported if guard_result else []
         raise ClaimsRejectedError(unsupported)
 
-    wc = _word_count(draft.body)
-    if wc < 200 or wc > 450:
-        pass  # template path may be shorter; warn in metadata only
+    body = draft.body
+    if seed_text and (locked_set or regenerate_paragraph_index is not None):
+        original = split_paragraphs(seed_text)
+        updated = split_paragraphs(body)
+        if regenerate_paragraph_index is not None and regenerate_paragraph_index < len(updated):
+            merged = list(original)
+            while len(merged) <= regenerate_paragraph_index:
+                merged.append("")
+            if regenerate_paragraph_index not in locked_set:
+                merged[regenerate_paragraph_index] = updated[regenerate_paragraph_index]
+            body = join_paragraphs(
+                merge_paragraphs(
+                    original=original,
+                    updated=merged,
+                    locked_indices=locked_set,
+                )
+            )
+        elif locked_set:
+            body = join_paragraphs(
+                merge_paragraphs(
+                    original=original,
+                    updated=updated,
+                    locked_indices=locked_set,
+                )
+            )
 
     coverage = score_keyword_coverage(
-        draft.body,
+        body,
         ctx.job_description,
         ctx.job_requirements,
     )
 
     scoring_prompt = (
-        f"Letter:\n{draft.body[:2000]}\n\nTargets present: {coverage.present}\n"
+        f"Letter:\n{body[:2000]}\n\nTargets present: {coverage.present}\n"
         f"Missing: {coverage.missing}"
     )
     score_completion = await provider.complete(
@@ -178,15 +240,17 @@ async def generate_cover_letter(
         completion=score_completion,
         system="score",
         user=scoring_prompt,
+        run_id=run_id,
     )
 
     document_id = uuid.uuid4()
     applicant = profile.name if profile and profile.name else "Applicant"
     pdf_bytes = render_cover_letter_pdf(
-        body=draft.body,
+        body=body,
         applicant_name=applicant,
         company=job.company,
         role=job.role,
+        template=resolved_template,
     )
     pdf_key = document_pdf_key(job_target_id, document_id)
     await storage.put_object(pdf_key, pdf_bytes, content_type="application/pdf")
@@ -194,10 +258,11 @@ async def generate_cover_letter(
     docx_key: str | None = None
     if include_docx:
         docx_bytes = render_cover_letter_docx(
-            body=draft.body,
+            body=body,
             applicant_name=applicant,
             company=job.company,
             role=job.role,
+            template=resolved_template,
         )
         docx_key = document_docx_key(job_target_id, document_id)
         await storage.put_object(
@@ -206,15 +271,34 @@ async def generate_cover_letter(
             content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
 
-    keyword_payload = _coverage_to_dict(coverage, draft, resume.id, variant)
+    version = 1
+    if parent_document_id:
+        parent = await docs.get(parent_document_id)
+        if parent is not None:
+            parent_meta = parent.keyword_coverage or {}
+            version = int(parent_meta.get("version") or 1) + 1
+
+    keyword_payload = _coverage_to_dict(
+        coverage,
+        draft,
+        resume.id,
+        variant,
+        template_style=resolved_template,
+        voice_preset=resolved_voice,
+        locked_paragraphs=sorted(locked_set),
+        parent_document_id=parent_document_id,
+        version=version,
+        job=job,
+    )
 
     row = await docs.create(
         id=document_id,
         job_target_id=job_target_id,
+        run_id=run_id,
         document_type=DocumentType.COVER_LETTER,
         object_key_pdf=pdf_key,
         object_key_docx=docx_key,
-        text=draft.body,
+        text=body,
         keyword_coverage=keyword_payload,
         ats_score=coverage.ats_score,
         generated_at=datetime.now(UTC),
@@ -243,6 +327,8 @@ def _fallback_job_description(job: JobTarget) -> str:
         parts.append(job.why_fit)
     if job.stage_signal:
         parts.append(job.stage_signal)
+    if job.cover_letter_hook:
+        parts.append(f"Hook: {job.cover_letter_hook}")
     return ". ".join(parts)
 
 
@@ -251,6 +337,13 @@ def _coverage_to_dict(
     draft: DraftLetter,
     resume_id: uuid.UUID,
     variant: str,
+    *,
+    template_style: str,
+    voice_preset: str,
+    locked_paragraphs: list[int],
+    parent_document_id: uuid.UUID | None,
+    version: int,
+    job: JobTarget,
 ) -> dict[str, Any]:
     return {
         "present": coverage.present,
@@ -262,13 +355,27 @@ def _coverage_to_dict(
         "asserted_facts": draft.asserted_facts,
         "paragraph_grounding": draft.paragraph_grounding,
         "explain": draft.paragraph_grounding,
+        "template_style": template_style,
+        "voice_preset": voice_preset,
+        "locked_paragraphs": locked_paragraphs,
+        "parent_document_id": str(parent_document_id) if parent_document_id else None,
+        "version": version,
+        "ab_tracking": {
+            "template_style": template_style,
+            "voice_preset": voice_preset,
+            "fit_lane": job.fit_lane,
+            "company": job.company,
+            "role": job.role,
+        },
     }
 
 
 def _serialize_document(row: GeneratedDocument, *, cached: bool) -> dict[str, Any]:
+    meta = row.keyword_coverage or {}
     return {
         "id": str(row.id),
         "job_target_id": str(row.job_target_id),
+        "run_id": str(row.run_id) if row.run_id else None,
         "document_type": row.document_type.value,
         "text": row.text,
         "keyword_coverage": row.keyword_coverage,
@@ -277,8 +384,48 @@ def _serialize_document(row: GeneratedDocument, *, cached: bool) -> dict[str, An
         "object_key_pdf": row.object_key_pdf,
         "object_key_docx": row.object_key_docx,
         "cached": cached,
+        "template_style": meta.get("template_style"),
+        "voice_preset": meta.get("voice_preset"),
+        "locked_paragraphs": meta.get("locked_paragraphs") or [],
+        "version": meta.get("version", 1),
         "pdf_download_path": f"/api/documents/{row.id}/download/pdf",
         "docx_download_path": (
             f"/api/documents/{row.id}/download/docx" if row.object_key_docx else None
         ),
     }
+
+
+async def duplicate_cover_letter(
+    session: AsyncSession,
+    storage: ObjectStorage,
+    *,
+    tenant_id: uuid.UUID,
+    user_id: uuid.UUID,
+    document_id: uuid.UUID,
+    target_job_target_id: uuid.UUID | None = None,
+) -> dict[str, Any]:
+    docs = GeneratedDocumentRepository(session)
+    source = await docs.get(document_id)
+    if source is None or source.text is None:
+        msg = "Document not found"
+        raise ValueError(msg)
+    jobs = JobTargetRepository(session, tenant_id)
+    job_id = target_job_target_id or source.job_target_id
+    job = await jobs.get(job_id)
+    if job is None:
+        msg = "Job target not found"
+        raise ValueError(msg)
+    meta = dict(source.keyword_coverage or {})
+    return await generate_cover_letter(
+        session,
+        storage,
+        tenant_id=tenant_id,
+        user_id=user_id,
+        job_target_id=job_id,
+        force=True,
+        seed_text=source.text,
+        template_style=str(meta.get("template_style") or "classic"),
+        voice_preset=str(meta.get("voice_preset") or "direct"),
+        locked_paragraphs=list(meta.get("locked_paragraphs") or []),
+        parent_document_id=source.id,
+    )
