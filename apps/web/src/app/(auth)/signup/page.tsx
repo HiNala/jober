@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { GoogleSignInBlock } from "@/components/auth/google-sign-in-block";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { trackEvent } from "@/lib/analytics/sdk";
 import { register } from "@/lib/api/auth";
 import { motionPress } from "@/lib/design/motion";
 
@@ -19,6 +20,10 @@ export default function SignupPage() {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    trackEvent("signup.start");
+  }, []);
 
   return (
     <AuthFormShell

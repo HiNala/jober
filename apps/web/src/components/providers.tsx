@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { UserPreferencesProvider } from "@/contexts/user-preferences-context";
 
@@ -28,8 +29,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <TooltipProvider delay={200}>
           <AuthProvider>
             <UserPreferencesProvider>
-              {children}
-              <Toaster richColors closeButton position="top-right" />
+              <AnalyticsProvider>
+                {children}
+                <Toaster richColors closeButton position="top-right" />
+              </AnalyticsProvider>
             </UserPreferencesProvider>
           </AuthProvider>
         </TooltipProvider>

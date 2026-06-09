@@ -1,0 +1,58 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { setAnalyticsConsent, trackPageView } from "@/lib/analytics/sdk";
+import { surface } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
+
+export function AnalyticsConsentBanner() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const decided = document.cookie.match(/(?:^|;\s*)jober_analytics_consent=/);
+    setVisible(!decided);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      className={cn(
+        surface.card,
+        "fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg rounded-lg border p-4 shadow-lg sm:left-auto",
+      )}
+      role="dialog"
+      aria-label="Analytics consent"
+    >
+      <p className="text-sm text-foreground">
+        Jober uses first-party analytics only — no third-party trackers. Help us improve by
+        allowing anonymous usage data on this device.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+          onClick={() => {
+            setAnalyticsConsent(true);
+            setVisible(false);
+            trackPageView();
+          }}
+        >
+          Allow analytics
+        </button>
+        <button
+          type="button"
+          className="rounded-md border px-3 py-1.5 text-xs text-muted-foreground"
+          onClick={() => {
+            setAnalyticsConsent(false);
+            setVisible(false);
+          }}
+        >
+          Decline
+        </button>
+      </div>
+    </div>
+  );
+}
