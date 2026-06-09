@@ -34,3 +34,6 @@
 - `/analytics` — user workspace tab; admin tab for product funnel, traffic, cost
 - Nav: Analytics in app sidebar
 - Components: `apps/web/src/components/analytics/`
+
+## CI
+Green on [27186144157](https://github.com/HiNala/jober/actions/runs/27186144157) (`7fb9f47`).
