@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Any
-
 from fastapi import Request
 from jober_schemas.analytics import AnalyticsBatchRequest, AnalyticsEventInput
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -135,7 +133,7 @@ async def emit_server_event(
     *,
     name: str,
     session_id: str,
-    props: dict | None = None,
+    props: dict[str, Any] | None = None,
     user_id: uuid.UUID | None = None,
     tenant_id: uuid.UUID | None = None,
     page: str | None = None,
