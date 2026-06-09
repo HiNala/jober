@@ -788,6 +788,18 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 27) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Shared `enum_value()` helper | `User.role` / `User.status` are VARCHAR columns; triple `_enum_value` copies were brittle |
+| `can()` normalizes string roles | DB-loaded auth context could deny admins when `ROLE_PERMISSIONS` keys are enums |
+| RBAC unit tests run without Postgres | Module-level `pytestmark` skipped coverage/startup fixtures locally |
+| `test_list_users_for_admin_serializes_string_role_status` | Regression for CI `AttributeError` on `.value` |
+| Admin mutation `onError` toasts | Promote/demote/suspend failures were silent — weakest UX on the admin surface |
+
+---
+
 ## Mission 27 — RBAC & admin users
 
 **Scope:** `/admin/users` page, admin nav guard, role/status actions, audit log panel.

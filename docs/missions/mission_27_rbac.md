@@ -33,3 +33,9 @@
 Impersonation **deferred** — documented in `docs/architecture/rbac.md` (consent + audit burden).
 
 **CI:** [run 27196521889](https://github.com/HiNala/jober/actions/runs/27196521889) (backend + web + policy green on `0a41bb0`).
+
+## Mission 99
+- [x] `enum_value()` helper + `can()` string-role normalization
+- [x] Startup coverage + string-serialization regression fixtures
+- [x] Admin UI mutation error toasts
+- [x] Design Council addendum in `design-review.md`
