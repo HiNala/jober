@@ -84,7 +84,8 @@ def analytics_daily_rollup(day: str | None = None) -> dict[str, object]:
 
     target = date.fromisoformat(day) if day else (datetime.now(UTC).date() - timedelta(days=1))
     with get_sync_session() as session:
-        return rollup_analytics_day_sync(session, target)
+        result: dict[str, object] = rollup_analytics_day_sync(session, target)
+        return result
 
 
 @celery_app.task(name="jober_worker.tasks.execute_batch_item", bind=True)
