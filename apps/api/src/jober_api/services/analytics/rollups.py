@@ -277,4 +277,4 @@ def server_session_id(
         return f"run-{run_id}"
     if user_id is not None:
         return f"user-{user_id}"
-    return "server"
+    return "server-system"
