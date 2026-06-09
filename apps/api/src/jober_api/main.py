@@ -28,7 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(PermissionMiddleware)
 app.add_middleware(AuthMiddleware)
 
 app.include_router(api_router)
