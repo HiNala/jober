@@ -7,11 +7,19 @@ import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/features", label: "Features", mobile: true },
+  { href: "/how-it-works", label: "How it works", mobile: false },
+  { href: "/pricing", label: "Pricing", mobile: true },
+  { href: "/faq", label: "FAQ", mobile: false },
 ] as const;
 
-export function MarketingShell({ children }: { children: React.ReactNode }) {
+export function MarketingShell({
+  children,
+  signupFeature = "marketing_header_signup",
+}: {
+  children: React.ReactNode;
+  signupFeature?: string;
+}) {
   return (
     <div className="flex min-h-full flex-col bg-background text-foreground">
       <a
@@ -26,14 +34,14 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="text-sm font-semibold tracking-tight">
             Jober
           </Link>
-          <nav aria-label="Marketing" className="flex items-center gap-4 md:gap-6">
-            {navLinks.map(({ href, label }) => (
+          <nav aria-label="Marketing" className="flex items-center gap-3 md:gap-5">
+            {navLinks.map(({ href, label, mobile }) => (
               <Link
                 key={href}
                 href={href}
                 className={cn(
                   "text-sm text-muted-foreground transition-colors hover:text-foreground",
-                  href.startsWith("/#") && "hidden md:inline",
+                  !mobile && "hidden md:inline",
                 )}
               >
                 {label}
@@ -47,7 +55,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
             >
               Sign in
             </Link>
-            <MarketingCtaLink href="/signup" feature="landing_header_signup" size="sm">
+            <MarketingCtaLink href="/signup" feature={signupFeature} size="sm">
               Get started
             </MarketingCtaLink>
           </div>

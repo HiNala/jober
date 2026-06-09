@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <MarketingShell>
+    <MarketingShell signupFeature="landing_header_signup">
       <LandingPage />
     </MarketingShell>
   );

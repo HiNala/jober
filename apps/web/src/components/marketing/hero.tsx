@@ -49,7 +49,7 @@ export function MarketingHero() {
               <ArrowRight className="size-4" aria-hidden />
             </MarketingCtaLink>
             <MarketingCtaLink
-              href="/#how-it-works"
+              href="/how-it-works"
               feature="landing_hero_how_it_works"
               variant="outline"
               size="lg"

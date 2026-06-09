@@ -4,9 +4,11 @@ const footerGroups = [
   {
     title: "Product",
     links: [
-      { href: "/signup", label: "Get started" },
-      { href: "/#how-it-works", label: "How it works" },
+      { href: "/features", label: "Features" },
+      { href: "/how-it-works", label: "How it works" },
       { href: "/pricing", label: "Pricing" },
+      { href: "/faq", label: "FAQ" },
+      { href: "/blog", label: "Blog" },
     ],
   },
   {
@@ -14,6 +16,7 @@ const footerGroups = [
     links: [
       { href: "mailto:hello@jober.app", label: "Contact" },
       { href: "/login", label: "Sign in" },
+      { href: "/signup", label: "Get started" },
     ],
   },
   {
@@ -21,6 +24,7 @@ const footerGroups = [
     links: [
       { href: "/privacy", label: "Privacy" },
       { href: "/terms", label: "Terms" },
+      { href: "/acceptable-use", label: "Acceptable use" },
     ],
   },
 ] as const;
@@ -34,8 +38,7 @@ export function MarketingFooter() {
         <div className="space-y-3">
           <p className="text-sm font-semibold">Jober</p>
           <p className="max-w-xs text-sm text-muted-foreground">
-            Assisted job applications with human review before every submit. You stay
-            in control.
+            Assisted job applications with human review before every submit. You stay in control.
           </p>
         </div>
         {footerGroups.map((group) => (
