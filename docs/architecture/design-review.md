@@ -777,6 +777,25 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `test_patch_cover_letter_text_updates_ats_score` | PATCH edit path lacked regression coverage |
 | `test_run_letter_options` + letter-options GET test | Close M24 acceptance gaps |
 
+**CI:** [run 27178549543](https://github.com/HiNala/jober/actions/runs/27178549543) (backend + web + policy + quarantine green on `cc1f6bd`).
+
+### Run console letter options (M99 addendum)
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Three radios; hides when terminal + no override |
+| Kare | 2 | Status copy explains default vs generate vs skip |
+| Norman | 2 | Matches run console card pattern |
+| Nielsen | 2 | `aria-label` on section; toast on save |
+| Tufte | 2 | No charts; one-line state summary |
+| Vignelli | 2 | `surface.card` + icon rail consistency |
+| Rand | 2 | Distinct from Document Studio but same tokens |
+| Maeda | 2 | Default defers to Settings — less is more |
+| Wroblewski | 2 | Radio row wraps on narrow widths |
+| Ive | 2 | Only shown when actionable or override exists |
+
+**Total: 20/20** — passes gate.
+
 ---
 
 ## Mission 99 (post–Mission 23) — improvements logged

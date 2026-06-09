@@ -37,3 +37,7 @@
 - [x] Self-improvement — `PATCH /application-runs/{id}/run-options` + run console control
 - [x] Docs — README Mission 24 routes; mission + design-review updated
 - [x] Fixture-for-bug — `run_id` FK test; patch text manual_edit regression
+- [x] CI green — [27178549543](https://github.com/HiNala/jober/actions/runs/27178549543) on `cc1f6bd`
+
+## Deferred (non-blocking)
+- Library “apply to job” UI — duplicate API accepts `job_target_id`; Library only duplicates in place today

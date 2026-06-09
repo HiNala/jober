@@ -285,7 +285,7 @@ Generate grounded cover letters at `/documents` (Document Studio) or edit in the
 | `GET /api/documents?job_target_id=` | Version history for a job |
 | `GET /api/documents/{id}/download/pdf` | Download rendered PDF (ATS-safe text) |
 
-Mission 24: Settings global generate toggle + default template/voice; batch `filters.generate_cover_letter` override; skip when form lacks `cover_letter_upload`; `ab_tracking` metadata for analytics.
+Mission 24: Settings global generate toggle + default template/voice; batch `filters.generate_cover_letter` override; per-run `PATCH /api/application-runs/{id}/run-options` (Default / Generate / Skip in run console); skip when form lacks `cover_letter_upload`; `ab_tracking` metadata for analytics.
 
 Without `LLM_API_KEY`, the API uses a deterministic template provider (CI-safe). Optional env vars: `LLM_PROVIDER`, `LLM_BASE_URL`, `LLM_DRAFT_MODEL`, `LLM_SCORING_MODEL`, `LLM_MONTHLY_BUDGET_USD` (default $25). Calls log to `LlmCall`; exceeding the monthly cap returns HTTP 402.
 
