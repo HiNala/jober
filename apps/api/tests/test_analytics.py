@@ -19,7 +19,12 @@ from jober_api.models.analytics import (
 )
 from jober_api.services.analytics.collector import emit_server_event, ingest_client_batch
 from jober_api.services.analytics.consent import CONSENT_COOKIE
-from jober_api.services.analytics.rollups import rollup_analytics_day, server_session_id
+from jober_api.services.analytics.retention import purge_stale_analytics_events
+from jober_api.services.analytics.rollups import (
+    MIN_ANALYTICS_SESSION_ID_LEN,
+    rollup_analytics_day,
+    server_session_id,
+)
 from jober_api.services.analytics.sessionization import compute_page_metrics
 
 pytestmark = pytest.mark.skipif(
@@ -47,6 +52,72 @@ def _event(
         "is_bot": False,
         "is_internal": False,
     }
+
+
+def test_server_session_id_fallback_meets_schema_min_length() -> None:
+    fallback = server_session_id()
+    assert len(fallback) >= MIN_ANALYTICS_SESSION_ID_LEN
+
+
+@pytest.mark.asyncio
+async def test_consent_opt_out_suppresses_tracking(db_session, truncate_tables) -> None:
+    transport = ASGITransport(app=app)
+    body = AnalyticsBatchRequest(
+        events=[
+            AnalyticsEventInput(
+                name="page.view",
+                session_id="sess-opt-out",
+                anon_id="anon-opt-out",
+                page="/",
+                props={"path": "/"},
+            )
+        ]
+    )
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.post(
+            "/api/events",
+            json=body.model_dump(mode="json"),
+            cookies={CONSENT_COOKIE: "0"},
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+    assert response.status_code == 204
+    count = await db_session.scalar(select(func.count()).select_from(AnalyticsEvent))
+    assert count == 0
+
+
+@pytest.mark.asyncio
+async def test_purge_stale_analytics_events(db_session, truncate_tables) -> None:
+    old = datetime(2020, 1, 1, tzinfo=UTC)
+    recent = datetime.now(UTC)
+    db_session.add_all(
+        [
+            AnalyticsEvent(
+                id=uuid.uuid4(),
+                ts=old,
+                session_id="sess-old",
+                name="page.view",
+                props={"path": "/"},
+                source="client",
+            ),
+            AnalyticsEvent(
+                id=uuid.uuid4(),
+                ts=recent,
+                session_id="sess-recent",
+                name="page.view",
+                props={"path": "/dashboard"},
+                source="client",
+            ),
+        ]
+    )
+    await db_session.commit()
+
+    result = await purge_stale_analytics_events(db_session)
+    assert result["deleted_events"] == 1
+
+    remaining = (
+        await db_session.execute(select(AnalyticsEvent.session_id))
+    ).scalars().all()
+    assert remaining == ["sess-recent"]
 
 
 def test_sessionization_time_on_page_and_bounce() -> None:

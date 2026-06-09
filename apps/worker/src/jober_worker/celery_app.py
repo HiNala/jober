@@ -26,5 +26,9 @@ celery_app.conf.update(
             "task": "jober_worker.tasks.analytics_daily_rollup",
             "schedule": crontab(hour=2, minute=15),
         },
+        "analytics-retention-purge": {
+            "task": "jober_worker.tasks.analytics_retention_purge",
+            "schedule": crontab(hour=3, minute=30, day_of_week="sun"),
+        },
     },
 )

@@ -268,13 +268,21 @@ def rollup_analytics_day_sync(session: Session, day: date) -> dict[str, object]:
     return {"events_processed": len(events), "day": day.isoformat()}
 
 
+MIN_ANALYTICS_SESSION_ID_LEN = 8
+
+
 def server_session_id(
     *,
     user_id: uuid.UUID | None = None,
     run_id: uuid.UUID | None = None,
 ) -> str:
     if run_id is not None:
-        return f"run-{run_id}"
-    if user_id is not None:
-        return f"user-{user_id}"
-    return "server-system"
+        session_id = f"run-{run_id}"
+    elif user_id is not None:
+        session_id = f"user-{user_id}"
+    else:
+        session_id = "server-system"
+    if len(session_id) < MIN_ANALYTICS_SESSION_ID_LEN:
+        msg = f"analytics session_id must be at least {MIN_ANALYTICS_SESSION_ID_LEN} chars"
+        raise ValueError(msg)
+    return session_id

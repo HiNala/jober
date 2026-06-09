@@ -74,6 +74,17 @@ def batch_orchestrator_tick(batch_id: str | None = None) -> dict[str, object]:
     return run_orchestrator_tick(batch_id)
 
 
+@celery_app.task(name="jober_worker.tasks.analytics_retention_purge")
+def analytics_retention_purge() -> dict[str, object]:
+    from jober_api.services.analytics.retention import purge_stale_analytics_events_sync
+
+    from jober_worker.db import get_sync_session
+
+    with get_sync_session() as session:
+        result: dict[str, object] = purge_stale_analytics_events_sync(session)
+        return result
+
+
 @celery_app.task(name="jober_worker.tasks.analytics_daily_rollup")
 def analytics_daily_rollup(day: str | None = None) -> dict[str, object]:
     from datetime import UTC, date, datetime, timedelta
