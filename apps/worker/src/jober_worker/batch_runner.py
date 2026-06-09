@@ -61,9 +61,19 @@ async def _run_fixture_pipeline(
     job_target_id: uuid.UUID,
     html: str,
     platform: str,
+    run_id: uuid.UUID,
+    tenant_id: uuid.UUID,
+    batch_filters: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    from jober_api.models.enums import RunStatus
+    from jober_api.services.documents.generation_prefs import resolve_user_id_for_tenant
+    from jober_api.services.documents.run_documents import (
+        generate_documents_for_run,
+        should_generate_for_run,
+    )
     from jober_api.services.form_discovery.service import discover_from_fixture_html
     from jober_api.services.form_fill.service import fill_from_fixture_html
+    from jober_api.storage.minio_client import ObjectStorage
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
     engine = create_async_engine(worker_settings.database_url, connect_args={"ssl": False})
@@ -78,6 +88,36 @@ async def _run_fixture_pipeline(
             )
             await session.commit()
             attempt_id = uuid.UUID(discover.attempt_id)
+            user_id = await resolve_user_id_for_tenant(session, tenant_id)
+            run_row = await session.get(ApplicationRun, run_id)
+            checkpoint = dict(run_row.checkpoint_data or {}) if run_row else {}
+            should_gen, letter_options = await should_generate_for_run(
+                session,
+                tenant_id=tenant_id,
+                user_id=user_id,
+                batch_filters=batch_filters,
+                run_checkpoint=checkpoint,
+                job_target_id=job_target_id,
+                observations_attempt_id=attempt_id,
+            )
+            documents: dict[str, Any] | None = None
+            if should_gen and user_id is not None:
+                if run_row is not None:
+                    run_row.current_step = RunStatus.GENERATE_DOCUMENTS
+                    await session.flush()
+                storage = ObjectStorage()
+                documents = await generate_documents_for_run(
+                    session,
+                    storage,
+                    tenant_id=tenant_id,
+                    user_id=user_id,
+                    job_target_id=job_target_id,
+                    run_id=run_id,
+                    options=letter_options,
+                )
+                await session.commit()
+            else:
+                documents = {"skipped": True, "reason": "cover_letter_disabled_or_unneeded"}
             fill = await fill_from_fixture_html(
                 session,
                 job_target_id=job_target_id,
@@ -85,7 +125,11 @@ async def _run_fixture_pipeline(
                 observations_attempt_id=attempt_id,
             )
             await session.commit()
-            return {"discover": discover.model_dump(), "fill": fill}
+            return {
+                "discover": discover.model_dump(),
+                "documents": documents,
+                "fill": fill,
+            }
     finally:
         await engine.dispose()
 
@@ -119,6 +163,7 @@ def run_batch_item(item_id: uuid.UUID) -> dict[str, Any]:
             item.status = BatchItemStatus.RUNNING
             run = ApplicationRun(
                 id=run_id,
+                tenant_id=job.tenant_id,
                 job_target_id=job.id,
                 batch_id=batch.id,
                 status=RunStatus.QUEUED,
@@ -175,7 +220,14 @@ def run_batch_item(item_id: uuid.UUID) -> dict[str, Any]:
 
                 asyncio.run(_budget())
             pipeline = asyncio.run(
-                _run_fixture_pipeline(job_target_id=job.id, html=html, platform=platform)
+                _run_fixture_pipeline(
+                    job_target_id=job.id,
+                    html=html,
+                    platform=platform,
+                    run_id=run_id,
+                    tenant_id=job.tenant_id,
+                    batch_filters=dict(batch.filters or {}),
+                )
             )
             item.status = BatchItemStatus.SUCCEEDED
             run.status = RunStatus.SUCCEEDED
