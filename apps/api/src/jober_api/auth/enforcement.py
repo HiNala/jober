@@ -77,6 +77,10 @@ class RBACRouter(APIRouter):
         route_deps.insert(0, Depends(require_permission(perm)))
         mark_permission(perm, endpoint)
         super().add_api_route(path, endpoint, dependencies=route_deps, **kwargs)
+        if self.routes:
+            registered = self.routes[-1]
+            if isinstance(registered, APIRoute):
+                setattr(registered, RBAC_ATTR, perm)
 
 
 def _is_public_path(path: str) -> bool:
@@ -99,6 +103,18 @@ def _route_permission(route: APIRoute) -> Permission | None:
     return None
 
 
+def bind_route_permissions(app: Any) -> None:
+    """Copy handler permission tags onto APIRoute objects for middleware."""
+    for route in app.routes:
+        if not isinstance(route, APIRoute):
+            continue
+        if getattr(route, RBAC_ATTR, None) is not None:
+            continue
+        perm = _route_permission(route)
+        if perm is not None:
+            setattr(route, RBAC_ATTR, perm)
+
+
 def validate_rbac_coverage(app: Any) -> None:
     """Fail fast at startup if any protected /api route lacks a permission tag."""
     missing: list[str] = []
@@ -107,7 +123,7 @@ def validate_rbac_coverage(app: Any) -> None:
             continue
         if not route.path.startswith("/api") or _is_public_path(route.path):
             continue
-        if _route_permission(route) is None:
+        if getattr(route, RBAC_ATTR, None) is None:
             methods = ",".join(sorted(route.methods or []))
             missing.append(f"{methods} {route.path}")
     if missing:
@@ -130,7 +146,12 @@ class PermissionMiddleware(BaseHTTPMiddleware):
             route = request.scope.get("route")
             permission: Permission | None = None
             if isinstance(route, APIRoute):
-                permission = _route_permission(route)
+                route_perm = getattr(route, RBAC_ATTR, None)
+                permission = (
+                    cast(Permission, route_perm)
+                    if route_perm is not None
+                    else _route_permission(route)
+                )
             if permission is None:
                 return JSONResponse(
                     status_code=status.HTTP_403_FORBIDDEN,
