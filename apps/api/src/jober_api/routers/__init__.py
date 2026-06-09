@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from jober_api.routers.admin import audit_router as admin_audit_router
+from jober_api.routers.admin import router as admin_router
 from jober_api.routers.analytics import router as analytics_router
 from jober_api.routers.analytics_dashboard import router as analytics_dashboard_router
 from jober_api.routers.auth import router as auth_router
@@ -26,6 +28,8 @@ from jober_api.routers.verification import router as verification_router
 from jober_api.routers.webhooks import router as webhooks_router
 
 api_router = APIRouter(prefix="/api")
+api_router.include_router(admin_router)
+api_router.include_router(admin_audit_router)
 api_router.include_router(analytics_router)
 api_router.include_router(analytics_dashboard_router)
 api_router.include_router(auth_router)

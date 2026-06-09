@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     analytics_anon_rotation_days: int = 30
     analytics_internal_user_ids: str = ""
     analytics_retention_days: int = 365
+    admin_bootstrap_secret: str = ""
 
 
 settings = Settings()

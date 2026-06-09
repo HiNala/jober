@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from jober_api.auth.enforcement import PermissionMiddleware, validate_rbac_coverage
 from jober_api.auth.middleware import AuthMiddleware
 from jober_api.config import settings
 from jober_api.health import readiness_report
@@ -14,6 +15,7 @@ from jober_api.routers import api_router
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     validate_startup_secrets()
+    validate_rbac_coverage(_app)
     yield
 
 
@@ -27,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(AuthMiddleware)
+app.add_middleware(PermissionMiddleware)
 
 app.include_router(api_router)
 

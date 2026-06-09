@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import Depends, Query, Request, Response
 from jober_schemas.analytics_dashboard import FunnelDashboardRead, UserAnalyticsRead
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from jober_api.auth.admin import require_admin
+from jober_api.auth.enforcement import RBACRouter, require_permission, requires
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.services.analytics.dashboard import (
     get_admin_cost,
@@ -17,7 +18,9 @@ from jober_api.services.analytics.dashboard import (
     rows_to_csv,
 )
 
-router = APIRouter(prefix="/analytics", tags=["analytics-dashboard"])
+router = RBACRouter(
+    prefix="/analytics", tags=["analytics-dashboard"], permission=Permission.AUTHENTICATED
+)
 
 
 def _parse_date(value: date | None) -> date | None:
@@ -25,6 +28,7 @@ def _parse_date(value: date | None) -> date | None:
 
 
 @router.get("/me", response_model=UserAnalyticsRead)
+@requires(Permission.AUTHENTICATED)
 async def user_analytics(
     request: Request,
     session: AsyncSession = Depends(get_session),
@@ -44,6 +48,7 @@ async def user_analytics(
 
 
 @router.get("/me/export.csv")
+@requires(Permission.AUTHENTICATED)
 async def export_user_analytics_csv(
     request: Request,
     session: AsyncSession = Depends(get_session),
@@ -75,15 +80,18 @@ async def export_user_analytics_csv(
     )
 
 
-@router.get("/admin/funnel", response_model=FunnelDashboardRead)
+@router.get(
+    "/admin/funnel",
+    response_model=FunnelDashboardRead,
+    dependencies=[Depends(require_permission(Permission.ADMIN_ANALYTICS_READ))],
+)
+@requires(Permission.ADMIN_ANALYTICS_READ)
 async def admin_funnel(
-    request: Request,
     session: AsyncSession = Depends(get_session),
     start: date | None = Query(default=None),
     end: date | None = Query(default=None),
     compare_previous: bool = Query(default=False),
 ) -> dict[str, object]:
-    await require_admin(request, session)
     return await get_admin_funnel(
         session,
         start=_parse_date(start),
@@ -92,14 +100,16 @@ async def admin_funnel(
     )
 
 
-@router.get("/admin/funnel/export.csv")
+@router.get(
+    "/admin/funnel/export.csv",
+    dependencies=[Depends(require_permission(Permission.ADMIN_ANALYTICS_READ))],
+)
+@requires(Permission.ADMIN_ANALYTICS_READ)
 async def export_admin_funnel_csv(
-    request: Request,
     session: AsyncSession = Depends(get_session),
     start: date | None = Query(default=None),
     end: date | None = Query(default=None),
 ) -> Response:
-    await require_admin(request, session)
     data = await get_admin_funnel(session, start=_parse_date(start), end=_parse_date(end))
     body = rows_to_csv(data["steps"])
     return Response(
@@ -109,25 +119,29 @@ async def export_admin_funnel_csv(
     )
 
 
-@router.get("/admin/traffic")
+@router.get(
+    "/admin/traffic",
+    dependencies=[Depends(require_permission(Permission.ADMIN_ANALYTICS_READ))],
+)
+@requires(Permission.ADMIN_ANALYTICS_READ)
 async def admin_traffic(
-    request: Request,
     session: AsyncSession = Depends(get_session),
     start: date | None = Query(default=None),
     end: date | None = Query(default=None),
 ) -> dict[str, object]:
-    await require_admin(request, session)
     return await get_admin_traffic(session, start=_parse_date(start), end=_parse_date(end))
 
 
-@router.get("/admin/traffic/export.csv")
+@router.get(
+    "/admin/traffic/export.csv",
+    dependencies=[Depends(require_permission(Permission.ADMIN_ANALYTICS_READ))],
+)
+@requires(Permission.ADMIN_ANALYTICS_READ)
 async def export_admin_traffic_csv(
-    request: Request,
     session: AsyncSession = Depends(get_session),
     start: date | None = Query(default=None),
     end: date | None = Query(default=None),
 ) -> Response:
-    await require_admin(request, session)
     data = await get_admin_traffic(session, start=_parse_date(start), end=_parse_date(end))
     body = rows_to_csv(data["pages"])
     return Response(
@@ -137,25 +151,29 @@ async def export_admin_traffic_csv(
     )
 
 
-@router.get("/admin/cost")
+@router.get(
+    "/admin/cost",
+    dependencies=[Depends(require_permission(Permission.ADMIN_ANALYTICS_READ))],
+)
+@requires(Permission.ADMIN_ANALYTICS_READ)
 async def admin_cost(
-    request: Request,
     session: AsyncSession = Depends(get_session),
     start: date | None = Query(default=None),
     end: date | None = Query(default=None),
 ) -> dict[str, object]:
-    await require_admin(request, session)
     return await get_admin_cost(session, start=_parse_date(start), end=_parse_date(end))
 
 
-@router.get("/admin/cost/export.csv")
+@router.get(
+    "/admin/cost/export.csv",
+    dependencies=[Depends(require_permission(Permission.ADMIN_ANALYTICS_READ))],
+)
+@requires(Permission.ADMIN_ANALYTICS_READ)
 async def export_admin_cost_csv(
-    request: Request,
     session: AsyncSession = Depends(get_session),
     start: date | None = Query(default=None),
     end: date | None = Query(default=None),
 ) -> Response:
-    await require_admin(request, session)
     data = await get_admin_cost(session, start=_parse_date(start), end=_parse_date(end))
     body = rows_to_csv(data["rows"])
     return Response(

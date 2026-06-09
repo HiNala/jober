@@ -1,3 +1,4 @@
+from jober_api.models.admin_audit_log import AdminAuditLog
 from jober_api.models.analytics import (
     AnalyticsDailyActiveUsers,
     AnalyticsDailyCost,
@@ -34,6 +35,7 @@ from jober_api.models.user_profile import UserProfile
 from jober_api.models.user_provider_key import UserProviderKey
 
 __all__ = [
+    "AdminAuditLog",
     "AnalyticsDailyActiveUsers",
     "AnalyticsDailyCost",
     "AnalyticsDailyFunnel",

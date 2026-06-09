@@ -124,3 +124,11 @@ class AuditAction(StrEnum):
     BATCH_CREATED = "batch_created"
     AUTO_SUBMIT_OPT_IN = "auto_submit_opt_in"
     SUBSCRIPTION_CHANGED = "subscription_changed"
+
+
+class AdminAuditAction(StrEnum):
+    BOOTSTRAP_ADMIN = "bootstrap_admin"
+    ROLE_CHANGED = "role_changed"
+    USER_SUSPENDED = "user_suspended"
+    USER_ACTIVATED = "user_activated"
+    ADMIN_DATA_ACCESS = "admin_data_access"
