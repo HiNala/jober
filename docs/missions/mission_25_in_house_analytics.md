@@ -39,4 +39,4 @@
 - [x] Fixture-for-bug — `test_server_session_id_fallback_meets_schema_min_length`
 
 ## CI
-Green on [27183550612](https://github.com/HiNala/jober/actions/runs/27183550612) (`ce05191`); M99 commits follow.
+Green on [27184269887](https://github.com/HiNala/jober/actions/runs/27184269887) (`48f9ad4`).

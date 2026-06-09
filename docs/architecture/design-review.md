@@ -798,7 +798,7 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `purge_stale_analytics_events` + weekly Celery job | `ANALYTICS_RETENTION_DAYS` was config-only; privacy retention now enforced |
 | `test_purge_stale_analytics_events` | Fixture for retention purge |
 
-**CI:** [run 27183550612](https://github.com/HiNala/jober/actions/runs/27183550612) (pre-M99 docs); M99 commits pending.
+**CI:** [run 27184269887](https://github.com/HiNala/jober/actions/runs/27184269887) (backend + web + policy + quarantine green on `48f9ad4`).
 
 ---
 
