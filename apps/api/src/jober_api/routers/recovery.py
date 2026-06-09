@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from jober_schemas.recovery import FailureAnalyticsRead, FailureReportRead
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant, require_run_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.recovery.service import (
@@ -16,7 +18,7 @@ from jober_api.services.recovery.service import (
     resume_from_checkpoint,
 )
 
-router = APIRouter(tags=["recovery"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, tags=["recovery"])
 
 
 @router.post("/job-targets/{job_target_id}/recovery-fill")

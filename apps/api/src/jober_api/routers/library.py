@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.services.library import service as library_service
 
-router = APIRouter(prefix="/library", tags=["library"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/library", tags=["library"])
 
 
 @router.get("/resumes")

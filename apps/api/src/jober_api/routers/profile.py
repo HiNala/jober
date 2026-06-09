@@ -4,10 +4,12 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.repositories.profile_common_answer import ProfileCommonAnswerRepository
 from jober_api.repositories.resume_asset import ResumeAssetRepository
@@ -17,7 +19,7 @@ from jober_api.vault.completeness import compute_completeness_score
 from jober_api.vault.field_registry import DEFAULT_COMMON_ANSWERS, SENSITIVE_EEO_KEYS
 from jober_api.vault.sensitive_store import merge_sensitive_answers
 
-router = APIRouter(prefix="/profile", tags=["profile"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/profile", tags=["profile"])
 
 _PUBLIC_PATCH_KEYS = {
     "name",

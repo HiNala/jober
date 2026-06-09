@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
+from fastapi import Depends, File, HTTPException, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
@@ -13,7 +15,7 @@ from jober_api.serializers.profile import serialize_resume
 from jober_api.services.resume_service import upload_resume
 from jober_api.storage.minio_client import ObjectStorage
 
-router = APIRouter(prefix="/resumes", tags=["resumes"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/resumes", tags=["resumes"])
 
 
 def get_storage() -> ObjectStorage:

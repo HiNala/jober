@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from jober_schemas.enums import RunPolicy
 from jober_schemas.verification import ReviewPackageRead, SubmitResultRead, VerifyReadyRead
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant, require_run_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.verification.service import (
@@ -20,7 +22,7 @@ from jober_api.services.verification.service import (
     verify_ready_from_fixture,
 )
 
-router = APIRouter(tags=["verification"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, tags=["verification"])
 
 
 @router.post("/job-targets/{job_target_id}/verify-ready", response_model=VerifyReadyRead)

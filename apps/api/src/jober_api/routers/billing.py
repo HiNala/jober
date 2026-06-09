@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.services.billing.usage import usage_dashboard
 
-router = APIRouter(prefix="/billing", tags=["billing"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/billing", tags=["billing"])
 
 
 @router.get("/usage")

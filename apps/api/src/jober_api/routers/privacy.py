@@ -4,11 +4,13 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.models.enums import JobTargetStatus, RunStatus
 from jober_api.services.privacy.retention import (
@@ -18,7 +20,7 @@ from jober_api.services.privacy.retention import (
     purge_run,
 )
 
-router = APIRouter(prefix="/privacy", tags=["privacy"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/privacy", tags=["privacy"])
 
 
 class CleanupRequest(BaseModel):

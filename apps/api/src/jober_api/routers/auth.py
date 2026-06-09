@@ -8,9 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.cookies import clear_auth_cookies, set_auth_cookies
 from jober_api.auth.csrf import verify_csrf
+from jober_api.auth.enforcement import requires
 from jober_api.auth.middleware import require_auth
 from jober_api.auth.oauth.state_store import consume_oauth_state
 from jober_api.auth.oauth.types import OAuthIntent
+from jober_api.auth.permissions import Permission
 from jober_api.auth.rate_limit import check_rate_limit
 from jober_api.auth.sessions import (
     create_session,
@@ -113,6 +115,7 @@ async def login(
     return auth_service.user_to_response(user, tenant)
 
 
+@requires(Permission.AUTHENTICATED)
 @router.post("/logout", response_model=AuthMessageResponse)
 async def logout(request: Request, response: Response) -> AuthMessageResponse:
     pair = await _session_from_request(request)
@@ -123,6 +126,7 @@ async def logout(request: Request, response: Response) -> AuthMessageResponse:
     return AuthMessageResponse(message="Signed out")
 
 
+@requires(Permission.AUTHENTICATED)
 @router.post("/logout-all", response_model=AuthMessageResponse)
 async def logout_all(
     request: Request,
@@ -141,6 +145,7 @@ async def logout_all(
     return AuthMessageResponse(message="Signed out everywhere")
 
 
+@requires(Permission.AUTHENTICATED)
 @router.get("/me", response_model=AuthUserResponse)
 async def me(
     request: Request,
@@ -196,6 +201,7 @@ async def reset_password(
     return AuthMessageResponse(message="Password updated")
 
 
+@requires(Permission.AUTHENTICATED)
 @router.post("/change-password", response_model=AuthMessageResponse)
 async def change_password(
     body: ChangePasswordRequest,
@@ -213,6 +219,7 @@ async def change_password(
     return AuthMessageResponse(message="Password changed")
 
 
+@requires(Permission.AUTHENTICATED)
 @router.get("/sessions", response_model=SessionListResponse)
 async def list_sessions(request: Request) -> SessionListResponse:
     auth = require_auth(request)
@@ -220,6 +227,7 @@ async def list_sessions(request: Request) -> SessionListResponse:
     return SessionListResponse(active_sessions=len(ids), session_ids=ids)
 
 
+@requires(Permission.AUTHENTICATED)
 @router.get("/totp/setup", response_model=TotpSetupResponse)
 async def totp_setup() -> TotpSetupResponse:
     return TotpSetupResponse(
@@ -254,6 +262,7 @@ async def google_oauth_start(
     return RedirectResponse(start.authorization_url, status_code=status.HTTP_302_FOUND)
 
 
+@requires(Permission.AUTHENTICATED)
 @router.get("/google/link/start")
 async def google_link_start(
     request: Request,
@@ -324,6 +333,7 @@ async def google_confirm_link(
     return user_response
 
 
+@requires(Permission.AUTHENTICATED)
 @router.get("/identities", response_model=IdentityListResponse)
 async def list_identities(
     request: Request,
@@ -334,6 +344,7 @@ async def list_identities(
     return IdentityListResponse(items=items)
 
 
+@requires(Permission.AUTHENTICATED)
 @router.delete("/identities/{provider}", response_model=AuthMessageResponse)
 async def unlink_identity(
     provider: str,

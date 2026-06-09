@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.job_extraction.service import (
@@ -15,7 +17,9 @@ from jober_api.services.job_extraction.service import (
     get_cached_extraction,
 )
 
-router = APIRouter(prefix="/job-targets", tags=["job-extraction"])
+router = RBACRouter(
+    permission=Permission.AUTHENTICATED, prefix="/job-targets", tags=["job-extraction"]
+)
 
 
 @router.get("/{job_target_id}/job-profile")

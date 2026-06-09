@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant, require_observation_for_tenant
 from jober_api.db.session import get_session
 from jober_api.models.enums import FieldObservationStatus
@@ -15,7 +17,9 @@ from jober_api.services.form_discovery.service import (
     update_field_observation,
 )
 
-router = APIRouter(prefix="/job-targets", tags=["form-discovery"])
+router = RBACRouter(
+    permission=Permission.AUTHENTICATED, prefix="/job-targets", tags=["form-discovery"]
+)
 
 
 @router.post("/{job_target_id}/discover-form")

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.models.enums import AuditAction, RunPolicy
 from jober_api.models.tenant import Tenant
@@ -15,7 +17,7 @@ from jober_api.repositories.user_provider_key import UserProviderKeyRepository
 from jober_api.services.audit.service import record_audit
 from jober_api.services.preferences.defaults import deep_merge, merged_preferences
 
-router = APIRouter(prefix="/settings", tags=["settings"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/settings", tags=["settings"])
 
 _ALLOWED_PROVIDERS = frozenset({"openai", "anthropic"})
 

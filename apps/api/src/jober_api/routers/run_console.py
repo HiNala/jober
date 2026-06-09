@@ -4,7 +4,7 @@ import uuid
 from collections.abc import AsyncIterator
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from jober_schemas.run_console import (
     CheckpointResolveRead,
@@ -15,7 +15,9 @@ from jober_schemas.run_console import (
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import async_session_factory, get_session
 from jober_api.privacy.browser_state import save_run_storage_state
 from jober_api.repositories.application_run import ApplicationRunRepository
@@ -27,7 +29,7 @@ from jober_api.services.console.service import (
     stream_run_events,
 )
 
-router = APIRouter(tags=["run-console"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, tags=["run-console"])
 
 
 @router.get("/console/recent-events")

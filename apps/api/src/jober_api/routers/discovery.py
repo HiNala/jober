@@ -3,15 +3,17 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.services.discovery import service as discovery_service
 
-router = APIRouter(prefix="/discovery", tags=["discovery"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/discovery", tags=["discovery"])
 
 
 class DiscoverySearchBody(BaseModel):

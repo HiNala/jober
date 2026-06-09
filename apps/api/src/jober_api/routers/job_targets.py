@@ -1,16 +1,20 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.models.enums import JobTargetStatus
 from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.serializers.job_target import serialize_job_target
 
-router = APIRouter(prefix="/job-targets", tags=["job-targets"])
+router = RBACRouter(
+    permission=Permission.AUTHENTICATED, prefix="/job-targets", tags=["job-targets"]
+)
 
 
 @router.get("")

@@ -1,14 +1,16 @@
 from zipfile import BadZipFile
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
+from fastapi import Depends, File, HTTPException, Query, Request, UploadFile, status
 from openpyxl.utils.exceptions import InvalidFileException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.services.xlsx.import_service import import_jobs_workbook
 
-router = APIRouter(prefix="/imports", tags=["imports"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/imports", tags=["imports"])
 
 
 @router.post("/jobs-xlsx")

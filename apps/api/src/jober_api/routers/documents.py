@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.models.generated_document import GeneratedDocument
@@ -25,7 +27,7 @@ from jober_api.services.documents.letter_styles import LETTER_TEMPLATES, VOICE_P
 from jober_api.services.llm.gateway import BudgetExceededError
 from jober_api.storage.minio_client import ObjectStorage
 
-router = APIRouter(prefix="/documents", tags=["documents"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/documents", tags=["documents"])
 
 
 def get_storage() -> ObjectStorage:

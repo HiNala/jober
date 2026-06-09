@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.models.job_list import JobList, JobListItem
@@ -15,7 +17,7 @@ from jober_api.services.analytics.collector import emit_server_event
 from jober_api.services.analytics.rollups import server_session_id
 from jober_api.services.library.service import serialize_job_list
 
-router = APIRouter(prefix="/job-lists", tags=["job-lists"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/job-lists", tags=["job-lists"])
 
 
 class JobListCreate(BaseModel):

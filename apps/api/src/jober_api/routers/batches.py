@@ -4,10 +4,12 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.config import settings
 from jober_api.db.session import get_session
 from jober_api.repositories.application_run import ApplicationRunRepository
@@ -30,7 +32,7 @@ from jober_api.services.batch.service import (
 )
 from jober_api.services.llm.gateway import BudgetExceededError
 
-router = APIRouter(tags=["batches"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, tags=["batches"])
 
 
 @router.get("/dashboard/summary")

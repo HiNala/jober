@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
+from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
 from jober_api.services.form_fill.service import (
@@ -14,7 +16,7 @@ from jober_api.services.form_fill.service import (
     fill_from_fixture_html,
 )
 
-router = APIRouter(prefix="/job-targets", tags=["form-fill"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/job-targets", tags=["form-fill"])
 
 
 @router.post("/{job_target_id}/fill-form")

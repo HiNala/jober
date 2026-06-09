@@ -1,8 +1,9 @@
-from fastapi import APIRouter
 
+from jober_api.auth.enforcement import RBACRouter
+from jober_api.auth.permissions import Permission
 from jober_api.config import settings
 
-router = APIRouter(tags=["llm"])
+router = RBACRouter(permission=Permission.AUTHENTICATED, tags=["llm"])
 
 
 @router.get("/llm/config")
