@@ -61,6 +61,7 @@ async def _auth_from_session_cookie(request: Request, session: AsyncSession) -> 
         tenant_id=tenant.id,
         email=user.email,
         plan=tenant.plan,
+        role=user.role,
     )
 
 
@@ -87,6 +88,7 @@ async def _auth_from_dev_headers(request: Request, session: AsyncSession) -> Aut
         tenant_id=tenant.id,
         email=user.email,
         plan=tenant.plan,
+        role=user.role,
     )
 
 
@@ -129,4 +131,5 @@ async def _auth_from_clerk_jwt(request: Request, session: AsyncSession) -> AuthC
         tenant_id=tenant.id,
         email=user.email or email,
         plan=tenant.plan,
+        role=user.role,
     )
