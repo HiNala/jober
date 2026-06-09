@@ -809,6 +809,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 30 — Marketing site (features, pricing, legal, SEO)
+
+**Scope:** `/features`, `/pricing`, `/faq`, `/how-it-works`, legal pages, `/blog`, consent + UTM.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Shared shell; FAQ uses native details, no widget soup |
+| Kare | 2 | FAQ answers auto-submit/CAPTCHA straight; draft legal banners |
+| Norman | 2 | Footer + nav cover all public routes; skip link retained |
+| Nielsen | 2 | Pricing table scannable; entitlements match Settings |
+| Tufte | 2 | Plan limits as numbers, not vanity metrics |
+| Vignelli | 2 | One grid/tokens across marketing set |
+| Rand | 2 | Consistent voice vs landing; trust-forward features |
+| Maeda | 2 | Motion vocabulary unchanged; blog is calm |
+| Wroblewski | 2 | Mobile nav shows Features + Pricing; FAQ accordion |
+| Ive | 2 | Consent links to privacy; UTM persists for funnel |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 29) — improvements logged
 
 | Change | Why |
