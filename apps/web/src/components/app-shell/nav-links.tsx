@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { useAuth } from "@/contexts/auth-context";
+import { isAdmin } from "@/lib/auth/permissions";
 import {
   BarChart3,
   BookOpen,
@@ -10,6 +13,7 @@ import {
   ListTodo,
   Search,
   Settings,
+  Shield,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,10 +41,18 @@ export function NavLinks({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const nav = isAdmin(user)
+    ? [
+        ...APP_NAV.slice(0, 6),
+        { href: "/admin/users", label: "Admin", icon: Shield },
+        ...APP_NAV.slice(6),
+      ]
+    : APP_NAV;
 
   return (
     <>
-      {APP_NAV.map(({ href, label, icon: Icon }) => {
+      {nav.map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Link

@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { isAdmin } from "@/lib/auth/permissions";
 import { AdminAnalyticsPanel } from "@/components/analytics/admin-analytics-panel";
 import { UserAnalyticsPanel } from "@/components/analytics/user-analytics-panel";
 import { spacing } from "@/lib/design/tokens";
@@ -11,7 +12,7 @@ type Tab = "mine" | "admin";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const showAdmin = isAdmin(user);
   const [tab, setTab] = useState<Tab>("mine");
 
   return (
@@ -23,7 +24,7 @@ export default function AnalyticsPage() {
         </p>
       </div>
 
-      {isAdmin ? (
+      {showAdmin ? (
         <div className="flex gap-2" role="tablist" aria-label="Analytics views">
           <button
             type="button"
@@ -52,7 +53,7 @@ export default function AnalyticsPage() {
         </div>
       ) : null}
 
-      {tab === "admin" && isAdmin ? <AdminAnalyticsPanel /> : <UserAnalyticsPanel />}
+      {tab === "admin" && showAdmin ? <AdminAnalyticsPanel /> : <UserAnalyticsPanel />}
     </div>
   );
 }

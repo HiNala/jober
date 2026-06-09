@@ -12,6 +12,7 @@ const TITLES: Record<string, string> = {
   "/library": "Library",
   "/search": "Search",
   "/analytics": "Analytics",
+  "/admin/users": "Admin users",
   "/settings": "Settings",
 };
 
