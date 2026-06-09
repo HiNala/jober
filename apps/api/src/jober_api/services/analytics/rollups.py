@@ -259,7 +259,7 @@ async def rollup_analytics_day(session: AsyncSession, day: date) -> dict[str, ob
     return {"events_processed": len(events), "day": day.isoformat()}
 
 
-def rollup_analytics_day_sync(session: Session, day: date) -> dict[str, int]:
+def rollup_analytics_day_sync(session: Session, day: date) -> dict[str, object]:
     start, end = _day_bounds(day)
     events = _fetch_events_sync(session, start, end)
     _upsert_product_rollups_sync(session, day, events)
