@@ -64,7 +64,6 @@ def upgrade() -> None:
         sa.Column("unique_users", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("unique_sessions", sa.Integer(), nullable=False, server_default="0"),
         sa.PrimaryKeyConstraint("day", "step"),
-        sa.UniqueConstraint("day", "step", name="uq_analytics_daily_funnel_day_step"),
     )
 
     op.create_table(
@@ -76,7 +75,6 @@ def upgrade() -> None:
         sa.Column("total_time_on_page_sec", sa.Float(), nullable=False, server_default="0"),
         sa.Column("bounces", sa.Integer(), nullable=False, server_default="0"),
         sa.PrimaryKeyConstraint("day", "page"),
-        sa.UniqueConstraint("day", "page", name="uq_analytics_daily_page_day_page"),
     )
 
     op.create_table(
@@ -100,13 +98,6 @@ def upgrade() -> None:
         sa.Column("llm_call_count", sa.Integer(), nullable=False, server_default="0"),
         sa.ForeignKeyConstraint(["tenant_id"], ["tenants.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("day", "tenant_id", "agent_role", "model"),
-        sa.UniqueConstraint(
-            "day",
-            "tenant_id",
-            "agent_role",
-            "model",
-            name="uq_analytics_daily_cost_day_tenant_agent_model",
-        ),
     )
 
 

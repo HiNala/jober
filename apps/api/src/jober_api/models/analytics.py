@@ -13,7 +13,6 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
-    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -68,7 +67,6 @@ class AnalyticsEvent(Base, UUIDPrimaryKeyMixin):
 
 class AnalyticsDailyFunnel(Base):
     __tablename__ = "analytics_daily_funnel"
-    __table_args__ = (UniqueConstraint("day", "step", name="uq_analytics_daily_funnel_day_step"),)
 
     day: Mapped[date] = mapped_column(Date, primary_key=True)
     step: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -79,7 +77,6 @@ class AnalyticsDailyFunnel(Base):
 
 class AnalyticsDailyPage(Base):
     __tablename__ = "analytics_daily_page"
-    __table_args__ = (UniqueConstraint("day", "page", name="uq_analytics_daily_page_day_page"),)
 
     day: Mapped[date] = mapped_column(Date, primary_key=True)
     page: Mapped[str] = mapped_column(String(2048), primary_key=True)
@@ -100,15 +97,6 @@ class AnalyticsDailyActiveUsers(Base):
 
 class AnalyticsDailyCost(Base):
     __tablename__ = "analytics_daily_cost"
-    __table_args__ = (
-        UniqueConstraint(
-            "day",
-            "tenant_id",
-            "agent_role",
-            "model",
-            name="uq_analytics_daily_cost_day_tenant_agent_model",
-        ),
-    )
 
     day: Mapped[date] = mapped_column(Date, primary_key=True)
     tenant_id: Mapped[uuid.UUID] = mapped_column(
