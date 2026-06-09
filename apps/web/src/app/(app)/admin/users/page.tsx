@@ -13,8 +13,10 @@ import {
   updateAdminUserStatus,
 } from "@/lib/api/admin";
 import { useAuth } from "@/contexts/auth-context";
+import { formatApiError } from "@/lib/api/errors";
 import { surface, spacing } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 function AdminUsersPanel() {
   const { user: me } = useAuth();
@@ -29,6 +31,7 @@ function AdminUsersPanel() {
       void queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       void queryClient.invalidateQueries({ queryKey: ["admin-audit"] });
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not update role")),
   });
 
   const statusMutation = useMutation({
@@ -38,6 +41,7 @@ function AdminUsersPanel() {
       void queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       void queryClient.invalidateQueries({ queryKey: ["admin-audit"] });
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not update status")),
   });
 
   if (users.isLoading) return <PageLoading label="Loading users…" />;
