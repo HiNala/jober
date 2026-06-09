@@ -11,6 +11,7 @@ const TITLES: Record<string, string> = {
   "/discover": "Discover",
   "/library": "Library",
   "/search": "Search",
+  "/analytics": "Analytics",
   "/settings": "Settings",
 };
 

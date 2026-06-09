@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BarChart3,
   BookOpen,
   Compass,
   LayoutDashboard,
@@ -24,6 +25,7 @@ export const APP_NAV: {
   { href: "/discover", label: "Discover", icon: Compass },
   { href: "/library", label: "Library", icon: BookOpen },
   { href: "/search", label: "Search", icon: Search },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
