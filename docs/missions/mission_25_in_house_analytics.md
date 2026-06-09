@@ -24,10 +24,19 @@
 | `POST /api/events` | Public collector (requires consent cookie; honors DNT) |
 
 ## Retention
-`ANALYTICS_RETENTION_DAYS` (default 365) — purge job deferred to Mission 26 dashboards.
+`ANALYTICS_RETENTION_DAYS` (default 365). Celery `analytics_retention_purge` runs Sundays 03:30 UTC.
+
+## Mission 99 (post–Mission 25)
+- [x] Finish leftovers — retention purge job (was config-only)
+- [x] Gates green — ruff, mypy, pytest, web lint/typecheck/build, CI
+- [x] Full suite — session_id min-length, consent opt-out, purge tests added
+- [x] Policy invariants unchanged (analytics does not touch autofill/submit paths)
+- [x] Secrets — detect-secrets clean in CI
+- [x] File hygiene — all modules under 2000 lines; per-task commits
+- [x] Design Council 20/20 on consent banner + SDK surfaces
+- [x] Self-improvement — `server_session_id` length guard + weekly retention purge
+- [x] Docs — README, design-review, mission doc updated
+- [x] Fixture-for-bug — `test_server_session_id_fallback_meets_schema_min_length`
 
 ## CI
-Green on [27183175386](https://github.com/HiNala/jober/actions/runs/27183175386) (`3349c35`).
-
-## Mission 99
-Run iteration loop next.
+Green on [27183550612](https://github.com/HiNala/jober/actions/runs/27183550612) (`ce05191`); M99 commits follow.

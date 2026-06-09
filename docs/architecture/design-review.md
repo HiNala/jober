@@ -767,6 +767,41 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 25 — First-party analytics (consent + SDK)
+
+**Scope:** Analytics consent banner, client SDK, first-party collector UX.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Opt-in only; decline dismisses; no third-party scripts |
+| Kare | 2 | Plain-language first-party disclosure |
+| Norman | 2 | `role="dialog"` + labeled actions |
+| Nielsen | 2 | Allow / Decline; fixed bottom card, non-blocking |
+| Tufte | 2 | No metrics chrome on marketing surfaces |
+| Vignelli | 2 | `surface.card` matches app tokens |
+| Rand | 2 | Distinct from auth forms but cohesive |
+| Maeda | 2 | Tracking off until explicit allow |
+| Wroblewski | 2 | Banner wraps; `sm:left-auto` on wide screens |
+| Ive | 2 | sendBeacon path; UI never awaits analytics |
+
+**Total: 20/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 25) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `MIN_ANALYTICS_SESSION_ID_LEN` + `server_session_id()` guard | CI caught `"server"` (6 chars) breaking Pydantic min_length=8 on letter generate |
+| `test_server_session_id_fallback_meets_schema_min_length` | Regression lock for server emitter session ids |
+| `test_consent_opt_out_suppresses_tracking` | Explicit `consent=0` path was untested |
+| `purge_stale_analytics_events` + weekly Celery job | `ANALYTICS_RETENTION_DAYS` was config-only; privacy retention now enforced |
+| `test_purge_stale_analytics_events` | Fixture for retention purge |
+
+**CI:** [run 27183550612](https://github.com/HiNala/jober/actions/runs/27183550612) (pre-M99 docs); M99 commits pending.
+
+---
+
 ## Mission 99 (post–Mission 24) — improvements logged
 
 | Change | Why |
