@@ -22,8 +22,9 @@ export type AdminAuditEntry = {
   created_at: string;
 };
 
-export function fetchAdminUsers(): Promise<{ items: AdminUser[] }> {
-  return apiFetch("/api/admin/users");
+export function fetchAdminUsers(q?: string): Promise<{ items: AdminUser[] }> {
+  const query = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
+  return apiFetch(`/api/admin/users${query}`);
 }
 
 export function updateAdminUserRole(userId: string, role: "user" | "admin"): Promise<{ role: string }> {

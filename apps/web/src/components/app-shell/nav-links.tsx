@@ -45,7 +45,7 @@ export function NavLinks({
   const nav = isAdmin(user)
     ? [
         ...APP_NAV.slice(0, 6),
-        { href: "/admin/users", label: "Admin", icon: Shield },
+        { href: "/admin", label: "Admin", icon: Shield },
         ...APP_NAV.slice(6),
       ]
     : APP_NAV;

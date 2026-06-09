@@ -4,7 +4,9 @@ export type Permission =
   | "authenticated"
   | "admin:analytics:read"
   | "admin:users:manage"
-  | "admin:audit:read";
+  | "admin:audit:read"
+  | "admin:ops:read"
+  | "admin:config:manage";
 
 const ROLE_PERMISSIONS: Record<string, ReadonlySet<Permission>> = {
   user: new Set(["authenticated"]),
@@ -13,6 +15,8 @@ const ROLE_PERMISSIONS: Record<string, ReadonlySet<Permission>> = {
     "admin:analytics:read",
     "admin:users:manage",
     "admin:audit:read",
+    "admin:ops:read",
+    "admin:config:manage",
   ]),
 };
 

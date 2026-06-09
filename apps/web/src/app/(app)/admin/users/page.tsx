@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-import { AdminRouteGuard } from "@/components/auth/admin-route-guard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageError, PageLoading } from "@/components/states/page-states";
@@ -12,17 +12,29 @@ import {
   updateAdminUserRole,
   updateAdminUserStatus,
 } from "@/lib/api/admin";
+import { fetchUserOperational } from "@/lib/api/admin-dashboard";
 import { useAuth } from "@/contexts/auth-context";
 import { formatApiError } from "@/lib/api/errors";
 import { surface, spacing } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-function AdminUsersPanel() {
+export default function AdminUsersPage() {
   const { user: me } = useAuth();
   const queryClient = useQueryClient();
-  const users = useQuery({ queryKey: ["admin-users"], queryFn: fetchAdminUsers });
+  const [search, setSearch] = useState("");
+  const [supportUserId, setSupportUserId] = useState<string | null>(null);
+
+  const users = useQuery({
+    queryKey: ["admin-users", search],
+    queryFn: () => fetchAdminUsers(search || undefined),
+  });
   const audit = useQuery({ queryKey: ["admin-audit"], queryFn: fetchAdminAuditLog });
+  const support = useQuery({
+    queryKey: ["admin-support", supportUserId],
+    queryFn: () => fetchUserOperational(supportUserId!),
+    enabled: Boolean(supportUserId),
+  });
 
   const roleMutation = useMutation({
     mutationFn: ({ id, role }: { id: string; role: "user" | "admin" }) =>
@@ -52,11 +64,20 @@ function AdminUsersPanel() {
   return (
     <div className={cn(spacing.section)}>
       <div>
-        <h1 className="text-lg font-semibold tracking-tight">Admin — users</h1>
+        <h1 className="text-lg font-semibold tracking-tight">Users</h1>
         <p className="text-sm text-muted-foreground">
-          Operational directory only (email, role, status). Vault and job data stay tenant-scoped.
+          Operational directory only. Support view is audited and excludes vault content.
         </p>
       </div>
+
+      <input
+        type="search"
+        placeholder="Search email or name…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full max-w-md rounded-md border border-input bg-background px-3 py-2 text-sm"
+        aria-label="Search users"
+      />
 
       <Card className={surface.card}>
         <CardHeader>
@@ -67,6 +88,7 @@ function AdminUsersPanel() {
             <thead>
               <tr className="text-left text-muted-foreground">
                 <th className="py-1">Email</th>
+                <th className="py-1">Plan</th>
                 <th className="py-1">Role</th>
                 <th className="py-1">Status</th>
                 <th className="py-1">Actions</th>
@@ -76,10 +98,18 @@ function AdminUsersPanel() {
               {users.data.items.map((row) => (
                 <tr key={row.id} className="border-t border-border/40">
                   <td className="py-2">{row.email}</td>
+                  <td className="py-2 capitalize">{row.plan}</td>
                   <td className="py-2 capitalize">{row.role}</td>
                   <td className="py-2 capitalize">{row.status}</td>
                   <td className="py-2">
                     <div className="flex flex-wrap gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSupportUserId(row.id)}
+                      >
+                        Support
+                      </Button>
                       {row.id !== me?.id && row.role === "user" ? (
                         <Button
                           size="sm"
@@ -129,13 +159,30 @@ function AdminUsersPanel() {
         </CardContent>
       </Card>
 
+      {supportUserId && support.data ? (
+        <Card className={surface.card}>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium">Support view (audited)</CardTitle>
+            <Button size="sm" variant="ghost" onClick={() => setSupportUserId(null)}>
+              Close
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-3 text-xs text-muted-foreground">{support.data.privacy_note}</p>
+            <pre className="overflow-x-auto rounded-md bg-muted/50 p-3 text-xs">
+              {JSON.stringify(support.data, null, 2)}
+            </pre>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <Card className={surface.card}>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">Admin audit log</CardTitle>
+          <CardTitle className="text-sm font-medium">Recent admin actions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-xs">
           {audit.isLoading ? <p className="text-muted-foreground">Loading audit…</p> : null}
-          {audit.data?.items.map((entry) => (
+          {audit.data?.items.slice(0, 15).map((entry) => (
             <p key={entry.id} className="border-b border-border/30 py-1 text-muted-foreground">
               <span className="text-foreground">{entry.created_at.slice(0, 19)}</span> —{" "}
               {entry.message}
@@ -144,13 +191,5 @@ function AdminUsersPanel() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-export default function AdminUsersPage() {
-  return (
-    <AdminRouteGuard>
-      <AdminUsersPanel />
-    </AdminRouteGuard>
   );
 }
