@@ -30,7 +30,10 @@ export default function AdminUsersPage() {
     queryKey: ["admin-users", search],
     queryFn: () => fetchAdminUsers(search || undefined),
   });
-  const audit = useQuery({ queryKey: ["admin-audit"], queryFn: fetchAdminAuditLog });
+  const audit = useQuery({
+    queryKey: ["admin-audit"],
+    queryFn: () => fetchAdminAuditLog({ limit: 15 }),
+  });
   const support = useQuery({
     queryKey: ["admin-support", supportUserId],
     queryFn: () => fetchUserOperational(supportUserId!),
