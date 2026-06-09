@@ -151,6 +151,26 @@ async def test_generate_cover_letter_budget_exceeded_returns_402(
 
 
 @pytest.mark.asyncio
+async def test_letter_options_lists_templates_and_voices(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.get("/api/documents/letter-options")
+            assert response.status_code == 200
+            body = response.json()
+            assert "classic" in body["templates"]
+            assert "direct" in body["voice_presets"]
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_generate_cover_letter_without_resume_returns_422(
     db_session,
     truncate_tables,

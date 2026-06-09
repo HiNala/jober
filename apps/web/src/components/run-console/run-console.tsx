@@ -15,6 +15,7 @@ import { useRunStream } from "@/hooks/useRunStream";
 import { ArtifactLinks } from "./artifact-links";
 import { CheckpointCard } from "./checkpoint-card";
 import { EventTerminal } from "./event-terminal";
+import { RunLetterOptions } from "./run-letter-options";
 import { StateTimeline } from "./state-timeline";
 
 export interface RunConsoleProps {
@@ -111,6 +112,7 @@ export function RunConsole({ runId }: RunConsoleProps) {
             selectedSeq={selectedTimelineSeq}
             onSelectSeq={setSelectedTimelineSeq}
           />
+          <RunLetterOptions runId={runId} snapshot={snapshot} />
           <CheckpointCard runId={runId} snapshot={snapshot} />
           <ArtifactLinks artifacts={snapshot.artifacts} />
         </div>

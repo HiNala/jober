@@ -1,13 +1,15 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Lock, LockOpen } from "lucide-react";
+import { Copy, Lock, LockOpen } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   coverLetterPdfUrl,
+  duplicateLibraryCoverLetter,
   fetchLibraryCoverLetters,
   lockCoverLetterTemplate,
 } from "@/lib/api/library";
@@ -28,6 +30,15 @@ export function LibraryCoverLetters() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["library", "cover-letters"] });
     },
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: (id: string) => duplicateLibraryCoverLetter(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["library", "cover-letters"] });
+      toast.success("Duplicated letter as a new version");
+    },
+    onError: () => toast.error("Could not duplicate letter"),
   });
 
   return (
@@ -78,6 +89,16 @@ export function LibraryCoverLetters() {
                 >
                   Open PDF
                 </a>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={duplicateMutation.isPending}
+                  onClick={() => duplicateMutation.mutate(letter.id)}
+                >
+                  <Copy className="mr-1 size-3.5" aria-hidden />
+                  Duplicate
+                </Button>
                 <Button
                   type="button"
                   size="sm"

@@ -206,6 +206,14 @@ async def get_console_snapshot(
         url = await _presign(storage, event.screenshot_key)
         serialized_events.append(_event_to_dict(event, url))
 
+    checkpoint_data = run.checkpoint_data or {}
+    generate_letter = checkpoint_data.get("generate_cover_letter")
+    run_options = {
+        "generate_cover_letter": (
+            bool(generate_letter) if generate_letter is not None else None
+        ),
+    }
+
     return {
         "run_id": str(run.id),
         "job_target_id": str(run.job_target_id),
@@ -217,10 +225,35 @@ async def get_console_snapshot(
         "latest_screenshot_url": await _presign(storage, latest_screenshot_key),
         "latest_screenshot_key": latest_screenshot_key,
         "open_checkpoint": open_checkpoint,
+        "run_options": run_options,
         "timeline": timeline,
         "artifacts": artifacts,
         "last_event_seq": await events_repo.max_seq(run_id),
         "events": serialized_events,
+    }
+
+
+async def patch_run_options(
+    session: AsyncSession,
+    run_id: uuid.UUID,
+    tenant_id: uuid.UUID,
+    *,
+    generate_cover_letter: bool | None,
+) -> dict[str, Any]:
+    runs = ApplicationRunRepository(session, tenant_id)
+    run = await runs.get(run_id)
+    if run is None:
+        msg = "Run not found"
+        raise ValueError(msg)
+    checkpoint = dict(run.checkpoint_data or {})
+    if generate_cover_letter is None:
+        checkpoint.pop("generate_cover_letter", None)
+    else:
+        checkpoint["generate_cover_letter"] = generate_cover_letter
+    run.checkpoint_data = checkpoint or None
+    await session.flush()
+    return {
+        "generate_cover_letter": checkpoint.get("generate_cover_letter"),
     }
 
 

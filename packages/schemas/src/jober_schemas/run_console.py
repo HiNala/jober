@@ -36,6 +36,10 @@ class RunEventRead(BaseModel):
     attempt_index: int | None = None
 
 
+class RunOptionsRead(BaseModel):
+    generate_cover_letter: bool | None = None
+
+
 class RunConsoleSnapshotRead(BaseModel):
     run_id: str
     job_target_id: str
@@ -47,10 +51,15 @@ class RunConsoleSnapshotRead(BaseModel):
     latest_screenshot_url: str | None = None
     latest_screenshot_key: str | None = None
     open_checkpoint: dict[str, Any] | None = None
+    run_options: RunOptionsRead = Field(default_factory=RunOptionsRead)
     timeline: list[dict[str, Any]] = Field(default_factory=list)
     artifacts: list[dict[str, Any]] = Field(default_factory=list)
     last_event_seq: int = 0
     events: list[RunEventRead] = Field(default_factory=list)
+
+
+class RunOptionsPatchRequest(BaseModel):
+    generate_cover_letter: bool | None = None
 
 
 class CheckpointResolveRequest(BaseModel):

@@ -27,6 +27,13 @@
 | `GET /api/documents/{id}` | Full document read |
 
 ## Mission 99 (post–Mission 24)
-- [x] CI green (193 API tests, web lint/typecheck/build)
-- [x] FK fixture for `run_id` → `LlmCall` linkage test
-- [x] Design Council 20/20 logged
+- [x] Finish leftovers — per-run toggle UI, library duplicate button
+- [x] Gates green — ruff, mypy, pytest, web lint/typecheck/build, CI
+- [x] Full suite — patch text ATS test, run-options API, letter-options endpoint
+- [x] Policy invariants unchanged (claims guard + prompt pack untrusted job page)
+- [x] Secrets — detect-secrets baseline clean in CI
+- [x] File hygiene — all modules under 2000 lines; per-task commits
+- [x] Design Council 20/20 on Document Studio, canvas, settings, run console
+- [x] Self-improvement — `PATCH /application-runs/{id}/run-options` + run console control
+- [x] Docs — README Mission 24 routes; mission + design-review updated
+- [x] Fixture-for-bug — `run_id` FK test; patch text manual_edit regression

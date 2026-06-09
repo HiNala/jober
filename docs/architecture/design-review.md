@@ -767,6 +767,18 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 24) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `PATCH /application-runs/{id}/run-options` | Mission 24 required per-run letter toggle; was API-only via `checkpoint_data` |
+| `RunLetterOptions` in run console | Default / generate / skip without opening Settings mid-run |
+| Library **Duplicate** button | Reuse endpoint existed but Library had no affordance |
+| `test_patch_cover_letter_text_updates_ats_score` | PATCH edit path lacked regression coverage |
+| `test_run_letter_options` + letter-options GET test | Close M24 acceptance gaps |
+
+---
+
 ## Mission 99 (post–Mission 23) — improvements logged
 
 | Change | Why |

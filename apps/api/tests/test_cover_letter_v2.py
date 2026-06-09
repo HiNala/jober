@@ -4,8 +4,11 @@ import os
 import uuid
 
 import pytest
+from httpx import ASGITransport, AsyncClient
 
 from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
+from jober_api.db import session as db_session_module
+from jober_api.main import app
 from jober_api.config import settings
 from jober_api.models.application_attempt import ApplicationAttempt
 from jober_api.models.application_run import ApplicationRun
@@ -46,6 +49,83 @@ def test_merge_paragraphs_preserves_locked() -> None:
         locked_indices={1},
     )
     assert merged == ["New opener", "Evidence", "New close"]
+
+
+@pytest.mark.asyncio
+async def test_patch_cover_letter_text_updates_ats_score(
+    db_session,
+    truncate_tables,
+    monkeypatch,
+) -> None:
+    async def _fake_put(self, key, data, content_type="application/octet-stream", length=None):
+        from jober_api.storage.minio_client import StoredObject
+
+        return StoredObject(bucket="test", key=key, etag="1")
+
+    monkeypatch.setattr(ObjectStorage, "put_object", _fake_put)
+    monkeypatch.setattr(settings, "llm_provider", "template")
+
+    profiles = UserProfileRepository(db_session, DEFAULT_DEV_TENANT_ID)
+    await profiles.get_singleton()
+    resumes = ResumeAssetRepository(db_session, DEFAULT_DEV_TENANT_ID)
+    text = "Python FastAPI React"
+    await resumes.create(
+        object_key="resume-key",
+        original_filename="resume.docx",
+        extracted_text=text,
+        skills_index={
+            "skills": ["Python", "FastAPI"],
+            "claims_index": build_claims_index(text, {"skills": ["Python", "FastAPI"]}),
+        },
+        is_active=True,
+    )
+    jobs = JobTargetRepository(db_session, DEFAULT_DEV_TENANT_ID)
+    job = await jobs.create(
+        company="Acme",
+        role="Engineer",
+        status=JobTargetStatus.NEW,
+        direct_apply_url="https://jobs.lever.co/acme/eng",
+        extracted_job_profile={
+            "description": "Python FastAPI platform",
+            "requirements": ["Python"],
+        },
+    )
+    await db_session.commit()
+
+    generated = await generate_cover_letter(
+        db_session,
+        ObjectStorage(),
+        tenant_id=DEFAULT_DEV_TENANT_ID,
+        user_id=DEFAULT_DEV_USER_ID,
+        job_target_id=job.id,
+        force=True,
+    )
+    original_score = generated["ats_score"]
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        edited = (
+            "Dear team,\n\n"
+            "I have delivered Python and FastAPI services in production with measurable impact.\n\n"
+            "Thank you for your consideration."
+        )
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.patch(
+                f"/api/documents/{generated['id']}",
+                json={"text": edited},
+            )
+            assert response.status_code == 200
+            body = response.json()
+            assert body["text"] == edited
+            assert body["ats_score"] is not None
+            assert body["keyword_coverage"]["manual_edit"] is True
+            assert body["ats_score"] != original_score or body["keyword_coverage"]["present"]
+    finally:
+        app.dependency_overrides.clear()
 
 
 def test_template_pdf_still_selectable_text() -> None:

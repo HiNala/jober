@@ -29,6 +29,9 @@ export interface RunConsoleSnapshot {
     prompt: string;
     options?: Record<string, unknown>;
   } | null;
+  run_options?: {
+    generate_cover_letter: boolean | null;
+  };
   timeline: Array<{
     seq: number;
     ts: string;
@@ -79,6 +82,17 @@ export async function fetchRecentRunEvents(limit = 25): Promise<RecentRunEvent[]
     `/api/console/recent-events?limit=${limit}`,
   );
   return body.items;
+}
+
+export async function patchRunOptions(
+  runId: string,
+  generateCoverLetter: boolean | null,
+): Promise<{ generate_cover_letter: boolean | null }> {
+  return apiFetch(`/api/application-runs/${runId}/run-options`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ generate_cover_letter: generateCoverLetter }),
+  });
 }
 
 export async function resolveRunCheckpoint(

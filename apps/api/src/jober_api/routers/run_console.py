@@ -10,6 +10,7 @@ from jober_schemas.run_console import (
     CheckpointResolveRead,
     CheckpointResolveRequest,
     RunConsoleSnapshotRead,
+    RunOptionsPatchRequest,
 )
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,6 +22,7 @@ from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.services.console.service import (
     get_console_snapshot,
     get_recent_events,
+    patch_run_options,
     resolve_checkpoint,
     stream_run_events,
 )
@@ -125,6 +127,27 @@ class BrowserStorageStateRequest(BaseModel):
     """Playwright storage state after human login — encrypted at rest, never plaintext in DB."""
 
     state: dict[str, Any] = Field(..., description="Playwright context.storage_state() JSON")
+
+
+@router.patch("/application-runs/{run_id}/run-options")
+async def update_run_options(
+    run_id: uuid.UUID,
+    request: Request,
+    body: RunOptionsPatchRequest,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, object]:
+    auth = require_auth(request)
+    try:
+        result = await patch_run_options(
+            session,
+            run_id,
+            auth.tenant_id,
+            generate_cover_letter=body.generate_cover_letter,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    await session.commit()
+    return result
 
 
 @router.put("/application-runs/{run_id}/browser-storage-state")
