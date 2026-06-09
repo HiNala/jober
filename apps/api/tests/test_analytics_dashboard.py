@@ -192,3 +192,98 @@ async def test_admin_cost_reconciles_with_llm_calls(
     body = response.json()
     assert body["reconciled"] is True
     assert body["rollup_total_usd"] == pytest.approx(0.02)
+
+
+@pytest.mark.asyncio
+async def test_admin_traffic_reads_page_rollups(
+    db_session, truncate_tables, admin_user, auth_headers
+) -> None:
+    from jober_api.models.analytics import AnalyticsDailyPage
+
+    day = date(2026, 6, 12)
+    db_session.add(
+        AnalyticsDailyPage(
+            day=day,
+            page="/dashboard",
+            page_views=120,
+            unique_sessions=40,
+            total_time_on_page_sec=600.0,
+            bounces=10,
+        )
+    )
+    await db_session.commit()
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(
+            "/api/analytics/admin/traffic",
+            params={"start": day.isoformat(), "end": day.isoformat()},
+            headers=auth_headers,
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["pages"][0]["page"] == "/dashboard"
+    assert body["pages"][0]["page_views"] == 120
+    assert body["pages"][0]["bounce_rate"] == pytest.approx(0.25)
+
+
+@pytest.mark.asyncio
+async def test_user_analytics_compare_previous(
+    db_session, truncate_tables, auth_headers
+) -> None:
+    current = date(2026, 6, 20)
+    prior = date(2026, 6, 16)
+    db_session.add_all(
+        [
+            JobTarget(
+                id=uuid.uuid4(),
+                tenant_id=DEFAULT_DEV_TENANT_ID,
+                company="NowCo",
+                role="Engineer",
+                status=JobTargetStatus.APPLIED,
+                applied_date=current,
+            ),
+            JobTarget(
+                id=uuid.uuid4(),
+                tenant_id=DEFAULT_DEV_TENANT_ID,
+                company="ThenCo",
+                role="Engineer",
+                status=JobTargetStatus.APPLIED,
+                applied_date=prior,
+            ),
+        ]
+    )
+    await db_session.commit()
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(
+            "/api/analytics/me",
+            params={
+                "start": (current - timedelta(days=2)).isoformat(),
+                "end": current.isoformat(),
+                "compare_previous": "true",
+            },
+            headers=auth_headers,
+        )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["summary"]["applications_sent"] == 1
+    assert body["previous"]["applications_sent"] == 1
+
+
+@pytest.mark.asyncio
+async def test_user_analytics_csv_export(
+    db_session, truncate_tables, auth_headers
+) -> None:
+    day = date.today()
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(
+            "/api/analytics/me/export.csv",
+            params={"start": (day - timedelta(days=7)).isoformat(), "end": day.isoformat()},
+            headers=auth_headers,
+        )
+    assert response.status_code == 200
+    assert "text/csv" in response.headers.get("content-type", "")
+    assert "applications_sent" in response.text
