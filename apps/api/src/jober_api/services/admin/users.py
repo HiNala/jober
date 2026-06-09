@@ -5,16 +5,11 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from jober_api.models.enums import AdminAuditAction, UserRole, UserStatus
+from jober_api.models.enum_utils import enum_value
+from jober_api.models.enums import AdminAuditAction, UserStatus
 from jober_api.models.tenant import Tenant
 from jober_api.models.user import User
 from jober_api.services.admin.audit import record_admin_audit
-
-
-def _enum_value(value: UserRole | UserStatus | str) -> str:
-    if isinstance(value, (UserRole, UserStatus)):
-        return value.value
-    return str(value)
 
 
 async def list_users_for_admin(
@@ -37,8 +32,8 @@ async def list_users_for_admin(
             "id": str(user.id),
             "email": user.email,
             "display_name": user.display_name,
-            "role": _enum_value(user.role),
-            "status": _enum_value(user.status),
+            "role": enum_value(user.role),
+            "status": enum_value(user.status),
             "tenant_id": str(user.tenant_id),
             "plan": plan.value if hasattr(plan, "value") else str(plan),
             "last_login_at": user.last_login_at.isoformat() if user.last_login_at else None,
@@ -73,10 +68,10 @@ async def set_user_status(
         actor_user_id=actor_user_id,
         target_user_id=target.id,
         action=action,
-        message=f"User status changed from {_enum_value(previous)} to {_enum_value(status)}",
+        message=f"User status changed from {enum_value(previous)} to {enum_value(status)}",
         details={
-            "previous_status": _enum_value(previous),
-            "new_status": _enum_value(status),
+            "previous_status": enum_value(previous),
+            "new_status": enum_value(status),
         },
     )
     await session.flush()

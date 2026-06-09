@@ -42,13 +42,19 @@ ROLE_PERMISSIONS: dict[UserRole, frozenset[Permission]] = {
 }
 
 
+def _normalize_role(role: UserRole | str) -> UserRole:
+    if isinstance(role, UserRole):
+        return role
+    return UserRole(role)
+
+
 def can(
     actor: AuthContext,
     action: Permission,
     resource: Resource | None = None,
 ) -> bool:
     """Return whether ``actor`` may perform ``action`` on ``resource``."""
-    granted = ROLE_PERMISSIONS.get(actor.role, frozenset())
+    granted = ROLE_PERMISSIONS.get(_normalize_role(actor.role), frozenset())
     if action not in granted:
         return False
 

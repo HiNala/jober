@@ -17,17 +17,12 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.models.admin_audit_log import AdminAuditLog
-from jober_api.models.enums import AdminAuditAction, UserRole, UserStatus
+from jober_api.models.enum_utils import enum_value
+from jober_api.models.enums import UserRole, UserStatus
 from jober_api.services.admin.bootstrap import BootstrapError, promote_user_to_admin
 from jober_api.services.admin.users import list_users_for_admin, set_user_status
 
 router = RBACRouter(prefix="/admin", tags=["admin"], permission=Permission.ADMIN_USERS_MANAGE)
-
-
-def _enum_value(value: UserRole | UserStatus | AdminAuditAction | str) -> str:
-    if isinstance(value, (UserRole, UserStatus, AdminAuditAction)):
-        return value.value
-    return str(value)
 
 
 @router.get("/users", response_model=AdminUserListRead)
@@ -65,7 +60,7 @@ async def admin_update_role(
         ) from None
     except BootstrapError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-    return {"role": _enum_value(user.role)}
+    return {"role": enum_value(user.role)}
 
 
 @router.patch("/users/{user_id}/status")
@@ -92,7 +87,7 @@ async def admin_update_status(
         ) from None
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-    return {"status": _enum_value(user.status)}
+    return {"status": enum_value(user.status)}
 
 
 audit_router = APIRouter(prefix="/admin", tags=["admin"])
@@ -116,7 +111,7 @@ async def admin_audit_log(
                 "id": str(row.id),
                 "actor_user_id": str(row.actor_user_id),
                 "target_user_id": str(row.target_user_id) if row.target_user_id else None,
-                "action": _enum_value(row.action),
+                "action": enum_value(row.action),
                 "resource_type": row.resource_type,
                 "resource_id": row.resource_id,
                 "message": row.message,

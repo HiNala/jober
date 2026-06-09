@@ -4,10 +4,8 @@ from collections.abc import Awaitable, Callable
 from functools import wraps
 from typing import Any, TypeVar, cast
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.routing import APIRoute
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse
 
 from jober_api.auth.context import AuthContext
 from jober_api.auth.deps import PUBLIC_API_PREFIXES
@@ -104,7 +102,7 @@ def _route_permission(route: APIRoute) -> Permission | None:
 
 
 def bind_route_permissions(app: Any) -> None:
-    """Copy handler permission tags onto APIRoute objects for middleware."""
+    """Copy handler permission tags onto APIRoute objects for startup validation."""
     for route in app.routes:
         if not isinstance(route, APIRoute):
             continue
@@ -131,41 +129,3 @@ def validate_rbac_coverage(app: Any) -> None:
             sorted(missing)
         )
         raise RuntimeError(msg)
-
-
-class PermissionMiddleware(BaseHTTPMiddleware):
-    """Enforce ``__rbac_permission__`` on every authenticated API route."""
-
-    async def dispatch(
-        self,
-        request: Request,
-        call_next: Callable[[Request], Awaitable[Response]],
-    ) -> Response:
-        path = request.url.path
-        if path.startswith("/api") and not _is_public_path(path):
-            route = request.scope.get("route")
-            permission: Permission | None = None
-            if isinstance(route, APIRoute):
-                route_perm = getattr(route, RBAC_ATTR, None)
-                permission = (
-                    cast(Permission, route_perm)
-                    if route_perm is not None
-                    else _route_permission(route)
-                )
-            if permission is None:
-                return JSONResponse(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    content={"detail": "Route permission not declared"},
-                )
-            auth: AuthContext | None = getattr(request.state, "auth", None)
-            if auth is None:
-                return JSONResponse(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    content={"detail": "Authentication required"},
-                )
-            if not can(auth, permission):
-                return JSONResponse(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    content={"detail": "Insufficient permissions"},
-                )
-        return await call_next(request)
