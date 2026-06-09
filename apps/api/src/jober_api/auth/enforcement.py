@@ -52,7 +52,7 @@ def require_permission(permission: Permission) -> Callable[[Request], Awaitable[
         return auth
 
     _enforce.__rbac_permission__ = permission  # type: ignore[attr-defined]
-    return _enforce  # type: ignore[return-value]
+    return _enforce
 
 
 class RBACRouter(APIRouter):
