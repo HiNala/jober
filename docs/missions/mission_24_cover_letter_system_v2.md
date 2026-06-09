@@ -27,4 +27,6 @@
 | `GET /api/documents/{id}` | Full document read |
 
 ## Mission 99 (post–Mission 24)
-- [ ] Run full CI gates and iteration sweep
+- [x] CI green (193 API tests, web lint/typecheck/build)
+- [x] FK fixture for `run_id` → `LlmCall` linkage test
+- [x] Design Council 20/20 logged
