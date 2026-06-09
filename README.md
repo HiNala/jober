@@ -1,6 +1,6 @@
 # Jober
 
-Assisted application autopilot for high-volume, high-quality startup engineering job applications.
+Assisted application autopilot for high-volume, high-quality job applications.
 
 **Owner:** Brian Permut · **Repo:** [github.com/HiNala/jober](https://github.com/HiNala/jober)
 
@@ -314,6 +314,23 @@ Rollup-backed dashboards at `/analytics` — no synchronous scans of raw `Analyt
 | `GET /api/analytics/admin/cost` | Admin | LLM spend reconciled against `LlmCall` |
 
 Each view supports `start`/`end` query params, optional `compare_previous=true`, and `export.csv` download. Charts use Recharts with shared theme tokens (`apps/web/src/components/analytics/charts/`).
+
+## RBAC & admin bootstrap (Mission 27)
+
+Central permissions in `apps/api/src/jober_api/auth/permissions.py`. Every protected API route declares a permission; undeclared routes are blocked at startup and by `PermissionMiddleware`.
+
+| Role | Capabilities |
+|------|----------------|
+| `user` | Tenant-scoped workspace data (`authenticated`) |
+| `admin` | Product analytics rollups, user directory, admin audit log |
+
+First admin (only while none exist):
+
+```bash
+ADMIN_BOOTSTRAP_SECRET=your-one-time-secret python apps/api/scripts/bootstrap_admin.py --email you@example.com
+```
+
+Further admins: existing admin promotes via `/admin/users` UI or `PATCH /api/admin/users/{id}/role`. See `docs/architecture/rbac.md` for admin data boundaries.
 
 ## Job spreadsheet import (Mission 03)
 

@@ -72,6 +72,9 @@ migrate-check:
 seed:
 	cd apps/api && python scripts/seed.py
 
+bootstrap-admin:
+	cd apps/api && python scripts/bootstrap_admin.py --email $(EMAIL)
+
 schemas-export:
 	cd packages/schemas && python scripts/export_typescript.py
 
