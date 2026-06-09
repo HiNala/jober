@@ -3,6 +3,7 @@
 import { FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
+import { CoverLetterEditor } from "@/components/canvas/cover-letter-editor";
 import { PageEmpty, PageLoading } from "@/components/states/page-states";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
 import { fetchReviewPackageByRun } from "@/lib/api/verification";
@@ -34,17 +35,30 @@ export function DocumentView() {
   }
 
   const review = reviewQuery.data;
+  const cover = review?.cover_letter;
 
   return (
     <div className={cn("space-y-4 p-4", motionFadeIn)}>
       <div className={cn("rounded-lg p-4", surface.card)}>
-        <div className="mb-2 flex items-center gap-2 font-medium">
+        <div className="mb-3 flex items-center gap-2 font-medium">
           <FileText className="size-4" aria-hidden />
           Cover letter
         </div>
-        <pre className="max-h-[50vh] overflow-auto whitespace-pre-wrap font-sans text-sm leading-relaxed text-muted-foreground">
-          {review?.cover_letter_preview ?? "No generated letter for this run yet."}
-        </pre>
+
+        {!cover ? (
+          <p className="text-sm text-muted-foreground">
+            {review?.cover_letter_preview
+              ? review.cover_letter_preview
+              : "No generated letter for this run — letter generation was skipped or not required."}
+          </p>
+        ) : (
+          <CoverLetterEditor
+            key={cover.id}
+            cover={cover}
+            jobTargetId={review!.job_target_id}
+            runId={runId}
+          />
+        )}
       </div>
       <div className={cn("rounded-lg p-4", surface.card)}>
         <p className="mb-1 font-medium">Resume in use</p>

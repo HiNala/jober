@@ -15,6 +15,7 @@ export type UserPreferences = {
   };
   application_defaults: {
     generate_cover_letter_per_run: boolean;
+    letter_template?: string;
     voice_preset: string;
     site_cooldown_seconds: number | null;
   };

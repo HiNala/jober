@@ -97,6 +97,13 @@ export function activateResume(resumeId: string) {
   return apiFetch<ResumeAssetRead>(`/api/resumes/${resumeId}/activate`, { method: "POST" });
 }
 
+export function duplicateLibraryCoverLetter(documentId: string, jobTargetId?: string) {
+  return apiFetch<{ id: string }>(`/api/documents/${documentId}/duplicate`, {
+    method: "POST",
+    body: JSON.stringify(jobTargetId ? { job_target_id: jobTargetId } : {}),
+  });
+}
+
 export function lockCoverLetterTemplate(documentId: string, locked: boolean) {
   return apiFetch<{ id: string; locked_template: boolean }>(`/api/documents/${documentId}`, {
     method: "PATCH",

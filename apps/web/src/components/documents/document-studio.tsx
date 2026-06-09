@@ -21,7 +21,9 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   documentDownloadUrl,
   fetchJobsForStudio,
+  fetchLetterOptions,
   generateCoverLetter,
+  patchCoverLetter,
   type GeneratedDocumentRead,
 } from "@/lib/api/documents";
 import { formatApiError } from "@/lib/api/errors";
@@ -32,19 +34,47 @@ export function DocumentStudio() {
   const [locked, setLocked] = useState(false);
   const [draft, setDraft] = useState<GeneratedDocumentRead | null>(null);
   const [letterText, setLetterText] = useState("");
+  const [templateStyle, setTemplateStyle] = useState("classic");
+  const [voicePreset, setVoicePreset] = useState("direct");
+  const [lockedParagraphs, setLockedParagraphs] = useState<Set<number>>(new Set());
 
   const jobsQuery = useQuery({ queryKey: ["job-targets"], queryFn: fetchJobsForStudio });
+  const optionsQuery = useQuery({ queryKey: ["letter-options"], queryFn: fetchLetterOptions });
   const profileQuery = useQuery({ queryKey: ["profile"], queryFn: fetchProfile });
 
   const generateMutation = useMutation({
     mutationFn: ({ force }: { force: boolean }) =>
-      generateCoverLetter(jobId, { force, includeDocx: true }),
+      generateCoverLetter(jobId, {
+        force,
+        includeDocx: true,
+        templateStyle,
+        voicePreset,
+        seedText: letterText || undefined,
+        lockedParagraphs: [...lockedParagraphs],
+      }),
     onSuccess: (doc) => {
       setDraft(doc);
       setLetterText(doc.text);
+      setLockedParagraphs(new Set(doc.locked_paragraphs ?? []));
       toast.success(doc.cached ? "Loaded cached letter" : "Cover letter generated");
     },
     onError: (err: unknown) => toast.error(formatApiError(err, "Cover letter generation failed")),
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: () =>
+      patchCoverLetter(draft!.id, {
+        text: letterText,
+        locked_paragraphs: [...lockedParagraphs],
+        template_style: templateStyle,
+        voice_preset: voicePreset,
+      }),
+    onSuccess: (doc) => {
+      setDraft(doc);
+      setLetterText(doc.text);
+      toast.success("Saved — ATS score updated");
+    },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not save letter")),
   });
 
   const selectedJob = useMemo(
@@ -104,6 +134,32 @@ export function DocumentStudio() {
               <p className="mt-1 text-amber-600">Upload a resume in Vault before generating.</p>
             )}
           </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Select value={templateStyle} onValueChange={(v) => setTemplateStyle(v ?? "classic")}>
+              <SelectTrigger aria-label="Letter template">
+                <SelectValue placeholder="Template" />
+              </SelectTrigger>
+              <SelectContent>
+                {(optionsQuery.data?.templates ?? ["classic", "modern", "compact"]).map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={voicePreset} onValueChange={(v) => setVoicePreset(v ?? "direct")}>
+              <SelectTrigger aria-label="Voice preset">
+                <SelectValue placeholder="Voice" />
+              </SelectTrigger>
+              <SelectContent>
+                {(optionsQuery.data?.voice_presets ?? ["direct"]).map((v) => (
+                  <SelectItem key={v} value={v}>
+                    {v.replace(/_/g, " ")}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
@@ -130,6 +186,14 @@ export function DocumentStudio() {
             >
               <Lock className="mr-2 size-4" aria-hidden />
               {locked ? "Locked" : "Lock edits"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={!draft || saveMutation.isPending}
+              onClick={() => saveMutation.mutate()}
+            >
+              Save edits
             </Button>
           </div>
         </CardContent>

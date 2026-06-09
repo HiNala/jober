@@ -746,6 +746,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 24 — Cover Letter System v2
+
+**Scope:** Document Studio, canvas `DocumentView`, Settings application defaults, letter API.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Toggle + templates; skip when not needed |
+| Kare | 2 | Voice presets advisory; claims guard unchanged |
+| Norman | 2 | Canvas editor + studio share patterns |
+| Nielsen | 2 | Global default + batch filter override |
+| Tufte | 2 | ATS + keyword chips inline |
+| Vignelli | 2 | Classic/Modern/Compact tokens consistent |
+| Rand | 2 | Document agent distinct from fill agent |
+| Maeda | 2 | Regen respects locked paragraphs |
+| Wroblewski | 2 | Settings defaults + per-run canvas |
+| Ive | 2 | ATS-safe text PDFs, no raster gimmicks |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 23) — improvements logged
 
 | Change | Why |

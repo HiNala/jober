@@ -272,16 +272,20 @@ Plans: **Free** (5 jobs/batch, 20 runs/mo) vs **Pro** (100/batch, 500 runs/mo). 
 
 Positioning: [`docs/architecture/product.md`](docs/architecture/product.md). Run `make migrate` after pull (adds `tenants`, `users`, `audit_log_entries`, `tenant_id` columns).
 
-## Cover letters (Mission 05)
+## Cover letters (Mission 05 + 24)
 
-Generate grounded cover letters at `/documents` (Document Studio).
+Generate grounded cover letters at `/documents` (Document Studio) or edit in the run canvas Documents tab.
 
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /api/documents/generate-cover-letter` | Draft letter + ATS score + PDF/DOCX keys |
-| `GET /api/documents?job_target_id=` | List generated documents for a job |
-| `GET /api/documents/{id}/download/pdf` | Download rendered PDF |
-| `GET /api/documents/{id}/download/docx` | Download DOCX (optional) |
+| `GET /api/documents/letter-options` | Templates (classic/modern/compact) + voice presets |
+| `POST /api/documents/generate-cover-letter` | Draft with template/voice, regen, `run_id` linkage |
+| `PATCH /api/documents/{id}` | Inline text edit, lock paragraphs, re-render + ATS refresh |
+| `POST /api/documents/{id}/duplicate` | Reuse letter as seed for another job |
+| `GET /api/documents?job_target_id=` | Version history for a job |
+| `GET /api/documents/{id}/download/pdf` | Download rendered PDF (ATS-safe text) |
+
+Mission 24: Settings global generate toggle + default template/voice; batch `filters.generate_cover_letter` override; skip when form lacks `cover_letter_upload`; `ab_tracking` metadata for analytics.
 
 Without `LLM_API_KEY`, the API uses a deterministic template provider (CI-safe). Optional env vars: `LLM_PROVIDER`, `LLM_BASE_URL`, `LLM_DRAFT_MODEL`, `LLM_SCORING_MODEL`, `LLM_MONTHLY_BUDGET_USD` (default $25). Calls log to `LlmCall`; exceeding the monthly cap returns HTTP 402.
 

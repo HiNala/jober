@@ -33,6 +33,21 @@ export interface ReviewPackage {
   screenshot_object_key?: string | null;
   resume_filename?: string | null;
   cover_letter_preview?: string | null;
+  cover_letter?: {
+    id: string;
+    text: string;
+    ats_score: number | null;
+    keyword_coverage?: {
+      present?: string[];
+      missing?: string[];
+      template_style?: string;
+      voice_preset?: string;
+    };
+    template_style?: string;
+    voice_preset?: string;
+    locked_paragraphs?: number[];
+    pdf_download_path?: string;
+  } | null;
   checkpoint_id?: string | null;
   policy: string;
 }
