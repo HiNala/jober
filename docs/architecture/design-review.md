@@ -788,6 +788,39 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 28) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Mission doc + Design Council on remote | `89a38ca` shipped web UI but docs were local-only until follow-up commit |
+| `permissions.test.ts` covers `admin:ops:read` + `admin:config:manage` | New M28 permissions had no web fixture |
+| README admin dashboard section | Cold-start path for `/admin` was missing |
+
+---
+
+## Mission 28 — Admin dashboard (ops-first)
+
+**Scope:** `/admin` overview, acquisition, users, runs, cost, system, config sections.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Attention-first layout; no vanity charts without action |
+| Kare | 2 | Privacy copy on users/support; calm ops tone |
+| Norman | 2 | Section nav + loading/error on every panel |
+| Nielsen | 2 | “What needs me” banners; search on users |
+| Tufte | 2 | Dense tables + M26 chart reuse; tabular nums |
+| Vignelli | 2 | Shared admin shell + chart-theme |
+| Rand | 1 | Internal ops surface |
+| Maeda | 2 | One question per section/page |
+| Wroblewski | 2 | Nav wraps; tables scroll on mobile |
+| Ive | 2 | Audited support view; config toggles with feedback |
+
+**Total: 19/20** — passes gate (Tufte ≥18).
+
+**CI:** [run 27204910495](https://github.com/HiNala/jober/actions/runs/27204910495) (green on `89a38ca`).
+
+---
+
 ## Mission 99 (post–Mission 27) — improvements logged
 
 | Change | Why |

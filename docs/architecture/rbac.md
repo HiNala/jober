@@ -15,6 +15,8 @@ Extensible via `ROLE_PERMISSIONS` in `apps/api/src/jober_api/auth/permissions.py
 | `admin:analytics:read` | Admin | Product-wide **rollup** analytics (no raw events scan) |
 | `admin:users:manage` | Admin | Email, role, status — no vault/profile body |
 | `admin:audit:read` | Admin | Admin audit log entries |
+| `admin:ops:read` | Admin | Overview, runs, system health (aggregates) |
+| `admin:config:manage` | Admin | Feature flags, banners, global defaults |
 
 `can(actor, action, resource)` is the single check — routes declare a permission via `RBACRouter` / `@requires`; `Depends(require_permission)` enforces at runtime; startup `validate_rbac_coverage` default-denies undeclared routes.
 

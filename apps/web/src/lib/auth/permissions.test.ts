@@ -23,6 +23,8 @@ describe("permissions", () => {
   it("grants admin permissions for admins", () => {
     const admin = { ...user, role: "admin" };
     expect(can(admin, "admin:audit:read")).toBe(true);
+    expect(can(admin, "admin:ops:read")).toBe(true);
+    expect(can(admin, "admin:config:manage")).toBe(true);
     expect(isAdmin(admin)).toBe(true);
   });
 });
