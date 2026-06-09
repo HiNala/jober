@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { setAnalyticsConsent, trackPageView } from "@/lib/analytics/sdk";
@@ -26,8 +27,12 @@ export function AnalyticsConsentBanner() {
       aria-label="Analytics consent"
     >
       <p className="text-sm text-foreground">
-        Jober uses first-party analytics only — no third-party trackers. Help us improve by
-        allowing anonymous usage data on this device.
+        Jober uses first-party analytics only — no third-party trackers. If you decline, we do
+        not record usage events on this device. See{" "}
+        <Link href="/privacy#cookies-and-analytics" className="underline underline-offset-2">
+          cookies &amp; analytics
+        </Link>{" "}
+        in our Privacy Policy.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <button

@@ -1,6 +1,7 @@
 import { getApiBaseUrl } from "@/lib/api/client";
 
 const CONSENT_COOKIE = "jober_analytics_consent";
+const UTM_STORAGE_KEY = "jober_utm";
 const ANON_KEY = "jober_anon_id";
 const ANON_ROTATED_KEY = "jober_anon_rotated_at";
 const SESSION_KEY = "jober_analytics_session";
@@ -43,10 +44,12 @@ export function setAnalyticsConsent(accepted: boolean): void {
   document.cookie = `${CONSENT_COOKIE}=${accepted ? "1" : "0"}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
-function readUtmParams(): Pick<
+type UtmFields = Pick<
   AnalyticsEventPayload,
   "utm_source" | "utm_medium" | "utm_campaign" | "utm_term" | "utm_content"
-> {
+>;
+
+function utmFromSearch(): UtmFields {
   if (typeof window === "undefined") return {};
   const params = new URLSearchParams(window.location.search);
   return {
@@ -56,6 +59,32 @@ function readUtmParams(): Pick<
     utm_term: params.get("utm_term") ?? undefined,
     utm_content: params.get("utm_content") ?? undefined,
   };
+}
+
+function hasUtm(fields: UtmFields): boolean {
+  return Object.values(fields).some(Boolean);
+}
+
+/** Persist UTM params from the landing URL for the session (signup funnel attribution). */
+export function captureUtmFromUrl(): void {
+  if (typeof sessionStorage === "undefined") return;
+  const fromUrl = utmFromSearch();
+  if (!hasUtm(fromUrl)) return;
+  sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(fromUrl));
+}
+
+function readUtmParams(): UtmFields {
+  if (typeof window === "undefined") return {};
+  const fromUrl = utmFromSearch();
+  if (hasUtm(fromUrl)) return fromUrl;
+  try {
+    const raw = sessionStorage.getItem(UTM_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as UtmFields;
+    return parsed;
+  } catch {
+    return {};
+  }
 }
 
 function rotateAnonIdIfNeeded(): string {
