@@ -1,3 +1,10 @@
+from jober_api.models.analytics import (
+    AnalyticsDailyActiveUsers,
+    AnalyticsDailyCost,
+    AnalyticsDailyFunnel,
+    AnalyticsDailyPage,
+    AnalyticsEvent,
+)
 from jober_api.models.application_attempt import ApplicationAttempt
 from jober_api.models.application_batch import ApplicationBatch
 from jober_api.models.application_run import ApplicationRun
@@ -27,6 +34,11 @@ from jober_api.models.user_profile import UserProfile
 from jober_api.models.user_provider_key import UserProviderKey
 
 __all__ = [
+    "AnalyticsDailyActiveUsers",
+    "AnalyticsDailyCost",
+    "AnalyticsDailyFunnel",
+    "AnalyticsDailyPage",
+    "AnalyticsEvent",
     "AuthIdentity",
     "AuthToken",
     "ApplicationAttempt",

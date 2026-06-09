@@ -14,6 +14,11 @@ from jober_api.config import settings
 from jober_api.db.base import Base
 from jober_api.db.migration_drift import material_diffs
 from jober_api.models import (  # noqa: F401 — register metadata
+    AnalyticsDailyActiveUsers,
+    AnalyticsDailyCost,
+    AnalyticsDailyFunnel,
+    AnalyticsDailyPage,
+    AnalyticsEvent,
     ApplicationAttempt,
     ApplicationBatch,
     ApplicationRun,
