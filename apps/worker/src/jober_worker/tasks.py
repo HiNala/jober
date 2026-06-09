@@ -74,6 +74,19 @@ def batch_orchestrator_tick(batch_id: str | None = None) -> dict[str, object]:
     return run_orchestrator_tick(batch_id)
 
 
+@celery_app.task(name="jober_worker.tasks.analytics_daily_rollup")
+def analytics_daily_rollup(day: str | None = None) -> dict[str, object]:
+    from datetime import UTC, date, datetime, timedelta
+
+    from jober_api.services.analytics.rollups import rollup_analytics_day_sync
+
+    from jober_worker.db import get_sync_session
+
+    target = date.fromisoformat(day) if day else (datetime.now(UTC).date() - timedelta(days=1))
+    with get_sync_session() as session:
+        return rollup_analytics_day_sync(session, target)
+
+
 @celery_app.task(name="jober_worker.tasks.execute_batch_item", bind=True)
 def execute_batch_item(self: object, item_id: str) -> dict[str, object]:
     del self

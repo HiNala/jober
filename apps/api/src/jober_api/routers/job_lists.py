@@ -68,6 +68,17 @@ async def create_job_list(
         description=body.description,
     )
     session.add(row)
+    from jober_api.services.analytics.collector import emit_server_event
+    from jober_api.services.analytics.rollups import server_session_id
+
+    await emit_server_event(
+        session,
+        name="list.create",
+        session_id=server_session_id(user_id=auth.user_id),
+        user_id=auth.user_id,
+        tenant_id=auth.tenant_id,
+        props={"list_id": str(row.id)},
+    )
     await session.commit()
     repo = JobListRepository(session, auth.tenant_id)
     loaded = await repo.get(row.id)

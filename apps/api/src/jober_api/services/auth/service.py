@@ -69,6 +69,17 @@ async def register_user(
     await session.flush()
 
     raw_token = await _create_auth_token(session, user.id, AuthTokenType.EMAIL_VERIFY, hours=24)
+    from jober_api.services.analytics.collector import emit_server_event
+    from jober_api.services.analytics.rollups import server_session_id
+
+    await emit_server_event(
+        session,
+        name="signup.complete",
+        session_id=server_session_id(user_id=user.id),
+        user_id=user.id,
+        tenant_id=tenant.id,
+        props={"method": "password"},
+    )
     await session.commit()
     await session.refresh(user)
     await session.refresh(tenant)

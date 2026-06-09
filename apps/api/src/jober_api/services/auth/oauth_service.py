@@ -267,6 +267,17 @@ async def _create_oauth_user(
     session.add(user)
     await session.flush()
     await _attach_identity(session, user, provider, profile)
+    from jober_api.services.analytics.collector import emit_server_event
+    from jober_api.services.analytics.rollups import server_session_id
+
+    await emit_server_event(
+        session,
+        name="signup.complete",
+        session_id=server_session_id(user_id=user.id),
+        user_id=user.id,
+        tenant_id=tenant.id,
+        props={"method": "oauth"},
+    )
     await session.commit()
     await session.refresh(user)
     await session.refresh(tenant)

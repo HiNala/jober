@@ -459,6 +459,18 @@ async def submit_application(
         prior_runs=prior,
     )
 
+    from jober_api.services.analytics.collector import emit_server_event
+    from jober_api.services.analytics.rollups import server_session_id
+
+    await emit_server_event(
+        session,
+        name="submit.complete",
+        session_id=server_session_id(run_id=submit_run_id),
+        tenant_id=run.tenant_id,
+        props={"run_id": str(submit_run_id)},
+    )
+    await session.commit()
+
     outcome = verification.get("outcome")
     run_status_by_outcome = {
         "success": RunStatus.SUCCEEDED.value,

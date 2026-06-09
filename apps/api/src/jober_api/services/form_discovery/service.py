@@ -89,6 +89,17 @@ async def discover_from_fixture_html(
     await session.flush()
     await session.refresh(attempt)
 
+    from jober_api.services.analytics.collector import emit_server_event
+    from jober_api.services.analytics.rollups import server_session_id
+
+    await emit_server_event(
+        session,
+        name="run.start",
+        session_id=server_session_id(run_id=run.id),
+        tenant_id=run.tenant_id,
+        props={"run_id": str(run.id), "job_target_id": str(job_target_id)},
+    )
+
     observations: list[FormFieldObservation] = []
     for field in discovered:
         remembered = await memory_repo.lookup(platform, field.label or field.field_key)

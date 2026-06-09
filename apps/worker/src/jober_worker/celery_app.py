@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 
 from jober_worker.config import settings
 
@@ -20,6 +21,10 @@ celery_app.conf.update(
         "batch-orchestrator-tick": {
             "task": "jober_worker.tasks.batch_orchestrator_tick",
             "schedule": float(settings.batch_tick_seconds),
+        },
+        "analytics-daily-rollup": {
+            "task": "jober_worker.tasks.analytics_daily_rollup",
+            "schedule": crontab(hour=2, minute=15),
         },
     },
 )

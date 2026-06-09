@@ -305,6 +305,18 @@ async def generate_cover_letter(
     )
     await session.flush()
     await session.refresh(row)
+
+    from jober_api.services.analytics.collector import emit_server_event
+    from jober_api.services.analytics.rollups import server_session_id
+
+    await emit_server_event(
+        session,
+        name="letter.generate",
+        session_id=server_session_id(run_id=run_id) if run_id else server_session_id(),
+        tenant_id=job.tenant_id,
+        props={"document_id": str(row.id), "job_target_id": str(job_target_id)},
+    )
+
     return _serialize_document(row, cached=False)
 
 
