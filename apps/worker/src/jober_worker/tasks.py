@@ -83,7 +83,12 @@ def run_artifact_retention_purge() -> dict[str, object]:
 
     async def _run() -> dict[str, object]:
         async with async_session_factory() as session:
-            return await purge_stale_run_artifacts(session)
+            summary = await purge_stale_run_artifacts(session)
+            return {
+                "purged_runs": summary["purged_runs"],
+                "removed_objects": summary["removed_objects"],
+                "default_retention_days": summary["default_retention_days"],
+            }
 
     return asyncio.run(_run())
 

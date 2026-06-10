@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from typing import Any
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,7 +16,7 @@ _TERMINAL_STATUSES = (
 )
 
 
-async def purge_stale_run_artifacts(session: AsyncSession) -> dict[str, Any]:
+async def purge_stale_run_artifacts(session: AsyncSession) -> dict[str, object]:
     """Remove terminal runs older than tenant retention (or platform default)."""
     tenants = list((await session.execute(select(Tenant))).scalars())
     purged_runs = 0
