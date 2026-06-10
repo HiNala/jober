@@ -105,5 +105,5 @@ source = ["jober_api"]
 omit = ["*/tests/*"]
 
 [tool.coverage.report]
-fail_under = 55
+fail_under = 58
 show_missing = true
