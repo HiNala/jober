@@ -26,7 +26,7 @@
 
 ## Acceptance criteria
 - [x] Staging API + web deploy healthy; Postgres/Redis/bucket `/readyz` green
-- [ ] Worker deploy healthy (psycopg URL fix redeployed)
+- [x] Worker deploy healthy on staging (`SUCCESS` after psycopg URL fix)
 - [x] Migrations run automatically in API entrypoint before uvicorn
 - [ ] Golden path e2e on staging (manual / Playwright)
 - [x] Production startup fails on placeholder secrets / dev bypass (unit tests)
