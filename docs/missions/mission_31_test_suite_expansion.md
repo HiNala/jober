@@ -23,5 +23,14 @@
 | `policy` | includes new `test_golden_path_integration` policy assertion |
 | `web` | Playwright a11y + funnel smoke |
 
+## Mission 99 (post–M31)
+
+- [x] Playwright e2e green locally (`CI=true` after `pnpm build` — avoids stale `reuseExistingServer`)
+- [x] Policy golden path no longer calls Redis-backed `/admin/overview`
+- [x] `/how-it-works` heading order + pricing smoke copy aligned with live pages
+- [x] `sitemap-routes` vitest asserts Playwright a11y routes ⊆ sitemap static paths
+
+**M99 CI:** [run 27250095094](https://github.com/HiNala/jober/actions/runs/27250095094) (green on `9e539b8`).
+
 ## Iteration clause
-Contract tests between `jober-schemas` and web `@jober/schemas` path. **Mission 99** runs next.
+Contract tests between `jober-schemas` and web `@jober/schemas` path.

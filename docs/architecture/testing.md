@@ -113,5 +113,8 @@ Web E2E (marketing a11y + funnel smoke):
 cd apps/web
 pnpm build
 pnpm test:e2e:install
-pnpm test:e2e
+pnpm test:e2e          # reuses an existing dev server when not in CI
+CI=true pnpm test:e2e  # starts a fresh production server (matches CI)
 ```
+
+`playwright.config.ts` sets `reuseExistingServer` when `CI` is unset — rebuild before e2e if marketing pages changed.
