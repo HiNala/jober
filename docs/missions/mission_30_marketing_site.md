@@ -33,6 +33,8 @@ Blog/changelog scaffold shipped.
 - [x] Footer + pricing teaser aligned with live `/pricing` entitlements
 - [x] Web gates: `typecheck`, `lint:strict`, `build`, vitest
 
+**M99 CI:** [run 27247296231](https://github.com/HiNala/jober/actions/runs/27247296231) (green on `b6c8e74`).
+
 ## Notes
 - Legal text is **draft** — requires counsel sign-off before public launch.
 - Pro Stripe checkout not wired on web yet; pricing copy is honest about “coming soon”.
