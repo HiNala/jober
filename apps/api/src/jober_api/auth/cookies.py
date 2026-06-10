@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import Response
 
 from jober_api.config import settings
 
+CookieSameSite = Literal["lax", "none"]
 
-def _cookie_samesite() -> str:
+
+def _cookie_samesite() -> CookieSameSite:
     """Cross-origin web→API deploys (Railway) need SameSite=None when Secure."""
     return "none" if settings.cookie_secure else "lax"
 
