@@ -6,7 +6,9 @@ from jober_worker import db
 from jober_worker.config import Settings
 
 
-def test_sync_database_url_uses_psycopg_driver(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_sync_database_url_uses_psycopg_driver_for_railway(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(
         db,
         "settings",

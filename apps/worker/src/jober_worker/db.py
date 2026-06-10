@@ -17,7 +17,12 @@ def _sync_database_url() -> str:
         url = url.replace("postgresql://", "postgresql+psycopg://", 1)
     # psycopg does not accept asyncpg's `ssl=disable` query param
     url = url.replace("?ssl=disable", "").replace("&ssl=disable", "")
-    if "sslmode=" not in url and settings.database_url.startswith("postgresql"):
+    lowered_source = settings.database_url.lower()
+    if (
+        "sslmode=" not in url
+        and "ssl=disable" not in lowered_source
+        and "sslmode=disable" not in lowered_source
+    ):
         separator = "&" if "?" in url else "?"
         url = f"{url}{separator}sslmode=require"
     return url
