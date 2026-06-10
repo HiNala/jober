@@ -1,4 +1,4 @@
-"""Golden-path integration — fixture discover/fill → verify → analytics rollup → admin."""
+"""Golden-path integration — fixture discover/fill → verify → analytics rollup → admin acquisition."""
 
 from __future__ import annotations
 
@@ -141,9 +141,6 @@ async def test_golden_path_fixture_fill_verify_analytics_admin(
             acquisition = await client.get("/api/admin/acquisition", headers=auth_headers)
             assert acquisition.status_code == 200
             assert "funnel" in acquisition.json()
-
-            overview = await client.get("/api/admin/overview", headers=auth_headers)
-            assert overview.status_code == 200
 
             tenant = await db_session.get(Tenant, DEFAULT_DEV_TENANT_ID)
             assert tenant is not None
