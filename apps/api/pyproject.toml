@@ -89,6 +89,8 @@ module = [
     "jober_schemas.*",
     "celery",
     "celery.*",
+    "sentry_sdk",
+    "sentry_sdk.*",
 ]
 ignore_missing_imports = true
 

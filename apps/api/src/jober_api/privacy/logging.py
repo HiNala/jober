@@ -69,8 +69,8 @@ def init_sentry() -> None:
     if not dsn:
         return
     try:
-        import sentry_sdk
-        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        import sentry_sdk  # type: ignore[import-not-found]
+        from sentry_sdk.integrations.fastapi import FastApiIntegration  # type: ignore[import-not-found]
     except ImportError:
         safe_log(logging.WARNING, "sentry-sdk not installed; error tracking disabled")
         return

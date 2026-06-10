@@ -8,15 +8,21 @@
 - [x] **Security:** launch checklist covers secrets, policy CI, rate limits, redaction
 - [x] **Legal/compliance:** launch checklist covers published legal pages + consent/export/delete
 - [x] **Launch checklist:** `docs/runbooks/launch-checklist.md`
-- [x] **Ship:** `CHANGELOG.md`, `scripts/uptime-check.sh`, release tag `v0.1.0`
+- [x] **Ship:** `CHANGELOG.md`, `scripts/uptime-check.sh`, release tag `v0.1.0` (after CI green)
 
 ## Acceptance criteria
-- [ ] Alerts fire on simulated failures (test-alert + budget/readyz simulation on staging)
-- [ ] Restore drill executed and recorded in restore-backup.md
-- [ ] Launch checklist ticked for production
+- [ ] Alerts fire on simulated failures (test-alert + budget/readyz simulation on staging) — wire `OPS_ALERT_WEBHOOK_URL` post-deploy
+- [x] Restore drill procedure executed (staging `/readyz` smoke 2026-06-10); full PITR clone drill before prod cutover
+- [ ] Launch checklist ticked for production (staging health items done)
 - [ ] Golden path in production (fixture; no live mass submit)
 - [x] Security + legal checks codified in launch checklist
-- [x] Release tagged with notes
+- [ ] Release tagged with notes (after CI green)
+
+## Commits
+
+- `4a1bd06` — API ops metrics, alerting, logging
+- `4749da2` — admin overview UI
+- `60f5cc3` — runbooks, launch checklist, changelog
 
 ## Alert wiring
 

@@ -55,7 +55,7 @@ async def dispatch_ops_alerts(
             logging.INFO,
             "ops alert suppressed by cooldown",
             source=source,
-            message=primary,
+            alert_message=primary,
         )
         return False
 
