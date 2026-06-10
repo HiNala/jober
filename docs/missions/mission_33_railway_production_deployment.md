@@ -36,5 +36,11 @@
 - `pytest apps/api/tests/test_startup_secrets.py apps/api/tests/test_db_connect.py`
 - Docker builds: `infra/docker/Dockerfile.api`, `Dockerfile.web.prod`, `Dockerfile.worker`
 
-## Mission 99
-Run after CI green on M33 commits.
+## Mission 99 (post–M33)
+
+- [x] Ruff: `monpatch` typo in `test_db_connect.py`
+- [x] Mypy: production secrets validation without untyped lambdas
+- [x] Worker SSL: skip `sslmode=require` when `ssl=disable` in local/CI URLs
+- [x] Tests: async `check_minio` + production secrets fixture fields
+
+**M99 CI:** [run 27271410323](https://github.com/HiNala/jober/actions/runs/27271410323) (green on `6bc3562`).
