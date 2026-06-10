@@ -53,7 +53,10 @@ The fix is not done until the fixture + test exist.
 |-------|----------|----------------|
 | **Unit** | `apps/api/tests/`, `packages/*/tests/` | Spreadsheet import, resume extraction, job normalization, prompt assembly, claims guard, ATS scoring, field mapping, state transitions, retry taxonomy, redaction, encryption |
 | **Integration** | `apps/api/tests/` (DB + MinIO) | API endpoints, document generation, checkpoint resolution |
-| **Browser** | `apps/worker/tests/test_fixture_browser.py` | Playwright against fixture server; discovery + label locators |
+| **Browser** | `apps/worker/tests/test_fixture_browser.py`, `test_golden_path_browser.py` | Playwright against fixture server; discovery + label locators |
+| **E2E (web)** | `apps/web/e2e/` (`@playwright/test` + `@axe-core/playwright`) | Marketing a11y, keyboard skip link, reduced-motion, funnel smoke — CI runs after `pnpm build` |
+| **Golden path (API)** | `apps/api/tests/test_golden_path_integration.py` | Fixture discover/fill → verify → analytics rollup → admin (hermetic, `@pytest.mark.policy`) |
+| **Schema contract** | `packages/schemas/tests/test_contract.py`, `apps/web/src/lib/schemas-contract.test.ts` | Python enums ↔ generated `types.ts`; drift fails CI |
 | **Policy (blocking)** | `pytest -m policy` | No consent-less sensitive autofill; no CAPTCHA/login bypass; no auto-submit without explicit opt-in; injection text as data |
 
 Policy tests run in a dedicated CI job and **fail the build** on regression.
@@ -85,7 +88,7 @@ Opt-in only. Never submit.
 
 ## Coverage
 
-API coverage gate: `fail_under = 55` in `apps/api/pyproject.toml`. CI uploads `coverage.xml` on every run.
+API coverage gate: `fail_under = 58` in `apps/api/pyproject.toml`. CI uploads `coverage.xml` on every run.
 
 ## Running locally
 
@@ -102,4 +105,13 @@ With Postgres for integration tests:
 make infra
 export RUN_DB_TESTS=1 DATABASE_URL=postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
 cd apps/api && pytest -q --cov=jober_api
+```
+
+Web E2E (marketing a11y + funnel smoke):
+
+```bash
+cd apps/web
+pnpm build
+pnpm test:e2e:install
+pnpm test:e2e
 ```

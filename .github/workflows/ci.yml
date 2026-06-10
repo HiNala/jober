@@ -114,6 +114,8 @@ jobs:
 
       - name: Pytest packages
         run: |
+          pip install "./packages/schemas[dev]"
+          pytest -q packages/schemas/tests
           pytest -q packages/verification/tests
           pytest -q packages/recovery/tests
           pytest -q fixtures/ats/tests
@@ -286,3 +288,11 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium
+
+      - name: E2E (marketing a11y + funnel smoke)
+        run: pnpm exec playwright test
+        env:
+          CI: "true"

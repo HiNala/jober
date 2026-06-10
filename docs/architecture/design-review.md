@@ -830,6 +830,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 31 — Test suite expansion & quality hardening
+
+**Scope:** Golden-path API integration, admin route coverage, schema contract tests, Playwright marketing a11y + funnel smoke, worker browser fixture, coverage gate 58%.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Tests grouped by layer; no duplicate harness sprawl |
+| Kare | 2 | Policy asserts auto-submit opt-in; consent unit tests |
+| Norman | 2 | Axe on all public routes; skip-link keyboard e2e |
+| Nielsen | 2 | Failures name route + violation JSON |
+| Tufte | 2 | Contract tests pin enum drift, not vanity coverage % |
+| Vignelli | 2 | Shared `marketing-routes.ts` for axe + sitemap parity |
+| Rand | 2 | Golden path documents human-in-the-loop invariant |
+| Maeda | 2 | Reduced-motion e2e; `color-contrast` disabled where theme false-positives |
+| Wroblewski | 2 | Funnel smoke: landing → signup, pricing keyboard focus |
+| Ive | 2 | Hermetic fixtures — no live ATS in CI |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 30) — improvements logged
 
 | Change | Why |

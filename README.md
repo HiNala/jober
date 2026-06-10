@@ -370,7 +370,7 @@ Expect **155** job targets, **130** company boards, and **10** cover-letter angl
 ## Development gates
 
 - Backend: `ruff`, `mypy`, `pytest`
-- Web: `pnpm typecheck`, `pnpm lint:strict`, `pnpm test`, `pnpm build` (in `apps/web`, or `make web-lint`)
+- Web: `pnpm typecheck`, `pnpm lint:strict`, `pnpm test`, `pnpm build`, `pnpm test:e2e` (in `apps/web`, or `make web-lint`; E2E needs `pnpm build` first — see `docs/architecture/testing.md`)
 - Pre-commit: `pre-commit install` then hooks run on commit
 - CI: `.github/workflows/ci.yml`
 - Architecture notes: [`docs/architecture/`](docs/architecture/) (design reviews, policy baseline)
