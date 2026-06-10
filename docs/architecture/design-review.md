@@ -872,6 +872,42 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 33 — Railway production deployment
+
+**Scope:** Production Dockerfiles, API/worker health probes, deploy runbook, Railway service configs, staging smoke script. No product UI changes.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One smoke script; migrate-then-serve entrypoint |
+| Kare | 2 | Runbook names classic failures (PORT, API URL, creds) |
+| Norman | 2 | `/healthz` vs `/readyz` split; worker Celery ping gate |
+| Nielsen | 2 | Variable template + staging→prod promotion steps |
+| Tufte | 2 | Smoke output is JSON checks, not log noise |
+| Vignelli | 2 | `infra/railway/*.toml` mirrors compose roles |
+| Rand | 1 | Infra mission; brand N/A |
+| Maeda | 2 | Private networking default; buckets optional |
+| Wroblewski | 1 | Ops docs; no mobile product surface |
+| Ive | 2 | SSL + secret guards feel deliberate, not bolted on |
+
+**Total: 19/20** — passes gate.
+
+---
+
+## Mission 99 (post–Mission 33) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `railway-smoke.sh` checks landing + `/signup` | Staging golden-path entry without auth; closes M33 acceptance gap |
+| `test_config_database_url.py` | Railway `postgresql://` → `asyncpg` rewrite had no fixture |
+| README Railway section + `infra/railway/` tree | Cold-start deploy path was only in mission doc |
+| Deploy runbook PowerShell creds pitfall | Corrupted `MINIO_*` vars blocked `/readyz` during first staging deploy |
+
+**Staging verified:** API `/readyz` green; web landing 200 (2026-06-10).
+
+**CI:** pending on M99 commits; prior green [run 27271410323](https://github.com/HiNala/jober/actions/runs/27271410323) on `6bc3562`.
+
+---
+
 ## Mission 99 (post–Mission 32) — improvements logged
 
 | Change | Why |

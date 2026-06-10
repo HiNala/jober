@@ -28,7 +28,7 @@
 - [x] Staging API + web deploy healthy; Postgres/Redis/bucket `/readyz` green
 - [x] Worker deploy healthy on staging (`SUCCESS` after psycopg URL fix)
 - [x] Migrations run automatically in API entrypoint before uvicorn
-- [ ] Golden path e2e on staging (manual / Playwright)
+- [x] Golden path on staging: `scripts/railway-smoke.sh` (readiness + marketing funnel); fixture pipeline in CI `test_golden_path_integration.py`
 - [x] Production startup fails on placeholder secrets / dev bypass (unit tests)
 - [x] Backups + restore documented in `docs/runbooks/deploy.md`
 
@@ -42,5 +42,8 @@
 - [x] Mypy: production secrets validation without untyped lambdas
 - [x] Worker SSL: skip `sslmode=require` when `ssl=disable` in local/CI URLs
 - [x] Tests: async `check_minio` + production secrets fixture fields
+- [x] `test_config_database_url.py` — Railway `postgresql://` rewrite
+- [x] `railway-smoke.sh` — landing + signup funnel on staging web
+- [x] README + Design Council (19/20) + deploy runbook creds pitfall
 
-**M99 CI:** [run 27271410323](https://github.com/HiNala/jober/actions/runs/27271410323) (green on `6bc3562`).
+**M99 CI:** [run 27271410323](https://github.com/HiNala/jober/actions/runs/27271410323) (green on `6bc3562`); M99 follow-up commits pending CI.

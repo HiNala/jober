@@ -82,11 +82,13 @@ Browsers cannot use `*.railway.internal` — only server-side services may.
 
 ```bash
 export API_URL=https://<api-domain>
-export WEB_URL=https://<web-domain>   # optional
+export WEB_URL=https://<web-domain>
 bash scripts/railway-smoke.sh
 ```
 
-Then run Playwright golden-path e2e against staging (`apps/web` with `NEXT_PUBLIC_API_URL` pointing at staging API).
+The script checks `/healthz`, `/readyz`, web `/api/health`, landing HTML, and `/signup` (marketing funnel entry). The authenticated fixture pipeline (discover → fill → verify) is covered in CI by `test_golden_path_integration.py`; run it locally before promoting if you changed worker or API batch paths.
+
+**Setting bucket credentials (CLI pitfall):** on PowerShell, pass credential strings explicitly — `railway variable set "MINIO_ACCESS_KEY=$($creds.accessKeyId)"` — not the whole `ConvertFrom-Json` object, or Railway stores a corrupted value and `/readyz` minio checks fail.
 
 ## Backups and restore
 

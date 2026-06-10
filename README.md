@@ -76,6 +76,19 @@ Set `VAULT_ENCRYPTION_KEY` in `.env` before seeding profiles with sensitive EEO 
 
 Backup/restore requires the infra profile (`make infra` or `make up`). On Windows, use Git Bash or WSL for `make backup`/`restore` (bash scripts).
 
+## Railway deployment (Mission 33)
+
+Staging/production run on [Railway](https://railway.com) with private Postgres, Redis, and object storage. See **`docs/runbooks/deploy.md`** for the one-command deploy flow, variable templates (`infra/railway/variables.example.env`), and backup/restore.
+
+```bash
+# After deploy — readiness + marketing funnel smoke (Git Bash / WSL)
+export API_URL=https://api-staging.example.com
+export WEB_URL=https://web-staging.example.com
+bash scripts/railway-smoke.sh
+```
+
+Production images: `infra/docker/Dockerfile.api` (Alembic migrate + `$PORT`), `Dockerfile.web.prod` (Next standalone), `Dockerfile.worker` (headless Chromium). API refuses boot in production when secrets are placeholders or `DEV_AUTH_BYPASS` is set. Railway’s `postgresql://` URL is rewritten to `postgresql+asyncpg://` automatically.
+
 ## Where things live
 
 ```
@@ -89,7 +102,8 @@ fixtures/
   ats/      Synthetic ATS pages for offline CI (see `docs/architecture/testing.md`)
 infra/
   compose.yaml
-  docker/   Dockerfiles
+  docker/   Dockerfiles (incl. production Railway images)
+  railway/  Per-service `*.railway.toml` + `variables.example.env`
 docs/
   MASTER_PLAN.md
   MISSION_INDEX.md
