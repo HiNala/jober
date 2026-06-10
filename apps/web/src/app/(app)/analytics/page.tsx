@@ -1,9 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin } from "@/lib/auth/permissions";
-import { AdminAnalyticsPanel } from "@/components/analytics/admin-analytics-panel";
-import { UserAnalyticsPanel } from "@/components/analytics/user-analytics-panel";
+
+const AdminAnalyticsPanel = dynamic(
+  () =>
+    import("@/components/analytics/admin-analytics-panel").then((mod) => ({
+      default: mod.AdminAnalyticsPanel,
+    })),
+  { loading: () => <p className="text-sm text-muted-foreground">Loading analytics…</p> },
+);
+const UserAnalyticsPanel = dynamic(
+  () =>
+    import("@/components/analytics/user-analytics-panel").then((mod) => ({
+      default: mod.UserAnalyticsPanel,
+    })),
+  { loading: () => <p className="text-sm text-muted-foreground">Loading analytics…</p> },
+);
 import { spacing } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 import { useState } from "react";

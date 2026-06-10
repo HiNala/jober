@@ -23,6 +23,8 @@ export function useRunStream(runId: string | null) {
   const liveFollowRef = useRef(liveFollow);
   const lastSeqRef = useRef(0);
   const sourceRef = useRef<EventSource | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectRef = useRef<() => Promise<void>>(async () => {});
 
   useEffect(() => {
     liveFollowRef.current = liveFollow;
@@ -68,7 +70,17 @@ export function useRunStream(runId: string | null) {
       const source = new EventSource(runEventsStreamUrl(id, afterSeq));
       sourceRef.current = source;
       source.onopen = () => setStatus("open");
-      source.onerror = () => setStatus("error");
+      source.onerror = () => {
+        setStatus("error");
+        source.close();
+        if (reconnectTimerRef.current) {
+          clearTimeout(reconnectTimerRef.current);
+        }
+        reconnectTimerRef.current = setTimeout(() => {
+          reconnectTimerRef.current = null;
+          void reconnectRef.current();
+        }, 3000);
+      };
       source.onmessage = (message) => handleStreamPayload(message.data);
       for (const eventType of RUN_SSE_EVENT_TYPES) {
         source.addEventListener(eventType, (message) => {
@@ -96,6 +108,10 @@ export function useRunStream(runId: string | null) {
       setStatus("error");
     }
   }, [mergeEvents, openStream, runId]);
+
+  useEffect(() => {
+    reconnectRef.current = reconnect;
+  }, [reconnect]);
 
   useEffect(() => {
     if (!runId) {
@@ -126,6 +142,10 @@ export function useRunStream(runId: string | null) {
 
     return () => {
       cancelled = true;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
       sourceRef.current?.close();
       setStatus("closed");
     };

@@ -79,7 +79,13 @@ export function CanvasFilmstrip() {
               <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded bg-[var(--terminal-bg)]">
                 {artifact.thumbUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={artifact.thumbUrl} alt="" className="size-full object-cover" />
+                  <img
+                    src={artifact.thumbUrl}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="size-full object-cover"
+                  />
                 ) : (
                   <ThumbIcon kind={artifact.kind} />
                 )}
