@@ -36,7 +36,7 @@
 - [x] `test_artifact_retention.py` — terminal run purge respects `run_artifact_retention_days`
 - [x] `.env.example` documents `CELERY_WORKER_CONCURRENCY` and `RUN_ARTIFACT_RETENTION_DAYS`
 
-**M99 CI:** pending — see latest [CI run on `main`](https://github.com/HiNala/jober/actions/workflows/ci.yml?query=branch%3Amain).
+**M99 CI:** [run 27264475631](https://github.com/HiNala/jober/actions/runs/27264475631) (green on `10fbfc8`).
 
 ## Iteration clause
 Perf indexes must live in both Alembic **and** SQLAlchemy `__table_args__` or `check_migration_drift.py` fails.
