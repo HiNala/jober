@@ -11,18 +11,19 @@
 - [x] **Ship:** `CHANGELOG.md`, `scripts/uptime-check.sh`, release tag `v0.1.0` (after CI green)
 
 ## Acceptance criteria
-- [ ] Alerts fire on simulated failures (test-alert + budget/readyz simulation on staging) — wire `OPS_ALERT_WEBHOOK_URL` post-deploy
+- [x] Alerts fire on simulated failures — `dispatch_ops_alerts` → webhook.site `sent True` (2026-06-10); set `OPS_ALERT_WEBHOOK_URL` on Railway before prod
 - [x] Restore drill procedure executed (staging `/readyz` smoke 2026-06-10); full PITR clone drill before prod cutover
 - [ ] Launch checklist ticked for production (staging health items done)
 - [ ] Golden path in production (fixture; no live mass submit)
 - [x] Security + legal checks codified in launch checklist
-- [ ] Release tagged with notes (after CI green)
+- [x] Release tagged with notes — `v0.1.0` on `864d76b`, CI [27276789268](https://github.com/HiNala/jober/actions/runs/27276789268)
 
 ## Commits
 
 - `4a1bd06` — API ops metrics, alerting, logging
 - `4749da2` — admin overview UI
 - `60f5cc3` — runbooks, launch checklist, changelog
+- `864d76b` — CI green (mypy/ruff/pytest fixes)
 
 ## Alert wiring
 

@@ -889,7 +889,7 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Wroblewski | 1 | Admin desktop-first |
 | Ive | 2 | Alert cooldown prevents webhook spam |
 
-**Total: 19/20** — passes gate.
+**Total: 19/20** — passes gate. CI green: [run 27276789268](https://github.com/HiNala/jober/actions/runs/27276789268).
 
 ---
 

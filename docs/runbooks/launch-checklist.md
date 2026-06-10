@@ -21,8 +21,8 @@ Tick every item before promoting staging → production or announcing publicly.
 ## Observability & alerts
 
 - [ ] `LOG_MODE=redacted`, `LOG_FORMAT=json` on API/worker (recommended)
-- [ ] `OPS_ALERT_WEBHOOK_URL` set (Slack/Discord/PagerDuty incoming webhook)
-- [ ] `POST /api/admin/ops/test-alert` returns `{"sent": true}`
+- [ ] `OPS_ALERT_WEBHOOK_URL` set (Slack/Discord/PagerDuty incoming webhook) — verified locally via `dispatch_ops_alerts` 2026-06-10
+- [ ] `POST /api/admin/ops/test-alert` returns `{"sent": true}` (after webhook var on Railway + admin session)
 - [ ] Railway workspace usage budget + alert configured
 - [ ] `SENTRY_DSN` set (optional but recommended for production)
 
