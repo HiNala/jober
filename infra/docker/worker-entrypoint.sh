@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 
+if [ "${JOBER_ENV:-development}" = "production" ]; then
+  export PLAYWRIGHT_HEADED=false
+fi
+
+python -m jober_worker.health_server &
+HEALTH_PID=$!
+
 celery -A jober_worker.celery_app beat --loglevel=warning &
 BEAT_PID=$!
 celery -A jober_worker.celery_app worker --loglevel=info --concurrency="${CELERY_WORKER_CONCURRENCY:-2}" &
@@ -26,3 +33,4 @@ fi
 
 wait $WORKER_PID
 kill $BEAT_PID 2>/dev/null || true
+kill $HEALTH_PID 2>/dev/null || true

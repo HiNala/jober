@@ -3,9 +3,22 @@
 FROM python:3.12-slim AS builder
 
 WORKDIR /build
-COPY apps/api /build
+COPY packages/schemas /build/packages/schemas
+COPY packages/extraction /build/packages/extraction
+COPY packages/forms /build/packages/forms
+COPY packages/fill /build/packages/fill
+COPY packages/verification /build/packages/verification
+COPY packages/recovery /build/packages/recovery
+COPY apps/api /build/apps/api
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir --prefix=/install .
+    && pip install --no-cache-dir --prefix=/install \
+        /build/packages/schemas \
+        /build/packages/extraction \
+        /build/packages/forms \
+        /build/packages/fill \
+        /build/packages/verification \
+        /build/packages/recovery \
+        /build/apps/api
 
 FROM python:3.12-slim AS runtime
 
@@ -16,12 +29,20 @@ RUN apt-get update \
     && useradd --uid 1000 --gid jober --create-home jober
 
 COPY --from=builder /install /usr/local
+COPY apps/api/alembic /app/alembic
+COPY apps/api/alembic.ini /app/alembic.ini
+COPY infra/docker/api-entrypoint.sh /app/api-entrypoint.sh
 WORKDIR /app
+
+USER root
+RUN sed -i 's/\r$//' /app/api-entrypoint.sh \
+    && chmod +x /app/api-entrypoint.sh \
+    && chown -R jober:jober /app
 
 USER jober
 EXPOSE 8000
 
-HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=15s \
-    CMD curl -f http://localhost:8000/healthz || exit 1
+HEALTHCHECK --interval=15s --timeout=5s --retries=5 --start-period=60s \
+    CMD sh -c 'curl -fsS "http://127.0.0.1:${PORT:-8000}/healthz" || exit 1'
 
-CMD ["uvicorn", "jober_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/app/api-entrypoint.sh"]

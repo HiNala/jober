@@ -1,0 +1,19 @@
+from __future__ import annotations
+
+import pytest
+
+from jober_worker import db
+from jober_worker.config import Settings
+
+
+def test_sync_database_url_uses_psycopg_driver(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        db,
+        "settings",
+        Settings(
+            database_url="postgresql://postgres:secret@postgres.railway.internal:5432/railway",
+        ),
+    )
+    url = db._sync_database_url()
+    assert url.startswith("postgresql+psycopg://")
+    assert "sslmode=require" in url

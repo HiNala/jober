@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +20,13 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     batch_tick_seconds: int = 5
     celery_worker_concurrency: int = 2
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: object) -> str:
+        if isinstance(value, str) and value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+psycopg://", 1)
+        return value  # type: ignore[return-value]
 
 
 settings = Settings()
