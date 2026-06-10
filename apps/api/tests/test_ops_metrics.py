@@ -39,7 +39,7 @@ async def test_global_circuit_trips_cross_tenant(db_session, truncate_tables) ->
             FailureEvent(
                 id=uuid.uuid4(),
                 job_target_id=target.id,
-                run_id=uuid.uuid4(),
+                run_id=None,
                 platform="greenhouse",
                 failure_class="captcha",
                 created_at=datetime.now(UTC),
