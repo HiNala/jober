@@ -101,6 +101,27 @@ services:
       retries: 10
       start_period: 20s
 
+  web:
+    build:
+      context: ..
+      dockerfile: infra/docker/Dockerfile.web
+    profiles: ["full"]
+    environment:
+      # The browser runs on the host, so it must reach the API via the
+      # host-published port (API_HOST_PORT), not the in-network "api" name.
+      NEXT_PUBLIC_API_URL: http://localhost:${API_HOST_PORT:-8000}
+      # Windows bind mounts don't emit fs events; poll so hot reload works.
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    command: pnpm exec next dev -H 0.0.0.0 -p 3000
+    ports:
+      - "${WEB_HOST_PORT:-3000}:3000"
+    volumes:
+      - ../apps/web:/app
+      - /app/node_modules
+    depends_on:
+      - api
+
   worker:
     build:
       context: ..

@@ -1,0 +1,7 @@
+# Root entrypoint so `docker compose <cmd>` works from the repo root.
+# The actual service definitions live in infra/compose.yaml; relative
+# paths there (e.g. build context "..") resolve against infra/.
+name: jober
+
+include:
+  - infra/compose.yaml

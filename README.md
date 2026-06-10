@@ -59,7 +59,13 @@ make infra
 Without Make:
 
 ```bash
-docker compose --env-file .env -f infra/compose.yaml --profile full up -d --build
+docker compose --env-file .env --profile full up -d --build
+```
+
+The root `compose.yaml` includes `infra/compose.yaml`, so `docker compose` works from the repo root. To run only the web dev container (Linux `node_modules`, hot reload on Windows bind mounts):
+
+```bash
+docker compose --env-file .env --profile full up -d web
 ```
 
 If default ports are busy, copy `.env.example` to `.env` and set `POSTGRES_HOST_PORT`, `REDIS_HOST_PORT`, `API_HOST_PORT`, `MINIO_API_HOST_PORT`, and `MINIO_CONSOLE_HOST_PORT`.
