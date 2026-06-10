@@ -17,14 +17,6 @@ _PLACEHOLDER_VALUES = frozenset(
     }
 )
 
-_PRODUCTION_REQUIRED = (
-    ("VAULT_ENCRYPTION_KEY", lambda: settings.vault_encryption_key),
-    ("SECRET_KEY", lambda: settings.secret_key),
-    ("MINIO_ACCESS_KEY", lambda: settings.minio_access_key),
-    ("MINIO_SECRET_KEY", lambda: settings.minio_secret_key),
-)
-
-
 def _is_placeholder(value: str) -> bool:
     normalized = value.strip().lower()
     return not normalized or normalized in _PLACEHOLDER_VALUES
@@ -48,8 +40,13 @@ def _validate_production_secrets() -> None:
     if settings.dev_auth_bypass:
         msg = "DEV_AUTH_BYPASS must be disabled in production"
         raise RuntimeError(msg)
-    for name, getter in _PRODUCTION_REQUIRED:
-        if _is_placeholder(getter()):
+    for name, value in (
+        ("VAULT_ENCRYPTION_KEY", settings.vault_encryption_key),
+        ("SECRET_KEY", settings.secret_key),
+        ("MINIO_ACCESS_KEY", settings.minio_access_key),
+        ("MINIO_SECRET_KEY", settings.minio_secret_key),
+    ):
+        if _is_placeholder(value):
             msg = f"{name} is missing or a placeholder — set a real value before starting"
             raise RuntimeError(msg)
 
