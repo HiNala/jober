@@ -109,6 +109,39 @@ export function AdminOverviewPanel() {
               <span className="text-muted-foreground">Active runs</span>
               <span className="font-medium tabular-nums">{data.health.queue.active_runs}</span>
             </div>
+            {data.ops?.budget ? (
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">LLM budget (month)</span>
+                <span
+                  className={cn(
+                    "font-medium tabular-nums",
+                    data.ops.budget.hard_stop
+                      ? "text-destructive"
+                      : data.ops.budget.soft_warn
+                        ? "text-amber-600"
+                        : undefined,
+                  )}
+                >
+                  ${data.ops.budget.spent_usd.toFixed(2)} / ${data.ops.budget.monthly_budget_usd.toFixed(0)}
+                </span>
+              </div>
+            ) : null}
+            {typeof data.ops?.recovery_rate_30d === "number" ? (
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">Run success rate (30d)</span>
+                <span className="font-medium tabular-nums">
+                  {Math.round(data.ops.recovery_rate_30d * 100)}%
+                </span>
+              </div>
+            ) : null}
+            {typeof data.health.queue.celery_broker_depth === "number" ? (
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">Celery backlog</span>
+                <span className="font-medium tabular-nums">
+                  {data.health.queue.celery_broker_depth}
+                </span>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>

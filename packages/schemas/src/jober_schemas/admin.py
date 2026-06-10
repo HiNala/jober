@@ -51,6 +51,7 @@ class AdminOverviewRead(BaseModel):
     cost: dict[str, object]
     health: dict[str, object]
     attention: list[dict[str, str]]
+    ops: dict[str, object] = Field(default_factory=dict)
 
 
 class AdminRunsSummaryRead(BaseModel):

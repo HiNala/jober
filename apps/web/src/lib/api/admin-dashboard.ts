@@ -27,9 +27,25 @@ export type AdminOverview = {
       globally_paused: boolean;
       max_concurrency: number;
       active_runs: number;
+      celery_broker_depth?: number;
     };
   };
   attention: AdminAttention[];
+  ops?: {
+    celery_broker_depth?: number;
+    recovery_rate_30d?: number;
+    budget?: {
+      monthly_budget_usd: number;
+      spent_usd: number;
+      soft_warn: boolean;
+      hard_stop: boolean;
+    };
+    circuit_trips?: Array<{
+      platform: string;
+      failure_class: string;
+      count: number;
+    }>;
+  };
 };
 
 export type AdminRunsSummary = {
