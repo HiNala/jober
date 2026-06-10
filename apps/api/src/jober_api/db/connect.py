@@ -10,6 +10,9 @@ def asyncpg_connect_args(database_url: str) -> dict[str, object]:
     lowered = database_url.lower()
     if "ssl=disable" in lowered or "sslmode=disable" in lowered:
         return {"ssl": False}
+    # Railway private Postgres (*.railway.internal) does not terminate TLS in-network.
+    if ".railway.internal" in lowered:
+        return {"ssl": False}
     if any(
         token in lowered
         for token in ("ssl=require", "sslmode=require", "sslmode=verify-full", "sslmode=verify-ca")

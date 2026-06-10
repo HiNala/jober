@@ -1,0 +1,55 @@
+{
+  "services": {
+    "43b4e9fb-a7ce-4462-8ce3-eb5f1e826641": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "buildEnvironment": "V3",
+        "dockerfilePath": "infra/docker/Dockerfile.api",
+        "watchPatterns": [
+          "apps/api/**",
+          "packages/**",
+          "infra/docker/Dockerfile.api",
+          "infra/docker/api-entrypoint.sh"
+        ]
+      },
+      "deploy": {
+        "healthcheckPath": "/healthz",
+        "healthcheckTimeout": 300
+      }
+    },
+    "52c4a317-2a44-4f59-b8ac-2d3d487e6ff4": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "buildEnvironment": "V3",
+        "dockerfilePath": "infra/docker/Dockerfile.web.prod",
+        "watchPatterns": [
+          "apps/web/**",
+          "packages/schemas/**",
+          "infra/docker/Dockerfile.web.prod"
+        ]
+      },
+      "deploy": {
+        "healthcheckPath": "/api/health",
+        "healthcheckTimeout": 300
+      }
+    },
+    "0b85f983-573a-40b0-b7da-46f98b28f9f4": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "buildEnvironment": "V3",
+        "dockerfilePath": "infra/docker/Dockerfile.worker",
+        "watchPatterns": [
+          "apps/worker/**",
+          "apps/api/**",
+          "packages/**",
+          "infra/docker/Dockerfile.worker",
+          "infra/docker/worker-entrypoint.sh"
+        ]
+      },
+      "deploy": {
+        "healthcheckPath": "/readyz",
+        "healthcheckTimeout": 300
+      }
+    }
+  }
+}
