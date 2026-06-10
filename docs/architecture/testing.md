@@ -58,6 +58,9 @@ The fix is not done until the fixture + test exist.
 | **Golden path (API)** | `apps/api/tests/test_golden_path_integration.py` | Fixture discover/fill → verify → analytics rollup → admin (hermetic, `@pytest.mark.policy`) |
 | **Schema contract** | `packages/schemas/tests/test_contract.py`, `apps/web/src/lib/schemas-contract.test.ts` | Python enums ↔ generated `types.ts`; drift fails CI |
 | **Policy (blocking)** | `pytest -m policy` | No consent-less sensitive autofill; no CAPTCHA/login bypass; no auto-submit without explicit opt-in; injection text as data |
+| **Load smoke** | `apps/api/tests/test_load_smoke.py` (`@pytest.mark.load`) | Concurrent reads on `/healthz`, queue dashboard, analytics |
+| **Resilience** | `apps/api/tests/test_resilience.py` | `/readyz` degrades when Redis fails; `/healthz` stays live |
+| **Bundle budget (web)** | `apps/web/scripts/check-bundle-budget.mjs` | Total client JS chunk size after `pnpm build` — CI gate |
 
 Policy tests run in a dedicated CI job and **fail the build** on regression.
 
@@ -65,6 +68,7 @@ Policy tests run in a dedicated CI job and **fail the build** on regression.
 
 - `@pytest.mark.policy` — blocking safety invariants
 - `@pytest.mark.quarantine` — flaky tests excluded from default runs (`addopts = "-m 'not quarantine'"`); optional CI lane
+- `@pytest.mark.load` — lightweight concurrent API load smoke (runs in default `pytest`)
 
 ### Environment flags
 

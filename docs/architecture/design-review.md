@@ -851,6 +851,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 32 — Performance, load & resilience testing
+
+**Scope:** API hot-path fixes, SSE backpressure, load/resilience tests, worker concurrency, artifact retention, web bundle budget.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | One presign map; SQL aggregates replace Python loops |
+| Kare | 2 | Budget hard-stop under concurrency; degraded readiness surfaced |
+| Norman | 2 | Auto-reconnect + snapshot catch-up on stream errors |
+| Nielsen | 2 | Load failures name slowest path + threshold |
+| Tufte | 2 | Perf budgets as numbers (KB, 3s, 50 events/poll) |
+| Vignelli | 2 | Markers + CI steps mirror test pyramid doc |
+| Rand | 2 | Honest headless worker concurrency default (2) |
+| Maeda | 2 | Lazy filmstrip thumbs; analytics code-split |
+| Wroblewski | 2 | Degraded pill already on `/readyz`; healthz vs readyz split |
+| Ive | 2 | Weekly artifact purge prevents trace volume fill |
+
+**Total: 20/20** — passes gate.
+
+---
+
 ## Mission 99 (post–Mission 31) — improvements logged
 
 | Change | Why |

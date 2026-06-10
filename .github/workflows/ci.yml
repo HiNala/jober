@@ -289,6 +289,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Bundle size budget
+        run: pnpm check:bundles
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install chromium
 
