@@ -35,6 +35,12 @@ Blog/changelog scaffold shipped.
 
 **M99 CI:** [run 27247296231](https://github.com/HiNala/jober/actions/runs/27247296231) (green on `b6c8e74`).
 
+### M99 pass 2
+- [x] Stale “Mission 30” copy removed from social proof + pricing FAQ
+- [x] `marketingSitemapPaths` regression fixture for public routes + blog slugs
+- [x] `readPersistedUtmParams` test — signup funnel attribution after navigation
+- [x] Web gates re-run: typecheck, lint:strict, build, vitest (51 tests)
+
 ## Notes
 - Legal text is **draft** — requires counsel sign-off before public launch.
 - Pro Stripe checkout not wired on web yet; pricing copy is honest about “coming soon”.

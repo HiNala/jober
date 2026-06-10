@@ -838,6 +838,9 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `marketingMetadata` vitest | Per-page OG/canonical had no regression fixture |
 | Footer `/how-it-works` route | Anchor-only link broke after dedicated page shipped |
 | Landing pricing teaser limits | Teaser still vague after real `/pricing` entitlements went live |
+| `marketingSitemapPaths` vitest | New routes could drop from sitemap silently |
+| `readPersistedUtmParams` test | UTM capture without read-path fixture left funnel gap |
+| Social proof / pricing FAQ copy | User-facing text still referenced internal mission numbers |
 
 ---
 
