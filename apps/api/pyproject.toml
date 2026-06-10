@@ -39,6 +39,9 @@ dependencies = [
 allow-direct-references = true
 
 [project.optional-dependencies]
+observability = [
+    "sentry-sdk[fastapi]>=2.19.0",
+]
 dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",

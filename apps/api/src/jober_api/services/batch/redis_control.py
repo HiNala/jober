@@ -117,6 +117,14 @@ def is_batch_paused(batch_id: str) -> bool:
     return _client().get(f"{_PREFIX}:batch_paused:{batch_id}") == "1"
 
 
+def celery_broker_depth(queue_name: str = "celery") -> int:
+    """Approximate Celery broker backlog (Redis list length)."""
+    try:
+        return int(_client().llen(queue_name) or 0)
+    except redis.RedisError:
+        return 0
+
+
 def queue_snapshot(default_max_concurrency: int) -> dict[str, Any]:
     client = _client()
     return {
@@ -124,4 +132,5 @@ def queue_snapshot(default_max_concurrency: int) -> dict[str, Any]:
         "max_concurrency": get_max_concurrency(default_max_concurrency),
         "active_runs": count_active_slots(),
         "active_run_ids": list(client.smembers(f"{_PREFIX}:active_runs") or []),
+        "celery_broker_depth": celery_broker_depth(),
     }

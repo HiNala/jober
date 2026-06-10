@@ -82,6 +82,10 @@ class Settings(BaseSettings):
     analytics_retention_days: int = 365
     run_artifact_retention_days: int = 90
     admin_bootstrap_secret: str = ""
+    log_format: str = "text"
+    sentry_dsn: str = ""
+    ops_alert_webhook_url: str = ""
+    ops_alert_cooldown_seconds: int = 900
 
     @field_validator("database_url", mode="before")
     @classmethod

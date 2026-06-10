@@ -15,8 +15,10 @@ from jober_api.models.enums import JobTargetStatus, RunStatus
 from jober_api.models.failure_event import FailureEvent
 from jober_api.models.job_target import JobTarget
 from jober_api.models.user import User
+from jober_api.services.admin.ops_metrics import build_ops_attention
 from jober_api.services.analytics.dashboard import get_admin_cost, resolve_date_range
 from jober_api.services.batch.redis_control import queue_snapshot
+from jober_api.services.ops.alerting import dispatch_ops_alerts
 
 
 async def get_admin_overview(session: AsyncSession) -> dict[str, Any]:
@@ -72,6 +74,16 @@ async def get_admin_overview(session: AsyncSession) -> dict[str, Any]:
             }
         )
 
+    ops_attention, ops = await build_ops_attention(session, queue=queue)
+    attention.extend(ops_attention)
+
+    succeeded = int(run_counts.get("succeeded", 0))
+    failed = int(run_counts.get("failed", 0))
+    recovery_rate = round(succeeded / max(succeeded + failed, 1), 4)
+    ops["recovery_rate_30d"] = recovery_rate
+
+    await dispatch_ops_alerts("admin_overview", attention)
+
     return {
         "as_of": datetime.now(UTC).isoformat(),
         "active_users": {
@@ -94,6 +106,7 @@ async def get_admin_overview(session: AsyncSession) -> dict[str, Any]:
             "queue": queue,
         },
         "attention": attention,
+        "ops": ops,
     }
 
 

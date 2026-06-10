@@ -53,6 +53,7 @@ async def test_admin_overview_returns_attention_shape(
     assert "signups" in body
     assert "attention" in body
     assert "health" in body
+    assert "ops" in body
 
 
 @requires_postgres
@@ -68,9 +69,7 @@ async def test_admin_runs_summary_forbidden_for_user(
 
 @requires_postgres
 @pytest.mark.asyncio
-async def test_support_view_audited(
-    db_session, truncate_tables, admin_user, auth_headers
-) -> None:
+async def test_support_view_audited(db_session, truncate_tables, admin_user, auth_headers) -> None:
     other = User(
         id=uuid.uuid4(),
         tenant_id=DEFAULT_DEV_TENANT_ID,
@@ -123,9 +122,7 @@ async def test_admin_config_update_audited(
 
 @requires_postgres
 @pytest.mark.asyncio
-async def test_admin_config_forbidden_for_user(
-    db_session, truncate_tables, auth_headers
-) -> None:
+async def test_admin_config_forbidden_for_user(db_session, truncate_tables, auth_headers) -> None:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/admin/config/", headers=auth_headers)
@@ -184,9 +181,7 @@ async def test_admin_audit_log_filters_by_action(
 
 @requires_postgres
 @pytest.mark.asyncio
-async def test_admin_user_search(
-    db_session, truncate_tables, admin_user, auth_headers
-) -> None:
+async def test_admin_user_search(db_session, truncate_tables, admin_user, auth_headers) -> None:
     other_tenant = Tenant(id=uuid.uuid4(), name="SearchCo", plan=PlanTier.FREE, policy={})
     other = User(
         id=uuid.uuid4(),
