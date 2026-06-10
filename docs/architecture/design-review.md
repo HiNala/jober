@@ -851,6 +851,16 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 31) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| `/how-it-works` step headings `h2` when page has `h1` | Axe `heading-order` failed on dedicated page |
+| Pricing e2e asserts real `h1` copy | Smoke test expected `/pricing/i` but title is “Plans that match…” |
+| Policy golden path skips `/admin/overview` | Policy CI has Postgres only; overview needs Redis (backend job covers it) |
+
+---
+
 ## Mission 99 (post–Mission 30) — improvements logged
 
 | Change | Why |
