@@ -120,8 +120,10 @@ async def test_sse_reconnect_replays_after_seq(db_session, truncate_tables) -> N
 
 @pytest.mark.asyncio
 async def test_sse_stream_includes_retry_and_caps_burst(db_session, truncate_tables) -> None:
-    from jober_api.db import session as db_session_module
+    from contextlib import asynccontextmanager
+
     from jober_api.repositories.application_run import ApplicationRunRepository
+    from jober_api.services.console.service import stream_run_events
 
     job = await _seed_job(db_session)
     runs = ApplicationRunRepository(db_session)
@@ -139,24 +141,22 @@ async def test_sse_stream_includes_retry_and_caps_burst(db_session, truncate_tab
         )
     await db_session.commit()
 
-    async def _override():
-        yield db_session
+    def session_factory():
+        @asynccontextmanager
+        async def _provide():
+            yield db_session
 
-    app.dependency_overrides[db_session_module.get_session] = _override
-    try:
-        transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as client:
-            res = await client.get(
-                f"/api/application-runs/{run.id}/events",
-                headers={"Accept": "text/event-stream"},
-                params={"after_seq": 0, "poll_once": "1"},
-            )
-            assert res.status_code == 200
-            assert "retry: 3000" in res.text
-            data_lines = [line for line in res.text.splitlines() if line.startswith("data: ")]
-            assert len(data_lines) <= 50
-    finally:
-        app.dependency_overrides.clear()
+        return _provide()
+
+    chunks: list[str] = []
+    async for chunk in stream_run_events(
+        session_factory, run.id, after_seq=0, poll_once=True
+    ):
+        chunks.append(chunk)
+    body = "".join(chunks)
+    assert "retry: 3000" in body
+    data_lines = [line for line in body.splitlines() if line.startswith("data: ")]
+    assert len(data_lines) <= 50
 
 
 @pytest.mark.asyncio

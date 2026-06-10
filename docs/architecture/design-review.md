@@ -881,6 +881,8 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | `.env.example` worker/retention vars | Cold-start ops config for concurrency + artifact TTL |
 | Load smoke uses `/api/dashboard/summary` | Wrong batches prefix returned 404 in CI |
 | SSE uses `get_running_loop()` | `get_event_loop()` broke streaming tests under pytest-asyncio |
+| Load smoke: parallel healthz only | Shared pytest session cannot serve concurrent ORM reads |
+| SSE burst test calls `stream_run_events` directly | httpx SSE + asyncpg loop mismatch in CI |
 
 ---
 

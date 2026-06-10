@@ -41,15 +41,18 @@ async def test_hot_read_paths_under_concurrent_load(
     try:
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as client:
-            paths = [
-                ("/healthz", {}),
-                ("/api/dashboard/summary", {"headers": auth_headers}),
-                ("/api/analytics/me", {"headers": auth_headers}),
-            ]
-            tasks = [
-                _timed_get(client, path, **kwargs) for path, kwargs in paths for _ in range(10)
-            ]
-            elapsed = await asyncio.gather(*tasks)
+            # Liveness: parallel (no DB session on the request path).
+            health_elapsed = await asyncio.gather(
+                *[_timed_get(client, "/healthz") for _ in range(20)]
+            )
+            # Hot reads: sequential — one shared test session cannot serve concurrent ORM work.
+            dash_elapsed = await _timed_get(
+                client, "/api/dashboard/summary", headers=auth_headers
+            )
+            analytics_elapsed = await _timed_get(
+                client, "/api/analytics/me", headers=auth_headers
+            )
+            elapsed = [*health_elapsed, dash_elapsed, analytics_elapsed]
         assert max(elapsed) < 3.0, f"slowest request {max(elapsed):.2f}s"
     finally:
         app.dependency_overrides.clear()
