@@ -1,4 +1,4 @@
-"""Golden-path integration — fixture discover/fill → verify → analytics rollup → admin acquisition."""
+"""Golden-path integration — fixture discover/fill → verify → analytics → acquisition."""
 
 from __future__ import annotations
 
