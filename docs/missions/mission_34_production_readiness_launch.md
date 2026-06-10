@@ -44,4 +44,4 @@ curl -X POST -H "Cookie: ..." https://api.example.com/api/admin/ops/test-alert
 - [x] **Fixture-for-bug:** `run_id=None` in circuit-trip fixture (FK violation found in CI)
 - [x] **Design Council:** 19/20 unchanged; CI link in design-review.md
 
-CI after M99 commits: _pending push_
+CI after M99: [run 27278864869](https://github.com/HiNala/jober/actions/runs/27278864869) ✅
