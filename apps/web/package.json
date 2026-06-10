@@ -10,7 +10,9 @@
     "test": "vitest run",
     "lint": "eslint .",
     "lint:strict": "eslint . --max-warnings 0",
-    "check:motion": "node scripts/check-motion-tokens.mjs"
+    "check:motion": "node scripts/check-motion-tokens.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -33,6 +35,8 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

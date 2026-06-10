@@ -46,7 +46,11 @@ export function HowItWorks({
             >
               <span className="text-xs font-medium text-muted-foreground">Step {index + 1}</span>
               <Icon className="mt-3 size-5 text-accent" aria-hidden />
-              <h3 className="mt-2 text-base font-semibold">{title}</h3>
+              {showIntro ? (
+                <h3 className="mt-2 text-base font-semibold">{title}</h3>
+              ) : (
+                <h2 className="mt-2 text-base font-semibold">{title}</h2>
+              )}
               <p className="mt-2 text-sm text-muted-foreground">{body}</p>
               {!compact ? (
                 <p className="mt-3 text-xs leading-relaxed text-muted-foreground/90">{detail}</p>
