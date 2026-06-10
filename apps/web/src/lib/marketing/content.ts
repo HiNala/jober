@@ -185,7 +185,7 @@ export const PRICING_FAQ: { question: string; answer: string }[] = [
   {
     question: "When will Pro checkout be available?",
     answer:
-      "Stripe subscription checkout is rolling out after Mission 30. Free tier limits are live today and match what you see in Settings → usage.",
+      "Stripe subscription checkout is rolling out soon. Free tier limits are live today and match what you see in Settings → usage.",
   },
   {
     question: "What counts as a run?",

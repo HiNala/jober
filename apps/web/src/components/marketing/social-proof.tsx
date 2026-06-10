@@ -27,7 +27,8 @@ export function SocialProof() {
             Built with operators who care about trust
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Placeholder quotes from design partners — full case studies ship with Mission 30.
+            Early feedback from design partners and private beta users — formal case studies
+            coming as we launch publicly.
           </p>
         </div>
 

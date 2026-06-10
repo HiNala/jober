@@ -73,18 +73,21 @@ export function captureUtmFromUrl(): void {
   sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(fromUrl));
 }
 
-function readUtmParams(): UtmFields {
+export function readPersistedUtmParams(): UtmFields {
   if (typeof window === "undefined") return {};
   const fromUrl = utmFromSearch();
   if (hasUtm(fromUrl)) return fromUrl;
   try {
     const raw = sessionStorage.getItem(UTM_STORAGE_KEY);
     if (!raw) return {};
-    const parsed = JSON.parse(raw) as UtmFields;
-    return parsed;
+    return JSON.parse(raw) as UtmFields;
   } catch {
     return {};
   }
+}
+
+function readUtmParams(): UtmFields {
+  return readPersistedUtmParams();
 }
 
 function rotateAnonIdIfNeeded(): string {
