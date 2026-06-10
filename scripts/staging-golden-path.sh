@@ -3,6 +3,7 @@
 # Authenticated fixture pipeline is covered by CI: test_golden_path_integration.py
 set -euo pipefail
 
+# Override for production: API_URL=https://api-production-4b5b.up.railway.app WEB_URL=https://web-production-29902.up.railway.app
 API_URL="${API_URL:-https://api-staging-a8ca.up.railway.app}"
 WEB_URL="${WEB_URL:-https://web-staging-763f.up.railway.app}"
 

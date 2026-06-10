@@ -91,6 +91,24 @@ Production images: `infra/docker/Dockerfile.api` (Alembic migrate + `$PORT`), `D
 
 **Ops & launch (Mission 34):** `/admin/overview` shows LLM budget, run success rate, Celery backlog, and circuit-breaker attention. Set `OPS_ALERT_WEBHOOK_URL` for outbound alerts; verify with `POST /api/admin/ops/test-alert` (admin session). Cron: `scripts/uptime-check.sh`. Staging gate: `bash scripts/staging-golden-path.sh`. Full launch gate: `docs/runbooks/launch-checklist.md`.
 
+### Production (live)
+
+| Service | URL |
+|---------|-----|
+| Web | https://web-production-29902.up.railway.app |
+| API | https://api-production-4b5b.up.railway.app |
+
+Smoke: `API_URL=https://api-production-4b5b.up.railway.app WEB_URL=https://web-production-29902.up.railway.app bash scripts/railway-smoke.sh`
+
+**Enable real LLM (OpenAI)** — only required variable left for AI features:
+
+```bash
+railway environment production
+railway variables set LLM_API_KEY=sk-... LLM_PROVIDER=openai --service api
+```
+
+Without `LLM_API_KEY`, the API uses the template LLM provider (stub responses). Sign up at `/signup`, then use the app; email verification tokens are created but outbound email is not configured yet.
+
 ## Where things live
 
 ```
