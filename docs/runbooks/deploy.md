@@ -113,6 +113,27 @@ The script checks `/healthz`, `/readyz`, web `/api/health`, landing HTML, and `/
 | Migrations failed | Check API deploy logs before uvicorn start; fix drift locally with `make migrate` |
 | Worker restart loop | Confirm `PLAYWRIGHT_HEADED=false`, Chromium deps in image, `/readyz` after Celery ping |
 
-## Usage budgets
+## Usage budgets & alerts
 
-Set Railway workspace usage alerts. Tie worker concurrency and batch limits to the cost governor (Mission 34).
+Set Railway workspace usage alerts. Tie worker concurrency and batch limits to the cost governor.
+
+| Variable | Purpose |
+|----------|---------|
+| `OPS_ALERT_WEBHOOK_URL` | Slack/Discord/PagerDuty incoming webhook for `/readyz` + admin attention |
+| `OPS_ALERT_COOLDOWN_SECONDS` | Dedup window (default 900) |
+| `LOG_FORMAT=json` | Structured logs for Railway log drains |
+| `SENTRY_DSN` | Optional error tracking (install `sentry-sdk` in API image) |
+| `LLM_MONTHLY_BUDGET_USD` | Monthly LLM cap; soft warn at 80% in admin |
+
+Verify: `POST /api/admin/ops/test-alert` (admin session required).
+
+## Related runbooks
+
+- [launch-checklist.md](./launch-checklist.md)
+- [rollback.md](./rollback.md)
+- [restore-backup.md](./restore-backup.md)
+- [worker-stuck.md](./worker-stuck.md)
+- [queue-backed-up.md](./queue-backed-up.md)
+- [cost-spike.md](./cost-spike.md)
+- [infra-down.md](./infra-down.md)
+- [rotate-secrets.md](./rotate-secrets.md)

@@ -872,6 +872,27 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 34 — Production readiness & launch
+
+**Scope:** Admin ops metrics, webhook alerting, structured logs, runbooks, launch checklist, uptime script.
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Rams | 2 | Reuses admin attention pattern; no duplicate monitoring stack |
+| Kare | 2 | Runbooks name symptoms → fix plainly |
+| Norman | 2 | test-alert endpoint; readyz fires webhook |
+| Nielsen | 2 | Launch checklist scannable; ops metrics on overview |
+| Tufte | 2 | Budget/backlog/success rate as numbers, not vanity charts |
+| Vignelli | 2 | Runbooks under `docs/runbooks/` consistent |
+| Rand | 1 | Ops/infra mission |
+| Maeda | 2 | Optional Sentry; webhook-only when configured |
+| Wroblewski | 1 | Admin desktop-first |
+| Ive | 2 | Alert cooldown prevents webhook spam |
+
+**Total: 19/20** — passes gate.
+
+---
+
 ## Mission 33 — Railway production deployment
 
 **Scope:** Production Dockerfiles, API/worker health probes, deploy runbook, Railway service configs, staging smoke script. No product UI changes.

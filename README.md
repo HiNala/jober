@@ -89,6 +89,8 @@ bash scripts/railway-smoke.sh
 
 Production images: `infra/docker/Dockerfile.api` (Alembic migrate + `$PORT`), `Dockerfile.web.prod` (Next standalone), `Dockerfile.worker` (headless Chromium). API refuses boot in production when secrets are placeholders or `DEV_AUTH_BYPASS` is set. Railway’s `postgresql://` URL is rewritten to `postgresql+asyncpg://` automatically.
 
+**Ops & launch (Mission 34):** `/admin/overview` shows LLM budget, run success rate, Celery backlog, and circuit-breaker attention. Set `OPS_ALERT_WEBHOOK_URL` for outbound alerts; use `scripts/uptime-check.sh` for cron monitoring. Full launch gate: `docs/runbooks/launch-checklist.md`.
+
 ## Where things live
 
 ```
