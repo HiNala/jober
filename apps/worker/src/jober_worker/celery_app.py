@@ -30,5 +30,9 @@ celery_app.conf.update(
             "task": "jober_worker.tasks.analytics_retention_purge",
             "schedule": crontab(hour=3, minute=30, day_of_week="sun"),
         },
+        "run-artifact-retention-purge": {
+            "task": "jober_worker.tasks.run_artifact_retention_purge",
+            "schedule": crontab(hour=4, minute=0, day_of_week="sun"),
+        },
     },
 )

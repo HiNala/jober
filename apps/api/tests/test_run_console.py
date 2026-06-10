@@ -119,6 +119,47 @@ async def test_sse_reconnect_replays_after_seq(db_session, truncate_tables) -> N
 
 
 @pytest.mark.asyncio
+async def test_sse_stream_includes_retry_and_caps_burst(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+    from jober_api.repositories.application_run import ApplicationRunRepository
+
+    job = await _seed_job(db_session)
+    runs = ApplicationRunRepository(db_session)
+    run = await runs.create(
+        job_target_id=job.id,
+        status=RunStatus.FILL_FORM,
+        current_step=RunStatus.FILL_FORM,
+    )
+    events = RunEventRepository(db_session)
+    for index in range(55):
+        await events.append(
+            run_id=run.id,
+            event_type="field.filled",
+            message=f"field {index}",
+        )
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            res = await client.get(
+                f"/api/application-runs/{run.id}/events",
+                headers={"Accept": "text/event-stream"},
+                params={"after_seq": 0, "poll_once": "1"},
+            )
+            assert res.status_code == 200
+            assert "retry: 3000" in res.text
+            data_lines = [line for line in res.text.splitlines() if line.startswith("data: ")]
+            assert len(data_lines) <= 50
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_checkpoint_resolve_from_api(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
     from jober_api.models.human_checkpoint import HumanCheckpoint

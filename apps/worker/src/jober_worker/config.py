@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     browserless_url: str = ""
     redis_url: str = "redis://localhost:6379/0"
     batch_tick_seconds: int = 5
+    celery_worker_concurrency: int = 2
 
 
 settings = Settings()

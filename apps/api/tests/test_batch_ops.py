@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from unittest.mock import patch
 
@@ -148,6 +149,17 @@ async def test_budget_hard_stop_blocks_generation(db_session, truncate_tables) -
         pytest.raises(BudgetExceededError, match="budget exceeded"),
     ):
         await assert_generation_budget(db_session, projected_cost=0.5)
+
+
+@pytest.mark.asyncio
+async def test_budget_hard_stop_under_concurrent_checks(db_session, truncate_tables) -> None:
+    with patch.object(settings, "llm_monthly_budget_usd", 0.01):
+
+        async def _check() -> None:
+            with pytest.raises(BudgetExceededError, match="budget exceeded"):
+                await assert_generation_budget(db_session, projected_cost=0.5)
+
+        await asyncio.gather(*[_check() for _ in range(8)])
 
 
 @pytest.mark.asyncio

@@ -3,7 +3,7 @@ set -e
 
 celery -A jober_worker.celery_app beat --loglevel=warning &
 BEAT_PID=$!
-celery -A jober_worker.celery_app worker --loglevel=info &
+celery -A jober_worker.celery_app worker --loglevel=info --concurrency="${CELERY_WORKER_CONCURRENCY:-2}" &
 WORKER_PID=$!
 
 echo "Waiting for Celery worker..."

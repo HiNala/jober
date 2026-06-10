@@ -97,6 +97,7 @@ pythonpath = ["src"]
 markers = [
     "policy: blocking safety invariant tests",
     "quarantine: flaky tests excluded from default CI",
+    "load: lightweight concurrent load smoke tests",
 ]
 addopts = "-m 'not quarantine'"
 

@@ -74,6 +74,20 @@ def batch_orchestrator_tick(batch_id: str | None = None) -> dict[str, object]:
     return run_orchestrator_tick(batch_id)
 
 
+@celery_app.task(name="jober_worker.tasks.run_artifact_retention_purge")
+def run_artifact_retention_purge() -> dict[str, object]:
+    import asyncio
+
+    from jober_api.db.session import async_session_factory
+    from jober_api.services.privacy.artifact_retention import purge_stale_run_artifacts
+
+    async def _run() -> dict[str, object]:
+        async with async_session_factory() as session:
+            return await purge_stale_run_artifacts(session)
+
+    return asyncio.run(_run())
+
+
 @celery_app.task(name="jober_worker.tasks.analytics_retention_purge")
 def analytics_retention_purge() -> dict[str, object]:
     from jober_api.services.analytics.retention import purge_stale_analytics_events_sync
