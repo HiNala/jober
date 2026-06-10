@@ -2,7 +2,7 @@
 
 **Owner:** Brian Permut
 **Repo:** github.com/HiNala/jober
-**Primary use:** Personal, high-volume *and* high-quality applications to startup engineering jobs.
+**Primary use:** Personal, high-volume *and* high-quality applications to any job.
 **Future path:** Commercializable self-hosted web app (auth, billing, multi-tenant isolation).
 
 ---

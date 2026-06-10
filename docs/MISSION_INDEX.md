@@ -1,5 +1,7 @@
 # Mission Index — Jober
 
+> **Post-launch improvement work lives in [`docs/polish-pack/`](polish-pack/mission_index.md)** — a self-contained pack of 2 audits + 31 polish missions for the deployed product. The missions below are the original build missions (complete; archived record).
+
 Run **in order**. After each numbered mission, run **Mission 99 — Iteration Loop** before advancing.
 
 | # | Mission | Builds |
