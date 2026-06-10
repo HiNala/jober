@@ -43,7 +43,7 @@ async def test_hot_read_paths_under_concurrent_load(
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             paths = [
                 ("/healthz", {}),
-                ("/api/batches/dashboard/summary", {"headers": auth_headers}),
+                ("/api/dashboard/summary", {"headers": auth_headers}),
                 ("/api/analytics/me", {"headers": auth_headers}),
             ]
             tasks = [

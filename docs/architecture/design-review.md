@@ -879,6 +879,8 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 | Perf indexes on ORM models | Migration-only indexes failed `check_migration_drift.py` in CI |
 | `test_artifact_retention.py` | Retention purge task had no regression fixture |
 | `.env.example` worker/retention vars | Cold-start ops config for concurrency + artifact TTL |
+| Load smoke uses `/api/dashboard/summary` | Wrong batches prefix returned 404 in CI |
+| SSE uses `get_running_loop()` | `get_event_loop()` broke streaming tests under pytest-asyncio |
 
 ---
 

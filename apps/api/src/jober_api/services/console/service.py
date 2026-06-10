@@ -297,7 +297,7 @@ async def stream_run_events(
     last_seq = after_seq
     last_screenshot_emit = 0.0
     last_heartbeat = 0.0
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     yield f"retry: {_SSE_RETRY_MS}\n\n"
 
     while True:
