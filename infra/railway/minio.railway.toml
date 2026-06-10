@@ -1,0 +1,14 @@
+# Railway service config — MinIO on a persistent volume (optional object storage).
+#
+# Provision manually:
+# 1. Add a Docker image service: minio/minio:RELEASE.2025-01-20T14-49-07Z
+# 2. Start command: server /data --console-address :9001
+# 3. Attach a volume at /data (brief downtime on redeploy).
+# 4. Keep networking private — do NOT expose publicly.
+# 5. Set MINIO_ROOT_USER / MINIO_ROOT_PASSWORD as sealed variables.
+#
+# Alternative: Railway native storage buckets (see docs/runbooks/deploy.md).
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

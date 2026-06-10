@@ -1,0 +1,15 @@
+# Railway service config — Web (attach in service Settings → Config path).
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "infra/docker/Dockerfile.web.prod"
+watchPatterns = [
+  "apps/web/**",
+  "infra/docker/Dockerfile.web.prod",
+]
+
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
