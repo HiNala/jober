@@ -830,6 +830,17 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 30) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Split UTM SDK commit (`470104d`) | `aad87e3` shipped legal/tests without `captureUtmFromUrl` — CI failed until SDK landed |
+| `marketingMetadata` vitest | Per-page OG/canonical had no regression fixture |
+| Footer `/how-it-works` route | Anchor-only link broke after dedicated page shipped |
+| Landing pricing teaser limits | Teaser still vague after real `/pricing` entitlements went live |
+
+---
+
 ## Mission 99 (post–Mission 29) — improvements logged
 
 | Change | Why |

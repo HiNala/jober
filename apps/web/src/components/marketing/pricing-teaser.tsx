@@ -21,8 +21,8 @@ export function PricingTeaser() {
             Start free, scale when your pipeline does
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-            A generous free tier for solo searchers. Pro adds batch runs, priority support, and
-            higher limits — full comparison on the pricing page.
+            Free includes 20 runs/month, batches up to 5, and a $5 managed LLM budget. Pro raises
+            those limits — see the full comparison on pricing.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <MarketingCtaLink href="/signup" feature="landing_pricing_signup" size="lg">

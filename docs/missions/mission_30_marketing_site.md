@@ -22,8 +22,16 @@
 ## Analytics CTA keys (sample)
 `features_cta_signup`, `pricing_free_signup`, `faq_cta_signup`, `how_it_works_cta_signup`, `blog_header_signup`, etc.
 
+**CI:** [run 27241226129](https://github.com/HiNala/jober/actions/runs/27241226129) (green on `470104d`).
+
 ## Iteration clause
-Blog/changelog scaffold shipped. **Mission 99** runs next.
+Blog/changelog scaffold shipped.
+
+## Mission 99
+- [x] CI green after UTM SDK follow-up commit (`470104d`)
+- [x] `marketingMetadata` vitest for canonical/OG URLs
+- [x] Footer + pricing teaser aligned with live `/pricing` entitlements
+- [x] Web gates: `typecheck`, `lint:strict`, `build`, vitest
 
 ## Notes
 - Legal text is **draft** — requires counsel sign-off before public launch.
