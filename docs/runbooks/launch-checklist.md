@@ -2,7 +2,15 @@
 
 Tick every item before promoting staging → production or announcing publicly.
 
-## Domains & SSL
+## Staging (verified 2026-06-10)
+
+- [x] API `/readyz` green (postgres, redis, storage)
+- [x] Public smoke: `bash scripts/staging-golden-path.sh` (or `railway-smoke.sh` with staging URLs)
+- [x] CI golden path: `test_golden_path_integration.py` (fixture ATS, no live mass submit)
+- [x] Release `v0.1.0` tagged; `CHANGELOG.md` updated
+- [ ] `OPS_ALERT_WEBHOOK_URL` on Railway API (set your webhook, then `POST /api/admin/ops/test-alert`)
+
+## Production cutover — domains & SSL
 
 - [ ] Web public domain + SSL (Railway or custom)
 - [ ] API public domain + SSL
@@ -61,6 +69,6 @@ Tick every item before promoting staging → production or announcing publicly.
 
 ## Release
 
-- [ ] Git tag created (`v0.1.0` or semver) with release notes
-- [ ] `CHANGELOG.md` updated
-- [ ] Post-launch review scheduled (reliability + cost + funnel, 7 days)
+- [x] Git tag created (`v0.1.0`) with release notes
+- [x] `CHANGELOG.md` updated
+- [ ] Post-launch review scheduled (reliability + cost + funnel, 7 days) — **target: 2026-06-17**

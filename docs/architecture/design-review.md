@@ -891,6 +891,8 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 **Total: 19/20** — passes gate. CI green: [run 27276789268](https://github.com/HiNala/jober/actions/runs/27276789268).
 
+**M99 (M34):** Added webhook success-path tests + `staging-golden-path.sh`; no score change.
+
 ---
 
 ## Mission 33 — Railway production deployment
