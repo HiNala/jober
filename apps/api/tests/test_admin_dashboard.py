@@ -203,3 +203,37 @@ async def test_admin_user_search(db_session, truncate_tables, admin_user, auth_h
     assert response.status_code == 200
     emails = [row["email"] for row in response.json()["items"]]
     assert "findme@searchco.local" in emails
+
+
+@requires_postgres
+@pytest.mark.asyncio
+async def test_admin_ops_test_alert_forbidden_for_user(
+    db_session, truncate_tables, auth_headers
+) -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.post("/api/admin/ops/test-alert", headers=auth_headers)
+    assert response.status_code == 403
+
+
+@requires_postgres
+@pytest.mark.asyncio
+async def test_admin_ops_test_alert_returns_sent_flag(
+    db_session,
+    truncate_tables,
+    admin_user,
+    auth_headers,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def _fake_dispatch(*_args: object, **_kwargs: object) -> bool:
+        return True
+
+    monkeypatch.setattr(
+        "jober_api.routers.admin_dashboard.dispatch_ops_alerts",
+        _fake_dispatch,
+    )
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.post("/api/admin/ops/test-alert", headers=auth_headers)
+    assert response.status_code == 200
+    assert response.json() == {"sent": True}
