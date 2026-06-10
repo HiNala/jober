@@ -94,6 +94,8 @@ Opt-in only. Never submit.
 
 API coverage gate: `fail_under = 58` in `apps/api/pyproject.toml`. CI uploads `coverage.xml` on every run.
 
+After adding Alembic indexes, mirror them on the SQLAlchemy models (`__table_args__`) — `python scripts/check_migration_drift.py` runs on every CI backend job.
+
 ## Running locally
 
 ```bash

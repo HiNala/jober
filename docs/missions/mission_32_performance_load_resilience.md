@@ -30,5 +30,13 @@
 | Hot API reads (30 concurrent) | p99 < 3s (CI smoke) |
 | SSE burst | ≤ 50 events per poll |
 
+## Mission 99 (post–M32)
+
+- [x] Model `Index()` definitions synced with `p8q9r0s31t62` migration (drift check was failing CI)
+- [x] `test_artifact_retention.py` — terminal run purge respects `run_artifact_retention_days`
+- [x] `.env.example` documents `CELERY_WORKER_CONCURRENCY` and `RUN_ARTIFACT_RETENTION_DAYS`
+
+**M99 CI:** pending — see latest [CI run on `main`](https://github.com/HiNala/jober/actions/workflows/ci.yml?query=branch%3Amain).
+
 ## Iteration clause
-**Mission 99** runs next.
+Perf indexes must live in both Alembic **and** SQLAlchemy `__table_args__` or `check_migration_drift.py` fails.

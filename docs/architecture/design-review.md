@@ -872,6 +872,16 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 ---
 
+## Mission 99 (post–Mission 32) — improvements logged
+
+| Change | Why |
+|--------|-----|
+| Perf indexes on ORM models | Migration-only indexes failed `check_migration_drift.py` in CI |
+| `test_artifact_retention.py` | Retention purge task had no regression fixture |
+| `.env.example` worker/retention vars | Cold-start ops config for concurrency + artifact TTL |
+
+---
+
 ## Mission 99 (post–Mission 31) — improvements logged
 
 | Change | Why |
