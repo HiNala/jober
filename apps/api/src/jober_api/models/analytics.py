@@ -33,6 +33,7 @@ class AnalyticsEvent(Base, UUIDPrimaryKeyMixin):
         Index("ix_analytics_events_name_ts", "name", "ts"),
         Index("ix_analytics_events_session_ts", "session_id", "ts"),
         Index("ix_analytics_events_user_ts", "user_id", "ts"),
+        Index("ix_analytics_events_tenant_ts", "tenant_id", "ts"),
     )
 
     ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

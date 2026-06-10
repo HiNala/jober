@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,6 +20,7 @@ class BatchItem(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "batch_items"
     __table_args__ = (
         UniqueConstraint("batch_id", "job_target_id", name="uq_batch_items_batch_job"),
+        Index("ix_batch_items_batch_status", "batch_id", "status"),
     )
 
     batch_id: Mapped[uuid.UUID] = mapped_column(

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 class LlmCall(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "llm_calls"
+    __table_args__ = (Index("ix_llm_calls_created_at", "created_at"),)
 
     run_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
