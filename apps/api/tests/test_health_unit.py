@@ -12,14 +12,14 @@ async def test_check_redis_fails_fast_on_bad_host() -> None:
     assert detail
 
 
-def test_check_minio_reports_missing_bucket(monkeypatch: pytest.MonkeyPatch) -> None:
-    class FakeClient:
-        def bucket_exists(self, name: str) -> bool:
-            _ = name
+@pytest.mark.asyncio
+async def test_check_minio_reports_missing_bucket(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeStorage:
+        async def bucket_exists(self) -> bool:
             return False
 
-    monkeypatch.setattr("jober_api.health.Minio", lambda *args, **kwargs: FakeClient())
+    monkeypatch.setattr("jober_api.health.ObjectStorage", lambda: FakeStorage())
 
-    ok, detail = check_minio()
+    ok, detail = await check_minio()
     assert ok is False
     assert "not found" in detail

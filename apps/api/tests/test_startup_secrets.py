@@ -12,8 +12,11 @@ def test_startup_rejects_placeholder_secrets_in_production(
     monkeypatch.setenv("CI", "")
     prod_settings = Settings(
         jober_env="production",
+        auth_mode="native",
         vault_encryption_key="changeme",
         secret_key="changeme",
+        minio_access_key="prod-minio-key",
+        minio_secret_key="prod-minio-secret",
     )
     monkeypatch.setattr("jober_api.privacy.secrets_check.settings", prod_settings)
     with pytest.raises(RuntimeError, match="VAULT_ENCRYPTION_KEY"):
