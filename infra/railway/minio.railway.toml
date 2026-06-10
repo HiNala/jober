@@ -2,13 +2,21 @@
 #
 # Provision manually:
 # 1. Add a Docker image service: minio/minio:RELEASE.2025-01-20T14-49-07Z
-# 2. Start command: server /data --console-address :9001
+# 2. Start command (Railway): bind $PORT and clear volume lost+found (see below)
 # 3. Attach a volume at /data (brief downtime on redeploy).
 # 4. Keep networking private — do NOT expose publicly.
 # 5. Set MINIO_ROOT_USER / MINIO_ROOT_PASSWORD as sealed variables.
+# 6. Wire api/worker: MINIO_ENDPOINT=${{Bucket.RAILWAY_PRIVATE_DOMAIN}}:9000,
+#    MINIO_ACCESS_KEY=${{Bucket.MINIO_ROOT_USER}},
+#    MINIO_SECRET_KEY=${{Bucket.MINIO_ROOT_PASSWORD}},
+#    MINIO_BUCKET=jober-artifacts, MINIO_SECURE=false
+# 7. Create bucket once (mc or MinIO SDK) — API does not auto-create.
+#
+# Do NOT set MINIO_BROWSER_REDIRECT_URL to ${{Console.*}} unless a Console service exists.
 #
 # Alternative: Railway native storage buckets (see docs/runbooks/deploy.md).
 
 [deploy]
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+startCommand = "/bin/sh -c \"rm -rf $RAILWAY_VOLUME_MOUNT_PATH/lost+found/ 2>/dev/null; exec minio server $RAILWAY_VOLUME_MOUNT_PATH --address :$PORT --console-address :9001\""
