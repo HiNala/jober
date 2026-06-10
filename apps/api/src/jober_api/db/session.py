@@ -4,11 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from jober_api.config import settings
 from jober_api.db.base import Base
+from jober_api.db.connect import asyncpg_connect_args
 
 engine = create_async_engine(
     settings.database_url,
     pool_pre_ping=True,
-    connect_args={"ssl": False},
+    connect_args=asyncpg_connect_args(settings.database_url),
 )
 
 async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

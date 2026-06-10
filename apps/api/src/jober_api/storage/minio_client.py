@@ -29,11 +29,15 @@ class ObjectStorage:
         secure: bool | None = None,
     ) -> None:
         self._bucket = bucket or settings.minio_bucket
+        minio_kwargs: dict[str, object] = {}
+        if settings.minio_region:
+            minio_kwargs["region"] = settings.minio_region
         self._client = Minio(
             endpoint or settings.minio_endpoint,
             access_key=access_key or settings.minio_access_key,
             secret_key=secret_key or settings.minio_secret_key,
             secure=secure if secure is not None else settings.minio_secure,
+            **minio_kwargs,  # type: ignore[arg-type]
         )
 
     @property

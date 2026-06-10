@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from jober_api.config import settings
 from jober_api.db.base import Base
+from jober_api.db.connect import asyncpg_connect_args
 from jober_api.db.migration_drift import material_diffs
 from jober_api.models import (  # noqa: F401 — register metadata
     AnalyticsDailyActiveUsers,
@@ -48,7 +49,10 @@ from jober_api.models import (  # noqa: F401 — register metadata
 
 
 async def main() -> int:
-    engine = create_async_engine(settings.database_url, connect_args={"ssl": False})
+    engine = create_async_engine(
+        settings.database_url,
+        connect_args=asyncpg_connect_args(settings.database_url),
+    )
     async with engine.connect() as connection:
 
         def _diff(sync_conn):  # type: ignore[no-untyped-def]

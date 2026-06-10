@@ -1,4 +1,15 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Annotated
+
+from pydantic import BeforeValidator, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+
+def _split_csv(value: object) -> list[str]:
+    if isinstance(value, str):
+        return [part.strip() for part in value.split(",") if part.strip()]
+    if isinstance(value, list):
+        return value
+    return []
 
 
 class Settings(BaseSettings):
@@ -11,9 +22,14 @@ class Settings(BaseSettings):
     minio_secret_key: str = "minioadmin"
     minio_bucket: str = "jober-artifacts"
     minio_secure: bool = False
+    minio_region: str = ""
     api_host: str = "0.0.0.0"
     api_port: int = 8000
-    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_origins: Annotated[
+        list[str],
+        NoDecode,
+        BeforeValidator(_split_csv),
+    ] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     secret_key: str = ""
     vault_encryption_key: str = ""
     llm_api_key: str = ""
@@ -67,5 +83,18 @@ class Settings(BaseSettings):
     run_artifact_retention_days: int = 90
     admin_bootstrap_secret: str = ""
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: object) -> str:
+        if isinstance(value, str) and value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return value  # type: ignore[return-value]
+
+    @field_validator("minio_endpoint", mode="before")
+    @classmethod
+    def normalize_minio_endpoint(cls, value: object) -> str:
+        if isinstance(value, str):
+            return value.removeprefix("https://").removeprefix("http://")
+        return value  # type: ignore[return-value]
 
 settings = Settings()

@@ -7,6 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from jober_api.config import settings
+from jober_api.db.connect import asyncpg_connect_args
 from jober_api.crypto.encrypted import EncryptedText
 from jober_api.db.base import Base
 from jober_api.models import (  # noqa: F401 — register metadata
@@ -68,7 +69,7 @@ async def run_async_migrations() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        connect_args={"ssl": False},
+        connect_args=asyncpg_connect_args(settings.database_url),
     )
 
     async with connectable.connect() as connection:

@@ -1,12 +1,12 @@
-import asyncio
 from typing import Any
 
 import redis.asyncio as aioredis
-from minio import Minio
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from jober_api.config import settings
+from jober_api.db.connect import asyncpg_connect_args
+from jober_api.storage.minio_client import ObjectStorage
 
 
 async def check_postgres(engine: AsyncEngine) -> tuple[bool, str]:
@@ -27,15 +27,10 @@ async def check_redis(url: str) -> tuple[bool, str]:
         return False, str(exc)
 
 
-def check_minio() -> tuple[bool, str]:
+async def check_minio() -> tuple[bool, str]:
     try:
-        client = Minio(
-            settings.minio_endpoint,
-            access_key=settings.minio_access_key,
-            secret_key=settings.minio_secret_key,
-            secure=settings.minio_secure,
-        )
-        exists = client.bucket_exists(settings.minio_bucket)
+        storage = ObjectStorage()
+        exists = await storage.bucket_exists()
         if not exists:
             return False, f"bucket '{settings.minio_bucket}' not found"
         return True, "ok"
@@ -47,12 +42,12 @@ async def readiness_report(database_url: str, redis_url: str) -> dict[str, Any]:
     engine = create_async_engine(
         database_url,
         pool_pre_ping=True,
-        connect_args={"ssl": False},
+        connect_args=asyncpg_connect_args(database_url),
     )
     try:
         pg_ok, pg_msg = await check_postgres(engine)
         redis_ok, redis_msg = await check_redis(redis_url)
-        minio_ok, minio_msg = await asyncio.to_thread(check_minio)
+        minio_ok, minio_msg = await check_minio()
 
         checks = {
             "postgres": {"ok": pg_ok, "detail": pg_msg},

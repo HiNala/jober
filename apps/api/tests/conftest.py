@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
 from jober_api.config import settings
 from jober_api.db.base import Base
+from jober_api.db.connect import asyncpg_connect_args
 from jober_api.models import (  # noqa: F401 — register mappers
     AdminAuditLog,
     AnalyticsDailyActiveUsers,
@@ -104,7 +105,10 @@ def fixture_server_url() -> Generator[str, None, None]:
 async def db_engine(database_url: str, vault_key: str, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(settings, "vault_encryption_key", vault_key)
     monkeypatch.setattr(settings, "auth_mode", "dev")
-    engine = create_async_engine(database_url, connect_args={"ssl": False})
+    engine = create_async_engine(
+        database_url,
+        connect_args=asyncpg_connect_args(database_url),
+    )
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -190,7 +194,10 @@ async def db_session(db_engine) -> AsyncGenerator[AsyncSession, None]:
 
 @pytest_asyncio.fixture
 async def raw_connection(database_url: str):
-    engine = create_async_engine(database_url, connect_args={"ssl": False})
+    engine = create_async_engine(
+        database_url,
+        connect_args=asyncpg_connect_args(database_url),
+    )
     async with engine.connect() as conn:
         yield conn
     await engine.dispose()
