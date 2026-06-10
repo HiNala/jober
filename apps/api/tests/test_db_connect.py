@@ -15,7 +15,7 @@ def test_asyncpg_ssl_required_in_url() -> None:
     assert asyncpg_connect_args(url) == {"ssl": True}
 
 
-def test_asyncpg_ssl_defaults_on_production_env(monpatch: pytest.MonkeyPatch) -> None:
+def test_asyncpg_ssl_defaults_on_production_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("JOBER_ENV", "production")
     url = "postgresql+asyncpg://u:p@host:5432/railway"
     assert asyncpg_connect_args(url) == {"ssl": True}
