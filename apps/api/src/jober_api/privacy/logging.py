@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import json
 import logging
 from datetime import UTC, datetime
@@ -69,15 +70,17 @@ def init_sentry() -> None:
     if not dsn:
         return
     try:
-        import sentry_sdk  # type: ignore[import-not-found]
-        from sentry_sdk.integrations.fastapi import FastApiIntegration  # type: ignore[import-not-found]
+        sentry_sdk = importlib.import_module("sentry_sdk")
+        fastapi_integration = importlib.import_module(
+            "sentry_sdk.integrations.fastapi",
+        ).FastApiIntegration
     except ImportError:
         safe_log(logging.WARNING, "sentry-sdk not installed; error tracking disabled")
         return
     sentry_sdk.init(
         dsn=dsn,
         environment=settings.jober_env,
-        integrations=[FastApiIntegration()],
+        integrations=[fastapi_integration()],
         send_default_pii=False,
         traces_sample_rate=0.1 if settings.jober_env == "production" else 0.0,
     )
