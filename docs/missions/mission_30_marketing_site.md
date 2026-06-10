@@ -41,6 +41,8 @@ Blog/changelog scaffold shipped.
 - [x] `readPersistedUtmParams` test — signup funnel attribution after navigation
 - [x] Web gates re-run: typecheck, lint:strict, build, vitest (51 tests)
 
+**M99 pass 2 CI:** [run 27247909805](https://github.com/HiNala/jober/actions/runs/27247909805) (green on `5283f04`).
+
 ## Notes
 - Legal text is **draft** — requires counsel sign-off before public launch.
 - Pro Stripe checkout not wired on web yet; pricing copy is honest about “coming soon”.
