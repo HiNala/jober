@@ -1,4 +1,5 @@
 from typing import Annotated
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from pydantic import BeforeValidator, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -90,9 +91,18 @@ class Settings(BaseSettings):
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_database_url(cls, value: object) -> str:
-        if isinstance(value, str) and value.startswith("postgresql://"):
-            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return value  # type: ignore[return-value]
+        if not isinstance(value, str):
+            return value  # type: ignore[return-value]
+        url = value.replace("postgresql://", "postgresql+asyncpg://", 1)
+        parsed = urlparse(url)
+        if not parsed.query:
+            return url
+        filtered = [
+            (key, val)
+            for key, val in parse_qsl(parsed.query)
+            if key.lower() not in {"ssl", "sslmode"}
+        ]
+        return urlunparse(parsed._replace(query=urlencode(filtered)))
 
     @field_validator("minio_endpoint", mode="before")
     @classmethod
