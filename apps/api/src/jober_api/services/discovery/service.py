@@ -163,9 +163,11 @@ async def search_candidates(
             return
         if work_style and not _matches_text(payload.get("location_work_style"), work_style):
             return
-        if stack and not any(
-            _matches_text(payload["role"], token) for token in stack
-        ) and not any(_matches_text(" ".join(skills), token) for token in stack):
+        if (
+            stack
+            and not any(_matches_text(payload["role"], token) for token in stack)
+            and not any(_matches_text(" ".join(skills), token) for token in stack)
+        ):
             return
         merged[key] = payload
 

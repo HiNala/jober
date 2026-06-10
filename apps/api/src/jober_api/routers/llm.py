@@ -1,4 +1,3 @@
-
 from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.permissions import Permission
 from jober_api.config import settings

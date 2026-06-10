@@ -84,11 +84,7 @@ def compute_page_metrics(events: list[dict[str, Any]]) -> list[PageMetric]:
 
 def compute_funnel_metrics(events: list[dict[str, Any]]) -> list[FunnelMetric]:
     """Count funnel steps from canonical event names for a single day."""
-    product_events = [
-        e
-        for e in events
-        if not e.get("is_bot") and not e.get("is_internal")
-    ]
+    product_events = [e for e in events if not e.get("is_bot") and not e.get("is_internal")]
     by_step: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for step, event_name in FUNNEL_STEPS.items():
         for event in product_events:

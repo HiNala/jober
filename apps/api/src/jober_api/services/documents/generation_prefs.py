@@ -22,10 +22,7 @@ async def resolve_user_id_for_tenant(
     tenant_id: uuid.UUID,
 ) -> uuid.UUID | None:
     stmt = (
-        select(User.id)
-        .where(User.tenant_id == tenant_id)
-        .order_by(User.created_at.asc())
-        .limit(1)
+        select(User.id).where(User.tenant_id == tenant_id).order_by(User.created_at.asc()).limit(1)
     )
     result = await session.execute(stmt)
     return result.scalar_one_or_none()

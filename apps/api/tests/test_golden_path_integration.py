@@ -173,8 +173,12 @@ async def test_golden_path_analytics_events_persist_before_rollup(
     assert result["events_processed"] == 1
 
     funnel = (
-        await db_session.execute(
-            select(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day)
+        (
+            await db_session.execute(
+                select(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert funnel  # rollup produced at least one funnel row

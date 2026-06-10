@@ -131,9 +131,7 @@ async def test_cross_tenant_job_profile_blocked(db_session, truncate_tables) -> 
             policy={},
         )
     )
-    db_session.add(
-        User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B")
-    )
+    db_session.add(User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B"))
     jobs = JobTargetRepository(db_session, DEFAULT_DEV_TENANT_ID)
     job = await jobs.create(company="Extract Co", role="Eng", status=JobTargetStatus.NEW)
     await db_session.commit()
@@ -169,9 +167,7 @@ async def test_cross_tenant_documents_blocked(db_session, truncate_tables) -> No
             policy={},
         )
     )
-    db_session.add(
-        User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B")
-    )
+    db_session.add(User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B"))
     jobs = JobTargetRepository(db_session, DEFAULT_DEV_TENANT_ID)
     job = await jobs.create(company="Doc Co", role="Eng", status=JobTargetStatus.NEW)
     db_session.add(
@@ -215,9 +211,7 @@ async def test_cross_tenant_run_console_blocked(db_session, truncate_tables) -> 
             policy={},
         )
     )
-    db_session.add(
-        User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B")
-    )
+    db_session.add(User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B"))
     jobs = JobTargetRepository(db_session, DEFAULT_DEV_TENANT_ID)
     job = await jobs.create(company="Run Co", role="Eng", status=JobTargetStatus.NEW)
     runs = ApplicationRunRepository(db_session, DEFAULT_DEV_TENANT_ID)

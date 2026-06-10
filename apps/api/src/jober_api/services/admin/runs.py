@@ -20,7 +20,7 @@ async def get_admin_runs_summary(
 ) -> dict[str, Any]:
     """Product-wide run reliability aggregates — no per-tenant private content."""
     end_date = (end or datetime.now(UTC)).date()
-    start_date = (start.date() if start else end_date - timedelta(days=29))
+    start_date = start.date() if start else end_date - timedelta(days=29)
     start_date, end_date = resolve_date_range(start_date, end_date)
     start_dt = datetime.combine(start_date, datetime.min.time(), tzinfo=UTC)
     end_dt = datetime.combine(end_date + timedelta(days=1), datetime.min.time(), tzinfo=UTC)

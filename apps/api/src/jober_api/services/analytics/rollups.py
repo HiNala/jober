@@ -166,9 +166,7 @@ async def _upsert_product_rollups(
     day: date,
     events: list[dict[str, Any]],
 ) -> None:
-    await session.execute(
-        delete(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day)
-    )
+    await session.execute(delete(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day))
     await session.execute(delete(AnalyticsDailyPage).where(AnalyticsDailyPage.day == day))
     await session.execute(
         delete(AnalyticsDailyActiveUsers).where(AnalyticsDailyActiveUsers.day == day)
@@ -214,9 +212,7 @@ def _upsert_product_rollups_sync(
 ) -> None:
     session.execute(delete(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day))
     session.execute(delete(AnalyticsDailyPage).where(AnalyticsDailyPage.day == day))
-    session.execute(
-        delete(AnalyticsDailyActiveUsers).where(AnalyticsDailyActiveUsers.day == day)
-    )
+    session.execute(delete(AnalyticsDailyActiveUsers).where(AnalyticsDailyActiveUsers.day == day))
 
     for metric in compute_funnel_metrics(events):
         session.add(

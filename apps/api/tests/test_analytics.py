@@ -114,9 +114,7 @@ async def test_purge_stale_analytics_events(db_session, truncate_tables) -> None
     result = await purge_stale_analytics_events(db_session)
     assert result["deleted_events"] == 1
 
-    remaining = (
-        await db_session.execute(select(AnalyticsEvent.session_id))
-    ).scalars().all()
+    remaining = (await db_session.execute(select(AnalyticsEvent.session_id))).scalars().all()
     assert remaining == ["sess-recent"]
 
 
@@ -260,15 +258,21 @@ async def test_rollup_daily_summaries(db_session, truncate_tables) -> None:
     assert result["events_processed"] == 3
 
     funnel = (
-        await db_session.execute(
-            select(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day)
+        (
+            await db_session.execute(
+                select(AnalyticsDailyFunnel).where(AnalyticsDailyFunnel.day == day)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     assert {row.step for row in funnel} >= {"landing", "signup_start", "signup_complete"}
 
     pages = (
-        await db_session.execute(select(AnalyticsDailyPage).where(AnalyticsDailyPage.day == day))
-    ).scalars().all()
+        (await db_session.execute(select(AnalyticsDailyPage).where(AnalyticsDailyPage.day == day)))
+        .scalars()
+        .all()
+    )
     assert any(row.page == "/" and row.page_views == 1 for row in pages)
 
     active = await db_session.get(AnalyticsDailyActiveUsers, day)

@@ -156,8 +156,7 @@ async def generate_cover_letter(
         )
     elif seed_text:
         user_prompt += (
-            "\n\nSTART FROM THIS DRAFT (preserve facts, improve flow):\n"
-            f"{seed_text[:4000]}"
+            f"\n\nSTART FROM THIS DRAFT (preserve facts, improve flow):\n{seed_text[:4000]}"
         )
 
     provider, llm_runtime = await resolve_llm_runtime(session, user_id)

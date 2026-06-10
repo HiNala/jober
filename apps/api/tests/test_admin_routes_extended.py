@@ -55,9 +55,7 @@ async def test_admin_acquisition_shape(
 
 @requires_postgres
 @pytest.mark.asyncio
-async def test_admin_cost_forbidden_for_user(
-    db_session, truncate_tables, auth_headers
-) -> None:
+async def test_admin_cost_forbidden_for_user(db_session, truncate_tables, auth_headers) -> None:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/admin/cost", headers=auth_headers)
@@ -66,9 +64,7 @@ async def test_admin_cost_forbidden_for_user(
 
 @requires_postgres
 @pytest.mark.asyncio
-async def test_admin_cost_shape(
-    db_session, truncate_tables, admin_user, auth_headers
-) -> None:
+async def test_admin_cost_shape(db_session, truncate_tables, admin_user, auth_headers) -> None:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/admin/cost", headers=auth_headers)
@@ -80,9 +76,7 @@ async def test_admin_cost_shape(
 
 @requires_postgres
 @pytest.mark.asyncio
-async def test_admin_system_shape(
-    db_session, truncate_tables, admin_user, auth_headers
-) -> None:
+async def test_admin_system_shape(db_session, truncate_tables, admin_user, auth_headers) -> None:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/admin/system", headers=auth_headers)

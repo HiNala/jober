@@ -228,9 +228,7 @@ async def test_admin_traffic_reads_page_rollups(
 
 
 @pytest.mark.asyncio
-async def test_user_analytics_compare_previous(
-    db_session, truncate_tables, auth_headers
-) -> None:
+async def test_user_analytics_compare_previous(db_session, truncate_tables, auth_headers) -> None:
     current = date(2026, 6, 20)
     prior = date(2026, 6, 16)
     db_session.add_all(
@@ -273,9 +271,7 @@ async def test_user_analytics_compare_previous(
 
 
 @pytest.mark.asyncio
-async def test_user_analytics_csv_export(
-    db_session, truncate_tables, auth_headers
-) -> None:
+async def test_user_analytics_csv_export(db_session, truncate_tables, auth_headers) -> None:
     day = date.today()
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:

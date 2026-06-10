@@ -23,7 +23,7 @@ async def get_admin_acquisition(
 ) -> dict[str, Any]:
     """Acquisition aggregates: funnel, traffic, UTM sources, coarse geo."""
     end_date = (end or datetime.now(UTC)).date()
-    start_date = (start.date() if start else end_date - timedelta(days=29))
+    start_date = start.date() if start else end_date - timedelta(days=29)
     start_date, end_date = resolve_date_range(start_date, end_date)
     start_dt = datetime.combine(start_date, datetime.min.time(), tzinfo=UTC)
     end_dt = datetime.combine(end_date + timedelta(days=1), datetime.min.time(), tzinfo=UTC)
@@ -81,13 +81,10 @@ async def get_admin_acquisition(
     )
     signups = int((await session.execute(signups_stmt)).scalar_one())
 
-    signup_funnel_stmt = (
-        select(func.sum(AnalyticsDailyFunnel.unique_sessions))
-        .where(
-            AnalyticsDailyFunnel.day >= start_date,
-            AnalyticsDailyFunnel.day <= end_date,
-            AnalyticsDailyFunnel.step == "signup_complete",
-        )
+    signup_funnel_stmt = select(func.sum(AnalyticsDailyFunnel.unique_sessions)).where(
+        AnalyticsDailyFunnel.day >= start_date,
+        AnalyticsDailyFunnel.day <= end_date,
+        AnalyticsDailyFunnel.step == "signup_complete",
     )
     funnel_signups = int((await session.execute(signup_funnel_stmt)).scalar_one() or 0)
 
