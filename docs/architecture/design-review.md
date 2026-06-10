@@ -904,7 +904,7 @@ Scores are **0–2** per criterion (max 20). Mission 99 requires **≥18** with 
 
 **Staging verified:** API `/readyz` green; web landing 200 (2026-06-10).
 
-**CI:** pending on M99 commits; prior green [run 27271410323](https://github.com/HiNala/jober/actions/runs/27271410323) on `6bc3562`.
+**CI:** [run 27272669598](https://github.com/HiNala/jober/actions/runs/27272669598) (green on `4ed58e5`).
 
 ---
 

@@ -46,4 +46,4 @@
 - [x] `railway-smoke.sh` — landing + signup funnel on staging web
 - [x] README + Design Council (19/20) + deploy runbook creds pitfall
 
-**M99 CI:** [run 27271410323](https://github.com/HiNala/jober/actions/runs/27271410323) (green on `6bc3562`); M99 follow-up commits pending CI.
+**M99 CI:** [run 27272669598](https://github.com/HiNala/jober/actions/runs/27272669598) (green on `4ed58e5`).
