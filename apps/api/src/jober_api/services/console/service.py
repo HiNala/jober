@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterable
 from typing import Any
 
 from jober_schemas.run_console import RunEventType
@@ -30,6 +30,9 @@ from jober_api.storage.keys import (
 from jober_api.storage.minio_client import ObjectStorage
 
 _SCREENSHOT_THROTTLE_SEC = 2.0
+_SSE_MAX_EVENTS_PER_POLL = 50
+_SSE_HEARTBEAT_SEC = 15.0
+_SSE_RETRY_MS = 3000
 
 
 async def append_run_event(
@@ -77,6 +80,20 @@ async def _presign(storage: ObjectStorage, key: str | None) -> str | None:
         return await storage.presigned_get(key)
     except Exception:  # noqa: BLE001
         return None
+
+
+async def _presign_map(storage: ObjectStorage, keys: Iterable[str | None]) -> dict[str, str | None]:
+    unique = list(dict.fromkeys(key for key in keys if key))
+    if not unique:
+        return {}
+    urls = await asyncio.gather(*[_presign(storage, key) for key in unique])
+    return dict(zip(unique, urls, strict=True))
+
+
+def _cached_url(cache: dict[str, str | None], key: str | None) -> str | None:
+    if not key:
+        return None
+    return cache.get(key)
 
 
 def _coalesce_screenshot_events(events: list[RunEvent]) -> list[RunEvent]:
@@ -156,20 +173,6 @@ async def get_console_snapshot(
             "options": checkpoint.options or {},
         }
 
-    timeline: list[dict[str, Any]] = []
-    for event in events:
-        if event.event_type == RunEventType.STATE_CHANGED.value:
-            timeline.append(
-                {
-                    "seq": int(event.seq),
-                    "ts": event.ts.isoformat(),
-                    "status": (event.payload or {}).get("status"),
-                    "step": (event.payload or {}).get("step"),
-                    "screenshot_key": event.screenshot_key,
-                    "screenshot_url": await _presign(storage, event.screenshot_key),
-                }
-            )
-
     attempt_rows = list(
         (
             await session.execute(
@@ -179,39 +182,65 @@ async def get_console_snapshot(
             )
         ).scalars()
     )
+    presign_keys: list[str | None] = [latest_screenshot_key]
+    state_changed = RunEventType.STATE_CHANGED.value
+    state_events = [event for event in events if event.event_type == state_changed]
+    presign_keys.extend(event.screenshot_key for event in state_events)
+    presign_keys.extend(event.screenshot_key for event in coalesced)
+    for attempt in attempt_rows:
+        idx = attempt.attempt_index
+        presign_keys.extend(
+            [
+                attempt.trace_object_key or run_attempt_trace_key(run_id, idx),
+                attempt.video_object_key or run_attempt_video_key(run_id, idx),
+                attempt.final_screenshot_object_key or run_attempt_screenshot_key(run_id, idx),
+                attempt.dom_snapshot_object_key or run_attempt_dom_key(run_id, idx),
+            ]
+        )
+    url_cache = await _presign_map(storage, presign_keys)
+
+    timeline: list[dict[str, Any]] = []
+    for event in state_events:
+        timeline.append(
+            {
+                "seq": int(event.seq),
+                "ts": event.ts.isoformat(),
+                "status": (event.payload or {}).get("status"),
+                "step": (event.payload or {}).get("step"),
+                "screenshot_key": event.screenshot_key,
+                "screenshot_url": _cached_url(url_cache, event.screenshot_key),
+            }
+        )
+
     artifacts: list[dict[str, Any]] = []
     for attempt in attempt_rows:
         idx = attempt.attempt_index
         trace_key = attempt.trace_object_key or run_attempt_trace_key(run_id, idx)
+        video_key = attempt.video_object_key or run_attempt_video_key(run_id, idx)
+        screenshot_key = attempt.final_screenshot_object_key or run_attempt_screenshot_key(
+            run_id, idx
+        )
+        dom_key = attempt.dom_snapshot_object_key or run_attempt_dom_key(run_id, idx)
         artifacts.append(
             {
                 "attempt_index": idx,
-                "trace_url": await _presign(storage, trace_key),
-                "video_url": await _presign(
-                    storage, attempt.video_object_key or run_attempt_video_key(run_id, idx)
-                ),
-                "screenshot_url": await _presign(
-                    storage,
-                    attempt.final_screenshot_object_key or run_attempt_screenshot_key(run_id, idx),
-                ),
-                "dom_url": await _presign(
-                    storage,
-                    attempt.dom_snapshot_object_key or run_attempt_dom_key(run_id, idx),
-                ),
+                "trace_url": _cached_url(url_cache, trace_key),
+                "video_url": _cached_url(url_cache, video_key),
+                "screenshot_url": _cached_url(url_cache, screenshot_key),
+                "dom_url": _cached_url(url_cache, dom_key),
             }
         )
 
     serialized_events: list[dict[str, Any]] = []
     for event in coalesced:
-        url = await _presign(storage, event.screenshot_key)
-        serialized_events.append(_event_to_dict(event, url))
+        serialized_events.append(
+            _event_to_dict(event, _cached_url(url_cache, event.screenshot_key))
+        )
 
     checkpoint_data = run.checkpoint_data or {}
     generate_letter = checkpoint_data.get("generate_cover_letter")
     run_options = {
-        "generate_cover_letter": (
-            bool(generate_letter) if generate_letter is not None else None
-        ),
+        "generate_cover_letter": (bool(generate_letter) if generate_letter is not None else None),
     }
 
     return {
@@ -222,7 +251,7 @@ async def get_console_snapshot(
         "status": run.status.value,
         "current_step": run.current_step.value if run.current_step else None,
         "attempt_count": run.attempt_count,
-        "latest_screenshot_url": await _presign(storage, latest_screenshot_key),
+        "latest_screenshot_url": _cached_url(url_cache, latest_screenshot_key),
         "latest_screenshot_key": latest_screenshot_key,
         "open_checkpoint": open_checkpoint,
         "run_options": run_options,
@@ -267,25 +296,37 @@ async def stream_run_events(
     storage = ObjectStorage()
     last_seq = after_seq
     last_screenshot_emit = 0.0
+    last_heartbeat = 0.0
     loop = asyncio.get_event_loop()
+    yield f"retry: {_SSE_RETRY_MS}\n\n"
 
     while True:
         async with session_factory() as session:
             repo = RunEventRepository(session)
             events = await repo.list_since(run_id, after_seq=last_seq, limit=200)
-        for event in _coalesce_screenshot_events(events):
+        coalesced = _coalesce_screenshot_events(events)
+        screenshot_keys = [event.screenshot_key for event in coalesced]
+        url_cache = await _presign_map(storage, screenshot_keys)
+        emitted = 0
+        for event in coalesced:
+            if emitted >= _SSE_MAX_EVENTS_PER_POLL:
+                break
             if event.event_type == RunEventType.BROWSER_SCREENSHOT.value:
                 now = loop.time()
                 if now - last_screenshot_emit < _SCREENSHOT_THROTTLE_SEC:
                     last_seq = int(event.seq)
                     continue
                 last_screenshot_emit = now
-            screenshot_url = await _presign(storage, event.screenshot_key)
-            payload = _event_to_dict(event, screenshot_url)
+            payload = _event_to_dict(event, _cached_url(url_cache, event.screenshot_key))
             last_seq = int(event.seq)
+            emitted += 1
             yield f"id: {last_seq}\nevent: {event.event_type}\ndata: {json.dumps(payload)}\n\n"
         if poll_once:
             return
+        now = loop.time()
+        if not coalesced and now - last_heartbeat >= _SSE_HEARTBEAT_SEC:
+            yield ": heartbeat\n\n"
+            last_heartbeat = now
         await asyncio.sleep(0.5)
 
 

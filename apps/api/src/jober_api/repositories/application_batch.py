@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -75,9 +75,10 @@ class BatchItemRepository(Repository[BatchItem]):
         return result.scalar_one_or_none()
 
     async def count_by_status(self, batch_id: uuid.UUID) -> dict[str, int]:
-        items = await self.list_for_batch(batch_id)
-        counts: dict[str, int] = {}
-        for item in items:
-            key = item.status.value
-            counts[key] = counts.get(key, 0) + 1
-        return counts
+        stmt = (
+            select(BatchItem.status, func.count())
+            .where(BatchItem.batch_id == batch_id)
+            .group_by(BatchItem.status)
+        )
+        rows = await self._session.execute(stmt)
+        return {status.value: int(count) for status, count in rows.all()}
