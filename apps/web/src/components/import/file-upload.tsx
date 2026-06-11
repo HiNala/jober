@@ -98,6 +98,7 @@ export function FileUpload({
           accept={accept}
           className="sr-only"
           disabled={disabled || busy}
+          aria-label={kind === "spreadsheet" ? "Choose spreadsheet file" : "Choose resume file"}
           onChange={(e) => handleFiles(e.target.files)}
         />
         <div className="flex size-12 items-center justify-center rounded-full bg-muted">

@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { ChartAccessibleFigure } from "./chart-accessible";
 import { chartColors, chartMargin } from "./chart-theme";
 
 export function AnalyticsBarChart({
@@ -27,6 +28,7 @@ export function AnalyticsBarChart({
     return <p className="text-sm text-muted-foreground">No data in this range.</p>;
   }
   return (
+    <ChartAccessibleFigure label={label} data={data} xKey={xKey} yKey={yKey}>
     <div className="h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <RechartsBarChart data={data} margin={chartMargin}>
@@ -55,5 +57,6 @@ export function AnalyticsBarChart({
         </RechartsBarChart>
       </ResponsiveContainer>
     </div>
+    </ChartAccessibleFigure>
   );
 }

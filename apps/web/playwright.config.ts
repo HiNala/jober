@@ -22,5 +22,13 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        env: {
+          ...process.env,
+          NEXT_PUBLIC_DEV_AUTH_BYPASS: "true",
+          NEXT_PUBLIC_JOBER_TENANT_ID:
+            process.env.NEXT_PUBLIC_JOBER_TENANT_ID ?? "00000000-0000-4000-8000-000000000001",
+          NEXT_PUBLIC_JOBER_USER_ID:
+            process.env.NEXT_PUBLIC_JOBER_USER_ID ?? "00000000-0000-4000-8000-000000000002",
+        },
       },
 });

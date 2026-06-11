@@ -54,6 +54,7 @@ export function LibraryResumes() {
           type="file"
           accept=".pdf,.docx"
           className="sr-only"
+          aria-label="Upload resume file"
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (file) void uploadMutation.mutate(file);

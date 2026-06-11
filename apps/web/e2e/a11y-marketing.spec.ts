@@ -1,6 +1,6 @@
-import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "@playwright/test";
 
+import { createAxeBuilder } from "./helpers/axe";
 import { dismissAnalyticsConsent } from "./helpers/consent";
 import { MARKETING_A11Y_ROUTES } from "./marketing-routes";
 
@@ -10,9 +10,7 @@ for (const path of MARKETING_A11Y_ROUTES) {
     await dismissAnalyticsConsent(page);
     await expect(page.locator("h1").first()).toBeVisible();
 
-    const results = await new AxeBuilder({ page })
-      .disableRules(["color-contrast"])
-      .analyze();
+    const results = await createAxeBuilder(page).analyze();
 
     expect(
       results.violations,

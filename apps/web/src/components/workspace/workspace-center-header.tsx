@@ -59,6 +59,8 @@ export function WorkspaceCenterHeader({
           size="sm"
           className={cn("hidden text-muted-foreground sm:inline-flex", motionPress)}
           onClick={() => setCommandPaletteOpen(true)}
+          aria-label="Open command palette"
+          aria-keyshortcuts="Control+K Meta+K"
         >
           Command
           <kbd className="ml-2 rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px]">

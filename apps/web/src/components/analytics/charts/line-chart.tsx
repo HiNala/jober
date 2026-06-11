@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { ChartAccessibleFigure } from "./chart-accessible";
 import { chartColors, chartMargin } from "./chart-theme";
 
 export function AnalyticsLineChart({
@@ -27,6 +28,7 @@ export function AnalyticsLineChart({
     return <p className="text-sm text-muted-foreground">No data in this range.</p>;
   }
   return (
+    <ChartAccessibleFigure label={label} data={data} xKey={xKey} yKey={yKey}>
     <div className="h-48 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <RechartsLineChart data={data} margin={chartMargin}>
@@ -62,5 +64,6 @@ export function AnalyticsLineChart({
         </RechartsLineChart>
       </ResponsiveContainer>
     </div>
+    </ChartAccessibleFigure>
   );
 }

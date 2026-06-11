@@ -12,13 +12,7 @@ import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
 import { JobKanban } from "@/components/jobs/job-kanban";
 import { PageError, PageLoading } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { exportJobsXlsxUrl, fetchJobTargets } from "@/lib/api/jobs";
 
@@ -68,10 +62,10 @@ export default function QueuePage() {
             <Download className="size-3.5" aria-hidden />
             Export XLSX
           </a>
+          <Button size="sm" type="button" onClick={() => setImportOpen(true)}>
+            Import spreadsheet
+          </Button>
           <Dialog open={importOpen} onOpenChange={setImportOpen}>
-            <DialogTrigger>
-              <Button size="sm">Import spreadsheet</Button>
-            </DialogTrigger>
             <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>Import job tracker</DialogTitle>

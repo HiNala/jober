@@ -44,7 +44,9 @@ export default function AnalyticsPage() {
           <button
             type="button"
             role="tab"
+            id="analytics-tab-mine"
             aria-selected={tab === "mine"}
+            aria-controls="analytics-panel-mine"
             className={cn(
               "rounded-md px-3 py-1.5 text-sm",
               tab === "mine" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
@@ -56,7 +58,9 @@ export default function AnalyticsPage() {
           <button
             type="button"
             role="tab"
+            id="analytics-tab-admin"
             aria-selected={tab === "admin"}
+            aria-controls="analytics-panel-admin"
             className={cn(
               "rounded-md px-3 py-1.5 text-sm",
               tab === "admin" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
@@ -68,7 +72,15 @@ export default function AnalyticsPage() {
         </div>
       ) : null}
 
-      {tab === "admin" && showAdmin ? <AdminAnalyticsPanel /> : <UserAnalyticsPanel />}
+      {tab === "admin" && showAdmin ? (
+        <div role="tabpanel" id="analytics-panel-admin" aria-labelledby="analytics-tab-admin">
+          <AdminAnalyticsPanel />
+        </div>
+      ) : (
+        <div role="tabpanel" id="analytics-panel-mine" aria-labelledby="analytics-tab-mine">
+          <UserAnalyticsPanel />
+        </div>
+      )}
     </div>
   );
 }

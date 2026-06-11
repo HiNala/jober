@@ -15,6 +15,7 @@ import { useRunStream } from "@/hooks/useRunStream";
 import { ArtifactLinks } from "./artifact-links";
 import { CheckpointCard } from "./checkpoint-card";
 import { EventTerminal } from "./event-terminal";
+import { RunStreamAnnouncer } from "./run-stream-announcer";
 import { RunLetterOptions } from "./run-letter-options";
 import { StateTimeline } from "./state-timeline";
 
@@ -62,6 +63,7 @@ export function RunConsole({ runId }: RunConsoleProps) {
     >
       {snapshot ? (
     <div className={cn("space-y-5", motionFadeIn)}>
+      <RunStreamAnnouncer events={events} />
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

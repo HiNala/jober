@@ -161,7 +161,20 @@ Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/
 
 **Discover (Mission 23):** `/discover` unifies board search and XLSX import into named target lists with dedupe, fit signals, saved searches, list refresh, and batch launch (`filters.job_list_id`). See `docs/missions/mission_23_unified_job_discovery.md`.
 
-**Workspace shell (Mission 09/17):** two in-app layout modes in `lib/workspace/layout.ts` — **ops-desk** (nav + work + resizable canvas) on `/runs/[id]` only; **editorial** (nav + full-width content) on dashboard, queue, discover, library, search, analytics, settings, and admin. Components live in `components/workspace/`. Layout prefs persist in `localStorage` (`jober-workspace-v1`). Shortcuts: ⌘/Ctrl-K and ⌘/Ctrl-/ (command palette), ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas on ops-desk routes).
+**Workspace shell (Mission 09/17):** two in-app layout modes in `lib/workspace/layout.ts` — **ops-desk** (nav + work + resizable canvas) on `/runs/[id]` only; **editorial** (nav + full-width content) on dashboard, queue, discover, library, search, analytics, settings, and admin. Components live in `components/workspace/`. Layout prefs persist in `localStorage` (`jober-workspace-v1`).
+
+**Keyboard shortcuts (Mission 13):** global listeners in `components/workspace/workspace-keyboard.tsx`.
+
+| Shortcut | Action |
+|----------|--------|
+| ⌘/Ctrl-K or ⌘/Ctrl-/ | Open command palette (navigate, queue import/export on `/queue`, canvas toggles on ops-desk) |
+| ⌘/Ctrl-B | Collapse/expand workspace navigation |
+| ⌘/Ctrl-\\ | Toggle canvas panel (ops-desk `/runs/[id]` only) |
+| Shift-⌘/Ctrl-F | Toggle focus mode (ops-desk only) |
+| Escape | Close command palette, dialogs, drawers (focus returns to trigger) |
+| Tab | Standard focus order; skip link targets `#main-content` on workspace routes |
+
+E2e coverage: `e2e/a11y-marketing.spec.ts`, `e2e/a11y-auth.spec.ts`, `e2e/a11y-app.spec.ts` (core app routes with dev-auth bypass).
 
 **Component surfaces (Mission 10):** three families in `lib/design/surface-variants.ts` — **marketing** (bento/funnel), **workspace** (data panels), **terminal** (run stream/live view). Use `<Surface family="…">` or `surface.*` tokens; reference at `/kitchen-sink` (dev-only, robots-disallowed).
 

@@ -46,7 +46,6 @@ export function EventTerminal({
           surface.terminal,
         )}
         role="log"
-        aria-live="polite"
         aria-relevant="additions"
       >
         {company && role && (
