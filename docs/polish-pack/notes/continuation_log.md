@@ -186,3 +186,44 @@ Web: typecheck, lint:strict, test (64), check:motion, e2e (15) green locally. Wo
 ### Deployment decision
 
 **Not deploying yet** — batch Missions 04 (consent sheet) + 05 (first-run onboarding) for one web deploy; then `railway-smoke.sh` + screenshot re-capture (`01-home`, `14-dashboard`, `15-queue`).
+
+---
+
+## Loop after Mission 06 — 2026-06-11
+
+### Re-verification (Mission 06 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Five auth routes share brand zone + trust strip | **Green** — `(auth)/layout.tsx`, `AuthBrandPanel`, `TrustStrip` |
+| Designed error/edge states | **Green** — `AuthFormError`, `AuthEdgeState`, `AuthOAuthAlert`, `parseAuthError` |
+| No false email promises | **Green** — `copy.test.ts`; `06_auth_email_copy_for_mission_11.md` for Mission 11 |
+| Auth axe + keyboard | **Green** — `a11y-auth.spec.ts` (7 tests); 22 e2e total |
+| Design Council ≥18/20 | **Deferred** — visual sign-off post-deploy screenshot review |
+| Screenshots 11–13 | **Deferred** — UI-REVIEW rows closed in prose; PNG refresh post-deploy |
+
+### Improvements made (this loop)
+
+- None required — Mission 06 landed clean; CI green on first push.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Auth screenshots `11–13` + reset-password | Post-deploy |
+| Design Council score on auth surfaces | Operator review after deploy |
+| Consent sheet on auth routes (post-session) | Mission 04 follow-up |
+| Email copy refresh when SMTP ships | Mission 11 (`06_auth_email_copy_for_mission_11.md`) |
+
+### Spot check (docs)
+
+- Verified Mission 11 handoff doc lists signup/forgot-password copy to update when email ships.
+- `test_auth.py` + `test_auth_cookies.py` (7 passed) — no auth API contract drift from UI-only mission.
+
+### Gate summary
+
+Web: typecheck, lint:strict, test (69), check:motion, build, e2e (22) green locally. API auth tests (7) green. CI [27320555203](https://github.com/HiNala/jober/actions/runs/27320555203) **success** on Mission 06 push.
+
+### Deployment decision
+
+**Recommend deploying soon** — Missions 04–06 are visual/UX-only with full gates green; batch as one web deploy, run `railway-smoke.sh`, manually verify production login first, then re-capture screenshots (`01`, `11–15`, consent overlap check).
