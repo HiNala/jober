@@ -26,6 +26,7 @@ class ApplicationRun(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __table_args__ = (
         Index("ix_application_runs_status", "status"),
         Index("ix_application_runs_tenant_id", "tenant_id"),
+        Index("ix_application_runs_tenant_status", "tenant_id", "status"),
     )
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(

@@ -21,6 +21,7 @@ class JobTarget(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __table_args__ = (
         Index("ix_job_targets_status", "status"),
         Index("ix_job_targets_tenant_id", "tenant_id"),
+        Index("ix_job_targets_tenant_status", "tenant_id", "status"),
     )
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(
