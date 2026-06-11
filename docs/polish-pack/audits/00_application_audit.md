@@ -85,16 +85,16 @@ Key API internals: RBAC permission registry in `auth/permissions.py` (startup-va
 
 Ranked; each item references evidence.
 
-1. **Uncommitted working tree on `main`** — 18 modified files (mostly ruff re-formatting in API services/tests, a new worker DB-URL test, compose `web` service) and 5 untracked paths (`compose.yaml` root include, `infra/docker/Dockerfile.web`, `apps/web/scripts/capture-screenshots.mjs`, `apps/web/src/components/product/announcement-banner.tsx`, `docs/screenshots/`). In-flight, unvalidated, unlanded.
-2. **Outbound email is not configured** (README: "email verification tokens are created but outbound email is not configured yet"). Signup verification and `/forgot-password` → `/reset-password` are dead ends in production. This is the single largest broken flow.
-3. **LLM in production may be the stub template provider** unless `LLM_API_KEY` was set (README documents the command but not confirmation). Discovery task: verify prod behavior.
+1. **Uncommitted working tree on `main`** — **Resolved (Mission 01, 2026-06-10):** in-flight work landed in logical commits; `main` clean at pack start.
+2. **Outbound email is not configured** — **Confirmed (Mission 03, 2026-06-11):** prod register creates verify tokens but no email is sent; forgot-password same class. Login still works while `pending_verification` (see GP-004).
+3. **LLM in production may be the stub template provider** — **Corrected (Mission 03, 2026-06-11):** production `/api/llm/config` reports `provider: openai`, `gpt-4o-mini`; template stub not active.
 4. **UI genericness** — fully documented in `docs/screenshots/UI-REVIEW.md`: consent toast overlapping content on nearly every screen, identical 40/60 split-pane on all in-app routes, default shadcn card grids on marketing, dev copy (`make seed`) in the production queue empty state, unbranded auth pages.
 5. **Pro plan is a dead card** on `/pricing` (not purchasable; Stripe webhook exists but no checkout). Either ghost it with a waitlist or wire checkout — decided in the positioning audit.
 6. **Legal pages are drafts** (`/acceptable-use` explicitly "requires counsel before launch").
-7. **Deployment fragility signals:** four of the last six commits are production hotfixes (Railway Postgres SSL ×2, cookie SameSite, URL rewriting). The worker `?ssl=disable` handling was being patched in the uncommitted diff.
-8. **Thin in-app e2e coverage:** `apps/web/e2e/` holds only `a11y-marketing.spec.ts` and `golden-path-smoke.spec.ts`; axe runs against marketing routes only, not `/dashboard`, `/queue`, `/runs/[id]`, `/settings`.
-9. **Windows dev friction:** backup/restore require Git Bash/WSL; the new `Dockerfile.web` + compose `web` service (uncommitted) exists precisely because host `node_modules` leaked into Linux containers.
-10. **Possible repo hygiene issues:** `apps/web/test-results/` and `tsconfig.tsbuildinfo` exist in the working tree — verify they are gitignored.
+7. **Deployment fragility signals** — **Re-tested (Mission 03):** prod `/readyz` all checks ok post hotfixes; full gate set green on Mission 02 CI after landing SSL/cookie fixes.
+8. **Thin in-app e2e coverage** — **Confirmed (Mission 03):** 13 Playwright tests, marketing-focused; authenticated app routes still uncovered (GP-009).
+9. **Windows dev friction** — **Partially addressed (Mission 01):** `Dockerfile.web` + root compose landed; backup/restore still require Git Bash/WSL.
+10. **Possible repo hygiene issues** — **Confirmed ok (Mission 02):** `test-results/`, `*.tsbuildinfo`, `.mypy_cache/` are gitignored.
 
 ## 8. UI audit
 
