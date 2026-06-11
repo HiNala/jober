@@ -31,6 +31,32 @@
 3. Redeploy api (migrations are idempotent).
 4. Smoke + admin overview check.
 
+## Local backup / restore (self-host)
+
+Scripts: `infra/backups/backup.sh`, `infra/backups/restore.sh` (invoked via `make backup` / `make restore`).
+
+### Prerequisites
+
+- Docker Compose v2 with `infra` profile (`postgres`, `minio`, `createbuckets`).
+- `.env` at repo root (optional) for non-default host ports (`POSTGRES_HOST_PORT`, `MINIO_API_HOST_PORT`).
+
+### Windows
+
+- **Git Bash** or **WSL** is required for `make backup` / `make restore` (bash + `mc` in the `createbuckets` sidecar).
+- From Git Bash at repo root: `make backup` then `make restore SOURCE=infra/backups/latest`.
+- PowerShell alone cannot run the Makefile targets unless you call `bash infra/backups/backup.sh` explicitly.
+- Volume wipe (`docker compose down -v`) is destructive — only use on local dev data.
+
+### Verify after restore
+
+```bash
+make migrate-check
+curl -s http://localhost:8000/healthz
+curl -s http://localhost:8000/readyz
+```
+
+Record timing: backup ~10–30s (empty DB), restore ~15–45s (depends on dump size). See `docs/polish-pack/notes/20_db_hygiene.md` for Mission 20 drill log.
+
 ## Object storage
 
 ### Railway bucket
@@ -42,6 +68,7 @@
 
 - Snapshot volume before major changes.
 - Restore volume snapshot in Railway; redeploy MinIO service.
+- Local restore: `restore.sh` mirrors `minio/` snapshot into `jober-artifacts` via `mc mirror`.
 
 ## Verify
 
