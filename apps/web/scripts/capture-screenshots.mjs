@@ -58,7 +58,7 @@ const APP_ROUTES = [
   { slug: "15-queue", path: "/queue" },
   { slug: "16-discover", path: "/discover" },
   { slug: "17-library-resumes", path: "/library?tab=resumes" },
-  { slug: "18-library-letters", path: "/library?tab=letters" },
+  { slug: "18-library-letters", path: "/library?tab=letters&view=studio" },
   { slug: "19-library-jobs", path: "/library?tab=jobs" },
   { slug: "20-library-runs", path: "/library?tab=runs" },
   { slug: "21-search", path: "/search" },

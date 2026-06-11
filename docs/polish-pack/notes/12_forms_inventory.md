@@ -21,7 +21,7 @@ Legend: **Y** compliant · **P** partial (toast-only or auto-save) · **N** not 
 | Settings — app defaults | P | P | mutation | auto-save | Y (instant persist) |
 | Settings — privacy delete | P (confirm phrase) | P | Y | redirect | Y |
 | Discover — search/upload | P | Y (`formatApiError` elsewhere) | mutations | toast | Y |
-| Documents — studio | P | Y | mutations | toast | P |
+| Documents — studio | P | Y | mutations | toast + save tick; 402 panel | P |
 | Run console — letter options | P | Y | mutations | toast | P |
 | Run console — checkpoint | P | Y | Y | toast | N/A (actions) |
 | Library — CRUD forms | P | P | mutations | toast | P |

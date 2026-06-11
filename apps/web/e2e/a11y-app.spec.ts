@@ -60,6 +60,15 @@ test("keyboard: analytics tabs are focusable", async ({ page }) => {
   }
 });
 
+test("axe clean (app): library cover letters studio", async ({ page }) => {
+  await page.goto("/library?tab=letters&view=studio");
+  await dismissAnalyticsConsent(page);
+  await waitForAppShell(page);
+
+  const results = await createAxeBuilder(page).analyze();
+  expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+});
+
 test("consent sheet is axe-clean when shown", async ({ page }) => {
   await page.goto("/dashboard");
   await page.evaluate(() => localStorage.removeItem("jober-analytics-consent"));

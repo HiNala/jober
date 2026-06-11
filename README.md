@@ -339,7 +339,7 @@ Positioning: [`docs/architecture/product.md`](docs/architecture/product.md). Run
 
 ## Cover letters (Mission 05 + 24)
 
-Generate grounded cover letters at `/documents` (Document Studio) or edit in the run canvas Documents tab.
+Generate grounded cover letters at **Library → Cover letters → Document Studio** (`/library?tab=letters&view=studio`; `/documents` redirects there) or edit in the run canvas Documents tab.
 
 | Endpoint | Purpose |
 |----------|---------|

@@ -679,3 +679,44 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — Mission 16 is UX/copy + batch preview (no policy logic changes). Safe to batch with Missions 04–16 web polish. **Post-deploy:** disposable-account dry-run XLSX import, verify batch preview exclusions on a list with mixed job statuses, `bash scripts/railway-smoke.sh`.
+
+---
+
+## Loop after Mission 17 — 2026-06-10
+
+### Re-verification (Mission 17 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Findings table fully green; lock-preservation test-enforced | **Green** — `17_studio_findings.md`; `merge-paragraphs.test.ts` + API `test_merge_paragraphs_preserves_locked` (CI) |
+| Stub mode and 402 honestly labeled | **Green** — `LlmProviderBanner`, `LlmBudgetExceeded` in studio + canvas |
+| Studio and canvas share components and behavior | **Green** — `paragraph-controls`, `keyword-coverage-panel`, shared download naming |
+| Micro-interactions pass `check:motion` + reduced-motion | **Green** — motion tokens only; no new raw durations |
+| All gates green; screenshot 18 re-captured | **Green (scoped)** — web gates + e2e; PNG refresh **deferred** post-deploy |
+
+### Improvements made (this loop)
+
+- `test(e2e): axe library document studio route [pack-31 after 17]` — closes blast-radius gap: studio sub-nav + error/empty chrome axe-clean without API.
+- `docs(pack): seam sweep after Mission 17 [pack-31 after 17]` — README studio URL; screenshot script `18-library-letters` → `view=studio`; Mission 26 deferral for fixture letter cycle; forms inventory 402 panel note.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Screenshot `18-library-letters.png` re-capture | Post-deploy (`capture-screenshots.mjs` path updated) |
+| Fixture generate→lock→regen→download e2e | Mission 26 (`document-studio.spec.ts` chrome-only) |
+| `make migrate-check`, api/worker pytest, fixtures, policy | CI — Docker Desktop engine 500 locally |
+
+### Spot check (a11y)
+
+- Rotated from states (Mission 16 loop) → **authenticated app axe** on new `/library?tab=letters&view=studio` surface (paragraph controls, LLM banners, job picker or error empty).
+
+### Gate summary
+
+**Local:** api ruff+mypy; worker ruff+mypy; web typecheck, lint:strict, test **107**, build, check:motion, check:bundles (**2547**/2800 KB), e2e **71×2** — all green.
+
+**Local blocker:** Docker engine unavailable — Mission 17 API validation (`test_cover_letter_v2.py`, etc.) and `make migrate-check` deferred to CI.
+
+### Deployment decision
+
+**Deploy recommended** — Mission 17 is web-only UX (no API contract change). Batch with Missions 04–17 web polish. **Post-deploy:** open Library → Document Studio with a job + resume, verify template banner when no LLM key, run `bash scripts/railway-smoke.sh`, re-capture screenshot `18-library-letters.png`.
