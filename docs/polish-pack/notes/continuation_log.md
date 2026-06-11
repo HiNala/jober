@@ -108,3 +108,40 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 ### Deployment decision
 
 **Not deploying.** Mission 03 observes production only; no prod defect at severity-critical level (email gap already tracked GP-001).
+
+---
+
+## Loop after Mission 04 — 2026-06-11
+
+### Re-verification (Mission 04 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| No persistent toast; sheet once per device | **Green** — `ConsentSheet` via vaul; `key={pathname}` remount for undecided |
+| Settings control reverses choice | **Green** — `AnalyticsConsentSection` |
+| SDK gating (unset / decline / DNT) | **Green** — `consent.test.ts` + `consent-state.test.ts` |
+| Screenshot overlap | **Deferred** — re-capture post-deploy (UI-REVIEW closure note added) |
+| a11y + reduced-motion | **Green** — drawer uses design tokens; existing marketing axe suite |
+
+### Improvements made (this loop)
+
+- Fixed drawer z-index so Accept/Decline buttons are clickable (removed erroneous `z-40` on content).
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Re-capture `01-home.png` / `14-dashboard.png` without consent overlap | Post-deploy (Mission 04 doc requirement) |
+| Production deploy of consent UX | Batch with next deployable mission or owner approval |
+
+### Spot check (a11y)
+
+- Consent e2e: sheet exposes `dialog` role; Accept sets `jober_analytics_consent=1` cookie.
+
+### Gate summary
+
+Web gates + consent e2e (2) + `test_analytics.py` (9) green locally pre-push.
+
+### Deployment decision
+
+**Not deploying yet** — Mission 04 permits deploy when full gates + smoke pass; batching with next web deploy. Screenshot re-capture should follow deploy.
