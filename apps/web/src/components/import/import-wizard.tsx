@@ -170,6 +170,9 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
               <Link href="/queue" className={buttonVariants({ size: "sm" })}>
                 View queue
               </Link>
+              <Link href="/discover" className={buttonVariants({ size: "sm", variant: "outline" })}>
+                Build a list
+              </Link>
               <a
                 href={exportJobsXlsxUrl()}
                 download

@@ -637,3 +637,45 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — Mission 15 hardens the signature surface (SSE reconnect contract, checkpoint idempotency). **Deploy API and web together** (SSE + resolve semantics). After deploy: verify a real run stream ≥5 min idle, resolve a checkpoint once, run `bash scripts/railway-smoke.sh`, capture `/runs/[id]` screenshots when fixture run available.
+
+---
+
+## Loop after Mission 16 — 2026-06-10
+
+### Re-verification (Mission 16 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| All entry paths batch-ready; journey matrix green | **Green** — `16_journey_findings.md` (manual single-job documented gap) |
+| `/search` vs `/discover` explicit in UI | **Green** — page subtitles, nav tooltips, cross-links, `discover-journey.spec.ts` |
+| Export → re-import loss-free for app-owned columns | **Green (API)** — `test_xlsx_round_trip.py` in CI |
+| Batch policy choices unmistakable | **Green** — `BatchPreviewDialog` dry_run vs review_before_submit + auto-submit note |
+| All gates green | **Green (scoped)** — see below |
+
+### Improvements made (this loop)
+
+- `chore(import): add Discover handoff on import complete [pack-31 after 16]` — import wizard done state links to **Build a list** (`/discover`).
+- `docs(missions): assign Mission 16 fixture batch e2e to Mission 26 [pack-31 after 16]`.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Fixture batch preview e2e (included/excluded API) | Mission 26 |
+| Manual XLSX round-trip UI on production | Operator post-deploy |
+| Manual single job add API | Future (documented in `16_journey_findings.md`) |
+| `make migrate-check`, api pytest, `test-policy`, fixtures | CI — Docker unavailable locally |
+
+### Spot check (states)
+
+- Rotated from chaos (Mission 15 loop) → **route states** on acquisition surfaces: `/queue` retains `PageLoading` / `PageError` + `QueuePolicyBanner`; `/discover` renders shell with tabs and list panel without API (e2e chrome green); import wizard preview/done steps show warnings and CTAs.
+
+### Gate summary
+
+**Local:** api ruff+mypy; worker ruff+mypy; web typecheck, lint:strict, test **104**, build, check:motion, check:bundles (**2548**/2800 KB), e2e **68×2** — all green.
+
+**Local blocker:** Docker engine unavailable — `make migrate-check`, `pytest`, `test-policy`, `test-fixtures` deferred to CI.
+
+### Deployment decision
+
+**Deploy recommended** — Mission 16 is UX/copy + batch preview (no policy logic changes). Safe to batch with Missions 04–16 web polish. **Post-deploy:** disposable-account dry-run XLSX import, verify batch preview exclusions on a list with mixed job statuses, `bash scripts/railway-smoke.sh`.
