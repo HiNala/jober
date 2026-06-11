@@ -25,6 +25,21 @@ pytestmark = pytest.mark.skipif(
 async def test_purge_stale_terminal_runs_respects_retention(
     db_session, truncate_tables, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    class FakeStorage:
+        async def remove_prefix(self, prefix: str) -> int:
+            return 0
+
+    monkeypatch.setattr(
+        "jober_api.services.privacy.retention.ObjectStorage",
+        FakeStorage,
+    )
+    async def _noop_storage_state(_run_id: object) -> None:
+        return None
+
+    monkeypatch.setattr(
+        "jober_api.services.privacy.retention.delete_run_storage_state",
+        _noop_storage_state,
+    )
     monkeypatch.setattr(settings, "run_artifact_retention_days", 30)
     jobs = JobTargetRepository(db_session)
     job = await jobs.create(company="Old Co", role="Eng")
