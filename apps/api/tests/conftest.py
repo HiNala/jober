@@ -120,6 +120,7 @@ async def db_engine(
     factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     monkeypatch.setattr("jober_api.db.session.async_session_factory", factory)
     monkeypatch.setattr("jober_api.auth.middleware.async_session_factory", factory)
+    monkeypatch.setattr("jober_api.routers.run_console.async_session_factory", factory)
     if "truncate_tables" not in request.fixturenames:
         await _seed_default_tenant(engine)
     yield engine

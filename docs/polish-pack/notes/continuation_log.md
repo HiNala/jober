@@ -740,7 +740,9 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 - `fix(api): pure ASGI correlation middleware [pack-31 after 18]` — replaces `BaseHTTPMiddleware` on correlation IDs (CI run 27357876037).
 - `fix(api): pure ASGI auth middleware [pack-31 after 18]` — `AuthMiddleware` also used `BaseHTTPMiddleware`; stacked middleware triggered pytest-asyncio `Runner.run()` errors on all async tests (CI run 27361588075 still red — root cause was conftest, not middleware).
 - `fix(test): seed tenant in db_engine fixture [pack-31 after 18]` — removed autouse `seed_default_tenant` that called `getfixturevalue("db_engine")` inside an async fixture (nested `Runner.run()` during setup). CI 284 passed / 4 failed on `7ee082d`.
-- `fix(api): error envelope follow-ups [pack-31 after 18]` — Starlette 404 handler registration; leak check only on opaque 500; session-scoped asyncio loop; import 422 message sanitized; error-contract tests use seeded DB + auth.
+- `fix(api): error envelope follow-ups [pack-31 after 18]` — Starlette 404 handler registration; leak check only on opaque 500; import 422 message sanitized; error-contract tests use seeded DB + auth. CI `d655e8f`: 286 passed / 2 failed.
+- `fix(test): revert asyncio loop scope to function [pack-31 after 18]` — session loop scope caused 174 failures with per-test engine dispose.
+- `fix(api): isinstance StarletteHTTPException + run_console factory patch [pack-31 after 18]` — routing 404s still returned 500 (`isinstance(exc, HTTPException)` too narrow); SSE used module-level pool on wrong event loop.
 - `docs(architecture): note ASGI middleware choice in errors.md`.
 
 ### Deferrals
@@ -757,10 +759,10 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 ### Gate summary
 
-**CI blocker (addressed):** Initial hypothesis was stacked `BaseHTTPMiddleware`; pure ASGI conversion did not clear CI. Actual root cause: `conftest.py` autouse `seed_default_tenant` nested `getfixturevalue("db_engine")` inside async fixture setup — 280 errors at `conftest.py:166`. Fixed by seeding inside `db_engine` when `truncate_tables` is not requested.
+**CI progression:** 280 errors (`getfixturevalue` in autouse fixture) → 4 failures (`7ee082d`) → 2 failures (`1398911`: 404 isinstance + SSE loop) → pending final push.
 
-**Local:** api ruff+mypy; web typecheck, unit **108**, mapper tests (6) — green. Full api pytest / migrate-check deferred to CI (Docker engine 500 on host).
+**Local:** api ruff+mypy; web typecheck, unit **108** — green. Full api pytest / migrate-check deferred to CI (Docker engine 500 on host).
 
 ### Deployment decision
 
-**Deploy API + web together** — Mission 18 Production Guidance. **Hold until CI green** on conftest fix push, then batch with Missions 04–18. Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.
+**Deploy API + web together** — Mission 18 Production Guidance. **Hold until CI green**, then batch with Missions 04–18. Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.

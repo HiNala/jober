@@ -117,7 +117,7 @@ def _assert_no_leak(body: dict[str, object]) -> None:
 
 
 async def http_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    if not isinstance(exc, HTTPException):
+    if not isinstance(exc, StarletteHTTPException):
         raise exc
     correlation_id = get_correlation_id(request)
     code = _code_from_detail(exc.detail)
