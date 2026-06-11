@@ -33,7 +33,7 @@
 
 1. **Brand layer** — one distinctive visual signature: mesh gradient hero, animated grid, or glass “agent orb” — used sparingly on marketing + auth only.
 2. **Layout discipline** — split-pane only on **run/watch** surfaces; other pages get full-width editorial layouts. *(Shipped Mission 09 — re-capture in-app screenshots post-deploy.)*
-3. **Component tiering** — “marketing bento” ≠ “data table” ≠ “terminal” — three distinct component families, not one `Card` everywhere.
+3. **Component tiering** — “marketing bento” ≠ “data table” ≠ “terminal” — three distinct component families, not one `Card` everywhere. *(Shipped Mission 10 — `surface-variants.ts` + `/kitchen-sink` reference.)*
 4. **Motion with purpose** — staggered hero entrance, live pulse on `LIVE` badge, skeleton loaders, chart draw-in (21st.dev motion catalog).
 5. **Empty states as onboarding** — illustrated steps, primary CTA, sample data toggle (Figma-style “try sample file”).
 6. **Consent UX** — bottom sheet once per device, not a persistent toast over product UI. *(Shipped Mission 04 — re-capture screenshots post-deploy to verify.)*

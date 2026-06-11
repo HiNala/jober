@@ -92,14 +92,17 @@ export function RunConsole({ runId }: RunConsoleProps) {
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div className="space-y-4">
-          <figure className={cn("overflow-hidden rounded-lg", surface.card)}>
+          <figure className={cn("overflow-hidden rounded-lg", surface.workspace)}>
             {displayScreenshotUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={displayScreenshotUrl}
                 src={displayScreenshotUrl}
                 alt={`Latest browser frame for ${snapshot.company}`}
-                className="jober-screenshot-frame aspect-video w-full bg-[var(--terminal-bg)] object-contain"
+                className={cn(
+                  "jober-screenshot-frame aspect-video w-full object-contain",
+                  surface.terminalMedia,
+                )}
               />
             ) : (
               <figcaption className="flex aspect-video items-center justify-center text-sm text-muted-foreground">

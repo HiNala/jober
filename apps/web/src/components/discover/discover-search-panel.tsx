@@ -94,7 +94,7 @@ export function DiscoverSearchPanel({ listId, lastQuery, onResults }: Props) {
   });
 
   return (
-    <div className={cn(surface.card, "space-y-4 rounded-lg p-4")}>
+    <div className={cn(surface.workspace, "space-y-4 rounded-lg p-4")}>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="discover-role">Role</Label>

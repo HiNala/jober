@@ -3,6 +3,8 @@
  * CSS variables live in `globals.css`; this module documents runtime/class usage.
  */
 
+import { surfaceFamilyClasses } from "@/lib/design/surface-variants";
+
 export const spacing = {
   page: "p-4 md:p-6",
   section: "space-y-6",
@@ -22,11 +24,17 @@ export const radius = {
   pill: "rounded-full",
 } as const;
 
+/** Surface family class strings — see `surface-variants.ts` and `components/ui/surface.tsx`. */
 export const surface = {
-  card: "border border-border/60 bg-card/80",
+  marketing: surfaceFamilyClasses.marketing,
+  workspace: surfaceFamilyClasses.workspace,
+  terminal: surfaceFamilyClasses.terminal,
+  /** @deprecated Use `surface.workspace` or `surface.marketing`. */
+  card: surfaceFamilyClasses.workspace,
   muted: "bg-muted/30",
   inset: "bg-muted/20",
-  terminal: "bg-[var(--terminal-bg)] text-[var(--terminal-fg)]",
+  terminalMuted: "text-[var(--terminal-muted)]",
+  terminalMedia: "bg-[var(--terminal-bg)]",
 } as const;
 
 /** Consistent product terminology (Mission 16 copy pass). */

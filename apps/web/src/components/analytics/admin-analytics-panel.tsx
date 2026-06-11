@@ -107,7 +107,7 @@ export function AdminAnalyticsPanel() {
         </p>
       ))}
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium">Signup funnel</CardTitle>
           <ExportCsvButton
@@ -160,7 +160,7 @@ export function AdminAnalyticsPanel() {
         </CardContent>
       </Card>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium">Traffic</CardTitle>
           <ExportCsvButton
@@ -239,7 +239,7 @@ export function AdminAnalyticsPanel() {
         </CardContent>
       </Card>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium">LLM cost</CardTitle>
           <ExportCsvButton

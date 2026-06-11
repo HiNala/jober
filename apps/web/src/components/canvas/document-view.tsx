@@ -39,7 +39,7 @@ export function DocumentView() {
 
   return (
     <div className={cn("space-y-4 p-4", motionFadeIn)}>
-      <div className={cn("rounded-lg p-4", surface.card)}>
+      <div className={cn("rounded-lg p-4", surface.workspace)}>
         <div className="mb-3 flex items-center gap-2 font-medium">
           <FileText className="size-4" aria-hidden />
           Cover letter
@@ -60,14 +60,14 @@ export function DocumentView() {
           />
         )}
       </div>
-      <div className={cn("rounded-lg p-4", surface.card)}>
+      <div className={cn("rounded-lg p-4", surface.workspace)}>
         <p className="mb-1 font-medium">Resume in use</p>
         <p className="text-sm text-muted-foreground">
           {review?.resume_filename ?? "Not attached"}
         </p>
       </div>
       {review?.readiness ? (
-        <div className={cn("rounded-lg p-4", surface.card)}>
+        <div className={cn("rounded-lg p-4", surface.workspace)}>
           <p className="mb-2 font-medium">Readiness report</p>
           <ul className="space-y-1 text-sm">
             {review.readiness.checks.map((check) => (

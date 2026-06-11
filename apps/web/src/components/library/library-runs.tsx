@@ -44,7 +44,7 @@ export function LibraryRuns() {
         {runsQuery.data?.map((run) => (
           <li
             key={run.id}
-            className={cn(surface.card, "flex flex-wrap items-center justify-between gap-3 rounded-lg p-4")}
+            className={cn(surface.workspace, "flex flex-wrap items-center justify-between gap-3 rounded-lg p-4")}
           >
             <div>
               <p className="font-medium">

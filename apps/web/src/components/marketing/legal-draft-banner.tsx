@@ -7,7 +7,7 @@ export function LegalDraftBanner() {
   return (
     <aside
       className={cn(
-        surface.card,
+        surface.marketing,
         "mb-8 rounded-lg border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-950 dark:text-amber-100",
       )}
       role="note"

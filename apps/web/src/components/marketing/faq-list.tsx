@@ -29,7 +29,7 @@ function FaqAccordionItem({
   const learnMore = "learnMore" in item ? item.learnMore : undefined;
 
   return (
-    <details className={cn(surface.card, "group rounded-lg px-4 py-3 open:pb-4")}>
+    <details className={cn(surface.marketing, "group rounded-lg px-4 py-3 open:pb-4")}>
       <summary className="cursor-pointer list-none text-sm font-medium marker:content-none [&::-webkit-details-marker]:hidden">
         <span className="flex items-center justify-between gap-3">
           {item.question}

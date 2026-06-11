@@ -2,19 +2,15 @@
 
 import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { Label } from "@/components/ui/label";
-import { surface } from "@/lib/design/tokens";
-import { cn } from "@/lib/utils";
+import { SettingsSection } from "@/components/settings/settings-section";
 
 export function AppearanceSettingsSection() {
   const { preferences, updatePreferences } = useUserPreferences();
   if (!preferences) return null;
 
   return (
-    <section className={cn(surface.card, "rounded-lg p-4")} aria-labelledby="appearance-heading">
-      <h2 id="appearance-heading" className="text-sm font-medium">
-        Appearance
-      </h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+    <SettingsSection headingId="appearance-heading" title="Appearance">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="theme-select">Theme</Label>
           <select
@@ -80,6 +76,6 @@ export function AppearanceSettingsSection() {
           </select>
         </div>
       </div>
-    </section>
+    </SettingsSection>
   );
 }

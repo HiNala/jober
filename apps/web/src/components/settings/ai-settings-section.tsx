@@ -14,8 +14,7 @@ import {
   fetchProviderKeys,
   upsertProviderKey,
 } from "@/lib/api/preferences";
-import { surface } from "@/lib/design/tokens";
-import { cn } from "@/lib/utils";
+import { SettingsSection } from "@/components/settings/settings-section";
 
 export function AiSettingsSection() {
   const { preferences, updatePreferences } = useUserPreferences();
@@ -45,11 +44,8 @@ export function AiSettingsSection() {
   const openai = keysQuery.data?.items.find((k) => k.provider === "openai");
 
   return (
-    <section className={cn(surface.card, "rounded-lg p-4")} aria-labelledby="ai-heading">
-      <h2 id="ai-heading" className="text-sm font-medium">
-        AI & providers
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
+    <SettingsSection headingId="ai-heading" title="AI & providers">
+      <p className="text-sm text-muted-foreground">
         Gateway provider: {llmQuery.data?.provider ?? "…"} · Budget used: $
         {usageQuery.data?.usage.llm_cost_usd.toFixed(2) ?? "0.00"} / $
         {usageQuery.data?.limits.max_llm_budget_usd.toFixed(0) ?? "—"}
@@ -117,6 +113,6 @@ export function AiSettingsSection() {
           )}
         </div>
       </div>
-    </section>
+    </SettingsSection>
   );
 }

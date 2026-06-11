@@ -86,7 +86,7 @@ export function MetricCards() {
         <Card
           key={label}
           className={cn(
-            surface.card,
+            surface.workspace,
             emphasize && "border-primary/40 ring-1 ring-primary/20",
           )}
         >

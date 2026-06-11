@@ -94,7 +94,7 @@ function SettingsPanelInner() {
           Usage this month
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Card className={surface.card}>
+          <Card className={surface.workspace}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Application runs
@@ -110,7 +110,7 @@ function SettingsPanelInner() {
               </p>
             </CardContent>
           </Card>
-          <Card className={surface.card}>
+          <Card className={surface.workspace}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Documents
@@ -122,7 +122,7 @@ function SettingsPanelInner() {
               </p>
             </CardContent>
           </Card>
-          <Card className={surface.card}>
+          <Card className={surface.workspace}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 LLM spend

@@ -35,6 +35,18 @@ Font: **Geist Sans** (UI), **Geist Mono** (logs, IDs).
 - `--radius`: `0.5rem` (8px) — cards, inputs
 - Animations use `motion-safe:` / `@media (prefers-reduced-motion: reduce)` — marketing gradient disables when reduced motion is set.
 
+## Component surface families (Mission 10)
+
+Three deliberate tiers — never blend marketing expressiveness with workspace density or terminal mono styling.
+
+| Family | Token / API | Radius | Border | Typography | Use |
+|--------|-------------|--------|--------|------------|-----|
+| **Marketing** | `surface.marketing`, `<Surface family="marketing">` | `rounded-2xl` | soft / ring | sans, roomy | Bento, pricing, FAQ, funnel |
+| **Workspace** | `surface.workspace`, `<Surface family="workspace">` | `rounded-lg` | quiet `border/60` | sans, dense | Tables, settings, admin, library |
+| **Terminal** | `surface.terminal`, `surface.terminalMedia` | `rounded-lg` | inset shadow | mono `text-xs` | Event stream, live screenshots |
+
+CVA definitions: `apps/web/src/lib/design/surface-variants.ts`. Terminal colors use CSS vars `--terminal-bg`, `--terminal-fg`, `--terminal-muted` in `globals.css`.
+
 ## Source of truth
 
-CSS variables live in `apps/web/src/app/globals.css`. Tailwind v4 maps them via `@theme inline`.
+CSS variables live in `apps/web/src/app/globals.css`. Tailwind v4 maps them via `@theme inline`. Runtime class strings: `apps/web/src/lib/design/tokens.ts`.

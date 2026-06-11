@@ -6,8 +6,7 @@ import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { Label } from "@/components/ui/label";
 import { fetchLetterOptions, type LetterOptions } from "@/lib/api/documents";
 import { updateTenantPolicy } from "@/lib/api/preferences";
-import { surface } from "@/lib/design/tokens";
-import { cn } from "@/lib/utils";
+import { SettingsSection } from "@/components/settings/settings-section";
 
 const VOICE_LABELS: Record<string, string> = {
   direct: "Direct",
@@ -53,11 +52,8 @@ export function ApplicationDefaultsSection({
     (preferences.application_defaults as { letter_template?: string }).letter_template ?? "classic";
 
   return (
-    <section className={cn(surface.card, "rounded-lg p-4")} aria-labelledby="app-defaults-heading">
-      <h2 id="app-defaults-heading" className="text-sm font-medium">
-        Application defaults
-      </h2>
-      <div className="mt-4 space-y-4">
+    <SettingsSection headingId="app-defaults-heading" title="Application defaults">
+      <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="run-policy">Default submission policy</Label>
           <select
@@ -145,6 +141,6 @@ export function ApplicationDefaultsSection({
           </select>
         </div>
       </div>
-    </section>
+    </SettingsSection>
   );
 }

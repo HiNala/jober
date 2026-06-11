@@ -31,7 +31,7 @@ export function AnalyticsConsentSection() {
           Analytics consent
         </h2>
       </div>
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">First-party usage analytics</CardTitle>
           <CardDescription className="text-sm">

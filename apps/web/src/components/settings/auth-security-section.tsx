@@ -66,7 +66,7 @@ export function AuthSecuritySection() {
   return (
     <section
       aria-labelledby="auth-security-heading"
-      className={cn(surface.card, "rounded-lg p-4")}
+      className={cn(surface.workspace, "p-4")}
     >
       <div className="mb-3 flex items-center gap-2">
         <KeyRound className="size-4 text-primary" aria-hidden />

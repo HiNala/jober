@@ -16,7 +16,7 @@ export function DiscoverUploadPanel({ listId }: Props) {
   const queryClient = useQueryClient();
 
   return (
-    <div className={cn(surface.card, "rounded-lg p-4")}>
+    <div className={cn(surface.workspace, "rounded-lg p-4")}>
       <p className="mb-4 text-sm text-muted-foreground">
         Import your tracker workbook — jobs land in the same named list as board search results.
         {listId ? null : " Select or create a target list on the right first."}

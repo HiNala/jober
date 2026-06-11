@@ -50,7 +50,7 @@ export function EventTerminal({
         aria-relevant="additions"
       >
         {company && role && (
-          <p className="mb-2 text-[var(--terminal-muted)]">
+          <p className={cn("mb-2", surface.terminalMuted)}>
             {company} / {role}
           </p>
         )}

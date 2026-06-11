@@ -4,6 +4,7 @@ import { FileJson, Film, Image as ImageIcon, ScrollText } from "lucide-react";
 
 import { useRunCanvas } from "@/contexts/run-canvas-context";
 import { motionLayout, motionPress, motionSpringSettle, motionView } from "@/lib/design/motion";
+import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -76,7 +77,12 @@ export function CanvasFilmstrip() {
               )}
               aria-pressed={selected}
             >
-              <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded bg-[var(--terminal-bg)]">
+              <div
+                className={cn(
+                  "flex aspect-video w-full items-center justify-center overflow-hidden rounded",
+                  surface.terminalMedia,
+                )}
+              >
                 {artifact.thumbUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

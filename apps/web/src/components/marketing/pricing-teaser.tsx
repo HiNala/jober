@@ -11,7 +11,7 @@ export function PricingTeaser() {
       <div className="mx-auto max-w-3xl">
         <div
           className={cn(
-            surface.card,
+            surface.marketing,
             "rounded-xl p-8 text-center md:p-10",
             motionFadeIn,
           )}

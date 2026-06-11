@@ -102,13 +102,13 @@ export function ReviewCanvasView() {
 
   return (
     <div className={cn("grid h-full gap-3 overflow-auto p-3 lg:grid-cols-2", motionFadeIn)}>
-      <figure className={cn("overflow-hidden rounded-lg", surface.card)}>
+      <figure className={cn("overflow-hidden rounded-lg", surface.workspace)}>
         {screenshotUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={screenshotUrl}
             alt="Final form screenshot before submit"
-            className="aspect-video w-full bg-[var(--terminal-bg)] object-contain"
+            className={cn("aspect-video w-full object-contain", surface.terminalMedia)}
           />
         ) : (
           <figcaption className="flex aspect-video items-center justify-center text-sm text-muted-foreground">
@@ -162,7 +162,7 @@ export function ReviewCanvasView() {
         <p className="text-sm text-muted-foreground">{review?.human_summary}</p>
 
         {review?.cover_letter_preview ? (
-          <div className={cn("rounded-lg p-3 text-sm", surface.card)}>
+          <div className={cn("rounded-lg p-3 text-sm", surface.workspace)}>
             <p className="mb-1 font-medium">Cover letter</p>
             <p className="line-clamp-6 whitespace-pre-wrap text-muted-foreground">
               {review.cover_letter_preview}

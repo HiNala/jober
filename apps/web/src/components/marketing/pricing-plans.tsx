@@ -15,7 +15,7 @@ export function PricingPlans() {
   return (
     <div className={motionFadeIn}>
       <ul className="mx-auto mt-12 grid max-w-5xl gap-4 md:grid-cols-2">
-        <li className={cn(surface.card, "pricing-border-beam relative flex flex-col rounded-xl p-6")}>
+        <li className={cn(surface.marketing, "pricing-border-beam relative flex flex-col rounded-xl p-6")}>
           <h2 className="text-lg font-semibold">{free.name}</h2>
           <p className="mt-4 flex items-baseline gap-1">
             <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">$0</span>
@@ -38,7 +38,7 @@ export function PricingPlans() {
           </MarketingCtaLink>
         </li>
 
-        <li className={cn(surface.card, "flex flex-col rounded-xl border-primary/25 p-6")}>
+        <li className={cn(surface.marketing, "flex flex-col rounded-xl border-primary/25 p-6")}>
           <h2 className="text-lg font-semibold">{pro.name}</h2>
           <p className="mt-4 flex items-baseline gap-2">
             <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">—</span>

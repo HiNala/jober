@@ -30,7 +30,7 @@ export default function BlogIndexPage() {
             <li key={post.slug}>
               <article
                 className={cn(
-                  surface.card,
+                  surface.marketing,
                   "overflow-hidden rounded-xl",
                   motionFadeIn,
                 )}

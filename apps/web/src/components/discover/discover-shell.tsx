@@ -145,7 +145,7 @@ export function DiscoverShell() {
             </TabsContent>
           </Tabs>
 
-          <section className={cn(surface.card, "rounded-lg p-4")}>
+          <section className={cn(surface.workspace, "rounded-lg p-4")}>
             <CandidateReview
               candidates={candidates}
               selectedKeys={selectedKeys}

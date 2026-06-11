@@ -49,7 +49,7 @@ export function DifferentiatorBento() {
         <ul className="mt-12 grid gap-4 md:grid-cols-3 md:grid-rows-2">
           <li
             className={cn(
-              surface.card,
+              surface.marketing,
               "flex flex-col gap-4 rounded-xl p-6 md:col-span-2 md:row-span-2",
               motionFadeIn,
             )}
@@ -69,7 +69,7 @@ export function DifferentiatorBento() {
           {SUPPORT_CELLS.map(({ icon: Icon, title, body }) => (
             <li
               key={title}
-              className={cn(surface.card, "rounded-xl p-5", motionFadeIn)}
+              className={cn(surface.marketing, "rounded-xl p-5", motionFadeIn)}
             >
               <Icon className="size-5 text-accent" aria-hidden />
               <h3 className="mt-3 text-sm font-semibold">{title}</h3>

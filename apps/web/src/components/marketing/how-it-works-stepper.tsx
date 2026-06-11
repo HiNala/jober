@@ -79,7 +79,7 @@ export function HowItWorksStepper({ showIntro = true }: { showIntro?: boolean })
                 }}
                 data-step-index={index}
                 className={cn(
-                  surface.card,
+                  surface.marketing,
                   "scroll-mt-24 rounded-xl p-5 transition-[box-shadow,border-color,transform]",
                   motionFadeIn,
                   !reduceMotion && isActive && "border-primary/50 shadow-md shadow-primary/5",

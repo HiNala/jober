@@ -39,7 +39,7 @@ export function AdminSupportView({
   };
 
   return (
-    <Card className={surface.card}>
+    <Card className={surface.workspace}>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium">Support view (audited)</CardTitle>
         <button

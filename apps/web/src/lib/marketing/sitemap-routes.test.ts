@@ -22,6 +22,10 @@ describe("marketingSitemapPaths", () => {
     );
   });
 
+  it("excludes dev-only kitchen sink from sitemap", () => {
+    expect(marketingSitemapPaths()).not.toContain("/kitchen-sink");
+  });
+
   it("includes every Playwright a11y marketing route", () => {
     const staticPaths = new Set<string>(MARKETING_SITEMAP_STATIC_ROUTES);
     for (const path of MARKETING_A11Y_ROUTES) {

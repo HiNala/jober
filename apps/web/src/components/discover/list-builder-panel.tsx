@@ -51,7 +51,7 @@ export function ListBuilderPanel({
   const activeList = lists.find((list) => list.id === activeListId);
 
   return (
-    <aside className={cn(surface.card, "space-y-4 rounded-lg p-4 xl:sticky xl:top-4")}>
+    <aside className={cn(surface.workspace, "space-y-4 rounded-lg p-4 xl:sticky xl:top-4")}>
       <h2 className="text-sm font-medium">Target list</h2>
 
       <div className="space-y-1.5">

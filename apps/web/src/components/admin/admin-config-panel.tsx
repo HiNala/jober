@@ -40,7 +40,7 @@ export function AdminConfigPanel() {
       </div>
 
       {config.data.items.map((entry) => (
-        <Card key={entry.key} className={surface.card}>
+        <Card key={entry.key} className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">{entry.key.replace(/_/g, " ")}</CardTitle>
           </CardHeader>

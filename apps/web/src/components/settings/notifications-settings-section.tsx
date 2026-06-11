@@ -1,8 +1,7 @@
 "use client";
 
 import { useUserPreferences } from "@/contexts/user-preferences-context";
-import { surface } from "@/lib/design/tokens";
-import { cn } from "@/lib/utils";
+import { SettingsSection } from "@/components/settings/settings-section";
 
 export function NotificationsSettingsSection() {
   const { preferences, updatePreferences } = useUserPreferences();
@@ -11,11 +10,8 @@ export function NotificationsSettingsSection() {
   const { notifications } = preferences;
 
   return (
-    <section className={cn(surface.card, "rounded-lg p-4")} aria-labelledby="notifications-heading">
-      <h2 id="notifications-heading" className="text-sm font-medium">
-        Notifications
-      </h2>
-      <div className="mt-4 space-y-3 text-sm">
+    <SettingsSection headingId="notifications-heading" title="Notifications">
+      <div className="space-y-3 text-sm">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -62,6 +58,6 @@ export function NotificationsSettingsSection() {
           Email when a batch finishes (optional)
         </label>
       </div>
-    </section>
+    </SettingsSection>
   );
 }

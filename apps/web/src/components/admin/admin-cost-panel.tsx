@@ -53,7 +53,7 @@ export function AdminCostPanel() {
         <BigNumber label="Reconciled" value={data.reconciled ? "Yes" : "No"} />
       </div>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Daily spend</CardTitle>
         </CardHeader>
@@ -63,7 +63,7 @@ export function AdminCostPanel() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">By model</CardTitle>
           </CardHeader>
@@ -76,7 +76,7 @@ export function AdminCostPanel() {
             />
           </CardContent>
         </Card>
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">By agent</CardTitle>
           </CardHeader>
@@ -92,7 +92,7 @@ export function AdminCostPanel() {
       </div>
 
       {data.anomalies.length ? (
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Spend anomalies</CardTitle>
           </CardHeader>

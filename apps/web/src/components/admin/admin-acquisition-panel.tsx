@@ -45,7 +45,7 @@ export function AdminAcquisitionPanel() {
         />
       </div>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Signup funnel</CardTitle>
         </CardHeader>
@@ -54,7 +54,7 @@ export function AdminAcquisitionPanel() {
         </CardContent>
       </Card>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Traffic & DAU</CardTitle>
         </CardHeader>
@@ -78,7 +78,7 @@ export function AdminAcquisitionPanel() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">UTM sources</CardTitle>
           </CardHeader>
@@ -112,7 +112,7 @@ export function AdminAcquisitionPanel() {
           </CardContent>
         </Card>
 
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Geo (coarse)</CardTitle>
           </CardHeader>

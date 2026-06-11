@@ -112,7 +112,7 @@ export function ReviewSubmitPanel({ jobTargetId, onEditField }: ReviewSubmitPane
 
   return (
     <section
-      className={cn("space-y-4 rounded-lg p-4", surface.card, motionFadeIn)}
+      className={cn("space-y-4 rounded-lg p-4", surface.workspace, motionFadeIn)}
       aria-labelledby="review-submit-heading"
     >
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">

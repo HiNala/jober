@@ -32,7 +32,7 @@ export function FounderProof() {
           {FOUNDER_PROOF.stats.map(({ label, value }) => (
             <li
               key={label}
-              className={cn(surface.card, "rounded-xl p-5 text-center lg:text-left", motionFadeIn)}
+              className={cn(surface.marketing, "rounded-xl p-5 text-center lg:text-left", motionFadeIn)}
             >
               <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
                 {value}

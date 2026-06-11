@@ -41,7 +41,7 @@ export function LayersView() {
             }}
             className={cn(
               "absolute inset-4 overflow-hidden rounded-lg border",
-              surface.card,
+              surface.workspace,
               motionView,
               isTop && "ring-2 ring-primary",
             )}
@@ -56,7 +56,7 @@ export function LayersView() {
               <img
                 src={artifact.thumbUrl}
                 alt={artifact.label}
-                className="h-full w-full object-contain bg-[var(--terminal-bg)]"
+                className={cn("h-full w-full object-contain", surface.terminalMedia)}
               />
             ) : (
               <span className="flex h-full items-center justify-center text-xs text-muted-foreground">

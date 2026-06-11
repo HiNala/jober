@@ -41,7 +41,7 @@ export function AdminOverviewPanel() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Runs (30d)</CardTitle>
           </CardHeader>
@@ -71,7 +71,7 @@ export function AdminOverviewPanel() {
           </CardContent>
         </Card>
 
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Cost & health</CardTitle>
           </CardHeader>

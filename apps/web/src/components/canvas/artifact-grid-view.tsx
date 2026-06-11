@@ -64,12 +64,17 @@ export function ArtifactGridView() {
             }}
             className={cn(
               "flex flex-col overflow-hidden rounded-lg border text-left",
-              surface.card,
+              surface.workspace,
               motionView,
               "hover:border-primary/40",
             )}
           >
-            <div className="flex aspect-video items-center justify-center bg-[var(--terminal-bg)]">
+            <div
+              className={cn(
+                "flex aspect-video items-center justify-center",
+                surface.terminalMedia,
+              )}
+            >
               {artifact.thumbUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img

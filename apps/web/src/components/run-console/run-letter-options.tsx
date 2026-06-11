@@ -39,7 +39,7 @@ export function RunLetterOptions({
   if (!canEdit && override === null) return null;
 
   return (
-    <section className={cn(surface.card, "rounded-lg p-3")} aria-label="Cover letter for this run">
+    <section className={cn(surface.workspace, "rounded-lg p-3")} aria-label="Cover letter for this run">
       <div className="flex items-start gap-2">
         <FileText className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
         <div className="space-y-2 text-sm">

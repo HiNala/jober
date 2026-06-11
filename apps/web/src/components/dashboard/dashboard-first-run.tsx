@@ -55,7 +55,7 @@ export function DashboardFirstRun() {
       />
       <ol className="mx-auto grid max-w-3xl gap-4 sm:grid-cols-3">
         {STEPS.map(({ step, title, body, href, cta, icon: Icon }) => (
-          <li key={step} className={cn(surface.card, "rounded-xl p-4")}>
+          <li key={step} className={cn(surface.workspace, "rounded-xl p-4")}>
             <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
               <span className="flex size-6 items-center justify-center rounded-full bg-muted font-mono">
                 {step}

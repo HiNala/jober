@@ -50,7 +50,7 @@ export function AdminSystemPanel() {
 
       <AttentionBanner items={attention} />
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Infrastructure</CardTitle>
         </CardHeader>
@@ -78,7 +78,7 @@ export function AdminSystemPanel() {
         </CardContent>
       </Card>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Data export / delete requests</CardTitle>
         </CardHeader>
@@ -98,7 +98,7 @@ export function AdminSystemPanel() {
         </CardContent>
       </Card>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <CardTitle className="text-sm font-medium">Admin audit log</CardTitle>
           <select

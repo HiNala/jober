@@ -16,7 +16,7 @@ export function FeaturesBento() {
       {hero ? (
         <li
           className={cn(
-            surface.card,
+            surface.marketing,
             "relative col-span-1 row-span-2 flex flex-col overflow-hidden rounded-xl p-6 md:col-span-2",
             motionFadeIn,
           )}
@@ -45,7 +45,7 @@ export function FeaturesBento() {
         </li>
       ) : null}
       {cells.map(({ icon: Icon, title, specLabel, body, bullets, howItWorksHref }) => (
-        <li key={title} className={cn(surface.card, "flex flex-col rounded-xl p-5", motionFadeIn)}>
+        <li key={title} className={cn(surface.marketing, "flex flex-col rounded-xl p-5", motionFadeIn)}>
           <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-accent">
             {specLabel}
           </p>

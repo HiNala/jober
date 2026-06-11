@@ -128,7 +128,7 @@ export function LibraryJobLists() {
 
       <ul className="space-y-3">
         {visibleLists.map((list) => (
-          <li key={list.id} className={cn(surface.card, "rounded-lg p-4")}>
+          <li key={list.id} className={cn(surface.workspace, "rounded-lg p-4")}>
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <p className="font-medium">

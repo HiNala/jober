@@ -13,7 +13,7 @@ export function PlanComparisonTable({ className }: { className?: string }) {
   const pro = MARKETING_PLANS[1];
 
   return (
-    <div className={cn(surface.card, "overflow-hidden rounded-xl", className)}>
+    <div className={cn(surface.marketing, "overflow-hidden rounded-xl", className)}>
       <table className="w-full text-sm">
         <caption className="sr-only">Plan feature comparison</caption>
         <thead>

@@ -7,8 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { deleteAllData, exportAllData } from "@/lib/api/privacy";
-import { surface } from "@/lib/design/tokens";
-import { cn } from "@/lib/utils";
+import { SettingsSection } from "@/components/settings/settings-section";
 
 export function PrivacyAccountSection() {
   const router = useRouter();
@@ -35,11 +34,8 @@ export function PrivacyAccountSection() {
   });
 
   return (
-    <section className={cn(surface.card, "rounded-lg p-4")} aria-labelledby="privacy-heading">
-      <h2 id="privacy-heading" className="text-sm font-medium">
-        Data & account
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
+    <SettingsSection headingId="privacy-heading" title="Data & account">
+      <p className="text-sm text-muted-foreground">
         Export everything tied to your tenant or permanently delete your data.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -77,6 +73,6 @@ export function PrivacyAccountSection() {
           </Button>
         </div>
       </div>
-    </section>
+    </SettingsSection>
   );
 }

@@ -25,7 +25,7 @@ export function MarketingCtaBand({
       aria-labelledby="marketing-cta-band-heading"
       className={cn("px-6 py-16", motionFadeIn)}
     >
-      <div className={cn(surface.card, "mx-auto max-w-3xl rounded-xl p-8 text-center md:p-10")}>
+      <div className={cn(surface.marketing, "mx-auto max-w-3xl rounded-xl p-8 text-center md:p-10")}>
         <h2 id="marketing-cta-band-heading" className="text-2xl font-semibold md:text-3xl">
           {title}
         </h2>

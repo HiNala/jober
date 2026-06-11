@@ -112,7 +112,10 @@ export function LiveBrowserView() {
             key={displayScreenshotUrl}
             src={displayScreenshotUrl}
             alt={`Browser frame for ${snapshot?.company ?? "run"}`}
-            className="jober-screenshot-frame h-full w-full bg-[var(--terminal-bg)] object-contain"
+            className={cn(
+              "jober-screenshot-frame h-full w-full object-contain",
+              surface.terminalMedia,
+            )}
             data-testid="workspace-browser-canvas"
           />
         ) : (

@@ -83,7 +83,7 @@ export default function AdminUsersPage() {
         aria-label="Search users"
       />
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Accounts</CardTitle>
         </CardHeader>
@@ -173,7 +173,7 @@ export default function AdminUsersPage() {
         />
       ) : null}
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Recent admin actions</CardTitle>
         </CardHeader>

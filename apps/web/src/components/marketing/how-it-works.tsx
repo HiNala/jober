@@ -62,7 +62,7 @@ export function HowItWorks({
                 key={slug}
                 id={isStepper ? `step-${slug}` : undefined}
                 className={cn(
-                  surface.card,
+                  surface.marketing,
                   "relative rounded-xl p-5",
                   motionFadeIn,
                   isDominant && "border-primary/40 ring-1 ring-primary/25 md:scale-[1.02]",

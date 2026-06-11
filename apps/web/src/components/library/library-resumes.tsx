@@ -90,7 +90,7 @@ export function LibraryResumes() {
         {resumesQuery.data?.map((resume) => (
           <li
             key={resume.id}
-            className={cn(surface.card, "flex flex-wrap items-start justify-between gap-3 rounded-lg p-4")}
+            className={cn(surface.workspace, "flex flex-wrap items-start justify-between gap-3 rounded-lg p-4")}
           >
             <div className="min-w-0">
               <p className="font-medium">{resume.original_filename}</p>

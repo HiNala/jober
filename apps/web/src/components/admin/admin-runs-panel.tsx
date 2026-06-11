@@ -46,7 +46,7 @@ export function AdminRunsPanel() {
         />
       </div>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Recovery rate</CardTitle>
         </CardHeader>
@@ -60,7 +60,7 @@ export function AdminRunsPanel() {
         </CardContent>
       </Card>
 
-      <Card className={surface.card}>
+      <Card className={surface.workspace}>
         <CardHeader>
           <CardTitle className="text-sm font-medium">Failures by ATS platform</CardTitle>
         </CardHeader>

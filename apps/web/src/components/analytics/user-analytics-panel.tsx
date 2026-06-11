@@ -88,7 +88,7 @@ export function UserAnalyticsPanel() {
       ) : null}
 
       {hasActivity ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardContent className="pt-4">
             <BigNumber
               label="Applications sent"
@@ -97,7 +97,7 @@ export function UserAnalyticsPanel() {
             />
           </CardContent>
         </Card>
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardContent className="pt-4">
             <BigNumber
               label="Responses tracked"
@@ -106,7 +106,7 @@ export function UserAnalyticsPanel() {
             />
           </CardContent>
         </Card>
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardContent className="pt-4">
             <BigNumber
               label="Letters generated"
@@ -115,7 +115,7 @@ export function UserAnalyticsPanel() {
             />
           </CardContent>
         </Card>
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardContent className="pt-4">
             <BigNumber
               label="LLM cost"
@@ -132,7 +132,7 @@ export function UserAnalyticsPanel() {
       </div> : null}
 
       {hasActivity ? <div className="grid gap-4 lg:grid-cols-2">
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Runs over time</CardTitle>
           </CardHeader>
@@ -140,7 +140,7 @@ export function UserAnalyticsPanel() {
             <AnalyticsLineChart data={data.activity} xKey="day" yKey="runs" label="Runs" />
           </CardContent>
         </Card>
-        <Card className={surface.card}>
+        <Card className={surface.workspace}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">LLM cost over time</CardTitle>
           </CardHeader>
