@@ -10,7 +10,7 @@ Legend: **Y** compliant · **P** partial (toast-only or auto-save) · **N** not 
 | Auth — signup | Y (`validateSignup`) | Y + field aliases | Y | redirect / verify-pending | Y |
 | Auth — forgot password | Y | Y | Y | success panel | Y |
 | Auth — reset password | Y | Y | Y | redirect login | Y |
-| Auth — link-google | P | Y (`parseAuthError`) | Y | — | Y |
+| Auth — link-google | Y | Y (`useFormSubmit`) | Y | redirect | Y |
 | Auth — verify-email / verify-pending | P | Y | Y | message states | Y |
 | Marketing — Pro waitlist | Y | Y (`formatApiError`) | Y | inline success | Y |
 | Import — XLSX wizard | Y (`validateUploadFile`) | Y (`formatApiError`) | Y (preview/import) | toast + done card | Y (file kept) |
@@ -30,6 +30,7 @@ Legend: **Y** compliant · **P** partial (toast-only or auto-save) · **N** not 
 
 ## Deferred to future missions
 
+- **Owner Mission 25:** full inline migration for discover/documents/library/admin/job forms marked **P** above.
 - Full migration of discover/documents/library/admin forms (toast-only errors already use `formatApiError` where wired).
 - react-hook-form / zod — **not adopted** (not in deps).
 - Upload cancel — API does not expose abort tokens; progress bar deferred.

@@ -12,7 +12,7 @@ import { PageLoading } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
 import { confirmGoogleLink } from "@/lib/api/auth";
 import { LINK_GOOGLE_INVALID } from "@/lib/auth/copy";
-import { parseAuthError } from "@/lib/auth/parse-auth-error";
+import { useFormSubmit } from "@/lib/forms/use-form-submit";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
@@ -21,8 +21,9 @@ function LinkGoogleForm() {
   const params = useSearchParams();
   const token = params.get("token");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const { pending, formError, fieldErrors, run, setClientFieldErrors } = useFormSubmit({
+    fallbackError: "Password incorrect or link expired.",
+  });
 
   if (!token) {
     return (
@@ -38,16 +39,17 @@ function LinkGoogleForm() {
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        setPending(true);
-        setError(null);
-        void confirmGoogleLink(token, password)
-          .then(() => router.push("/dashboard"))
-          .catch((err: unknown) =>
-            setError(parseAuthError(err, "Password incorrect or link expired.")),
-          )
-          .finally(() => setPending(false));
+        if (!password) {
+          setClientFieldErrors({ password: "Password is required" });
+          return;
+        }
+        void run(async () => {
+          await confirmGoogleLink(token, password);
+          router.push("/dashboard");
+        });
       }}
     >
       <PasswordField
@@ -57,8 +59,9 @@ function LinkGoogleForm() {
         onChange={setPassword}
         showMeter={false}
         autoComplete="current-password"
+        error={fieldErrors.password}
       />
-      {error ? <AuthFormError message={error} /> : null}
+      {formError ? <AuthFormError message={formError} /> : null}
       <Button type="submit" className={cn(motionPress, "w-full")} disabled={pending}>
         {pending ? "Linking…" : "Link and continue"}
       </Button>

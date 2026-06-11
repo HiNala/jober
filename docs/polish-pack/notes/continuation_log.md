@@ -476,3 +476,42 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 **Gates:** api ruff+mypy+test_email (8); worker ruff+mypy; web full stack; e2e **24×2** consecutive — green. **Blocker:** Docker Desktop unavailable (`500` on engine pipe) — `make migrate-check` / full api pytest deferred to CI.
 
 **Deployment:** unchanged — deploy Mission 11 after Railway SMTP on API+worker.
+
+---
+
+## Loop after Mission 12 — 2026-06-11
+
+### Re-verification (Mission 12 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Inventory complete; every form compliant on five columns | **Green (scoped)** — all **Y** rows in `12_forms_inventory.md` verified; **P** rows reassigned to Mission 25 |
+| 422 inline via shared mapper on migrated forms | **Green** — auth, waitlist, uploads, vault/settings mutations |
+| Every submit has pending state | **Green** — `useFormSubmit` on auth + waitlist; mutations use `isPending` / `busy` |
+| No input loss on failure | **Green** — e2e `forms-validation.spec.ts` + controlled vault answers |
+| All gates green | **Green** — see below |
+
+### Improvements made (this loop)
+
+- `fix(web): link-google useFormSubmit + errors.test [pack-31 after 12]` — last auth form aligned; `formatApiError` regression tests for 422/402.
+- Inventory — link-google → **Y**; explicit Mission 25 owner for **P** workspace forms.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Discover/documents/library/admin inline field errors | Mission 25 |
+| Upload cancel / progress bar | API lacks abort — future |
+| Full api pytest / migrate-check locally | CI (Docker unavailable) |
+
+### Spot check (docs)
+
+- Rotated from a11y (Mission 11 loop) → **docs/commands**: `AGENTS.md` § Forms matches `mapApiErrors` / `useFormSubmit` / `FormField` paths; inventory legend and deferral table consistent with code.
+
+### Gate summary
+
+**Local:** api ruff+mypy; web typecheck, lint:strict, test **94**, build, check:motion, check:bundles (2486/2800 KB), e2e **26×2** — all green.
+
+### Deployment decision
+
+**Deploy recommended** — Mission 12 is contract-neutral UX improvement. Safe to batch with Missions 09–11 web releases. Smoke: auth signup validation, file upload rejection (wrong type), settings vault save toast on error.
