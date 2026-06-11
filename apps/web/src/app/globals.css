@@ -252,6 +252,16 @@
   }
 }
 
+@keyframes jober-hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--motion-distance-sm) * -1));
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

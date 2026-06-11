@@ -16,8 +16,13 @@ export function PricingTeaser() {
             motionFadeIn,
           )}
         >
-          <p className="text-sm font-medium uppercase tracking-widest text-accent">Pricing</p>
-          <h2 id="pricing-teaser-heading" className="mt-3 text-2xl font-semibold md:text-3xl">
+          <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent">
+            Pricing
+          </p>
+          <h2
+            id="pricing-teaser-heading"
+            className="mt-3 text-3xl font-semibold tracking-[-0.02em] md:text-4xl"
+          >
             Start free, scale when your pipeline does
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-muted-foreground">

@@ -7,10 +7,11 @@ import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
 const DEMO_LINES = [
-  "[09:14:02] run.start — Opening application for Acme Corp",
+  "[09:14:02] run.start — Staff engineer @ Northwind Labs",
   "[09:14:18] field.filled — work_authorization",
   "[09:14:31] field.filled — resume_upload",
-  "[09:14:44] checkpoint — Review cover letter before submit",
+  "[09:14:44] checkpoint.human_required — Review letter before submit",
+  "[09:14:52] run.paused — Awaiting your approval",
 ] as const;
 
 function subscribeReducedMotion(onStoreChange: () => void) {
@@ -23,7 +24,7 @@ function getReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function ProductVisual() {
+export function ProductVisual({ className }: { className?: string }) {
   const [animatedLines, setAnimatedLines] = useState(1);
   const reducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => true);
   const visibleLines = reducedMotion ? DEMO_LINES.length : animatedLines;
@@ -32,7 +33,7 @@ export function ProductVisual() {
     if (reducedMotion || animatedLines >= DEMO_LINES.length) return;
     const timer = window.setTimeout(() => {
       setAnimatedLines((count) => Math.min(count + 1, DEMO_LINES.length));
-    }, 1400);
+    }, 1200);
     return () => window.clearTimeout(timer);
   }, [animatedLines, reducedMotion]);
 
@@ -41,6 +42,7 @@ export function ProductVisual() {
       className={cn(
         "relative mx-auto w-full max-w-xl rounded-xl border border-border/70 bg-card/80 p-4 shadow-md backdrop-blur-sm",
         motionFadeIn,
+        className,
       )}
       aria-hidden
     >

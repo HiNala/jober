@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { MOTION_DISTANCE, MOTION_MS, runStatusTone } from "@/lib/design/motion";
+import {
+  HERO_STAGGER_MS,
+  MOTION_DISTANCE,
+  MOTION_MS,
+  motionHeroStagger,
+  runStatusTone,
+} from "@/lib/design/motion";
 
 describe("motion tokens", () => {
   it("keeps micro interactions at or below 200ms", () => {
@@ -17,6 +23,11 @@ describe("motion tokens", () => {
   it("uses small transform distances only", () => {
     expect(MOTION_DISTANCE.sm).toBeLessThanOrEqual(8);
     expect(MOTION_DISTANCE.md).toBeLessThanOrEqual(16);
+  });
+
+  it("hero stagger uses 50ms steps", () => {
+    expect(HERO_STAGGER_MS).toBe(50);
+    expect(motionHeroStagger(2)).toContain("100ms");
   });
 });
 

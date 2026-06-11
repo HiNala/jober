@@ -38,6 +38,21 @@ export const motionLayout =
 export const motionFadeIn =
   "motion-safe:animate-[jober-fade-in_var(--motion-view)_var(--ease-organic)_both]";
 
+/** Hero entrance stagger delay (ms) — §18 landing. */
+export const HERO_STAGGER_MS = 50;
+
+export function motionHeroStagger(index: number): string {
+  if (index <= 0) return motionFadeIn;
+  return cn(
+    motionFadeIn,
+    `motion-safe:[animation-delay:${index * HERO_STAGGER_MS}ms]`,
+  );
+}
+
+/** Gentle product preview float — marketing hero only. */
+export const motionHeroFloat =
+  "motion-safe:animate-[jober-hero-float_6s_ease-in-out_infinite]";
+
 export const motionFadeOut =
   "motion-safe:animate-[jober-fade-out_var(--motion-micro)_ease-out_both]";
 

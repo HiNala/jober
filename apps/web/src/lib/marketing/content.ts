@@ -143,6 +143,73 @@ export const FEATURE_DEEP_DIVES: {
   },
 ];
 
+/** Homepage trust strip — positioning audit §18. */
+export const LANDING_TRUST_ITEMS = [
+  "Review before submit",
+  "No CAPTCHA bypass",
+  "No third-party trackers",
+  "BYOK supported",
+] as const;
+
+/** Objection-ordered FAQ teaser for `/` (full list on /faq). */
+export const HOME_FAQ_TEASER = [
+  {
+    question: "Is this a bot that sprays applications?",
+    answer:
+      "No. Jober only works on jobs you queue. Every application pauses for your review — nothing submits until you approve.",
+  },
+  {
+    question: "Will ATSs flag automated fills?",
+    answer:
+      "Jober fills forms with your real vault data and stops at CAPTCHA, login, and ambiguous fields. You review the diff before submit — same judgment you'd apply manually.",
+  },
+  {
+    question: "Where does my data live?",
+    answer:
+      "Your queue, runs, and vault stay in your private workspace. Sensitive vault fields are encrypted; you can use your own LLM keys (BYOK) in Settings.",
+  },
+] as const;
+
+export const FOUNDER_PROOF = {
+  eyebrow: "Built in the open",
+  title: "Born from a 155-lead job search",
+  story:
+    "Jober started as tooling for one operator's own pipeline — importing a Direct Job Leads tracker, tailoring letters per role, and refusing to click submit without reading the diff. The product is that workflow, productized.",
+  stats: [
+    { label: "Tracker rows dogfooded", value: "155" },
+    { label: "Submit default", value: "Review first" },
+    { label: "Managed LLM on Free", value: "$5/mo cap" },
+  ],
+} as const;
+
+/** Redacted fill-diff sample for marketing bento (not live API data). */
+export const FILL_DIFF_MOCK_ROWS = [
+  {
+    field: "Work authorization",
+    proposed: "Authorized to work in the US",
+    actual: "Authorized to work in the US",
+    matched: true,
+  },
+  {
+    field: "Resume upload",
+    proposed: "[resume.pdf]",
+    actual: "[resume.pdf]",
+    matched: true,
+  },
+  {
+    field: "Cover letter",
+    proposed: "Tailored intro paragraph…",
+    actual: "Tailored intro paragraph…",
+    matched: true,
+  },
+  {
+    field: "LinkedIn URL",
+    proposed: "linkedin.com/in/…",
+    actual: "—",
+    matched: false,
+  },
+] as const;
+
 export const FAQ_ITEMS: { question: string; answer: string }[] = [
   {
     question: "Does Jober auto-submit applications?",

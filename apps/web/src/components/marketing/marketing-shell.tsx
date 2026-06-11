@@ -30,17 +30,17 @@ export function MarketingShell({
       </a>
 
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-6">
-          <Link href="/" className="text-sm font-semibold tracking-tight">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+          <Link href="/" className="text-base font-semibold tracking-tight">
             Jober
           </Link>
-          <nav aria-label="Marketing" className="flex items-center gap-3 md:gap-5">
+          <nav aria-label="Marketing" className="flex items-center gap-4 md:gap-6">
             {navLinks.map(({ href, label, mobile }) => (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "text-sm text-muted-foreground transition-colors hover:text-foreground",
+                  "text-base font-medium text-muted-foreground transition-colors hover:text-foreground",
                   !mobile && "hidden md:inline",
                 )}
               >
@@ -51,11 +51,11 @@ export function MarketingShell({
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className={cn(buttonVariants({ variant: "ghost", size: "sm" }), motionPress)}
+              className={cn(buttonVariants({ variant: "ghost", size: "default" }), motionPress)}
             >
               Sign in
             </Link>
-            <MarketingCtaLink href="/signup" feature={signupFeature} size="sm">
+            <MarketingCtaLink href="/signup" feature={signupFeature} size="default">
               Get started
             </MarketingCtaLink>
           </div>

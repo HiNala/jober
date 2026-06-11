@@ -44,23 +44,14 @@
 
 ### 01 — Home (`01-home.png`)
 
-**What it is:** Primary marketing landing — hero, value props, how-it-works teaser, social proof, pricing CTA, footer.
+**What it is:** Linear-style centered hero with animated run-console preview, trust strip, review-first bento, stepper how-it-works, founder proof, pricing + FAQ teasers.
 
-**UX / flow:** Strong funnel: eyebrow → headline → dual CTA → scroll education → final conversion. Product mockup (application preview + terminal) is the best brand asset on the site.
+**Closed Mission 07 (2026-06-11):** §18 structure implemented; placeholder testimonials removed; `ProductVisual` loop + fill-diff bento; larger nav type. Re-capture `01-home.png` post-deploy.
 
-**Issues**
+**Remaining**
 
-- Hero mockup is static; Hyper Agents would show **live-typed terminal lines** or a looping 3–4s video.
-- Three-up feature row uses identical cards — no visual hierarchy for the lead differentiator (“review before submit”).
-- Social proof quotes look placeholder (generic titles, no logos/avatars).
-- Consent banner overlaps footer CTA on first paint.
-
-**Upgrade toward Hyper / Figma / 21st**
-
-- **Hero:** asymmetric bento — large mockup right, copy left; subtle `radial-gradient` behind mockup (21st.dev).
-- **Type:** tighten H1 tracking (`-0.02em`), use weight 600 not 700; eyebrow in mono uppercase (agent signal).
-- **Proof:** avatar stack + “used by operators at …” with blurred company marks.
-- **Motion:** `framer-motion` stagger children 50ms; mockup float `y: [0,-4,0]` infinite 6s.
+- Consent sheet may overlap footer CTA until post-deploy re-capture confirms Mission 04 layout.
+- Video capture of real run console (optional upgrade over animated terminal).
 
 ---
 
