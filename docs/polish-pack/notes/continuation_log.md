@@ -142,7 +142,7 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 
 ### Gate summary
 
-Web: typecheck, lint:strict, test (62), e2e (15) green locally. Worker: ruff, mypy, pytest 22 passed. API ruff + mypy green; full api pytest deferred to CI (local run slow). Mission 04 validation: `test_analytics.py` via CI.
+Web: typecheck, lint:strict, test (62), e2e (15) green locally. Worker: ruff, mypy, pytest 22 passed. API ruff + mypy green. CI [27318382739](https://github.com/HiNala/jober/actions/runs/27318382739) **success** on push (backend + policy + web e2e).
 
 ### Deployment decision
 
