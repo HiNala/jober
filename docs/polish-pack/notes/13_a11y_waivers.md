@@ -18,6 +18,7 @@
 | Chart accessibility | `ChartAccessibleFigure` with sr-only data table |
 | Run stream spam | `RunStreamAnnouncer` for checkpoints/status; log is `role="log"` without `aria-live` |
 | Command palette crash on open | `CommandDialog` wraps children in `<Command>` (cmdk context required) |
+| cmdk listbox separators | `CommandSeparator` is decorative (`role="none"`) — cmdk `role="separator"` is invalid inside `listbox` |
 | Command palette title | `DialogHeader` moved inside `DialogContent` |
 | Analytics tabs | `aria-controls` + `tabpanel` ids |
 

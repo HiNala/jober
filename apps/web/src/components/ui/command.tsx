@@ -139,10 +139,12 @@ function CommandGroup({
 function CommandSeparator({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Separator>) {
+}: React.ComponentProps<"div">) {
   return (
-    <CommandPrimitive.Separator
+    <div
       data-slot="command-separator"
+      role="none"
+      aria-hidden="true"
       className={cn("-mx-1 h-px bg-border", className)}
       {...props}
     />

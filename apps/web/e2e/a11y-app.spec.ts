@@ -16,6 +16,21 @@ for (const path of APP_A11Y_ROUTES) {
   });
 }
 
+test("axe clean: command palette when open", async ({ page }) => {
+  await page.goto("/dashboard");
+  await dismissAnalyticsConsent(page);
+  await waitForAppShell(page);
+
+  await page.getByRole("button", { name: "Workspace menu" }).focus();
+  await page.keyboard.press("Control+K");
+  await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
+
+  const results = await createAxeBuilder(page).analyze();
+  expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+
+  await page.keyboard.press("Escape");
+});
+
 test("keyboard: command palette opens and closes with Escape", async ({ page }) => {
   await page.goto("/dashboard");
   await dismissAnalyticsConsent(page);
