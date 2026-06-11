@@ -32,17 +32,28 @@ async def test_unhandled_exception_returns_opaque_500_with_correlation_id(
 
 
 @pytest.mark.asyncio
-async def test_http_exception_includes_correlation_id_and_code() -> None:
+@pytest.mark.skipif(
+    __import__("os").getenv("CI") != "true" and __import__("os").getenv("RUN_DB_TESTS") != "1",
+    reason="requires Postgres for dev auth",
+)
+async def test_http_exception_includes_correlation_id_and_code(
+    db_session,
+    truncate_tables,
+    auth_headers,
+) -> None:
     transport = ASGITransport(app=app, raise_app_exceptions=False)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test",
+        headers=auth_headers,
+    ) as client:
         response = await client.get("/api/nonexistent-route-for-404-test")
 
-    assert response.status_code in {404, 405}
-    if response.status_code == 404:
-        body = response.json()
-        assert "detail" in body
-        assert "correlation_id" in body
-        assert CORRELATION_ID_HEADER in response.headers
+    assert response.status_code == 404
+    body = response.json()
+    assert "detail" in body
+    assert "correlation_id" in body
+    assert CORRELATION_ID_HEADER in response.headers
 
 
 @pytest.mark.asyncio
@@ -101,7 +112,15 @@ async def test_resume_upload_maps_storage_outage_to_503(
 
 
 @pytest.mark.asyncio
-async def test_cors_headers_on_error_response() -> None:
+@pytest.mark.skipif(
+    __import__("os").getenv("CI") != "true" and __import__("os").getenv("RUN_DB_TESTS") != "1",
+    reason="requires Postgres for dev auth",
+)
+async def test_cors_headers_on_error_response(
+    db_session,
+    truncate_tables,
+    auth_headers,
+) -> None:
     from jober_api.config import settings
 
     origin = settings.cors_origins[0] if settings.cors_origins else "http://localhost:3000"
@@ -110,10 +129,14 @@ async def test_cors_headers_on_error_response() -> None:
     async with AsyncClient(
         transport=transport,
         base_url="http://test",
-        headers={"Origin": origin},
+        headers={**auth_headers, "Origin": origin},
     ) as client:
-        response = await client.get("/api/definitely-missing-route-xyz")
+        response = await client.get(
+            "/api/job-targets/00000000-0000-0000-0000-000000000000",
+        )
 
     assert response.status_code == 404
+    body = response.json()
+    assert "correlation_id" in body
     allow = response.headers.get("access-control-allow-origin")
     assert allow in {origin, "*"}

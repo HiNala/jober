@@ -6,6 +6,7 @@ import uuid
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from jober_api.privacy.logging import safe_log
@@ -24,7 +25,8 @@ DEPENDENCY_UNAVAILABLE_MESSAGE = (
     "A required service is temporarily unavailable. Try again shortly."
 )
 
-_LEAK_MARKERS = ("traceback", "file ", "line ", "sqlalchemy", "asyncpg")
+# Traceback-shaped leaks only — avoid matching benign client messages ("File is not a zip file").
+_LEAK_MARKERS = ("traceback", 'file "', "line ", "sqlalchemy", "asyncpg")
 
 
 def error_detail(
@@ -120,7 +122,6 @@ async def http_exception_handler(request: Request, exc: Exception) -> JSONRespon
     correlation_id = get_correlation_id(request)
     code = _code_from_detail(exc.detail)
     content = _envelope(detail=exc.detail, correlation_id=correlation_id, code=code)
-    _assert_no_leak(content)
     return JSONResponse(
         status_code=exc.status_code,
         content=content,
@@ -149,6 +150,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
         exc_type=type(exc).__name__,
     )
     content = _envelope(detail=INTERNAL_ERROR_MESSAGE, correlation_id=correlation_id)
+    _assert_no_leak(content)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=content,
@@ -188,6 +190,8 @@ class CorrelationIdMiddleware:
 
 
 def register_exception_handlers(app: FastAPI) -> None:
+    # Starlette routing 404s use starlette.exceptions.HTTPException — register both aliases.
+    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
     app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, unhandled_exception_handler)

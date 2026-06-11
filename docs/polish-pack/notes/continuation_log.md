@@ -739,7 +739,8 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 - `fix(api): pure ASGI correlation middleware [pack-31 after 18]` — replaces `BaseHTTPMiddleware` on correlation IDs (CI run 27357876037).
 - `fix(api): pure ASGI auth middleware [pack-31 after 18]` — `AuthMiddleware` also used `BaseHTTPMiddleware`; stacked middleware triggered pytest-asyncio `Runner.run()` errors on all async tests (CI run 27361588075 still red — root cause was conftest, not middleware).
-- `fix(test): seed tenant in db_engine fixture [pack-31 after 18]` — removed autouse `seed_default_tenant` that called `getfixturevalue("db_engine")` inside an async fixture (nested `Runner.run()` during setup).
+- `fix(test): seed tenant in db_engine fixture [pack-31 after 18]` — removed autouse `seed_default_tenant` that called `getfixturevalue("db_engine")` inside an async fixture (nested `Runner.run()` during setup). CI 284 passed / 4 failed on `7ee082d`.
+- `fix(api): error envelope follow-ups [pack-31 after 18]` — Starlette 404 handler registration; leak check only on opaque 500; session-scoped asyncio loop; import 422 message sanitized; error-contract tests use seeded DB + auth.
 - `docs(architecture): note ASGI middleware choice in errors.md`.
 
 ### Deferrals

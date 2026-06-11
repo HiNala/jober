@@ -37,6 +37,6 @@ async def import_jobs_xlsx(
     except (BadZipFile, InvalidFileException, KeyError, ValueError) as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Could not read workbook: {exc}",
+            detail="Could not read workbook",
         ) from exc
     return report.as_dict()
