@@ -63,4 +63,38 @@ describe("applyStreamEvent", () => {
       }),
     ).toBeNull();
   });
+
+  it("sets succeeded on run.succeeded", () => {
+    const next = applyStreamEvent(baseSnapshot, {
+      id: "e4",
+      seq: 4,
+      ts: "2026-01-01T00:00:00Z",
+      level: "info",
+      event_type: "run.succeeded",
+      message: "done",
+    });
+    expect(next?.status).toBe("succeeded");
+  });
+
+  it("clears open checkpoint on human.required skip", () => {
+    const withCheckpoint: RunConsoleSnapshot = {
+      ...baseSnapshot,
+      open_checkpoint: {
+        id: "cp-1",
+        checkpoint_type: "review_submit",
+        prompt: "Review",
+        options: {},
+      },
+    };
+    const next = applyStreamEvent(withCheckpoint, {
+      id: "e5",
+      seq: 5,
+      ts: "2026-01-01T00:00:00Z",
+      level: "info",
+      event_type: "human.required",
+      message: "skipped",
+      payload: { action: "skip" },
+    });
+    expect(next?.open_checkpoint).toBeNull();
+  });
 });

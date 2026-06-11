@@ -1,12 +1,15 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Hand } from "lucide-react";
+import { AlertCircle, Hand } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { resolveRunCheckpoint, type RunConsoleSnapshot } from "@/lib/api/run-console";
+import { ApiError } from "@/lib/api/client";
 import { formatApiError } from "@/lib/api/errors";
 import { motionAttentionEnter, motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
@@ -14,28 +17,91 @@ import { cn } from "@/lib/utils";
 export interface CheckpointCardProps {
   runId: string;
   snapshot: RunConsoleSnapshot;
+  onResolved?: () => void;
 }
 
-export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
+const VALUE_CHECKPOINT_TYPES = new Set([
+  "captcha",
+  "sensitive_field",
+  "manual_intervention",
+  "two_factor",
+]);
+
+export function CheckpointCard({ runId, snapshot, onResolved }: CheckpointCardProps) {
   const checkpoint = snapshot.open_checkpoint;
   const queryClient = useQueryClient();
+  const [gateValue, setGateValue] = useState("");
+  const [conflict, setConflict] = useState(false);
 
   const resolveMutation = useMutation({
-    mutationFn: (action: "approve" | "deny" | "edit" | "skip") =>
-      resolveRunCheckpoint(runId, checkpoint!.id, action),
+    mutationFn: (params: { action: "approve" | "deny" | "edit" | "skip"; value?: string }) =>
+      resolveRunCheckpoint(runId, checkpoint!.id, params.action, params.value),
     onSuccess: (result) => {
+      setConflict(false);
       toast.message(`Checkpoint ${result.action} — run ${result.run_status.replace(/_/g, " ")}`);
       void queryClient.invalidateQueries({ queryKey: ["run-console", runId] });
+      onResolved?.();
     },
-    onError: (err: unknown) => toast.error(formatApiError(err)),
+    onError: (err: unknown) => {
+      if (err instanceof ApiError && err.status === 422) {
+        const detail = err.body ?? "";
+        if (detail.includes("already resolved")) {
+          setConflict(true);
+          return;
+        }
+      }
+      toast.error(formatApiError(err));
+    },
   });
 
   if (!checkpoint) {
     return null;
   }
 
+  if (conflict) {
+    return (
+      <section
+        className={cn(
+          "space-y-3 rounded-lg border border-border/60 bg-muted/30 p-4",
+          motionAttentionEnter,
+        )}
+        aria-labelledby="checkpoint-conflict-heading"
+      >
+        <div className="flex items-center gap-2">
+          <AlertCircle className="size-4 text-muted-foreground" aria-hidden />
+          <h3 id="checkpoint-conflict-heading" className="text-sm font-semibold">
+            Checkpoint already resolved
+          </h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          This checkpoint was handled in another session. Sync the run console to see the latest
+          state.
+        </p>
+        <Button
+          size="sm"
+          variant="outline"
+          className={motionPress}
+          onClick={() => {
+            setConflict(false);
+            onResolved?.();
+          }}
+        >
+          Sync console
+        </Button>
+      </section>
+    );
+  }
+
   const isReview = checkpoint.checkpoint_type === "review_submit";
+  const needsValue = VALUE_CHECKPOINT_TYPES.has(checkpoint.checkpoint_type);
   const typeLabel = checkpoint.checkpoint_type.replace(/_/g, " ");
+
+  const approve = () => {
+    resolveMutation.mutate({
+      action: "approve",
+      value: needsValue && gateValue.trim() ? gateValue.trim() : undefined,
+    });
+  };
 
   return (
     <section
@@ -53,13 +119,27 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
         <Badge variant="outline">{typeLabel}</Badge>
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground">{checkpoint.prompt}</p>
+      {needsValue ? (
+        <div className="space-y-1">
+          <label htmlFor="checkpoint-gate-value" className="text-xs font-medium text-muted-foreground">
+            Response value
+          </label>
+          <Input
+            id="checkpoint-gate-value"
+            value={gateValue}
+            onChange={(event) => setGateValue(event.target.value)}
+            placeholder="Enter code or value to continue"
+            disabled={resolveMutation.isPending}
+          />
+        </div>
+      ) : null}
       <div className="flex flex-wrap gap-2" role="group" aria-label="Checkpoint actions">
         {isReview ? (
           <>
             <Button
               size="sm"
               className={motionPress}
-              onClick={() => resolveMutation.mutate("approve")}
+              onClick={() => resolveMutation.mutate({ action: "approve" })}
               disabled={resolveMutation.isPending}
             >
               Approve submit
@@ -68,7 +148,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
               size="sm"
               variant="secondary"
               className={motionPress}
-              onClick={() => resolveMutation.mutate("edit")}
+              onClick={() => resolveMutation.mutate({ action: "edit" })}
               disabled={resolveMutation.isPending}
             >
               Edit form
@@ -77,7 +157,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
               size="sm"
               variant="outline"
               className={motionPress}
-              onClick={() => resolveMutation.mutate("skip")}
+              onClick={() => resolveMutation.mutate({ action: "skip" })}
               disabled={resolveMutation.isPending}
             >
               Skip
@@ -86,7 +166,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
               size="sm"
               variant="destructive"
               className={motionPress}
-              onClick={() => resolveMutation.mutate("deny")}
+              onClick={() => resolveMutation.mutate({ action: "deny" })}
               disabled={resolveMutation.isPending}
             >
               Deny
@@ -97,8 +177,8 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
             <Button
               size="sm"
               className={motionPress}
-              onClick={() => resolveMutation.mutate("approve")}
-              disabled={resolveMutation.isPending}
+              onClick={approve}
+              disabled={resolveMutation.isPending || (needsValue && !gateValue.trim())}
             >
               Continue
             </Button>
@@ -106,7 +186,7 @@ export function CheckpointCard({ runId, snapshot }: CheckpointCardProps) {
               size="sm"
               variant="outline"
               className={motionPress}
-              onClick={() => resolveMutation.mutate("skip")}
+              onClick={() => resolveMutation.mutate({ action: "skip" })}
               disabled={resolveMutation.isPending}
             >
               Skip

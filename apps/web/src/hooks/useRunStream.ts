@@ -10,8 +10,14 @@ import {
 } from "@/lib/api/run-console";
 import { applyStreamEvent } from "@/lib/run-stream/apply-stream-event";
 import { RUN_SSE_EVENT_TYPES } from "@/lib/run-stream/event-types";
+import { pruneStreamEvents } from "@/lib/run-stream/prune-events";
+import {
+  isStreamReconnecting,
+  type RunStreamStatus,
+} from "@/lib/run-stream/stream-status";
 
-export type RunStreamStatus = "idle" | "connecting" | "open" | "closed" | "error";
+export type { RunStreamStatus };
+export { isStreamReconnecting };
 
 export function useRunStream(runId: string | null) {
   const [status, setStatus] = useState<RunStreamStatus>(runId ? "connecting" : "idle");
@@ -39,7 +45,7 @@ export function useRunStream(runId: string | null) {
       for (const event of incoming) {
         bySeq.set(event.seq, event);
       }
-      return [...bySeq.values()].sort((a, b) => a.seq - b.seq);
+      return pruneStreamEvents([...bySeq.values()].sort((a, b) => a.seq - b.seq));
     });
     const maxSeq = Math.max(...incoming.map((event) => event.seq));
     if (maxSeq > lastSeqRef.current) {
@@ -71,7 +77,8 @@ export function useRunStream(runId: string | null) {
       sourceRef.current = source;
       source.onopen = () => setStatus("open");
       source.onerror = () => {
-        setStatus("error");
+        const midRun = lastSeqRef.current > 0;
+        setStatus(midRun ? "connecting" : "error");
         source.close();
         if (reconnectTimerRef.current) {
           clearTimeout(reconnectTimerRef.current);
@@ -195,9 +202,13 @@ export function useRunStream(runId: string | null) {
     [events],
   );
 
+  const streamStatus = runId ? status : "idle";
+  const eventList = runId ? events : [];
+
   return {
-    status: runId ? status : "idle",
-    events: runId ? events : [],
+    status: streamStatus,
+    isReconnecting: isStreamReconnecting(streamStatus, eventList.length),
+    events: eventList,
     snapshot: runId ? snapshot : null,
     lastSeq,
     reconnect,

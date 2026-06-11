@@ -1,13 +1,14 @@
 "use client";
 
-import { RefreshCw } from "lucide-react";
+import { Radio, RefreshCw } from "lucide-react";
 
 import { ContentReveal } from "@/components/motion/content-reveal";
 import { StatusPill } from "@/components/motion/status-pill";
 import { PageError, RunConsoleSkeleton } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
-import { motionFadeIn, motionPress } from "@/lib/design/motion";
+import { motionFadeIn, motionPress, motionShimmer } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
+import { streamStatusLabel } from "@/lib/run-stream/stream-status";
 import { cn } from "@/lib/utils";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
 import { useRunStream } from "@/hooks/useRunStream";
@@ -15,19 +16,13 @@ import { useRunStream } from "@/hooks/useRunStream";
 import { ArtifactLinks } from "./artifact-links";
 import { CheckpointCard } from "./checkpoint-card";
 import { EventTerminal } from "./event-terminal";
+import { isTerminalRunStatus, RunEndStateSummary } from "./run-end-state-summary";
 import { RunStreamAnnouncer } from "./run-stream-announcer";
 import { RunLetterOptions } from "./run-letter-options";
 import { StateTimeline } from "./state-timeline";
 
 export interface RunConsoleProps {
   runId: string;
-}
-
-function streamStatusLabel(status: string): string {
-  if (status === "open") return "Live";
-  if (status === "connecting") return "Connecting";
-  if (status === "error") return "Disconnected";
-  return status;
 }
 
 export function RunConsole({ runId }: RunConsoleProps) {
@@ -40,10 +35,14 @@ export function RunConsole({ runId }: RunConsoleProps) {
     events,
     snapshot,
     reconnect,
+    isReconnecting,
     selectedTimelineSeq,
     setSelectedTimelineSeq,
     displayScreenshotUrl,
   } = stream;
+
+  const streamLabel = streamStatusLabel(status, { hasEvents: events.length > 0 });
+  const streamLive = status === "open";
 
   if (status === "error" && !snapshot) {
     return (
@@ -78,7 +77,15 @@ export function RunConsole({ runId }: RunConsoleProps) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={snapshot.status} />
-          <StatusPill status={status === "open" ? "in_progress" : status} label={streamStatusLabel(status)} />
+          <StatusPill
+            status={streamLive ? "in_progress" : status}
+            label={streamLabel}
+            icon={
+              streamLive ? (
+                <Radio className={cn("size-3 fill-current", motionShimmer)} aria-hidden />
+              ) : undefined
+            }
+          />
           <Button
             size="sm"
             variant="outline"
@@ -117,16 +124,24 @@ export function RunConsole({ runId }: RunConsoleProps) {
             selectedSeq={selectedTimelineSeq}
             onSelectSeq={setSelectedTimelineSeq}
           />
+          <RunEndStateSummary snapshot={snapshot} />
           <RunLetterOptions runId={runId} snapshot={snapshot} />
-          <CheckpointCard runId={runId} snapshot={snapshot} />
-          <ArtifactLinks artifacts={snapshot.artifacts} />
+          <CheckpointCard
+            runId={runId}
+            snapshot={snapshot}
+            onResolved={() => void reconnect()}
+          />
+          {!isTerminalRunStatus(snapshot.status) ? (
+            <ArtifactLinks artifacts={snapshot.artifacts} />
+          ) : null}
         </div>
         <EventTerminal
           streamKey={runId}
           events={events}
           company={snapshot.company}
           role={snapshot.role}
-          isConnecting={status === "connecting"}
+          isConnecting={status === "connecting" && events.length === 0}
+          isReconnecting={isReconnecting}
         />
       </div>
     </div>

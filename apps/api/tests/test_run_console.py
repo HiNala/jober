@@ -255,6 +255,136 @@ async def test_checkpoint_skip_syncs_console_snapshot(db_session, truncate_table
 
 
 @pytest.mark.asyncio
+async def test_checkpoint_double_resolve_returns_422(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+    from jober_api.models.human_checkpoint import HumanCheckpoint
+    from jober_api.repositories.application_run import ApplicationRunRepository
+
+    job = await _seed_job(db_session)
+    runs = ApplicationRunRepository(db_session)
+    run = await runs.create(
+        job_target_id=job.id,
+        status=RunStatus.REVIEW_AND_SUBMIT,
+        current_step=RunStatus.REVIEW_AND_SUBMIT,
+    )
+    cp = HumanCheckpoint(
+        id=uuid.uuid4(),
+        run_id=run.id,
+        checkpoint_type=CheckpointType.REVIEW_SUBMIT,
+        prompt="Review",
+        options={"readiness": {"passed": True, "checks": []}},
+        status=CheckpointStatus.OPEN,
+    )
+    db_session.add(cp)
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            first = await client.post(
+                f"/api/application-runs/{run.id}/checkpoints/{cp.id}/resolve",
+                json={"action": "skip"},
+            )
+            assert first.status_code == 200
+
+            second = await client.post(
+                f"/api/application-runs/{run.id}/checkpoints/{cp.id}/resolve",
+                json={"action": "skip"},
+            )
+            assert second.status_code == 422
+            assert "already resolved" in second.text.lower()
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_sse_last_event_id_header_resumes_after_seq(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+    from jober_api.repositories.application_run import ApplicationRunRepository
+
+    job = await _seed_job(db_session)
+    runs = ApplicationRunRepository(db_session)
+    run = await runs.create(
+        job_target_id=job.id,
+        status=RunStatus.FILL_FORM,
+        current_step=RunStatus.FILL_FORM,
+    )
+    events = RunEventRepository(db_session)
+    await events.append(run_id=run.id, event_type="run.started", message="one")
+    await events.append(run_id=run.id, event_type="state.changed", message="two")
+    await events.append(run_id=run.id, event_type="field.filled", message="three")
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            res = await client.get(
+                f"/api/application-runs/{run.id}/events",
+                headers={"Accept": "text/event-stream", "Last-Event-ID": "2"},
+                params={"poll_once": "1"},
+            )
+            assert res.status_code == 200
+            assert "field.filled" in res.text
+            assert "id: 3" in res.text
+            assert "run.started" not in res.text
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_sse_emits_heartbeat_when_idle(db_session, truncate_tables, monkeypatch) -> None:
+    from contextlib import asynccontextmanager
+
+    from jober_api.repositories.application_run import ApplicationRunRepository
+    from jober_api.services.console import service as console_service
+
+    job = await _seed_job(db_session)
+    runs = ApplicationRunRepository(db_session)
+    run = await runs.create(
+        job_target_id=job.id,
+        status=RunStatus.FILL_FORM,
+        current_step=RunStatus.FILL_FORM,
+    )
+    await db_session.commit()
+
+    monkeypatch.setattr(console_service, "_SSE_HEARTBEAT_SEC", 0.0)
+
+    async def fast_sleep(_delay: float) -> None:
+        return None
+
+    monkeypatch.setattr(console_service.asyncio, "sleep", fast_sleep)
+
+    def session_factory():
+        @asynccontextmanager
+        async def _provide():
+            yield db_session
+
+        return _provide()
+
+    chunks: list[str] = []
+    async for chunk in console_service.stream_run_events(
+        session_factory, run.id, after_seq=0, poll_once=False
+    ):
+        chunks.append(chunk)
+        if ": heartbeat" in chunk:
+            break
+        if len(chunks) > 10:
+            break
+
+    body = "".join(chunks)
+    assert "retry: 3000" in body
+    assert ": heartbeat" in body
+
+
+@pytest.mark.asyncio
 async def test_recent_events_feed(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
     from jober_api.repositories.application_run import ApplicationRunRepository

@@ -178,9 +178,11 @@ E2e coverage: `e2e/a11y-marketing.spec.ts`, `e2e/a11y-auth.spec.ts`, `e2e/a11y-a
 
 **Responsive (Mission 14):** below 1024px the workspace nav rail hides in favor of `MobileNav`; run console uses **Work | Canvas** tabs (`run-ops-desk-shell.tsx`); touch Search icon opens the command palette. Breakpoint constant: `lib/workspace/breakpoints.ts`. Mobile screenshots: `docs/screenshots/mobile/`.
 
+**Run console reliability (Mission 15):** SSE reconnect resumes from `Last-Event-ID` / `after_seq` with snapshot fallback; mid-run **Reconnecting** state; 15s SSE heartbeat; event list pruned to 500 lines; checkpoint double-resolve → 422 conflict UI; terminal auto-scroll with scroll-lock and per-event copy; end-state summary for succeeded/failed/skipped. Notes: `docs/polish-pack/notes/15_console_chaos.md`.
+
 **Component surfaces (Mission 10):** three families in `lib/design/surface-variants.ts` — **marketing** (bento/funnel), **workspace** (data panels), **terminal** (run stream/live view). Use `<Surface family="…">` or `surface.*` tokens; reference at `/kitchen-sink` (dev-only, robots-disallowed).
 
-**Live canvas (Mission 18):** on `/runs/[id]`, the right canvas streams screenshots via SSE, shows artifact grid/layers, document and fill-diff views, and a combined review-and-submit surface. Components live in `components/canvas/`.
+**Live canvas (Mission 18):** on `/runs/[id]`, the right canvas streams screenshots via SSE (see Mission 15 for reconnect/heartbeat), shows artifact grid/layers, document and fill-diff views, and a combined review-and-submit surface. Components live in `components/canvas/`.
 
 ## Profile vault (Mission 04)
 

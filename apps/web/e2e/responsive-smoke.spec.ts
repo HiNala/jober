@@ -74,5 +74,14 @@ for (const [label, viewport] of Object.entries(VIEWPORTS) as [
       await page.getByRole("button", { name: "Show canvas" }).click();
       await expect(page.getByRole("tab", { name: "Canvas" })).toHaveAttribute("aria-selected", "true");
     });
+
+    test("run console: work surface mounts (stream or API error)", async ({ page }) => {
+      await page.goto(`/runs/${E2E_FIXTURE_RUN_ID}`);
+      await dismissAnalyticsConsent(page);
+      await waitForAppShell(page);
+      const eventStream = page.getByRole("heading", { name: "Event stream" });
+      const unavailable = page.getByRole("heading", { name: "Run console unavailable" });
+      await expect(eventStream.or(unavailable)).toBeVisible({ timeout: 15_000 });
+    });
   });
 }
