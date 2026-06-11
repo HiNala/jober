@@ -9,6 +9,8 @@ from jober_api.db.connect import asyncpg_connect_args
 engine = create_async_engine(
     settings.database_url,
     pool_pre_ping=True,
+    pool_size=settings.database_pool_size,
+    max_overflow=settings.database_max_overflow,
     connect_args=asyncpg_connect_args(settings.database_url),
 )
 

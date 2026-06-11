@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = "postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable"
+    # Railway Hobby Postgres ~20 connections; api + worker must share headroom.
+    database_pool_size: int = 5
+    database_max_overflow: int = 5
     redis_url: str = "redis://localhost:6379/0"
     minio_endpoint: str = "localhost:9000"
     minio_access_key: str = "minioadmin"
