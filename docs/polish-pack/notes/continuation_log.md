@@ -275,3 +275,48 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Recommend deploying** — batch Missions 04–07 as one web deploy (consent sheet, onboarding states, auth shell, landing hero). Run `railway-smoke.sh`, verify production login + home hero, then re-capture `01-home.png` and auth screenshots (`11–13`).
+
+---
+
+## Loop after Mission 08 — 2026-06-11
+
+### Re-verification (Mission 08 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| UI-REVIEW rows 02–06 closed | **Green** (prose) — bento, stepper, pricing waitlist, FAQ columns, blog typography; PNG refresh **deferred** post-deploy |
+| Pro waitlist replaces dead card; limits match API | **Green** — `ProWaitlistForm` → `POST /api/waitlist/pro`; `plans.test.ts` mirrors `entitlements.py` |
+| Marketing axe + bundle budgets | **Green** — e2e 22 passed; 2471/2800 KB |
+| Visual continuity with Mission 07 | **Green** — shared `MarketingPageHeader`, mono eyebrows, type scale |
+| Design Council ≥18/20 | **Deferred** — post-deploy screenshot review |
+| Waitlist docs (`08_waitlist.md`, README) | **Green** |
+
+### Improvements made (this loop)
+
+- None required — Mission 08 landed clean; CI green on first push.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Screenshots `02–06` + `01` | Post-deploy re-capture |
+| Design Council per-page scores | Operator review after deploy |
+| Blog newsletter capture | Out of scope (Mission 08) |
+| Production waitlist smoke | Operator immediately after deploy |
+
+### Spot check (chaos / contract)
+
+- Rotated from a11y (Mission 07 loop) → **public API contract**: confirmed `/api/waitlist/` in `PUBLIC_API_PREFIXES` (middleware + RBAC enforcement); migration `q9r0s1t32u63` applied in CI Alembic step; `test_waitlist.py` covers create, dedupe, consent-required.
+- Local Docker Desktop returned 500 (engine unavailable) — backend DB gates not re-run locally; CI is authoritative this loop.
+
+### Gate summary
+
+**CI:** [27324654433](https://github.com/HiNala/jober/actions/runs/27324654433) **success** (backend migrate + pytest incl. waitlist, policy, web 22 e2e).
+
+**Local (web):** typecheck, lint:strict, test 73, build, check:motion, check:bundles, e2e 22 — green. API ruff + mypy green (no DB).
+
+**Local blocker:** Docker engine 500 — `make migrate-check` / `pytest` not rerun on host; defer to CI + next loop with healthy Docker.
+
+### Deployment decision
+
+**Deploy recommended** — batch Missions 04–08 as one release. **Requires migration** `q9r0s1t32u63` before/at web deploy. After deploy: submit test email on `/pricing`, confirm `pro_waitlist_entries` row, run `railway-smoke.sh`, re-capture screenshots `01–06` and auth `11–13`.
