@@ -766,3 +766,44 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy API + web together** — Mission 18 Production Guidance. **Ready to batch** with Missions 04–18 (CI green on `6676845`). Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.
+
+---
+
+## Loop after Mission 19 — 2026-06-11
+
+### Re-verification (Mission 19 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Auth matrix complete with evidence per row | **Green** — `19_auth_matrix.md`; middleware 401 row added this loop |
+| CSRF test-enforced on mutating routes + exempt list | **Green** — `test_csrf_coverage.py` parametrizes OpenAPI routes; exempt = `PUBLIC_API_PREFIXES` |
+| Cookie flags + SameSite rationale documented | **Green** — `test_auth_cookies.py`; Railway `None`+`Secure` documented |
+| Logout + password-change revocation tested | **Green** — `test_logout_invalidates_session_server_side`, `test_password_change_revokes_other_sessions` |
+| Login/signup/reset rate-limited; gates green | **Green** — `check_rate_limit` on auth routes; `test_lockout_after_failed_logins`; CI **364** api + **71** e2e + policy |
+
+### Improvements made (this loop)
+
+- `docs(pack): auth matrix middleware 401 row [pack-31 after 19]` — documents `e9a5b9e` behavior in matrix.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Manual prod cookie devtools + CSRF negative curl | Post-deploy verification (Mission 19 Production Guidance) |
+| `make migrate-check`, full local api pytest | CI authoritative (Docker engine 500 on host) |
+| Separate idle session timeout | Future hardening (`19_auth_matrix.md` § Open) |
+| Clerk-mode dead code decision | Product owner |
+
+### Spot check (a11y)
+
+- Rotated from chaos (Mission 18 loop) → **auth surface axe**: `e2e/a11y-auth.spec.ts` **9/9** locally (login, signup, forgot/reset, verify, link-google, keyboard tab order).
+
+### Gate summary
+
+**CI:** run [27373012507](https://github.com/HiNala/jober/actions/runs/27373012507) on `e9a5b9e` — backend, web **71** e2e, policy, quarantine **success**.
+
+**Local:** api ruff+mypy; web typecheck, lint:strict, unit **108**, build, check:motion; a11y-auth **9** — green.
+
+### Deployment decision
+
+**Deploy API promptly** — Mission 19 Production Guidance (session hardening protects live users). Web unchanged in pack-19 (CSRF header already in `client.ts`). **Post-deploy:** devtools cookie flags on prod login; logout → old cookie rejected; OAuth link smoke; `bash scripts/railway-smoke.sh`; keep `docs/runbooks/rollback.md` handy for cookie misconfig.

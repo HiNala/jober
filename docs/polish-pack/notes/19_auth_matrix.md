@@ -26,6 +26,7 @@ Production boot **refuses** `JOBER_ENV=production` without `COOKIE_SECURE=true` 
 | Control | Implementation | Evidence |
 |---------|----------------|----------|
 | Global middleware | `CsrfMiddleware` on mutating `/api/*` when `jober_session` cookie present | `auth/csrf.py`, `main.py` |
+| Auth middleware 401 | Revoked/invalid session cookie → **401** JSON envelope (not 500) | `auth/middleware.py` (`e9a5b9e`), `test_logout_invalidates_session_server_side` |
 | Algorithm | Header `X-CSRF-Token` == `jober_csrf` cookie == Redis session `csrf` field | `verify_csrf()` |
 | Web client | `apiFetch` / `auth.ts` attach header from cookie on non-GET | `apps/web/src/lib/api/client.ts` |
 | Exempt prefixes | `PUBLIC_API_PREFIXES` in `auth/deps.py` | Parametrized `test_csrf_coverage.py` |
