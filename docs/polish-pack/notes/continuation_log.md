@@ -856,3 +856,51 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy API** — CI green on `44e8df3`. Production backup before `r1a2b3c34d65` index migration. Plain `CREATE INDEX` at current scale. Smoke queue + admin runs filter post-deploy; `bash scripts/railway-smoke.sh`.
+
+---
+
+## Loop after Mission 21 — 2026-06-11
+
+### Re-verification (Mission 21 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Threat-model controls probed with evidence | **Green** — `21_security_matrix.md` (19 rows, all pass) |
+| Dependency audits clean or waived | **Green** — postcss transitive via Next waived; API audit on CI clean install |
+| Security headers baseline | **Green** — API middleware + web `next.config.ts` (CSP report-only) |
+| Policy suite green | **Green** — CI policy job **44** passed (`+8` from `test_security_controls.py`) |
+| `threat-model.md` current | **Green** — Mission 21 deltas (headers, webhooks, startup guards) |
+
+### Improvements made (this loop)
+
+No code changes — Mission 21 landed complete on `4387b97`; this loop re-verifies and records gates.
+
+| Commit (prior) | Summary |
+|----------------|---------|
+| `3df6e29` | `feat(api): security headers [pack-21]` |
+| `4ad4ff8` | `test(api): security probes [pack-21]` |
+| `784b930` | `chore(web): CSP report-only [pack-21]` |
+| `4387b97` | `docs(pack): security matrix [pack-21]` |
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Enforce CSP (remove report-only) | After console clean across routes (Mission 21 guidance) |
+| PostCSS transitive advisory | Next.js upgrade / Mission 22 |
+| `pre-commit run --all-files` locally | CI `detect-secrets` job is authoritative |
+| Full local api pytest / policy DB probes | Host Postgres/MinIO unavailable; CI authoritative |
+
+### Spot check (chaos)
+
+- Rotated from docs (Mission 20 loop) → **downstream failure**: invalid Stripe webhook signature returns **400** with generic detail and no `whsec` substring (`test_stripe_webhook_rejects_invalid_signature` — 5 local unit probes green).
+
+### Gate summary
+
+**CI:** run [27384431210](https://github.com/HiNala/jober/actions/runs/27384431210) on `4387b97` — migrate-check, api **380** passed, worker **22**, web **71** e2e, policy **44**, quarantine — **success**.
+
+**Local:** api ruff+mypy; worker ruff+pytest **22**; web typecheck; Mission 21 unit probes **5** — green.
+
+### Deployment decision
+
+**Deploy API + web together** — Mission 21 Production Guidance (headers/CSP touch both surfaces). Post-deploy: login smoke, browser console for CSP reports, artifact download, `bash scripts/railway-smoke.sh`. Batch with Mission 20 index migration if not yet deployed.
