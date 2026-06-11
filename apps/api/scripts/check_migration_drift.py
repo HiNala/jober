@@ -37,6 +37,7 @@ from jober_api.models import (  # noqa: F401 — register metadata
     JobListItem,
     JobTarget,
     LlmCall,
+    ProWaitlistEntry,
     ResumeAsset,
     SavedSearch,
     RunEvent,
