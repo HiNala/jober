@@ -26,6 +26,8 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Jober API", version="0.1.0", lifespan=lifespan)
 
+app.add_middleware(AuthMiddleware)
+app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -33,8 +35,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(CorrelationIdMiddleware)
-app.add_middleware(AuthMiddleware)
 
 register_exception_handlers(app)
 

@@ -737,7 +737,8 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 ### Improvements made (this loop)
 
-- `fix(api): pure ASGI correlation middleware [pack-31 after 18]` — replaces `BaseHTTPMiddleware` (broke pytest-asyncio with 280 `Runner.run()` errors on CI run 27357876037).
+- `fix(api): pure ASGI correlation middleware [pack-31 after 18]` — replaces `BaseHTTPMiddleware` on correlation IDs (CI run 27357876037).
+- `fix(api): pure ASGI auth middleware [pack-31 after 18]` — `AuthMiddleware` also used `BaseHTTPMiddleware`; stacked middleware triggered pytest-asyncio `Runner.run()` errors on all async tests.
 - `docs(architecture): note ASGI middleware choice in errors.md`.
 
 ### Deferrals
