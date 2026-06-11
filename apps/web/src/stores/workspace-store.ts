@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 export type CanvasViewMode = "single" | "grid" | "layers";
 export type CanvasSurface = "browser" | "document" | "fill-diff" | "review";
+export type RunMobileTab = "work" | "canvas";
 
 interface WorkspaceState {
   navCollapsed: boolean;
@@ -14,6 +15,7 @@ interface WorkspaceState {
   selectedArtifactId: string | null;
   activeRunId: string | null;
   commandPaletteOpen: boolean;
+  runMobileTab: RunMobileTab;
   setNavCollapsed: (collapsed: boolean) => void;
   toggleNav: () => void;
   setCanvasOpen: (open: boolean) => void;
@@ -25,6 +27,7 @@ interface WorkspaceState {
   setSelectedArtifactId: (id: string | null) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   toggleCommandPalette: () => void;
+  setRunMobileTab: (tab: RunMobileTab) => void;
 }
 
 export const WORKSPACE_PERSISTED_KEYS = [
@@ -48,6 +51,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       selectedArtifactId: null,
       activeRunId: null,
       commandPaletteOpen: false,
+      runMobileTab: "work",
       setNavCollapsed: (navCollapsed) => set({ navCollapsed }),
       toggleNav: () => set((state) => ({ navCollapsed: !state.navCollapsed })),
       setCanvasOpen: (canvasOpen) => set({ canvasOpen }),
@@ -63,6 +67,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setCommandPaletteOpen: (commandPaletteOpen) => set({ commandPaletteOpen }),
       toggleCommandPalette: () =>
         set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
+      setRunMobileTab: (runMobileTab) => set({ runMobileTab }),
     }),
     {
       name: "jober-workspace-v1",

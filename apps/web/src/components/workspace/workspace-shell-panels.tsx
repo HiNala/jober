@@ -8,11 +8,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { WorkspaceCanvasDrawer, WorkspaceCanvasPanel } from "@/components/workspace/workspace-canvas";
+import { WorkspaceCanvasPanel } from "@/components/workspace/workspace-canvas";
 import { WorkspaceCenterHeader } from "@/components/workspace/workspace-center-header";
 import { WorkspaceNav } from "@/components/workspace/workspace-nav";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { RouteTransition } from "@/components/motion/route-transition";
+import { WORKSPACE_NARROW_QUERY } from "@/lib/workspace/breakpoints";
 import type { WorkspaceLayoutMode } from "@/lib/workspace/layout";
 import { motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ export function WorkspaceShellPanels({
   layoutMode: WorkspaceLayoutMode;
   children: React.ReactNode;
 }) {
-  const isNarrow = useMediaQuery("(max-width: 1023px)");
+  const isNarrow = useMediaQuery(WORKSPACE_NARROW_QUERY);
   const isOpsDesk = layoutMode === "ops-desk";
   const { navCollapsed, canvasOpen, focusMode, setNavCollapsed, setCanvasOpen } =
     useWorkspaceStore();
@@ -36,10 +37,10 @@ export function WorkspaceShellPanels({
   const effectiveCanvasOpen = isOpsDesk && canvasOpen;
 
   const panelIds = useMemo(() => {
-    if (focusMode && isOpsDesk) {
+    if (isNarrow || (focusMode && isOpsDesk)) {
       return ["center"];
     }
-    if (effectiveCanvasOpen && !isNarrow) {
+    if (effectiveCanvasOpen) {
       return ["nav", "center", "canvas"];
     }
     return ["nav", "center"];
@@ -101,7 +102,7 @@ export function WorkspaceShellPanels({
         onLayoutChanged={onLayoutChanged}
         className={cn("min-h-0 flex-1", motionView)}
       >
-        {!(focusMode && isOpsDesk) ? (
+        {!(focusMode && isOpsDesk) && !isNarrow ? (
           <>
             <ResizablePanel
               id="nav"
@@ -145,12 +146,6 @@ export function WorkspaceShellPanels({
         ) : null}
       </ResizablePanelGroup>
 
-      {isNarrow && isOpsDesk ? (
-        <WorkspaceCanvasDrawer
-          open={effectiveCanvasOpen && !focusMode}
-          onOpenChange={setCanvasOpen}
-        />
-      ) : null}
     </>
   );
 }

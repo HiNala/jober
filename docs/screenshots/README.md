@@ -6,7 +6,18 @@ Full-page captures for visual QA and design review.
 
 | Folder | Contents |
 |--------|----------|
-| [`prod/`](prod/) | **23 PNGs** from live production (`web-production-29902.up.railway.app`) |
+| [`prod/`](prod/) | **23 PNGs** from live production (`web-production-29902.up.railway.app`) at 1440×900 |
+| [`mobile/`](mobile/) | **5 PNGs** at 375×812 — see Mobile index below |
+
+### Mobile (375×812)
+
+| File | Route |
+|------|-------|
+| `01-home.png` | `/` |
+| `02-pricing.png` | `/pricing` |
+| `03-signup.png` | `/signup` |
+| `04-dashboard.png` | `/dashboard` |
+| `05-queue.png` | `/queue` |
 
 Open any `.png` directly in your file explorer or IDE image preview.
 
@@ -47,8 +58,21 @@ Open any `.png` directly in your file explorer or IDE image preview.
 
 ## Regenerate
 
+Desktop (1440×900):
+
 ```bash
 cd apps/web
+PLAYWRIGHT_SKIP_WEB_SERVER=1 \
+PLAYWRIGHT_BASE_URL=https://web-production-29902.up.railway.app \
+API_URL=https://api-production-4b5b.up.railway.app \
+node scripts/capture-screenshots.mjs
+```
+
+Mobile subset (375×812):
+
+```bash
+cd apps/web
+SCREENSHOT_MOBILE=1 \
 PLAYWRIGHT_SKIP_WEB_SERVER=1 \
 PLAYWRIGHT_BASE_URL=https://web-production-29902.up.railway.app \
 API_URL=https://api-production-4b5b.up.railway.app \

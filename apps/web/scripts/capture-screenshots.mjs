@@ -18,9 +18,22 @@ const API_URL =
   process.env.API_URL ??
   process.env.NEXT_PUBLIC_API_URL ??
   "https://api-production-4b5b.up.railway.app";
+const IS_MOBILE = process.env.SCREENSHOT_MOBILE === "1";
 const OUT_DIR =
   process.env.SCREENSHOT_DIR ??
-  path.resolve(__dirname, "../../../docs/screenshots/prod");
+  path.resolve(
+    __dirname,
+    IS_MOBILE ? "../../../docs/screenshots/mobile" : "../../../docs/screenshots/prod",
+  );
+
+/** @type {{ slug: string; path: string }[]} */
+const MOBILE_ROUTES = [
+  { slug: "01-home", path: "/" },
+  { slug: "02-pricing", path: "/pricing" },
+  { slug: "03-signup", path: "/signup" },
+  { slug: "04-dashboard", path: "/dashboard" },
+  { slug: "05-queue", path: "/queue" },
+];
 
 /** @type {{ slug: string; path: string }[]} */
 const PUBLIC_ROUTES = [
@@ -124,25 +137,40 @@ async function main() {
     ],
   });
   const context = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
+    viewport: IS_MOBILE ? { width: 375, height: 812 } : { width: 1440, height: 900 },
     deviceScaleFactor: 1,
+    isMobile: IS_MOBILE,
+    hasTouch: IS_MOBILE,
   });
   const page = await context.newPage();
 
-  for (const { slug, path: route } of PUBLIC_ROUTES) {
-    await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
-    await capture(page, slug);
-  }
+  if (IS_MOBILE) {
+    for (const { slug, path: route } of MOBILE_ROUTES.slice(0, 3)) {
+      await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+      await capture(page, slug);
+    }
+    await authenticate(context, page);
+    for (const { slug, path: route } of MOBILE_ROUTES.slice(3)) {
+      await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+      await capture(page, slug);
+    }
+  } else {
+    for (const { slug, path: route } of PUBLIC_ROUTES) {
+      await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+      await capture(page, slug);
+    }
 
-  await authenticate(context, page);
+    await authenticate(context, page);
 
-  for (const { slug, path: route } of APP_ROUTES) {
-    await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
-    await capture(page, slug);
+    for (const { slug, path: route } of APP_ROUTES) {
+      await page.goto(`${BASE_URL}${route}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+      await capture(page, slug);
+    }
   }
 
   await browser.close();
-  console.log(`\nDone — ${PUBLIC_ROUTES.length + APP_ROUTES.length} screenshots in ${OUT_DIR}`);
+  const count = IS_MOBILE ? MOBILE_ROUTES.length : PUBLIC_ROUTES.length + APP_ROUTES.length;
+  console.log(`\nDone — ${count} screenshots in ${OUT_DIR}`);
 }
 
 main().catch((err) => {

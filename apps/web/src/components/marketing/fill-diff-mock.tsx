@@ -16,7 +16,8 @@ export function FillDiffMock({ className }: { className?: string }) {
       <div className="border-b border-border/40 px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
         Fill diff — proposed vs actual
       </div>
-      <table className="w-full text-[10px]">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[16rem] text-[10px]">
         <thead>
           <tr className="text-muted-foreground">
             <th className="px-3 py-1.5 text-left font-medium">Field</th>
@@ -41,6 +42,7 @@ export function FillDiffMock({ className }: { className?: string }) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

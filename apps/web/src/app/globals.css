@@ -317,6 +317,7 @@
   }
   html {
     @apply font-sans;
+    overflow-x: clip;
   }
   @media (prefers-reduced-motion: reduce) {
     *,

@@ -26,6 +26,12 @@ export const metadata: Metadata = {
     "High-quality job applications with human review before submit.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

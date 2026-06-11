@@ -193,10 +193,10 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
         />
       </div>
       <div className="rounded-lg border border-border/60">
-        <Table>
+        <Table className="[&_th]:bg-background [&_td]:bg-background">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-10">
+              <TableHead className="sticky left-0 z-10 w-10">
                 <Checkbox
                   aria-label="Select all rows"
                   checked={allSelected}
@@ -209,7 +209,9 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
                   }}
                 />
               </TableHead>
-              <TableHead>Company</TableHead>
+              <TableHead className="sticky left-10 z-10 min-w-[7rem] shadow-[4px_0_8px_-4px_rgba(0,0,0,0.15)]">
+                Company
+              </TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
@@ -231,7 +233,7 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
                   className="cursor-pointer hover:bg-muted/40"
                   onClick={() => setDetail(row)}
                 >
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell className="sticky left-0 z-10" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       aria-label={`Select ${row.company}`}
                       checked={selected.has(row.id)}
@@ -245,7 +247,9 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
                       }}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{row.company}</TableCell>
+                  <TableCell className="sticky left-10 z-10 min-w-[7rem] font-medium shadow-[4px_0_8px_-4px_rgba(0,0,0,0.15)]">
+                    {row.company}
+                  </TableCell>
                   <TableCell>{row.role}</TableCell>
                   <TableCell>{row.priority ?? "—"}</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>

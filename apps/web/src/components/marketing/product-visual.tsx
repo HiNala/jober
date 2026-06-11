@@ -77,12 +77,12 @@ export function ProductVisual({ className }: { className?: string }) {
 
         <div
           className={cn(
-            "min-h-[148px] rounded-lg border p-3 font-mono text-[10px] leading-relaxed",
+            "min-h-[148px] overflow-x-auto rounded-lg border p-3 font-mono text-[10px] leading-relaxed",
             surface.terminal,
           )}
         >
           <p className="mb-2 text-[10px] font-medium text-muted-foreground">Event stream</p>
-          <ul className="space-y-1">
+          <ul className="space-y-1 break-words">
             {DEMO_LINES.slice(0, visibleLines).map((line) => (
               <li key={line} className={motionStreamReveal}>
                 {line}

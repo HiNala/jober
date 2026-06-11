@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { use } from "react";
 
+import { RunOpsDeskShell } from "@/components/run-console/run-ops-desk-shell";
 import { RunConsoleSkeleton } from "@/components/states/page-states";
 
 const RunConsole = dynamic(
@@ -13,8 +14,10 @@ const RunConsole = dynamic(
 export default function RunConsolePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <div className="h-full min-h-0 p-3 md:p-4">
-      <RunConsole runId={id} />
+    <div className="flex h-full min-h-0 flex-col p-3 md:p-4">
+      <RunOpsDeskShell>
+        <RunConsole runId={id} />
+      </RunOpsDeskShell>
     </div>
   );
 }
