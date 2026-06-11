@@ -147,7 +147,7 @@ pnpm dev                     # http://localhost:3000
 
 Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/login`, `/dashboard`, `/queue`, `/discover`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
 
-**Marketing (Missions 29–30):** Public site at `/` (landing), `/features`, `/how-it-works`, `/faq`, `/pricing`, `/blog`, plus `/privacy`, `/terms`, and `/acceptable-use` (draft legal — requires counsel before launch). Pricing mirrors API plan limits (Free: 20 runs/mo, 5 batch, $5 LLM; Pro: 500/100/$50). CTA clicks emit `feature.use` (consent-gated); UTM params persist in-session for signup attribution. Set `NEXT_PUBLIC_SITE_URL` for sitemap/OG. See `docs/missions/mission_29_marketing_landing.md` and `mission_30_marketing_site.md`.
+**Marketing (Missions 29–30, polish pack 07–08):** Public site at `/` (landing), `/features`, `/how-it-works`, `/faq`, `/pricing`, `/blog`, plus `/privacy`, `/terms`, and `/acceptable-use` (draft legal — requires counsel before launch). Pricing mirrors API plan limits in `services/billing/entitlements.py` (Free: 20 runs/mo, 5 batch, $5 LLM; Pro: 500/100/$50). Pro interest is captured via `POST /api/waitlist/pro` (see `docs/polish-pack/notes/08_waitlist.md`). CTA clicks emit `feature.use` (consent-gated); UTM params persist in-session for signup attribution. Set `NEXT_PUBLIC_SITE_URL` for sitemap/OG.
 
 **Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
 

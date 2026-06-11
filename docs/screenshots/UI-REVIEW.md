@@ -57,97 +57,31 @@
 
 ### 02 — Features (`02-features.png`)
 
-**What it is:** Six feature cards in 2×3 grid + bottom CTA.
-
-**UX / flow:** Scannable for evaluators comparing to auto-apply bots. Bullets help skimmers.
-
-**Issues**
-
-- Every card same height/icon treatment — reads like Notion database gallery.
-- Icons are outline Lucide at low contrast — don’t anchor memory.
-- No deep links into in-app equivalents (e.g. “Live-watch canvas” → demo GIF).
-
-**Upgrade**
-
-- **Bento grid:** make “Live-watch canvas” 2×2, others 1×1 (21st.dev layout).
-- **Show, don’t tell:** embed 8s loop of run console inside the large card.
-- **Figma-style specs:** add tiny mono labels (`SSE · screenshots · checkpoints`) under feature titles.
+**Closed Mission 08 (2026-06-11):** Bento grid with 2× dominant live-watch cell + `HeroRunPreview` loop; mono spec labels; deep links to `/how-it-works` anchors. Re-capture post-deploy.
 
 ---
 
 ### 03 — How it works (`03-how-it-works.png`)
 
-**What it is:** Four-step horizontal timeline + FAQ accordion + CTA.
-
-**UX / flow:** Reinforces trust narrative; FAQ reduces sales friction.
-
-**Issues**
-
-- Steps 1–4 equal weight — step 3 (watch/review) should dominate visually.
-- FAQ accordion styling identical to pricing/FAQ page — fine, but no progress connector between steps.
-
-**Upgrade**
-
-- Horizontal **stepper with connecting gradient line** and numbered mono badges.
-- Step 3 card contains **mini browser chrome** screenshot.
-- Animate step highlight on scroll (`intersection observer`).
+**Closed Mission 08 (2026-06-11):** Scroll-highlight stepper, dominant step 3 with mini browser chrome, gradient connector. Re-capture post-deploy.
 
 ---
 
 ### 04 — Pricing (`04-pricing.png`)
 
-**What it is:** Free vs Pro (coming soon) tiers, BYOK explainer, billing FAQ.
-
-**UX / flow:** Honest “coming soon” avoids trust hit. Limits mirror settings — good consistency.
-
-**Issues**
-
-- Two cards same visual weight though Pro isn’t purchasable — consider ghosted Pro with waitlist email.
-- `$0` / “Coming soon” typography feels default — no price anchoring drama.
-- Checklist bullets use same green checks as every SaaS template.
-
-**Upgrade**
-
-- **Figma pricing reference:** large price numeral, small `/mo`, feature table below cards not inside.
-- **Pro waitlist:** inline email capture instead of dead card.
-- Subtle **glow border** on Free “Start free” card (21st.dev `border-beam` pattern).
+**Closed Mission 08 (2026-06-11):** Large `$0` numeral, comparison table below cards, Pro waitlist form (`POST /api/waitlist/pro`), border-beam Free CTA. Re-capture post-deploy; verify waitlist in production after deploy.
 
 ---
 
 ### 05 — FAQ (`05-faq.png`)
 
-**What it is:** Accordion list + CTA (screenshot is lower portion of page).
-
-**UX / flow:** “Straight answers” tone matches brand; questions cover real objections.
-
-**Issues**
-
-- Long accordion list with no category tabs (Billing / Privacy / Product).
-- Plus icons only — no expand animation cue.
-
-**Upgrade**
-
-- Split into **two columns** on desktop: Product | Trust & billing.
-- Replace `+` with chevron rotation on open; add `max-height` transition.
-- Link each answer to anchor on privacy/terms where relevant.
+**Closed Mission 08 (2026-06-11):** Two-column Product | Trust & billing; chevron accordion; legal/learn-more links. Re-capture post-deploy.
 
 ---
 
 ### 06 — Blog index (`06-blog.png`)
 
-**What it is:** Single post list (“Markdown-driven posts until CMS”).
-
-**UX / flow:** Minimal blog — fine for pre-launch.
-
-**Issues**
-
-- One post feels empty; meta line about CMS is **internal dev copy** on a public page.
-- No featured image, date, or read time.
-
-**Upgrade**
-
-- Hide CMS meta; show **editorial card** with gradient thumbnail even for one post.
-- Add newsletter capture (Figma blog pattern).
+**Closed Mission 08 (2026-06-11):** Editorial card typography, gradient strip, no CMS dev copy. Newsletter capture deferred. Re-capture post-deploy.
 
 ---
 
