@@ -831,7 +831,9 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 | `74f9b7b` | `fix(api): ProWaitlistEntry in drift check [pack-20]` |
 | `bc6d77a` | `test(api): hot-path indexes and retention purge [pack-20]` |
 | `d3ec0ca` | `docs(pack): 20_db_hygiene drill log [pack-20]` |
-| (pending) | `chore(api): bump fastapi minimum [pack-31 after 20]` — aligns local OpenAPI with CI resolver (0.136.x) |
+| `105bfc7` | `chore(api): bump fastapi minimum [pack-31 after 20]` |
+| `e458e77` | `docs(pack): continuation loop after Mission 20 [pack-31 after 20]` |
+| `44e8df3` | `fix(test): planner-chosen index in EXPLAIN [pack-31 after 20]` — CI flake on `ix_job_targets_status` |
 
 ### Deferrals
 
@@ -849,8 +851,8 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 **Local:** migrate-check, api ruff+mypy, worker ruff+mypy+pytest **22**, web typecheck — green. Api full pytest **342 passed / 30 failed** (MinIO/Redis infra on host, not pack-20 regressions).
 
-**CI:** run [27380275271](https://github.com/HiNala/jober/actions/runs/27380275271) on `e458e77` — migrate-check, api **372** passed, worker **22**, web **71** e2e, policy **36** — **success**.
+**CI:** run [27382928455](https://github.com/HiNala/jober/actions/runs/27382928455) on `44e8df3` — migrate-check, api **372** passed, worker **22**, web **71** e2e, policy **36** — **success**. (Prior run `27380709893` failed one EXPLAIN assertion — fixed in `44e8df3`.)
 
 ### Deployment decision
 
-**Deploy API** — CI green on `e458e77`. Production backup before `r1a2b3c34d65` index migration. Plain `CREATE INDEX` at current scale. Smoke queue + admin runs filter post-deploy; `bash scripts/railway-smoke.sh`.
+**Deploy API** — CI green on `44e8df3`. Production backup before `r1a2b3c34d65` index migration. Plain `CREATE INDEX` at current scale. Smoke queue + admin runs filter post-deploy; `bash scripts/railway-smoke.sh`.
