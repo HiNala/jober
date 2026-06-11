@@ -181,7 +181,7 @@ Web: typecheck, lint:strict, test (62), e2e (15) green locally. Worker: ruff, my
 
 ### Gate summary
 
-Web: typecheck, lint:strict, test (64), check:motion, e2e (15) green locally. Worker: ruff, pytest 22 passed. CI [27319174508](https://github.com/HiNala/jober/actions/runs/27319174508) **success** on Mission 05 push.
+Web: typecheck, lint:strict, test (64), check:motion, e2e (15) green locally. Worker: ruff, pytest 22 passed. CI [27319174508](https://github.com/HiNala/jober/actions/runs/27319174508) **success** (Mission 05); [27319457908](https://github.com/HiNala/jober/actions/runs/27319457908) **success** (loop log push).
 
 ### Deployment decision
 
