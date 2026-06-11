@@ -807,3 +807,50 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy API promptly** — Mission 19 Production Guidance (session hardening protects live users). Web unchanged in pack-19 (CSRF header already in `client.ts`). **Post-deploy:** devtools cookie flags on prod login; logout → old cookie rejected; OAuth link smoke; `bash scripts/railway-smoke.sh`; keep `docs/runbooks/rollback.md` handy for cookie misconfig.
+
+---
+
+## Loop after Mission 20 — 2026-06-11
+
+### Re-verification (Mission 20 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Fresh-DB replay + drift check green | **Green** — `88462e6`…`74f9b7b`; migrate-check on Postgres `:5435` |
+| Hot paths indexed | **Green** — `r1a2b3c34d65`; `test_db_hot_paths.py` (`pg_indexes` + EXPLAIN) |
+| Retention deletes DB + storage | **Green** — `test_purge_storage.py`, `test_artifact_retention.py` (MinIO mocked) |
+| Backup/restore drill | **Documented** — `restore-backup.md` + `20_db_hygiene.md`; full destroy-restore deferred (port conflicts) |
+| Pool settings | **Green** — `DATABASE_POOL_SIZE=5`, `DATABASE_MAX_OVERFLOW=5` (`a79bc37`) |
+
+### Improvements made (this loop)
+
+| Commit | Summary |
+|--------|---------|
+| `88462e6` | `feat(db): composite queue indexes [pack-20]` |
+| `a79bc37` | `chore(api): database pool defaults [pack-20]` |
+| `74f9b7b` | `fix(api): ProWaitlistEntry in drift check [pack-20]` |
+| `bc6d77a` | `test(api): hot-path indexes and retention purge [pack-20]` |
+| `d3ec0ca` | `docs(pack): 20_db_hygiene drill log [pack-20]` |
+| (pending) | `chore(api): bump fastapi minimum [pack-31 after 20]` — aligns local OpenAPI with CI resolver (0.136.x) |
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Full local api pytest (30 fails) | Host MinIO port 9000 owned by another stack (`InvalidAccessKeyId`); CI authoritative |
+| Backup destroy-restore loop on Windows | Git Bash drill in runbook; Mission 29 |
+| `CREATE INDEX CONCURRENTLY` at scale | Re-evaluate when `job_targets` > ~100k rows |
+
+### Spot check (docs)
+
+- Rotated from performance (Mission 20 draft) → **runbook accuracy**: `restore-backup.md` `make backup` / `make restore` targets match `Makefile`; Windows requires Git Bash/WSL for `.sh` scripts.
+
+### Gate summary
+
+**Local:** migrate-check, api ruff+mypy, worker ruff+mypy+pytest **22**, web typecheck — green. Api full pytest **342 passed / 30 failed** (MinIO/Redis infra on host, not pack-20 regressions).
+
+**CI:** pending push.
+
+### Deployment decision
+
+**Deploy API after CI green** — production backup before `r1a2b3c34d65` index migration. Plain `CREATE INDEX` at current scale. Smoke queue + admin runs filter post-deploy.
