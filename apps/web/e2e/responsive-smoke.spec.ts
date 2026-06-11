@@ -52,15 +52,27 @@ for (const [label, viewport] of Object.entries(VIEWPORTS) as [
       await expect(page.getByRole("button", { name: "Open command palette" }).first()).toBeVisible();
     });
 
-    if (label === "tablet") {
-      test("run console: Work tab visible", async ({ page }) => {
-        await page.goto(`/runs/${E2E_FIXTURE_RUN_ID}`);
-        await dismissAnalyticsConsent(page);
-        await waitForAppShell(page);
-        await expect(page.getByRole("tab", { name: "Work" })).toBeVisible();
-        await expect(page.getByRole("tab", { name: "Canvas" })).toBeVisible();
-        await assertNoHorizontalOverflow(page);
-      });
-    }
+    test("marketing: mobile menu trigger visible", async ({ page }) => {
+      await page.goto("/");
+      await dismissAnalyticsConsent(page);
+      await expect(page.getByRole("button", { name: "Open marketing menu" })).toBeVisible();
+    });
+
+    test("run console: Work and Canvas tabs", async ({ page }) => {
+      await page.goto(`/runs/${E2E_FIXTURE_RUN_ID}`);
+      await dismissAnalyticsConsent(page);
+      await waitForAppShell(page);
+      await expect(page.getByRole("tab", { name: "Work" })).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Canvas" })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+    });
+
+    test("run console: header canvas button switches tab", async ({ page }) => {
+      await page.goto(`/runs/${E2E_FIXTURE_RUN_ID}`);
+      await dismissAnalyticsConsent(page);
+      await waitForAppShell(page);
+      await page.getByRole("button", { name: "Show canvas" }).click();
+      await expect(page.getByRole("tab", { name: "Canvas" })).toHaveAttribute("aria-selected", "true");
+    });
   });
 }

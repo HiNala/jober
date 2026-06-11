@@ -556,3 +556,42 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — Mission 13 is low-risk accessibility improvement (palette crash fix, chart alts, live-region tuning). Batch with prior web polish (Missions 09–12). Smoke after deploy: open command palette (⌘K), analytics page tabs, queue import dialog. Not deploying from this host — push to CI and deploy via runbook when ready.
+
+---
+
+## Loop after Mission 14 — 2026-06-11
+
+### Re-verification (Mission 14 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Findings table resolved to per-surface targets | **Green** — `14_responsive_findings.md` complete |
+| No horizontal body overflow at 375/768 (e2e) | **Green** — `responsive-smoke.spec.ts` (26 tests after loop) |
+| Run console operable on tablet | **Green (scoped)** — Work\|Canvas tabs + header canvas button switch at 375/768; live checkpoint resolve → Mission 26 |
+| Mobile nav + touch palette trigger | **Green** — e2e asserts nav menu, Search palette, marketing menu |
+| Mobile screenshots + gates green | **Green** — 5 PNGs in `docs/screenshots/mobile/`; see gates below |
+
+### Improvements made (this loop)
+
+- `test(e2e): extend responsive smoke for run console + marketing menu [pack-31 after 14]` — run tabs on phone and tablet; header “Show canvas” switches tab; marketing mobile menu visibility.
+- `docs: README responsive section + Mission 26 checkpoint deferral [pack-31 after 14]`.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Live checkpoint resolve e2e at 768 with fixture API | Mission 26 |
+| Card-list queue fallback, PWA, pixel-perfect admin on phone | Out of scope per Mission 14 |
+| `make migrate-check`, api/worker pytest, fixtures, policy | CI — Docker Desktop unavailable locally |
+
+### Spot check (a11y)
+
+- Rotated from states (Mission 13 loop) → **responsive + a11y names**: `RunOpsDeskShell` tablist `aria-label="Run console views"`; touch triggers use explicit `aria-label`s; full axe suites (marketing + auth + app) still green in combined e2e run (64 tests).
+
+### Gate summary
+
+**Local:** api ruff+mypy; worker ruff+mypy; web typecheck, lint:strict, test **94**, build, check:motion, check:bundles (**2500**/2800 KB), e2e **64×2** — all green.
+
+### Deployment decision
+
+**Deploy recommended** — Mission 14 is layout/CSS only. Smoke on real phone: `/`, `/signup`, nav drawer, dashboard Search icon, run console tabs at tablet width. Batch with Missions 09–13 web polish. Not deploying from this host — push to CI and run `scripts/railway-smoke.sh` after deploy.

@@ -174,7 +174,9 @@ Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/
 | Escape | Close command palette, dialogs, drawers (focus returns to trigger) |
 | Tab | Standard focus order; skip link targets `#main-content` on workspace routes |
 
-E2e coverage: `e2e/a11y-marketing.spec.ts`, `e2e/a11y-auth.spec.ts`, `e2e/a11y-app.spec.ts` (core app routes with dev-auth bypass).
+E2e coverage: `e2e/a11y-marketing.spec.ts`, `e2e/a11y-auth.spec.ts`, `e2e/a11y-app.spec.ts` (core app routes with dev-auth bypass), `e2e/responsive-smoke.spec.ts` (375×812 and 768×1024 overflow + mobile nav/palette).
+
+**Responsive (Mission 14):** below 1024px the workspace nav rail hides in favor of `MobileNav`; run console uses **Work | Canvas** tabs (`run-ops-desk-shell.tsx`); touch Search icon opens the command palette. Breakpoint constant: `lib/workspace/breakpoints.ts`. Mobile screenshots: `docs/screenshots/mobile/`.
 
 **Component surfaces (Mission 10):** three families in `lib/design/surface-variants.ts` — **marketing** (bento/funnel), **workspace** (data panels), **terminal** (run stream/live view). Use `<Surface family="…">` or `surface.*` tokens; reference at `/kitchen-sink` (dev-only, robots-disallowed).
 

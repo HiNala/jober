@@ -22,3 +22,4 @@ Per-surface targets: marketing/auth **fully designed** at 375/768/1024/1440; app
 - Card-list fallback for queue at 375 (table scroll + sticky deemed sufficient).
 - Pixel-perfect admin/analytics on phone.
 - PWA / touch gestures.
+- Live checkpoint resolve at 768 with fixture API → Mission 26 (tabs + canvas switch covered in `responsive-smoke.spec.ts`).
