@@ -71,7 +71,11 @@ async def test_golden_path_fixture_fill_verify_analytics_admin(
     app.dependency_overrides[db_session_module.get_session] = _override
     try:
         transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as client:
+        async with AsyncClient(
+            transport=transport,
+            base_url="http://test",
+            cookies={CONSENT_COOKIE: "1"},
+        ) as client:
             discover = await client.post(
                 f"/api/job-targets/{job.id}/discover-form",
                 json={"fixture_html": ats_html, "platform": "greenhouse"},
@@ -124,7 +128,6 @@ async def test_golden_path_fixture_fill_verify_analytics_admin(
             events_res = await client.post(
                 "/api/events",
                 json=analytics_body.model_dump(mode="json"),
-                cookies={CONSENT_COOKIE: "1"},
                 headers={"User-Agent": "Mozilla/5.0 Chrome/120"},
             )
             assert events_res.status_code == 204
@@ -134,7 +137,7 @@ async def test_golden_path_fixture_fill_verify_analytics_admin(
             user.role = UserRole.ADMIN
             await db_session.commit()
 
-            day = date.today()
+            day = datetime.now(UTC).date()
             rollup = await rollup_analytics_day(db_session, day)
             assert rollup["events_processed"] >= 3
 
