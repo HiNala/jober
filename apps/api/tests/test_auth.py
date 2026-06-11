@@ -24,13 +24,14 @@ async def test_register_verify_login_reset_cycle(db_session, truncate_tables, mo
     from jober_api.db import session as db_session_module
 
     monkeypatch.setattr(settings, "auth_mode", "native")
+    monkeypatch.setattr(settings, "dev_auth_bypass", False)
     monkeypatch.setattr(settings, "jober_env", "development")
 
     async def _override():
         yield db_session
 
     app.dependency_overrides[db_session_module.get_session] = _override
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=app, raise_app_exceptions=False)
     try:
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             reg = await client.post(
@@ -53,6 +54,14 @@ async def test_register_verify_login_reset_cycle(db_session, truncate_tables, mo
             me = await client.get("/api/auth/me", cookies=cookies)
             assert me.status_code == 200
 
+            csrf = cookies.get(settings.csrf_cookie_name, "")
+            logout = await client.post(
+                "/api/auth/logout",
+                cookies=cookies,
+                headers={"X-CSRF-Token": csrf},
+            )
+            assert logout.status_code == 200
+
             forgot = await client.post(
                 "/api/auth/forgot-password",
                 json={"email": "newuser@example.com"},
@@ -65,13 +74,6 @@ async def test_register_verify_login_reset_cycle(db_session, truncate_tables, mo
                 json={"token": reset_token, "new_password": "N3wStr0ng!Pass"},
             )
             assert reset.status_code == 200
-
-            logout = await client.post(
-                "/api/auth/logout",
-                cookies=cookies,
-                headers={"X-CSRF-Token": cookies.get(settings.csrf_cookie_name, "")},
-            )
-            assert logout.status_code == 200
 
             login = await client.post(
                 "/api/auth/login",
@@ -213,13 +215,14 @@ async def test_logout_invalidates_session_server_side(
     from jober_api.db import session as db_session_module
 
     monkeypatch.setattr(settings, "auth_mode", "native")
+    monkeypatch.setattr(settings, "dev_auth_bypass", False)
     monkeypatch.setattr(settings, "jober_env", "development")
 
     async def _override():
         yield db_session
 
     app.dependency_overrides[db_session_module.get_session] = _override
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=app, raise_app_exceptions=False)
     try:
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             reg = await client.post(
@@ -262,6 +265,7 @@ async def test_password_change_revokes_other_sessions(
     from jober_api.models.user import User
 
     monkeypatch.setattr(settings, "auth_mode", "native")
+    monkeypatch.setattr(settings, "dev_auth_bypass", False)
 
     user_id = DEFAULT_DEV_USER_ID
     user = await db_session.get(User, user_id)
@@ -276,7 +280,7 @@ async def test_password_change_revokes_other_sessions(
         yield db_session
 
     app.dependency_overrides[db_session_module.get_session] = _override
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=app, raise_app_exceptions=False)
     cookies_a = {
         settings.session_cookie_name: session_a,
         settings.refresh_cookie_name: refresh_a,

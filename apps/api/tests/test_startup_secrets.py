@@ -13,6 +13,7 @@ def test_startup_rejects_placeholder_secrets_in_production(
     prod_settings = Settings(
         jober_env="production",
         auth_mode="native",
+        cookie_secure=True,
         vault_encryption_key="changeme",
         secret_key="changeme",
         minio_access_key="prod-minio-key",
@@ -30,6 +31,7 @@ def test_startup_rejects_dev_auth_mode_in_production(
     prod_settings = Settings(
         jober_env="production",
         auth_mode="dev",
+        cookie_secure=True,
         vault_encryption_key="real-key-value-here-32chars!!",
         secret_key="real-secret-key-value-here!!",
         minio_access_key="prod-minio-key",
@@ -48,6 +50,7 @@ def test_startup_rejects_dev_auth_bypass_in_production(
         jober_env="production",
         auth_mode="native",
         dev_auth_bypass=True,
+        cookie_secure=True,
         vault_encryption_key="real-key-value-here-32chars!!",
         secret_key="real-secret-key-value-here!!",
         minio_access_key="prod-minio-key",
