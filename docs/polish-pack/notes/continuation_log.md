@@ -227,3 +227,51 @@ Web: typecheck, lint:strict, test (69), check:motion, build, e2e (22) green loca
 ### Deployment decision
 
 **Recommend deploying soon** — Missions 04–06 are visual/UX-only with full gates green; batch as one web deploy, run `railway-smoke.sh`, manually verify production login first, then re-capture screenshots (`01`, `11–15`, consent overlap check).
+
+---
+
+## Loop after Mission 07 — 2026-06-11
+
+### Re-verification (Mission 07 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| `/` matches §18 structure (centered hero, dominant differentiator, larger nav/type) | **Green** — `landing-page.tsx`, `hero.tsx`, `marketing-shell.tsx` |
+| Hero shows product working + reduced-motion fallback | **Green** — `ProductVisual` loop; e2e `reduced motion: hero renders` |
+| Zero placeholder testimonials on `/` | **Green** — `social-proof.tsx` removed; `founder-proof.tsx`; `landing-content.test.ts` |
+| `check:motion` + `check:bundles` | **Green** — 2459/2800 KB |
+| Marketing axe spec | **Green** — 22 e2e (marketing + auth + consent + golden-path) |
+| CTA/UTM analytics wired | **Green** — `MarketingCtaLink` features on hero/footer (`cta.test.ts`) |
+| Design Council ≥18/20 | **Deferred** — post-deploy visual review |
+| `01-home.png` re-captured | **Deferred** — post-deploy `capture-screenshots.mjs` |
+
+### Improvements made (this loop)
+
+- `chore(marketing): remove orphaned value-sections [pack-31 after 07]` — dead file after Mission 07 removed `ValueSections` from landing composition.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Hero video capture vs animated terminal | Future fixture recording pipeline |
+| Customer quotes | When permissioned testimonials exist |
+| `01-home.png` + Design Council score | Post-deploy screenshot review |
+| Consent sheet overlap with footer CTA | Re-capture after deploy (Mission 04) |
+
+### Spot check (a11y)
+
+- Rotated from docs (Mission 06 loop) → **marketing + auth axe** via full e2e suite: 9 marketing routes + skip-link keyboard + reduced-motion hero + 7 auth axe/keyboard tests — all green after clearing stale `:3000` listener.
+
+### Gate summary
+
+Infra restarted mid-loop (postgres had stopped — caused initial API connection errors). Full set green after recovery:
+
+- migrate-check, api ruff/mypy/pytest **58 passed**, worker **22 passed**
+- fixtures **23+8** passed, policy **12 passed**
+- web typecheck, lint:strict, test **73**, build, check:motion, check:bundles, e2e **22** — all green locally
+
+**Note:** e2e fails if a stale process holds `localhost:3000` with `reuseExistingServer` (non-CI). Use `CI=true pnpm test:e2e` or free the port first.
+
+### Deployment decision
+
+**Recommend deploying** — batch Missions 04–07 as one web deploy (consent sheet, onboarding states, auth shell, landing hero). Run `railway-smoke.sh`, verify production login + home hero, then re-capture `01-home.png` and auth screenshots (`11–13`).
