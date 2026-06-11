@@ -36,3 +36,38 @@ Mission 01 validation commands rerun green. Mission 02 canonical `gates.md` not 
 ### Deployment decision
 
 **Not deploying.** Mission 01 Production Guidance: dev-local and docs only; MinIO Railway change waits for Mission 30. No production contract changes in this mission.
+
+---
+
+## Loop after Mission 02 — 2026-06-11
+
+### Re-verification (Mission 02 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Every gate passes locally twice | **Green** — api pytest 58 passed ×2, worker 22, policy 12, fixtures, full web stack, e2e 13 |
+| CI green on `main` | **Green** — [run 27315598137](https://github.com/HiNala/jober/actions/runs/27315598137) |
+| `gates.md` accurate | **Green** — created with env table, Windows notes, durations |
+| No undocumented blockers | **Green** |
+
+### Improvements made (this loop)
+
+- Documented Windows harness notes in `gates.md`: keep infra up during gate runs; delete `apps/web/.next` after Docker web dev before typecheck.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| `make doctor` on Windows (no Make) | Documented manual equivalent in `gates.md` |
+
+### Spot check (states)
+
+- Confirmed e2e `golden-path-smoke.spec.ts` and `a11y-marketing.spec.ts` pass in CI web job (13 tests total).
+
+### Gate summary
+
+Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on GitHub Actions.
+
+### Deployment decision
+
+**Not deploying.** Mission 02 Production Guidance: gate certification only; no production defect fix in this mission.
