@@ -27,6 +27,7 @@ export function PasswordField({
   label = "Password",
   showMeter = true,
   autoComplete,
+  error,
 }: {
   id: string;
   value: string;
@@ -34,7 +35,9 @@ export function PasswordField({
   label?: string;
   showMeter?: boolean;
   autoComplete?: string;
+  error?: string | null;
 }) {
+  const errorId = error ? `${id}-error` : undefined;
   const [visible, setVisible] = useState(false);
   const score = useMemo(() => scorePassword(value), [value]);
 
@@ -53,6 +56,8 @@ export function PasswordField({
           className="pr-10"
           minLength={10}
           required
+          aria-invalid={error ? true : undefined}
+          aria-describedby={errorId}
         />
         <Button
           type="button"
@@ -65,6 +70,11 @@ export function PasswordField({
           {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </Button>
       </div>
+      {error ? (
+        <p id={errorId} className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
       {showMeter && value.length > 0 ? (
         <div className="space-y-1" aria-live="polite">
           <div className="flex gap-1">

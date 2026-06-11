@@ -9,10 +9,12 @@ import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { AuthOAuthAlert } from "@/components/auth/auth-oauth-alert";
 import { GoogleSignInBlock } from "@/components/auth/google-sign-in-block";
 import { PasswordField } from "@/components/auth/password-field";
+import { fieldDescribedBy, FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { login } from "@/lib/api/auth";
-import { parseAuthError } from "@/lib/auth/parse-auth-error";
+import { validateEmail } from "@/lib/forms/client-validation";
+import { useFormSubmit } from "@/lib/forms/use-form-submit";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
@@ -20,8 +22,9 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const { pending, formError, fieldErrors, run, setClientFieldErrors } = useFormSubmit({
+    fallbackError: "Invalid email or password.",
+  });
 
   return (
     <AuthFormShell
@@ -40,22 +43,25 @@ export default function LoginPage() {
       <GoogleSignInBlock />
       <form
         className="space-y-4"
+        noValidate
         onSubmit={(event) => {
           event.preventDefault();
-          setPending(true);
-          setError(null);
-          void login(email, password)
-            .then(() => router.push("/dashboard"))
-            .catch((err: unknown) =>
-              setError(parseAuthError(err, "Invalid email or password.")),
-            )
-            .finally(() => setPending(false));
+          const emailError = validateEmail(email);
+          if (emailError) {
+            setClientFieldErrors({ email: emailError });
+            return;
+          }
+          if (!password) {
+            setClientFieldErrors({ password: "Password is required" });
+            return;
+          }
+          void run(async () => {
+            await login(email, password);
+            router.push("/dashboard");
+          });
         }}
       >
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
+        <FormField id="email" label="Email" error={fieldErrors.email}>
           <Input
             id="email"
             type="email"
@@ -63,21 +69,24 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            aria-invalid={fieldErrors.email ? true : undefined}
+            aria-describedby={fieldDescribedBy(fieldErrors.email, "email")}
           />
-        </div>
+        </FormField>
         <PasswordField
           id="password"
           value={password}
           onChange={setPassword}
           showMeter={false}
           autoComplete="current-password"
+          error={fieldErrors.password}
         />
         <div className="text-right text-sm">
           <Link href="/forgot-password" className="text-muted-foreground hover:text-foreground">
             Forgot password?
           </Link>
         </div>
-        {error ? <AuthFormError message={error} /> : null}
+        {formError ? <AuthFormError message={formError} /> : null}
         <Button type="submit" className={cn(motionPress, "w-full")} disabled={pending}>
           {pending ? "Signing in…" : "Sign in"}
         </Button>

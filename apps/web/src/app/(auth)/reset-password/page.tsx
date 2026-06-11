@@ -12,7 +12,8 @@ import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { resetPassword } from "@/lib/api/auth";
 import { RESET_TOKEN_MISSING } from "@/lib/auth/copy";
-import { parseAuthError } from "@/lib/auth/parse-auth-error";
+import { validateResetPassword } from "@/lib/forms/client-validation";
+import { useFormSubmit } from "@/lib/forms/use-form-submit";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
@@ -21,8 +22,9 @@ function ResetForm() {
   const router = useRouter();
   const token = searchParams.get("token") ?? "";
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const { pending, formError, fieldErrors, run, setClientFieldErrors } = useFormSubmit({
+    fallbackError: "Reset link expired or invalid.",
+  });
 
   if (!token) {
     return (
@@ -38,20 +40,28 @@ function ResetForm() {
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        setPending(true);
-        setError(null);
-        void resetPassword(token, password)
-          .then(() => router.push("/login"))
-          .catch((err: unknown) =>
-            setError(parseAuthError(err, "Reset link expired or invalid.")),
-          )
-          .finally(() => setPending(false));
+        const clientErrors = validateResetPassword(password);
+        if (Object.keys(clientErrors).length > 0) {
+          setClientFieldErrors(clientErrors);
+          return;
+        }
+        void run(async () => {
+          await resetPassword(token, password);
+          router.push("/login");
+        });
       }}
     >
-      <PasswordField id="password" value={password} onChange={setPassword} label="New password" />
-      {error ? <AuthFormError message={error} /> : null}
+      <PasswordField
+        id="password"
+        value={password}
+        onChange={setPassword}
+        label="New password"
+        error={fieldErrors.password}
+      />
+      {formError ? <AuthFormError message={formError} /> : null}
       <Button type="submit" className={cn(motionPress, "w-full")} disabled={pending}>
         {pending ? "Updating…" : "Update password"}
       </Button>

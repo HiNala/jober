@@ -2,6 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
+
+import { formatApiError } from "@/lib/api/errors";
+import { useUnsavedChanges } from "@/lib/forms/use-unsaved-changes";
 
 import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { Button } from "@/components/ui/button";
@@ -20,6 +24,7 @@ export function AiSettingsSection() {
   const { preferences, updatePreferences } = useUserPreferences();
   const [openaiKey, setOpenaiKey] = useState("");
   const queryClient = useQueryClient();
+  useUnsavedChanges(openaiKey.length > 0);
   const llmQuery = useQuery({ queryKey: ["llm-config"], queryFn: fetchLlmConfig });
   const usageQuery = useQuery({ queryKey: ["billing-usage"], queryFn: fetchUsageDashboard });
   const keysQuery = useQuery({ queryKey: ["provider-keys"], queryFn: fetchProviderKeys });
@@ -29,7 +34,9 @@ export function AiSettingsSection() {
     onSuccess: async () => {
       setOpenaiKey("");
       await queryClient.invalidateQueries({ queryKey: ["provider-keys"] });
+      toast.success("OpenAI key saved");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not save API key")),
   });
 
   const deleteKeyMutation = useMutation({

@@ -2,8 +2,11 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Lock, ShieldAlert } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+
+import { formatApiError } from "@/lib/api/errors";
+import { useUnsavedChanges } from "@/lib/forms/use-unsaved-changes";
 
 import { FileUpload } from "@/components/import/file-upload";
 import { PageError, PageLoading } from "@/components/states/page-states";
@@ -40,6 +43,7 @@ function FieldRow({
   field,
   onSavePublic,
   onSaveSensitive,
+  onDirtyChange,
 }: {
   field: VaultField;
   onSavePublic: (key: string, value: string) => void;
@@ -48,10 +52,14 @@ function FieldRow({
     value: string,
     consent: { consent: boolean; never_autofill: boolean },
   ) => void;
+  onDirtyChange?: (key: string, dirty: boolean) => void;
 }) {
-  const [draft, setDraft] = useState(
-    typeof field.value === "string" ? field.value : "",
-  );
+  const savedValue = typeof field.value === "string" ? field.value : "";
+  const [draft, setDraft] = useState(savedValue);
+
+  useEffect(() => {
+    onDirtyChange?.(field.key, draft !== savedValue);
+  }, [draft, field.key, onDirtyChange, savedValue]);
   const [revealed, setRevealed] = useState(false);
   const sensitive = field.tier === "sensitive";
   const fieldId = `vault-field-${field.key}`;
@@ -163,8 +171,57 @@ function FieldRow({
   );
 }
 
+function CommonAnswerField({
+  answerKey,
+  label,
+  initialBody,
+  onSave,
+  onDirtyChange,
+}: {
+  answerKey: string;
+  label: string;
+  initialBody: string;
+  onSave: (body: string) => void;
+  onDirtyChange?: (key: string, dirty: boolean) => void;
+}) {
+  const [body, setBody] = useState(initialBody);
+
+  useEffect(() => {
+    onDirtyChange?.(answerKey, body !== initialBody);
+  }, [answerKey, body, initialBody, onDirtyChange]);
+
+  return (
+    <div className="space-y-1">
+      <label className="text-xs font-medium text-muted-foreground" htmlFor={`answer-${answerKey}`}>
+        {label}
+      </label>
+      <Textarea
+        id={`answer-${answerKey}`}
+        value={body}
+        rows={3}
+        onChange={(e) => setBody(e.target.value)}
+        onBlur={() => {
+          if (body !== initialBody) onSave(body);
+        }}
+      />
+    </div>
+  );
+}
+
 export function ProfileVault() {
   const queryClient = useQueryClient();
+  const [dirtyKeys, setDirtyKeys] = useState<Set<string>>(new Set());
+
+  const markDirty = (key: string, dirty: boolean) => {
+    setDirtyKeys((prev) => {
+      const next = new Set(prev);
+      if (dirty) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  };
+
+  useUnsavedChanges(dirtyKeys.size > 0);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["profile"],
     queryFn: fetchProfile,
@@ -182,13 +239,13 @@ export function ProfileVault() {
   const profileMutation = useMutation({
     mutationFn: patchProfile,
     onSuccess: invalidate,
-    onError: () => toast.error("Could not save profile"),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not save profile")),
   });
 
   const vaultMutation = useMutation({
     mutationFn: patchVault,
     onSuccess: invalidate,
-    onError: () => toast.error("Could not save vault field"),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not save vault field")),
   });
 
   const resumeMutation = useMutation({
@@ -197,7 +254,7 @@ export function ProfileVault() {
       toast.success("Resume uploaded and parsed");
       invalidate();
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not upload resume")),
   });
 
   const answerMutation = useMutation({
@@ -262,6 +319,7 @@ export function ProfileVault() {
         <FileUpload
           kind="resume"
           accept=".pdf,.docx"
+          busy={resumeMutation.isPending}
           onFile={(file) => resumeMutation.mutate(file)}
         />
         {data.active_resume && (
@@ -296,8 +354,9 @@ export function ProfileVault() {
           <div className="grid gap-3 md:grid-cols-2">
             {grouped[tier].map((field) => (
               <FieldRow
-                key={field.key}
+                key={`${field.key}:${String(field.value)}`}
                 field={field}
+                onDirtyChange={markDirty}
                 onSavePublic={(key, value) => {
                   const patch: Record<string, unknown> = { [key]: value };
                   if (value === "true" || value === "false") {
@@ -321,22 +380,20 @@ export function ProfileVault() {
         <h2 className="text-sm font-medium">Common answers</h2>
         <div className="space-y-3">
           {(answersQuery.data ?? []).map((answer) => (
-            <div key={answer.id} className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">
-                {answer.label}
-              </label>
-              <Textarea
-                defaultValue={answer.body}
-                rows={3}
-                onBlur={(e) =>
-                  answerMutation.mutate({
-                    key: answer.answer_key,
-                    body: e.target.value,
-                    label: answer.label,
-                  })
-                }
-              />
-            </div>
+            <CommonAnswerField
+              key={`${answer.id}:${answer.body}`}
+              answerKey={answer.answer_key}
+              label={answer.label}
+              initialBody={answer.body}
+              onDirtyChange={markDirty}
+              onSave={(body) =>
+                answerMutation.mutate({
+                  key: answer.answer_key,
+                  body,
+                  label: answer.label,
+                })
+              }
+            />
           ))}
         </div>
       </section>

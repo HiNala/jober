@@ -12,6 +12,7 @@ import { surface } from "@/lib/design/tokens";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatApiError } from "@/lib/api/errors";
 import {
   commitJobsImport,
   exportJobsXlsxUrl,
@@ -37,7 +38,7 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
       setPreview(data);
       setStep("preview");
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not parse workbook")),
   });
 
   const importMutation = useMutation({
@@ -49,7 +50,7 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
       toast.success("Spreadsheet imported");
       if (onCommitted) await onCommitted(data);
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Import failed")),
   });
 
   const handleFile = useCallback(
@@ -65,7 +66,9 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
 
   return (
     <div className="space-y-4">
-      {step === "upload" && <FileUpload onFile={handleFile} />}
+      {step === "upload" && (
+        <FileUpload onFile={handleFile} busy={previewMutation.isPending} />
+      )}
       {previewMutation.isPending && (
         <p className="text-sm text-muted-foreground">Parsing workbook…</p>
       )}

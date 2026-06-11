@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
+import { FormError } from "@/components/forms/form-error";
+import { fieldDescribedBy, FormField } from "@/components/forms/form-field";
+import { formatApiError } from "@/lib/api/errors";
 import { joinProWaitlist } from "@/lib/api/waitlist";
-import { ApiError } from "@/lib/api/client";
+import { validateEmail } from "@/lib/forms/client-validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 type FormState = "idle" | "loading" | "success" | "duplicate" | "error";
@@ -17,10 +19,17 @@ export function ProWaitlistForm({ className }: { className?: string }) {
   const [consent, setConsent] = useState(false);
   const [state, setState] = useState<FormState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setFieldError(null);
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setFieldError(emailError);
+      return;
+    }
     if (!consent) {
       setError("Please confirm we can email you when Pro launches.");
       return;
@@ -31,11 +40,7 @@ export function ProWaitlistForm({ className }: { className?: string }) {
       setState(result.status === "already_registered" ? "duplicate" : "success");
     } catch (err) {
       setState("error");
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong. Try again in a moment.");
-      }
+      setError(formatApiError(err, "Something went wrong. Try again in a moment."));
     }
   }
 
@@ -58,10 +63,7 @@ export function ProWaitlistForm({ className }: { className?: string }) {
 
   return (
     <form onSubmit={onSubmit} className={cn("space-y-3", className)} noValidate>
-      <div className="space-y-2">
-        <Label htmlFor="pro-waitlist-email" className="text-sm">
-          Email for early access
-        </Label>
+      <FormField id="pro-waitlist-email" label="Email for early access" error={fieldError}>
         <Input
           id="pro-waitlist-email"
           type="email"
@@ -71,8 +73,10 @@ export function ProWaitlistForm({ className }: { className?: string }) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@company.com"
           disabled={state === "loading"}
+          aria-invalid={fieldError ? true : undefined}
+          aria-describedby={fieldDescribedBy(fieldError, "pro-waitlist-email")}
         />
-      </div>
+      </FormField>
       <label className="flex items-start gap-2 text-xs text-muted-foreground">
         <input
           type="checkbox"
@@ -89,11 +93,7 @@ export function ProWaitlistForm({ className }: { className?: string }) {
           .
         </span>
       </label>
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      ) : null}
+      {error ? <FormError message={error} /> : null}
       <Button type="submit" className="w-full" disabled={state === "loading"}>
         {state === "loading" ? (
           <>

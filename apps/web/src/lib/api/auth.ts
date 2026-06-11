@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "@/lib/api/client";
+import { ApiError, getApiBaseUrl } from "@/lib/api/client";
 
 export type AuthUser = {
   id: string;
@@ -50,7 +50,7 @@ export async function authFetch<T>(path: string, init?: RequestInit): Promise<T>
 
   if (!res.ok) {
     const body = await res.text().catch(() => undefined);
-    throw new Error(body || `Auth ${res.status}`);
+    throw new ApiError(body || `Auth ${res.status}`, res.status, body);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
