@@ -1,28 +1,51 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 import { HOW_IT_WORKS_STEPS } from "@/lib/marketing/content";
 import { motionFadeIn } from "@/lib/design/motion";
-import { spacing, surface } from "@/lib/design/tokens";
+import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
-export function HowItWorks({
-  compact = false,
-  showIntro = true,
-  variant = "cards",
-}: {
-  compact?: boolean;
-  showIntro?: boolean;
-  variant?: "cards" | "stepper";
-}) {
-  const isStepper = variant === "stepper";
+export function HowItWorksStepper({ showIntro = true }: { showIntro?: boolean }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const stepRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduceMotion(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const nodes = stepRefs.current.filter(Boolean) as HTMLLIElement[];
+    if (nodes.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]?.target instanceof HTMLElement) {
+          const idx = Number(visible[0].target.dataset.stepIndex);
+          if (!Number.isNaN(idx)) setActiveIndex(idx);
+        }
+      },
+      { rootMargin: "-20% 0px -35% 0px", threshold: [0.25, 0.5, 0.75] },
+    );
+
+    for (const node of nodes) observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section
       id="how-it-works"
       aria-labelledby={showIntro ? "how-it-works-heading" : undefined}
-      className={cn(
-        "px-6 py-20",
-        showIntro && "border-t border-border/50",
-        spacing.section,
-      )}
+      className={cn("px-6 py-12 md:py-16", showIntro && "border-t border-border/50")}
     >
       <div className="mx-auto max-w-6xl">
         {showIntro ? (
@@ -36,42 +59,37 @@ export function HowItWorks({
             >
               Human-in-the-loop by design
             </h2>
-            <p className="mt-3 text-muted-foreground">
-              Jober accelerates prep and form work — you keep authority over what gets sent.
-            </p>
           </div>
         ) : null}
 
-        <ol
-          className={cn(
-            "relative grid gap-4",
-            isStepper ? "mt-12 md:grid-cols-4" : "md:grid-cols-2 lg:grid-cols-4",
-            showIntro ? "mt-12" : "mt-0",
-          )}
-        >
-          {isStepper ? (
-            <div
-              className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-8 hidden h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent md:block"
-              aria-hidden
-            />
-          ) : null}
+        <ol className={cn("relative mt-10 grid gap-4 md:grid-cols-4", showIntro && "mt-12")}>
+          <div
+            className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-8 hidden h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent md:block"
+            aria-hidden
+          />
           {HOW_IT_WORKS_STEPS.map(({ icon: Icon, slug, title, body, detail }, index) => {
-            const isDominant = isStepper && index === 2;
+            const isDominant = index === 2;
+            const isActive = activeIndex === index;
             return (
               <li
                 key={slug}
-                id={isStepper ? `step-${slug}` : undefined}
+                id={`step-${slug}`}
+                ref={(el) => {
+                  stepRefs.current[index] = el;
+                }}
+                data-step-index={index}
                 className={cn(
                   surface.card,
-                  "relative rounded-xl p-5",
+                  "scroll-mt-24 rounded-xl p-5 transition-[box-shadow,border-color,transform]",
                   motionFadeIn,
+                  !reduceMotion && isActive && "border-primary/50 shadow-md shadow-primary/5",
                   isDominant && "border-primary/40 ring-1 ring-primary/25 md:scale-[1.02]",
                 )}
               >
                 <span
                   className={cn(
                     "inline-flex size-7 items-center justify-center rounded-full border text-xs font-mono font-medium",
-                    isDominant
+                    isDominant || isActive
                       ? "border-primary/50 bg-primary/10 text-primary"
                       : "border-border text-muted-foreground",
                   )}
@@ -90,15 +108,9 @@ export function HowItWorks({
                   </div>
                 ) : null}
                 <Icon className="mt-3 size-5 text-accent" aria-hidden />
-                {showIntro ? (
-                  <h3 className="mt-2 text-base font-semibold">{title}</h3>
-                ) : (
-                  <h2 className="mt-2 text-base font-semibold">{title}</h2>
-                )}
+                <h2 className="mt-2 text-base font-semibold">{title}</h2>
                 <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-                {!compact ? (
-                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground/90">{detail}</p>
-                ) : null}
+                <p className="mt-3 text-xs leading-relaxed text-muted-foreground/90">{detail}</p>
               </li>
             );
           })}
