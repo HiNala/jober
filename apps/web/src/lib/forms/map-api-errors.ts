@@ -12,9 +12,15 @@ type PydanticErrorItem = {
   msg?: string;
 };
 
-function parseJsonBody(raw: string): { detail?: unknown } | null {
+type ApiErrorBody = {
+  detail?: unknown;
+  code?: string;
+  correlation_id?: string;
+};
+
+function parseJsonBody(raw: string): ApiErrorBody | null {
   try {
-    return JSON.parse(raw) as { detail?: unknown };
+    return JSON.parse(raw) as ApiErrorBody;
   } catch {
     return null;
   }

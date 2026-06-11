@@ -71,3 +71,7 @@
 - `test_error_contract.py` — envelope, leak, 503 resume, CORS on 404
 - `test_documents_api.py` — 402 code assertion updated
 - Policy suite unchanged semantics
+
+## CI follow-up (Mission 31)
+
+Initial `[pack-18]` used `BaseHTTPMiddleware` for correlation IDs → pytest-asyncio `Runner.run() cannot be called from a running event loop` (280 errors). Fixed by pure ASGI `CorrelationIdMiddleware` in `[pack-31 after 18]`.

@@ -720,3 +720,44 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — Mission 17 is web-only UX (no API contract change). Batch with Missions 04–17 web polish. **Post-deploy:** open Library → Document Studio with a job + resume, verify template banner when no LLM key, run `bash scripts/railway-smoke.sh`, re-capture screenshot `18-library-letters.png`.
+
+---
+
+## Loop after Mission 18 — 2026-06-10
+
+### Re-verification (Mission 18 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| One documented envelope; inventory shows routers conforming | **Green** — `errors.md`, `18_error_inventory.md` |
+| No error body leaks internals (test-enforced) | **Green** — `test_error_contract.py` opaque 500 + leak markers |
+| Cross-tenant 404 convention | **Green** — unchanged; `tenant_guard` + isolation tests (CI) |
+| Downstream outages → deliberate 503; `/readyz` truth | **Green** — resume upload + documents generate; readiness unchanged |
+| All gates green incl. policy | **Green after fix** — CI `[pack-18]` failed on middleware; fixed below |
+
+### Improvements made (this loop)
+
+- `fix(api): pure ASGI correlation middleware [pack-31 after 18]` — replaces `BaseHTTPMiddleware` (broke pytest-asyncio with 280 `Runner.run()` errors on CI run 27357876037).
+- `docs(architecture): note ASGI middleware choice in errors.md`.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Bulk `detail=str(exc)` normalization | Incremental / Mission 25 |
+| Celery enqueue → 503 | Mission 23 |
+| `make migrate-check`, full api pytest locally | CI authoritative (Docker unavailable locally) |
+
+### Spot check (chaos)
+
+- Rotated from a11y (Mission 17 loop) → **downstream failure / readiness**: `/readyz` still reports per-dependency checks; runtime MinIO outage on resume upload maps to **503** `dependency_unavailable` without leaking driver text (`test_error_contract.py`).
+
+### Gate summary
+
+**CI blocker (fixed):** `BaseHTTPMiddleware` + pytest-asyncio event loop — 280 test collection/runtime errors on push `59f59fd`.
+
+**Local:** api ruff+mypy; web typecheck, mapper tests (6), e2e **71×2** — green after middleware fix.
+
+### Deployment decision
+
+**Deploy API + web together** — Mission 18 Production Guidance. **Hold until CI green** on `[pack-31 after 18]` push, then batch with Missions 04–18. Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.

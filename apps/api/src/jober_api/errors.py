@@ -6,8 +6,7 @@ import uuid
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import Response
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from jober_api.privacy.logging import safe_log
 
@@ -157,18 +156,35 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     )
 
 
-class CorrelationIdMiddleware(BaseHTTPMiddleware):
-    async def dispatch(
-        self,
-        request: Request,
-        call_next: RequestResponseEndpoint,
-    ) -> Response:
-        incoming = request.headers.get(CORRELATION_ID_HEADER, "").strip()
-        correlation_id = incoming or str(uuid.uuid4())
-        request.state.correlation_id = correlation_id
-        response = await call_next(request)
-        response.headers[CORRELATION_ID_HEADER] = correlation_id
-        return response
+class CorrelationIdMiddleware:
+    """Pure ASGI middleware — avoids BaseHTTPMiddleware event-loop clashes in pytest-asyncio."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        correlation_id = str(uuid.uuid4())
+        for name, value in scope.get("headers", ()):
+            if name.lower() == b"x-correlation-id":
+                decoded = value.decode("latin-1").strip()
+                if decoded:
+                    correlation_id = decoded
+                break
+
+        scope.setdefault("state", {})["correlation_id"] = correlation_id
+
+        async def send_wrapper(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                headers = list(message.get("headers", []))
+                headers.append((b"x-correlation-id", correlation_id.encode("latin-1")))
+                message["headers"] = headers
+            await send(message)
+
+        await self.app(scope, receive, send_wrapper)
 
 
 def register_exception_handlers(app: FastAPI) -> None:

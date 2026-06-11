@@ -68,7 +68,7 @@ Add new codes only when the web or a client must branch; otherwise a string `det
 
 ## Implementation
 
-- `jober_api/errors.py` — envelope helpers, correlation middleware, global handlers
+- `jober_api/errors.py` — envelope helpers, correlation middleware (pure ASGI, not `BaseHTTPMiddleware`), global handlers
 - `register_exception_handlers(app)` in `main.py`
 - Routers raise `HTTPException` or helpers (`budget_exceeded_http`, `dependency_unavailable_http`, `error_detail`)
 - `/readyz` reports Postgres, Redis, MinIO; runtime 503s align with readiness semantics
