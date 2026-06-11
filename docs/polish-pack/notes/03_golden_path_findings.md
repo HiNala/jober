@@ -44,8 +44,8 @@ signup page renders (account/signup copy present)
 
 1. `POST /api/auth/register` with disposable email → **200**, `status: pending_verification`, `email_verified: false`, session cookies set.
 2. `POST /api/auth/login` with same credentials → **200**, session established (`last_login_at` set). **App is usable without inbox verification** — verification is a dead letter UX path, not a hard gate.
-3. No verification email received (expected — outbound email not configured).
-4. Web `/forgot-password` page loads (200); reset email delivery **not configured** (same class as verification).
+3. No verification email received *(pre–Mission 11 walk; code now dispatches via SMTP when configured)*.
+4. Web `/forgot-password` page loads (200); reset email delivery *(same — re-walk after Railway `EMAIL_BACKEND=smtp`)*.
 
 ## LLM provider (production)
 

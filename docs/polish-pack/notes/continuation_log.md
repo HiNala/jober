@@ -464,3 +464,15 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended for Mission 11** — requires **API + worker** env together: `EMAIL_BACKEND=smtp`, `EMAIL_FROM`, `SMTP_*`. Web can deploy independently (honest copy already). After deploy: send real verification + reset to a test inbox, complete both loops, update GP-001/002 in golden-path findings, re-capture auth screenshots.
+
+### Refinement pass (same day)
+
+**Re-verification:** Mission 11 criteria unchanged — production inbox still operator-blocked; all code-path criteria green.
+
+**Improvements:** `test(e2e): axe verify-email and verify-pending routes [pack-31 after 11]` — closes Mission 11 blast-radius gap in `a11y-auth.spec.ts` (22 → **24** specs). Golden-path walkthrough steps 3–4 annotated as pre–Mission 11.
+
+**Spot check (a11y):** Rotated from states → **auth axe** on `/verify-email` (no-token error state) and `/verify-pending` (unavailable fallback when API unreachable in e2e).
+
+**Gates:** api ruff+mypy+test_email (8); worker ruff+mypy; web full stack; e2e **24×2** consecutive — green. **Blocker:** Docker Desktop unavailable (`500` on engine pipe) — `make migrate-check` / full api pytest deferred to CI.
+
+**Deployment:** unchanged — deploy Mission 11 after Railway SMTP on API+worker.

@@ -8,6 +8,8 @@ const AUTH_ROUTES = [
   "/signup",
   "/forgot-password",
   "/reset-password?token=e2e-placeholder",
+  "/verify-email",
+  "/verify-pending",
   "/link-google",
 ] as const;
 
