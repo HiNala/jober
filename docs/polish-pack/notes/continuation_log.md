@@ -71,3 +71,41 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 ### Deployment decision
 
 **Not deploying.** Mission 02 Production Guidance: gate certification only; no production defect fix in this mission.
+
+---
+
+## Loop after Mission 03 — 2026-06-11
+
+### Re-verification (Mission 03 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Every journey segment recorded | **Green** — matrix in `03_golden_path_findings.md` |
+| Production smoke + signup walkthrough | **Green** — smoke PASS; register/login documented |
+| LLM provider answered | **Green** — production `openai` / `gpt-4o-mini` |
+| Findings mapped to missions | **Green** — GP-001…011 |
+| No code beyond trivial blockers | **Green** — one test harness fix (GP-003) |
+
+### Improvements made (this loop)
+
+- Re-ran `test_golden_path_integration.py` after harness fix (2 passed).
+- Seamed audit §7 with Mission 03 evidence.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Full manual UI golden path on prod (authenticated) | Mission 03 notes — automated + API probes sufficient for this mission |
+| CI confirmation on push | Watching post-push run |
+
+### Spot check (chaos)
+
+- Production register with invalid `/api/auth/signup` → 500 vs correct `/register` → 200 (GP-011).
+
+### Gate summary
+
+`test_golden_path_integration.py` + `test-fixtures` green locally; full `gates.md` deferred to post-push CI.
+
+### Deployment decision
+
+**Not deploying.** Mission 03 observes production only; no prod defect at severity-critical level (email gap already tracked GP-001).
