@@ -24,6 +24,7 @@ from jober_api.models.human_checkpoint import HumanCheckpoint
 from jober_api.models.job_list import JobList, JobListItem
 from jober_api.models.job_target import JobTarget
 from jober_api.models.llm_call import LlmCall
+from jober_api.models.pro_waitlist import ProWaitlistEntry
 from jober_api.models.product_config import ProductConfig
 from jober_api.models.profile_common_answer import ProfileCommonAnswer
 from jober_api.models.resume_asset import ResumeAsset
@@ -60,6 +61,7 @@ __all__ = [
     "JobList",
     "JobListItem",
     "JobTarget",
+    "ProWaitlistEntry",
     "ProductConfig",
     "ProfileCommonAnswer",
     "LlmCall",

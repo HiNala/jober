@@ -16,6 +16,7 @@ from jober_api.models.user import User
 
 PUBLIC_API_PREFIXES = (
     "/api/events",
+    "/api/waitlist/",
     "/api/webhooks/",
     "/api/health",
     "/api/auth/register",

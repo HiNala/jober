@@ -27,6 +27,7 @@ from jober_api.routers.resumes import router as resumes_router
 from jober_api.routers.run_console import router as run_console_router
 from jober_api.routers.settings import router as settings_router
 from jober_api.routers.verification import router as verification_router
+from jober_api.routers.waitlist import router as waitlist_router
 from jober_api.routers.webhooks import router as webhooks_router
 
 api_router = APIRouter(prefix="/api")
@@ -57,4 +58,5 @@ api_router.include_router(privacy_router)
 api_router.include_router(billing_router)
 api_router.include_router(settings_router)
 api_router.include_router(llm_router)
+api_router.include_router(waitlist_router)
 api_router.include_router(webhooks_router)
