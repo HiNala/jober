@@ -4,7 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, ArchiveRestore, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+import { PageEmpty } from "@/components/states/page-states";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -102,14 +106,24 @@ export function LibraryJobLists() {
       </form>
 
       {listsQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading lists…</p>
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-24 w-full rounded-lg" />
+        </div>
       ) : null}
-      {visibleLists.length === 0 ? (
-        <p className={cn(surface.card, "rounded-lg p-4 text-sm text-muted-foreground")}>
-          {showArchived
-            ? "No lists yet. Create one in Discover or here."
-            : "No active lists. Create one or enable “Show archived”."}
-        </p>
+      {!listsQuery.isLoading && visibleLists.length === 0 ? (
+        <PageEmpty
+          title={showArchived ? "No saved lists" : "No active lists"}
+          description={
+            showArchived
+              ? "Create a list here or build one from board search on Discover."
+              : "Create a list below, or search job boards on Discover to fill one."
+          }
+          action={
+            <Link href="/discover" className={buttonVariants({ size: "sm" })}>
+              Open Discover
+            </Link>
+          }
+        />
       ) : null}
 
       <ul className="space-y-3">

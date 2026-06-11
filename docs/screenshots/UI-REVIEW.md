@@ -26,7 +26,7 @@
 | ~~Floating analytics toast~~ | ~~Nearly every screen~~ | **Closed Mission 04 (2026-06-11):** replaced with one-time bottom sheet + Settings control |
 | Identical split layout | All in-app routes | Dashboard, queue, discover, library, search, analytics, settings share the same 40/60 shell |
 | Bottom “Describe what you want…” bar | Every in-app page | Feels pasted on; Hyper-style products use **⌘K command palette** + contextual prompts |
-| Dev copy in empty states | Queue (`make seed`) | Breaks production polish |
+| ~~Dev copy in empty states~~ | ~~Queue (`make seed`)~~ | **Closed Mission 05 (2026-06-11):** onboarding empty states + vault dropzone + blog lead |
 | Auth on empty void | Login, signup | No brand moment, no product preview, no trust strip |
 
 ### Priority upgrade themes (cross-cutting)
@@ -277,7 +277,7 @@
 
 **Issues**
 
-- Empty copy references **`make seed`** — must be user-facing onboarding text.
+- ~~Empty copy references `make seed`~~ — fixed Mission 05; re-capture screenshot post-deploy.
 - Table headers float in a void — no illustration for import.
 - Board/Table toggle is easy to miss.
 

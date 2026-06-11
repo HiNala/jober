@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { BLOG_POSTS } from "@/content/blog/posts";
+import { BLOG_LEAD } from "@/lib/states/onboarding-copy";
 import { motionFadeIn } from "@/lib/design/motion";
 import { marketingMetadata } from "@/lib/marketing/metadata";
 import { surface } from "@/lib/design/tokens";
@@ -22,7 +23,7 @@ export default function BlogIndexPage() {
         <MarketingPageHeader
           eyebrow="Blog"
           title="Updates & changelog"
-          lead="Markdown-driven posts until a CMS is wired. Subscribe by bookmarking this page."
+          lead={BLOG_LEAD}
         />
         <ul className="mx-auto mt-12 max-w-3xl space-y-4">
           {BLOG_POSTS.map((post) => (

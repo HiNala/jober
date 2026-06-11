@@ -4,7 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileUp, Star } from "lucide-react";
 import { useRef } from "react";
 
+import { PageEmpty } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { activateResume, fetchLibraryResumes, uploadResumeFile } from "@/lib/api/library";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
@@ -61,12 +63,27 @@ export function LibraryResumes() {
       </div>
 
       {resumesQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading resumes…</p>
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-20 w-full rounded-lg" />
+          <Skeleton className="h-20 w-full rounded-lg" />
+        </div>
       ) : null}
-      {resumesQuery.data?.length === 0 ? (
-        <p className={cn(surface.card, "rounded-lg p-4 text-sm text-muted-foreground")}>
-          No resumes yet. Upload a PDF or DOCX to set your canonical profile source.
-        </p>
+      {!resumesQuery.isLoading && resumesQuery.data?.length === 0 ? (
+        <PageEmpty
+          title="Upload your canonical resume"
+          description="PDF or DOCX — parsed skills feed cover letters and claims checks across every job."
+          action={
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploadMutation.isPending}
+            >
+              <FileUp className="mr-2 size-4" aria-hidden />
+              Choose file
+            </Button>
+          }
+        />
       ) : null}
 
       <ul className="space-y-2">

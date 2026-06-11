@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
+import { PageEmpty } from "@/components/states/page-states";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { fetchLibraryRuns } from "@/lib/api/library";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
@@ -21,12 +23,21 @@ export function LibraryRuns() {
       </h2>
 
       {runsQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading runs…</p>
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-16 w-full rounded-lg" />
+          <Skeleton className="h-16 w-full rounded-lg" />
+        </div>
       ) : null}
-      {runsQuery.data?.length === 0 ? (
-        <p className={cn(surface.card, "rounded-lg p-4 text-sm text-muted-foreground")}>
-          Past application runs appear here with status and outcomes. Start from the queue to create one.
-        </p>
+      {!runsQuery.isLoading && runsQuery.data?.length === 0 ? (
+        <PageEmpty
+          title="No runs yet"
+          description="Launch a dry-run or review batch from the queue to watch Jober work — outcomes land here."
+          action={
+            <Link href="/queue" className={buttonVariants({ size: "sm" })}>
+              Open queue
+            </Link>
+          }
+        />
       ) : null}
 
       <ul className="space-y-2">

@@ -259,6 +259,7 @@ export function ProfileVault() {
           PDF or DOCX — parsed skills feed generation and claims checks.
         </p>
         <FileUpload
+          kind="resume"
           accept=".pdf,.docx"
           onFile={(file) => resumeMutation.mutate(file)}
         />

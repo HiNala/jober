@@ -5,8 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { BigNumber } from "@/components/analytics/charts/big-number";
 import { AnalyticsLineChart } from "@/components/analytics/charts/line-chart";
 import { DateRangeControls } from "@/components/analytics/date-range-controls";
+import Link from "next/link";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageError, PageLoading } from "@/components/states/page-states";
+import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
+import { buttonVariants } from "@/components/ui/button";
 import {
   fetchUserAnalytics,
   rangeFromPreset,
@@ -37,6 +40,11 @@ export function UserAnalyticsPanel() {
   if (isLoading) return <PageLoading label="Loading your analytics" />;
   if (isError || !data) return <PageError message="Could not load analytics." onRetry={() => refetch()} />;
 
+  const hasActivity =
+    data.summary.applications_sent > 0 ||
+    data.summary.letters_generated > 0 ||
+    data.activity.some((row) => row.runs > 0);
+
   return (
     <div className={cn(spacing.section)}>
       <DateRangeControls
@@ -48,6 +56,18 @@ export function UserAnalyticsPanel() {
         exportPath="/api/analytics/me/export.csv"
         exportFilename="user-analytics.csv"
       />
+
+      {!hasActivity ? (
+        <PageEmpty
+          title="Analytics appear after your first run"
+          description="Import jobs, launch a dry-run batch, and metrics will populate here — applications sent, letter usage, and LLM cost."
+          action={
+            <Link href="/queue" className={buttonVariants({ size: "sm" })}>
+              Open queue
+            </Link>
+          }
+        />
+      ) : null}
 
       {data.attention.length > 0 ? (
         <div className="space-y-2">
@@ -67,7 +87,7 @@ export function UserAnalyticsPanel() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {hasActivity ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className={surface.card}>
           <CardContent className="pt-4">
             <BigNumber
@@ -109,9 +129,9 @@ export function UserAnalyticsPanel() {
             />
           </CardContent>
         </Card>
-      </div>
+      </div> : null}
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      {hasActivity ? <div className="grid gap-4 lg:grid-cols-2">
         <Card className={surface.card}>
           <CardHeader>
             <CardTitle className="text-sm font-medium">Runs over time</CardTitle>
@@ -133,7 +153,7 @@ export function UserAnalyticsPanel() {
             />
           </CardContent>
         </Card>
-      </div>
+      </div> : null}
     </div>
   );
 }

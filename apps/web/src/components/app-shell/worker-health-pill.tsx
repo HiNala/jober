@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 function degradedHint(detail?: string): string {
   const base = getApiBaseUrl();
-  const hint = `API: ${base}/readyz — start the stack with make up or set NEXT_PUBLIC_API_URL.`;
+  const hint = `Worker is not reachable at ${base}. Check your connection or try again shortly.`;
   return detail ? `${detail}\n${hint}` : hint;
 }
 

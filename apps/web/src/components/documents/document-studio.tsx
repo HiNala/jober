@@ -5,7 +5,14 @@ import { Download, Lock, RefreshCw, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import { PageError, PageLoading } from "@/components/states/page-states";
+import Link from "next/link";
+
+import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  DOCUMENTS_EMPTY_JOBS,
+  DOCUMENTS_ERROR_JOBS,
+} from "@/lib/states/onboarding-copy";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,13 +99,27 @@ export function DocumentStudio() {
     return (
       <PageError
         title="Could not load jobs"
-        message="Import the job tracker or seed demo data first."
+        message={DOCUMENTS_ERROR_JOBS}
         onRetry={() => void jobsQuery.refetch()}
       />
     );
   }
 
   const jobs = jobsQuery.data ?? [];
+
+  if (jobs.length === 0) {
+    return (
+      <PageEmpty
+        title={DOCUMENTS_EMPTY_JOBS.title}
+        description={DOCUMENTS_EMPTY_JOBS.description}
+        action={
+          <Link href="/queue" className={buttonVariants({ size: "sm" })}>
+            Import job tracker
+          </Link>
+        }
+      />
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">

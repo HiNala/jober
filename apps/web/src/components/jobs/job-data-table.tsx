@@ -2,10 +2,14 @@
 
 import type { JobTargetRead, JobTargetStatus } from "@jober/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FileSpreadsheet } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
+import { PageEmpty } from "@/components/states/page-states";
+import { Button } from "@/components/ui/button";
+import { QUEUE_EMPTY, QUEUE_FILTER_EMPTY } from "@/lib/states/onboarding-copy";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -59,9 +63,10 @@ const ATS_OPTIONS = [
 export interface JobDataTableProps {
   rows?: JobTargetRead[];
   className?: string;
+  onImportClick?: () => void;
 }
 
-export function JobDataTable({ rows = [], className }: JobDataTableProps) {
+export function JobDataTable({ rows = [], className, onImportClick }: JobDataTableProps) {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState<string>("all");
@@ -109,6 +114,25 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
   });
 
   const allSelected = filtered.length > 0 && filtered.every((r) => selected.has(r.id));
+
+  if (rows.length === 0) {
+    return (
+      <div className={className}>
+        <PageEmpty
+          title={QUEUE_EMPTY.title}
+          description={QUEUE_EMPTY.description}
+          icon={<FileSpreadsheet className="size-5 text-muted-foreground" aria-hidden />}
+          action={
+            onImportClick ? (
+              <Button size="sm" onClick={onImportClick}>
+                Import spreadsheet
+              </Button>
+            ) : undefined
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -197,8 +221,7 @@ export function JobDataTable({ rows = [], className }: JobDataTableProps) {
             {filtered.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                  No job targets yet — import a spreadsheet or run{" "}
-                  <code className="text-xs">make seed</code>.
+                  {QUEUE_FILTER_EMPTY}
                 </TableCell>
               </TableRow>
             ) : (

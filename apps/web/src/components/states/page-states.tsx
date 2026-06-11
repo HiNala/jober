@@ -51,10 +51,14 @@ export function PageEmpty({
   title,
   description,
   action,
+  secondaryAction,
+  icon,
 }: {
   title: string;
   description: string;
   action?: React.ReactNode;
+  secondaryAction?: React.ReactNode;
+  icon?: React.ReactNode;
 }) {
   return (
     <div
@@ -69,11 +73,14 @@ export function PageEmpty({
           motionEmptyPulse,
         )}
       >
-        <Inbox className="size-5 text-muted-foreground" aria-hidden />
+        {icon ?? <Inbox className="size-5 text-muted-foreground" aria-hidden />}
       </div>
       <h2 className="text-lg font-medium">{title}</h2>
       <p className="max-w-md text-sm text-muted-foreground">{description}</p>
-      {action}
+      {action ? <div className="flex flex-wrap items-center justify-center gap-2">{action}</div> : null}
+      {secondaryAction ? (
+        <div className="flex flex-wrap items-center justify-center gap-2">{secondaryAction}</div>
+      ) : null}
     </div>
   );
 }

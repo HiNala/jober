@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { PageEmpty } from "@/components/states/page-states";
 import { Input } from "@/components/ui/input";
 import { searchLibrary } from "@/lib/api/library";
 import { surface } from "@/lib/design/tokens";
@@ -37,6 +38,13 @@ function SearchResults({ initialQ }: { initialQ: string }) {
       />
 
       {searchQuery.isFetching ? <p className="text-sm text-muted-foreground">Searching…</p> : null}
+
+      {!query.trim() ? (
+        <PageEmpty
+          title="Search your workspace"
+          description="Find jobs, cover letters, runs, and saved lists. Start typing to search across everything you have imported."
+        />
+      ) : null}
 
       {searchQuery.data && query.trim() ? (
         <div className="grid gap-6 md:grid-cols-2">

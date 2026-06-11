@@ -3,12 +3,13 @@
 import type { ImportReportRead } from "@jober/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, Download } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { FileUpload } from "@/components/import/file-upload";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   commitJobsImport,
@@ -143,14 +144,22 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
                 </ul>
               </div>
             )}
-            <a
-              href={exportJobsXlsxUrl()}
-              download
-              className="inline-flex h-7 items-center gap-1 rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium hover:bg-muted"
-            >
-              <Download className="size-3.5" aria-hidden />
-              Export workbook
-            </a>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/queue" className={buttonVariants({ size: "sm" })}>
+                View queue
+              </Link>
+              <a
+                href={exportJobsXlsxUrl()}
+                download
+                className={buttonVariants({ size: "sm", variant: "outline" })}
+              >
+                <Download className="size-3.5" aria-hidden />
+                Export workbook
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Next: review imported targets, then start a dry-run batch from the dashboard.
+            </p>
           </CardContent>
         </Card>
       )}

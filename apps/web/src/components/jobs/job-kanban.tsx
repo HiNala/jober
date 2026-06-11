@@ -2,7 +2,9 @@
 
 import type { JobTargetRead } from "@jober/schemas";
 
+import { PageEmpty } from "@/components/states/page-states";
 import { Badge } from "@/components/ui/badge";
+import { QUEUE_EMPTY } from "@/lib/states/onboarding-copy";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { motionDragItem, motionMicro, motionSpringSettle } from "@/lib/design/motion";
@@ -22,6 +24,15 @@ export interface JobKanbanProps {
 }
 
 export function JobKanban({ rows = [], className, onSelect }: JobKanbanProps) {
+  if (rows.length === 0) {
+    return (
+      <PageEmpty
+        title={QUEUE_EMPTY.title}
+        description="Switch to the table view to import your spreadsheet, then track progress by lane here."
+      />
+    );
+  }
+
   return (
     <ScrollArea className={cn("w-full whitespace-nowrap", className)}>
       <div className="flex gap-4 pb-4" role="list" aria-label="Job pipeline board">

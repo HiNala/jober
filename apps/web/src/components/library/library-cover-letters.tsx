@@ -5,7 +5,11 @@ import { Copy, Lock, LockOpen } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import Link from "next/link";
+
+import { PageEmpty } from "@/components/states/page-states";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import {
   coverLetterPdfUrl,
@@ -47,22 +51,33 @@ export function LibraryCoverLetters() {
         <h2 id="library-letters-heading" className="text-sm font-medium">
           Cover letters
         </h2>
-        <Input
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          placeholder="Filter by company or role…"
-          className="max-w-xs"
-          aria-label="Filter cover letters"
-        />
+        {(lettersQuery.data?.length ?? 0) > 0 ? (
+          <Input
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Filter by company or role…"
+            className="max-w-xs"
+            aria-label="Filter cover letters"
+          />
+        ) : null}
       </div>
 
       {lettersQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading cover letters…</p>
+        <div className="space-y-2" aria-busy="true">
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+        </div>
       ) : null}
-      {lettersQuery.data?.length === 0 ? (
-        <p className={cn(surface.card, "rounded-lg p-4 text-sm text-muted-foreground")}>
-          Generated cover letters appear here after you run document generation on a job.
-        </p>
+      {!lettersQuery.isLoading && lettersQuery.data?.length === 0 ? (
+        <PageEmpty
+          title="Generate your first cover letter"
+          description="Pick a job in Document Studio, tailor the letter to the role, then find every version here."
+          action={
+            <Link href="/documents" className={buttonVariants({ size: "sm" })}>
+              Open Document Studio
+            </Link>
+          }
+        />
       ) : null}
 
       <ul className="space-y-2">

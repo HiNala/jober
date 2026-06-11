@@ -80,7 +80,7 @@ export default function QueuePage() {
             <TabsTrigger value="board">Board</TabsTrigger>
           </TabsList>
           <TabsContent value="table" className="mt-4">
-            <JobDataTable rows={rows} />
+            <JobDataTable rows={rows} onImportClick={() => setImportOpen(true)} />
           </TabsContent>
           <TabsContent value="board" className="mt-4">
             <JobKanban rows={rows} onSelect={setKanbanDetail} />

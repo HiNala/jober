@@ -1,13 +1,10 @@
 "use client";
 
-import { PageError } from "@/components/states/page-states";
+import { AppRouteError } from "@/components/states/app-route-error";
 
-export default function QueueError({
-  error,
-  reset,
-}: {
+export default function QueueError(props: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  return <PageError message={error.message} onRetry={reset} />;
+  return <AppRouteError {...props} />;
 }

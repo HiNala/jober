@@ -1,21 +1,49 @@
 "use client";
 
-import { FileSpreadsheet, Upload } from "lucide-react";
+import { FileSpreadsheet, FileText, Upload } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
+export type FileUploadKind = "spreadsheet" | "resume";
+
+const UPLOAD_COPY: Record<
+  FileUploadKind,
+  { title: string; hint: string; Icon: typeof Upload }
+> = {
+  spreadsheet: {
+    title: "Drop your job spreadsheet here",
+    hint: "XLSX export from your tracker · or click to browse",
+    Icon: FileSpreadsheet,
+  },
+  resume: {
+    title: "Drop your resume here",
+    hint: "PDF or DOCX · parsed skills feed generation and claims checks",
+    Icon: FileText,
+  },
+};
+
 export interface FileUploadProps {
   accept?: string;
+  kind?: FileUploadKind;
+  title?: string;
+  hint?: string;
   onFile?: (file: File) => void;
   className?: string;
 }
 
 export function FileUpload({
   accept = ".xlsx,.xls",
+  kind = "spreadsheet",
+  title,
+  hint,
   onFile,
   className,
 }: FileUploadProps) {
+  const defaults = UPLOAD_COPY[kind];
+  const displayTitle = title ?? defaults.title;
+  const displayHint = hint ?? defaults.hint;
+  const DoneIcon = defaults.Icon;
   const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
 
@@ -58,18 +86,16 @@ export function FileUpload({
       />
       <div className="flex size-12 items-center justify-center rounded-full bg-muted">
         {fileName ? (
-          <FileSpreadsheet className="size-5 text-primary" aria-hidden />
+          <DoneIcon className="size-5 text-primary" aria-hidden />
         ) : (
           <Upload className="size-5 text-muted-foreground" aria-hidden />
         )}
       </div>
       <div>
-        <p className="text-sm font-medium">
-          {fileName ? fileName : "Drop your job spreadsheet here"}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          XLSX export from Direct Job Leads · or click to browse
-        </p>
+        <p className="text-sm font-medium">{fileName ? fileName : displayTitle}</p>
+        {!fileName ? (
+          <p className="mt-1 text-xs text-muted-foreground">{displayHint}</p>
+        ) : null}
       </div>
     </label>
   );

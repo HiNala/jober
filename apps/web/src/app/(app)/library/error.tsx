@@ -2,7 +2,7 @@
 
 import { AppRouteError } from "@/components/states/app-route-error";
 
-export default function DashboardError(props: {
+export default function LibraryError(props: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
