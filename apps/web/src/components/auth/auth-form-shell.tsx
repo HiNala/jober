@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { motionFadeIn } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
@@ -8,23 +6,36 @@ export function AuthFormShell({
   subtitle,
   children,
   footer,
+  bullets,
 }: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  bullets?: readonly string[];
 }) {
   return (
-    <div className={cn("mx-auto flex min-h-screen max-w-md flex-col justify-center p-6", motionFadeIn)}>
-      <div className="mb-8 space-y-2 text-center">
-        <Link href="/" className="text-sm font-semibold tracking-tight text-primary">
-          Jober
-        </Link>
+    <div className={cn("w-full", motionFadeIn)}>
+      <header className="mb-6 space-y-2 text-center lg:text-left">
         <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
-      </div>
-      <div className="rounded-xl border bg-card p-6 shadow-sm">{children}</div>
-      {footer ? <div className="mt-4 text-center text-sm text-muted-foreground">{footer}</div> : null}
+        {bullets && bullets.length > 0 ? (
+          <ul className="mt-3 space-y-1 text-left text-xs text-muted-foreground">
+            {bullets.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="text-accent" aria-hidden>
+                  ·
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </header>
+      <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm">{children}</div>
+      {footer ? (
+        <p className="mt-4 text-center text-sm text-muted-foreground lg:text-left">{footer}</p>
+      ) : null}
     </div>
   );
 }

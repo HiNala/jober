@@ -27,7 +27,7 @@
 | Identical split layout | All in-app routes | Dashboard, queue, discover, library, search, analytics, settings share the same 40/60 shell |
 | Bottom “Describe what you want…” bar | Every in-app page | Feels pasted on; Hyper-style products use **⌘K command palette** + contextual prompts |
 | ~~Dev copy in empty states~~ | ~~Queue (`make seed`)~~ | **Closed Mission 05 (2026-06-11):** onboarding empty states + vault dropzone + blog lead |
-| Auth on empty void | Login, signup | No brand moment, no product preview, no trust strip |
+| ~~Auth on empty void~~ | ~~Login, signup~~ | **Closed Mission 06:** branded auth shell + trust strip — re-capture 11–13 post-deploy |
 
 ### Priority upgrade themes (cross-cutting)
 
@@ -197,52 +197,32 @@
 
 ### 11 — Login (`11-login.png`)
 
-**What it is:** Centered auth card on empty background.
+**What it is:** Sign-in form in branded two-zone auth shell.
 
-**UX / flow:** Email/password + forgot link + signup cross-link. Functional.
+**UX / flow:** Email/password + forgot link + signup cross-link; Google when `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED`.
 
-**Issues**
+**Closed Mission 06 (2026-06-11):** split layout with `ProductVisual` brand panel, trust strip, unified error alerts. Re-capture screenshot post-deploy.
 
-- No Google OAuth button visible (signup may have it — login should mirror).
-- Zero brand reinforcement — could be any app.
-- Consent banner on auth feels odd.
+**Remaining**
 
-**Upgrade**
-
-- **Split auth layout:** left panel = looping product film + gradient; right = form (Hyper Agents, Linear).
-- Show **Google sign-in** parity with signup.
-- Defer consent until after first successful session.
+- Consent sheet on auth routes (defer to post-session — Mission 04 follow-up).
+- Google button only when OAuth enabled in env.
 
 ---
 
 ### 12 — Signup (`12-signup.png`)
 
-**What it is:** Register form — display name, email, password.
+**What it is:** Register form with value bullets and password strength meter.
 
-**Issues**
-
-- Same void background as login.
-- No password strength hint or value recap (“review before submit”).
-
-**Upgrade**
-
-- Add **3-bullet value strip** under title.
-- Inline password requirements with live validation ticks.
-- Optional: “Continue with Google” above fold (if enabled in prod).
+**Closed Mission 06 (2026-06-11):** shared auth shell, honest “no verification required” subtitle, password meter. Re-capture post-deploy.
 
 ---
 
 ### 13 — Forgot password (`13-forgot-password.png`)
 
-**What it is:** Password reset request form.
+**What it is:** Reset request with honest success state (no false email promise until Mission 11).
 
-**Issues**
-
-- Fine for MVP; very minimal.
-
-**Upgrade**
-
-- Success state illustration + “check your inbox” with resend timer.
+**Closed Mission 06 (2026-06-11):** designed success UI; copy notes email not live. Re-capture post-deploy.
 
 ---
 

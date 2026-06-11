@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { AuthFormError } from "@/components/auth/auth-form-error";
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { GoogleSignInBlock } from "@/components/auth/google-sign-in-block";
 import { PasswordField } from "@/components/auth/password-field";
@@ -11,7 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics/sdk";
 import { register } from "@/lib/api/auth";
+import { SIGNUP_VALUE_BULLETS } from "@/lib/auth/copy";
+import { parseAuthError } from "@/lib/auth/parse-auth-error";
 import { motionPress } from "@/lib/design/motion";
+import { cn } from "@/lib/utils";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,11 +32,12 @@ export default function SignupPage() {
   return (
     <AuthFormShell
       title="Create account"
-      subtitle="Start applying with a private workspace."
+      subtitle="Your workspace is ready to use immediately — no inbox verification required."
+      bullets={SIGNUP_VALUE_BULLETS}
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="text-primary underline-offset-4 hover:underline">
+          <Link href="/login" className="font-medium text-primary underline underline-offset-4">
             Sign in
           </Link>
         </>
@@ -47,7 +52,9 @@ export default function SignupPage() {
           setError(null);
           void register(email, password, displayName || undefined)
             .then(() => router.push("/dashboard"))
-            .catch(() => setError("Could not create account. Try a different email."))
+            .catch((err: unknown) =>
+              setError(parseAuthError(err, "Could not create account. Try a different email.")),
+            )
             .finally(() => setPending(false));
         }}
       >
@@ -76,12 +83,8 @@ export default function SignupPage() {
           />
         </div>
         <PasswordField id="password" value={password} onChange={setPassword} autoComplete="new-password" />
-        {error ? (
-          <p className="text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        ) : null}
-        <Button type="submit" className={`${motionPress} w-full`} disabled={pending}>
+        {error ? <AuthFormError message={error} /> : null}
+        <Button type="submit" className={cn(motionPress, "w-full")} disabled={pending}>
           {pending ? "Creating…" : "Create account"}
         </Button>
       </form>

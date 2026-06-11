@@ -4,11 +4,17 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import { AuthEdgeState } from "@/components/auth/auth-edge-state";
+import { AuthFormError } from "@/components/auth/auth-form-error";
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
+import { PageLoading } from "@/components/states/page-states";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { resetPassword } from "@/lib/api/auth";
+import { RESET_TOKEN_MISSING } from "@/lib/auth/copy";
+import { parseAuthError } from "@/lib/auth/parse-auth-error";
 import { motionPress } from "@/lib/design/motion";
+import { cn } from "@/lib/utils";
 
 function ResetForm() {
   const searchParams = useSearchParams();
@@ -20,13 +26,12 @@ function ResetForm() {
 
   if (!token) {
     return (
-      <p className="text-sm text-destructive" role="alert">
-        Missing reset token. Request a new link from{" "}
-        <Link href="/forgot-password" className="underline">
-          forgot password
-        </Link>
-        .
-      </p>
+      <AuthEdgeState
+        title={RESET_TOKEN_MISSING.title}
+        description={RESET_TOKEN_MISSING.description}
+        actionHref="/forgot-password"
+        actionLabel="Request reset"
+      />
     );
   }
 
@@ -39,17 +44,15 @@ function ResetForm() {
         setError(null);
         void resetPassword(token, password)
           .then(() => router.push("/login"))
-          .catch(() => setError("Reset link expired or invalid."))
+          .catch((err: unknown) =>
+            setError(parseAuthError(err, "Reset link expired or invalid.")),
+          )
           .finally(() => setPending(false));
       }}
     >
       <PasswordField id="password" value={password} onChange={setPassword} label="New password" />
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
-      ) : null}
-      <Button type="submit" className={`${motionPress} w-full`} disabled={pending}>
+      {error ? <AuthFormError message={error} /> : null}
+      <Button type="submit" className={cn(motionPress, "w-full")} disabled={pending}>
         {pending ? "Updating…" : "Update password"}
       </Button>
     </form>
@@ -58,8 +61,16 @@ function ResetForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <AuthFormShell title="Choose a new password">
-      <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+    <AuthFormShell
+      title="Choose a new password"
+      subtitle="Use at least 10 characters with mixed case and a number."
+      footer={
+        <Link href="/login" className="font-medium text-primary underline underline-offset-4">
+          Back to sign in
+        </Link>
+      }
+    >
+      <Suspense fallback={<PageLoading label="Loading reset form…" />}>
         <ResetForm />
       </Suspense>
     </AuthFormShell>

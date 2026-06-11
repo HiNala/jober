@@ -4,13 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { AuthOAuthAlert } from "@/components/auth/auth-oauth-alert";
+import { AuthFormError } from "@/components/auth/auth-form-error";
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
+import { AuthOAuthAlert } from "@/components/auth/auth-oauth-alert";
 import { GoogleSignInBlock } from "@/components/auth/google-sign-in-block";
 import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { login } from "@/lib/api/auth";
+import { parseAuthError } from "@/lib/auth/parse-auth-error";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +30,7 @@ export default function LoginPage() {
       footer={
         <>
           No account?{" "}
-          <Link href="/signup" className="text-primary underline-offset-4 hover:underline">
+          <Link href="/signup" className="font-medium text-primary underline underline-offset-4">
             Create one
           </Link>
         </>
@@ -44,7 +46,9 @@ export default function LoginPage() {
           setError(null);
           void login(email, password)
             .then(() => router.push("/dashboard"))
-            .catch(() => setError("Invalid email or password."))
+            .catch((err: unknown) =>
+              setError(parseAuthError(err, "Invalid email or password.")),
+            )
             .finally(() => setPending(false));
         }}
       >
@@ -73,11 +77,7 @@ export default function LoginPage() {
             Forgot password?
           </Link>
         </div>
-        {error ? (
-          <p className="text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        ) : null}
+        {error ? <AuthFormError message={error} /> : null}
         <Button type="submit" className={cn(motionPress, "w-full")} disabled={pending}>
           {pending ? "Signing in…" : "Sign in"}
         </Button>
