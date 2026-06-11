@@ -147,3 +147,42 @@ Web: typecheck, lint:strict, test (62), e2e (15) green locally. Worker: ruff, my
 ### Deployment decision
 
 **Not deploying yet** — Mission 04 permits deploy when full gates + smoke pass; batching with next web deploy. Screenshot re-capture should follow deploy.
+
+---
+
+## Loop after Mission 05 — 2026-06-11
+
+### Re-verification (Mission 05 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| State inventory all compliant | **Green** — `05_states_inventory.md` |
+| Zero dev-only copy (`make seed` grep) | **Green** — `apps/web/src` clean |
+| Empty states have golden-path CTAs | **Green** — queue import, dashboard first-run, library/doc links |
+| Skeleton loading + error retry | **Green** — library skeletons; `AppRouteError` on all `(app)` routes touched |
+| Screenshots confirm changes | **Deferred** — PNG refresh post-deploy (UI-REVIEW row closed in prose) |
+
+### Improvements made (this loop)
+
+- None required — Mission 05 landed clean; gates green on first pass.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Re-capture screenshots `14–23` | Post-deploy (Missions 04 + 05) |
+| Sample data toggle on empty states | Mission 05 — no public seed API |
+| `runs/[id]` route-level `error.tsx` | Low priority — `RunConsole` has inline `PageError` |
+
+### Spot check (states)
+
+- `onboarding-copy.test.ts` asserts no `make seed` / `make up` in user-facing strings; queue empty copy names import action.
+- Re-ran e2e (15 passed) — no regressions from empty-state refactors.
+
+### Gate summary
+
+Web: typecheck, lint:strict, test (64), check:motion, e2e (15) green locally. Worker: ruff, pytest 22 passed. CI [27319174508](https://github.com/HiNala/jober/actions/runs/27319174508) **success** on Mission 05 push.
+
+### Deployment decision
+
+**Not deploying yet** — batch Missions 04 (consent sheet) + 05 (first-run onboarding) for one web deploy; then `railway-smoke.sh` + screenshot re-capture (`01-home`, `14-dashboard`, `15-queue`).
