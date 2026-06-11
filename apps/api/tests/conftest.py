@@ -102,7 +102,12 @@ def fixture_server_url() -> Generator[str, None, None]:
 
 
 @pytest_asyncio.fixture
-async def db_engine(database_url: str, vault_key: str, monkeypatch: pytest.MonkeyPatch):
+async def db_engine(
+    request: pytest.FixtureRequest,
+    database_url: str,
+    vault_key: str,
+    monkeypatch: pytest.MonkeyPatch,
+):
     monkeypatch.setattr(settings, "vault_encryption_key", vault_key)
     monkeypatch.setattr(settings, "auth_mode", "dev")
     engine = create_async_engine(
@@ -115,6 +120,8 @@ async def db_engine(database_url: str, vault_key: str, monkeypatch: pytest.Monke
     factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     monkeypatch.setattr("jober_api.db.session.async_session_factory", factory)
     monkeypatch.setattr("jober_api.auth.middleware.async_session_factory", factory)
+    if "truncate_tables" not in request.fixturenames:
+        await _seed_default_tenant(engine)
     yield engine
     await engine.dispose()
 
@@ -156,17 +163,6 @@ async def _seed_default_tenant(engine) -> None:
             )
         )
         await session.commit()
-
-
-@pytest_asyncio.fixture(autouse=True)
-async def seed_default_tenant(request: pytest.FixtureRequest) -> AsyncGenerator[None, None]:
-    if request.node.get_closest_marker("no_db") is not None:
-        yield
-        return
-    db_engine = request.getfixturevalue("db_engine")
-    if "truncate_tables" not in request.fixturenames:
-        await _seed_default_tenant(db_engine)
-    yield
 
 
 @pytest_asyncio.fixture(autouse=True)

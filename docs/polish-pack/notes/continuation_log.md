@@ -738,7 +738,8 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Improvements made (this loop)
 
 - `fix(api): pure ASGI correlation middleware [pack-31 after 18]` — replaces `BaseHTTPMiddleware` on correlation IDs (CI run 27357876037).
-- `fix(api): pure ASGI auth middleware [pack-31 after 18]` — `AuthMiddleware` also used `BaseHTTPMiddleware`; stacked middleware triggered pytest-asyncio `Runner.run()` errors on all async tests.
+- `fix(api): pure ASGI auth middleware [pack-31 after 18]` — `AuthMiddleware` also used `BaseHTTPMiddleware`; stacked middleware triggered pytest-asyncio `Runner.run()` errors on all async tests (CI run 27361588075 still red — root cause was conftest, not middleware).
+- `fix(test): seed tenant in db_engine fixture [pack-31 after 18]` — removed autouse `seed_default_tenant` that called `getfixturevalue("db_engine")` inside an async fixture (nested `Runner.run()` during setup).
 - `docs(architecture): note ASGI middleware choice in errors.md`.
 
 ### Deferrals
@@ -755,10 +756,10 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 ### Gate summary
 
-**CI blocker (fixed):** `BaseHTTPMiddleware` + pytest-asyncio event loop — 280 test collection/runtime errors on push `59f59fd`.
+**CI blocker (addressed):** Initial hypothesis was stacked `BaseHTTPMiddleware`; pure ASGI conversion did not clear CI. Actual root cause: `conftest.py` autouse `seed_default_tenant` nested `getfixturevalue("db_engine")` inside async fixture setup — 280 errors at `conftest.py:166`. Fixed by seeding inside `db_engine` when `truncate_tables` is not requested.
 
-**Local:** api ruff+mypy; web typecheck, mapper tests (6), e2e **71×2** — green after middleware fix.
+**Local:** api ruff+mypy; web typecheck, unit **108**, mapper tests (6) — green. Full api pytest / migrate-check deferred to CI (Docker engine 500 on host).
 
 ### Deployment decision
 
-**Deploy API + web together** — Mission 18 Production Guidance. **Hold until CI green** on `[pack-31 after 18]` push, then batch with Missions 04–18. Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.
+**Deploy API + web together** — Mission 18 Production Guidance. **Hold until CI green** on conftest fix push, then batch with Missions 04–18. Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.
