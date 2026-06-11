@@ -45,7 +45,7 @@
 | Analytics retention | `analytics_events` WHERE `tenant_id` + `ts` | `ix_analytics_events_tenant_ts` (mission 32) | `pg_indexes` test |
 | Batch preview | `batch_items` WHERE `batch_id` + `status` | `ix_batch_items_batch_status` (mission 32) | `pg_indexes` test |
 
-**Planner note:** On empty/small tables Postgres may prefer `ix_job_targets_status` over the composite index; `test_job_targets_tenant_status_uses_index_scan` seeds ~40 rows + `ANALYZE` and asserts index scan (composite or `tenant_id`) without seq scan.
+**Planner note:** On small tables Postgres may prefer `ix_job_targets_status` over the composite index; `test_job_targets_tenant_status_uses_index_scan` asserts any `job_targets` index scan (not seq scan). Composite presence is enforced by `test_hot_path_index_exists`.
 
 **Production deploy:** New indexes are plain `CREATE INDEX` (not `CONCURRENTLY`). Safe while row counts are low on Railway; re-evaluate `CONCURRENTLY` if `job_targets` > ~100k rows.
 
