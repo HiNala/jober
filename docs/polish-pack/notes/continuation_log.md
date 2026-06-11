@@ -126,6 +126,7 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 ### Improvements made (this loop)
 
 - Fixed drawer z-index so Accept/Decline buttons are clickable (removed erroneous `z-40` on content).
+- `fix(e2e): dismiss consent sheet in marketing smoke tests [pack-31 after 04]` — `e2e/helpers/consent.ts`; `a11y-marketing.spec.ts` + `golden-path-smoke.spec.ts` call `dismissAnalyticsConsent` after `goto` so fresh profiles do not block skip-link keyboard test.
 
 ### Deferrals
 
@@ -133,14 +134,15 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 |------|-------|
 | Re-capture `01-home.png` / `14-dashboard.png` without consent overlap | Post-deploy (Mission 04 doc requirement) |
 | Production deploy of consent UX | Batch with next deployable mission or owner approval |
+| Local `migrate-check` drift | Pre-existing local DB vs model indexes; CI uses fresh Postgres |
 
 ### Spot check (a11y)
 
-- Consent e2e: sheet exposes `dialog` role; Accept sets `jober_analytics_consent=1` cookie.
+- Re-ran full e2e (15 passed): consent sheet + skip-link keyboard coexist after dismiss helper; consent spec still asserts dialog + cookie on accept.
 
 ### Gate summary
 
-Web gates + consent e2e (2) + `test_analytics.py` (9) green locally pre-push.
+Web: typecheck, lint:strict, test (62), e2e (15) green locally. Worker: ruff, mypy, pytest 22 passed. API ruff + mypy green; full api pytest deferred to CI (local run slow). Mission 04 validation: `test_analytics.py` via CI.
 
 ### Deployment decision
 
