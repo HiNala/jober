@@ -39,7 +39,9 @@ Personal-mode Jober: one operator, self-hosted stack, assisted job applications.
 3. **Storage state** — Playwright cookies encrypted in MinIO per run; not shared across runs; excluded from git.
 4. **Policy gates** — CAPTCHA/login/2FA/sensitive fill require human checkpoints; injection fixtures in blocking CI.
 5. **Retention** — Purge run, cleanup filters, export-all metadata, delete-all with confirmation phrase.
-6. **Startup guard** — Production refuses boot with placeholder/missing `VAULT_ENCRYPTION_KEY` and `SECRET_KEY`.
+6. **Startup guard** — Production refuses boot with placeholder/missing `VAULT_ENCRYPTION_KEY` and `SECRET_KEY`; blocks `AUTH_MODE=dev`, `DEV_AUTH_BYPASS`, and `COOKIE_SECURE=false` (Mission 19/21).
+7. **Stripe webhooks** — `construct_stripe_event` verifies `Stripe-Signature` when `STRIPE_WEBHOOK_SECRET` is set.
+8. **Security headers** — API middleware + web Next config (Mission 21); see matrix in `docs/polish-pack/notes/21_security_matrix.md`.
 
 ## Encryption at rest (self-host)
 
@@ -57,6 +59,14 @@ We do **not** defend against:
 - **Malicious operator** — personal mode has no multi-tenant isolation.
 - **Determined ATS anti-bot** — pacing reduces load; we do not evade fraud detection.
 - **LLM provider breach** — prompts are redacted/truncated before audit storage; live calls still leave the trust boundary.
+
+## HTTP security headers (Mission 21)
+
+| Surface | Mechanism |
+|---------|-----------|
+| API | `SecurityHeadersMiddleware` — `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy` |
+| Web | Next.js `headers()` — same baseline + `Content-Security-Policy-Report-Only` (enforce after console is clean) |
+| Edge | HSTS and TLS termination on Railway |
 
 ## Session and CSRF (Mission 19)
 

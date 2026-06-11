@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Security (Mission 21)
+
+- API `SecurityHeadersMiddleware` (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)
+- Web report-only CSP and matching baseline headers in `next.config.ts`
+- Security regression probes in `tests/test_security_controls.py` (Stripe signature, presigned TTL, tenant library/resume gates)
+- Verification matrix: `docs/polish-pack/notes/21_security_matrix.md`
+
 ## [0.1.0] — 2026-06-10 — Launch
 
 First production-ready release of Jober: assisted job-application autopilot with human-in-the-loop review.
