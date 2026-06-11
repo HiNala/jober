@@ -3,11 +3,11 @@
 ## Task list
 - [x] Three-pane layout with draggable resize handles (`react-resizable-panels`)
 - [x] Collapsible left nav with sections, badges, keyboard toggle, persisted state
-- [x] Center command bar with Plan/Execute toggle and model selector (`GET /api/llm/config`)
+- [x] ~~Center command bar~~ → **Mission 09:** removed non-functional bar; ⌘K command palette + contextual page actions
 - [x] Right canvas with view-mode toggle, filmstrip, corner status badge
 - [x] Responsive: narrow widths → canvas drawer; nav auto-collapses
 - [x] Layout state persisted via `localStorage` (`useDefaultLayout` + `zustand/persist`)
-- [x] Keyboard: ⌘/Ctrl-B nav, ⌘/Ctrl-\\ canvas, ⌘/Ctrl-/ focus command bar; Shift-⌘/Ctrl-F focus mode
+- [x] Keyboard: ⌘/Ctrl-B nav, ⌘/Ctrl-K and ⌘/Ctrl-/ palette, ⌘/Ctrl-\\ canvas (ops-desk only); Shift-⌘/Ctrl-F focus mode
 - [x] Focus mode hides side panels for distraction-free center column
 
 ## Acceptance criteria

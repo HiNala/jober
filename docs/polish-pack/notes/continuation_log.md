@@ -320,3 +320,52 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — batch Missions 04–08 as one release. **Requires migration** `q9r0s1t32u63` before/at web deploy. After deploy: submit test email on `/pricing`, confirm `pro_waitlist_entries` row, run `railway-smoke.sh`, re-capture screenshots `01–06` and auth `11–13`.
+
+---
+
+## Loop after Mission 09 — 2026-06-10
+
+### Re-verification (Mission 09 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Split-pane only on `/runs/[id]`; editorial elsewhere | **Green** — `layoutModeForPath` + `layout.test.ts`; editorial shell hides canvas pane |
+| Bottom bar removed; ⌘K palette with nav + page actions | **Green** — `workspace-command-bar.tsx` deleted; palette has `APP_NAV`, queue import/export, run canvas/focus |
+| Keyboard shortcuts + layout prefs on ops-desk | **Green** — ⌘B nav, ⌘K/⌘/ palette, ⌘\ canvas + Shift-⌘F focus ops-desk-only; separate panel storage ids |
+| UI-REVIEW rows closed (prose) | **Green** — identical split + bottom bar struck; PNG refresh **deferred** post-deploy |
+| Design Council ≥18/20 | **Deferred** — post-deploy screenshot review |
+| README workspace section updated | **Green** |
+
+### Improvements made (this loop)
+
+- `feat(web): workspace layout discipline and command palette [pack-09]` — landed Mission 09 (19 files).
+- `docs(missions): mission 17 shell doc reflects palette [pack-31 after 09]` — stale command-bar checklist lines updated.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Screenshots `14–23` re-capture | Post-deploy (`capture-screenshots.mjs`) |
+| Design Council in-app scores | Operator review after deploy |
+| Per-page max-width/density tuning | Mission 10 (component tiering) |
+| Search page as ⌘K modal | Mission 10 / future UX |
+| Authenticated app axe (GP-009) | Mission 26 |
+
+### Spot check (states)
+
+- Rotated from chaos (Mission 08 loop) → **loading/error/empty state inventory** on `(app)` routes.
+- Confirmed `PageLoading` uses `role="status"` + `aria-live="polite"`; dedicated `loading.tsx` on dashboard, queue, discover, library, analytics, settings, vault, documents, search.
+- Queue retains inline `PageLoading` / `PageError` inside editorial center column (no canvas squeeze); palette `?import=1` opens import dialog without breaking error retry path.
+- `onboarding-copy.test.ts` green — empty-state copy unchanged by layout refactor.
+
+### Gate summary
+
+**Local (web, ×2 consecutive e2e):** typecheck, lint:strict, test **75**, build, check:motion, check:bundles **2461/2800 KB**, e2e **22+22** — all green.
+
+**Local (api/worker lint):** ruff + mypy — green (no DB).
+
+**Local blocker:** Docker Desktop engine 500 — `make migrate-check`, `pytest`, `test-fixtures`, `test-policy` not rerun on host; defer to CI (same class as Mission 08 loop).
+
+### Deployment decision
+
+**Deploy recommended** — batch **Missions 04–09** as one web release. Mission 09 is the largest structural UI change; deploy only after CI green on push. **Requires migration** `q9r0s1t32u63` (Mission 08 waitlist). After deploy: manual pass all `(app)` routes at 1440px, verify ⌘K on dashboard/queue/run, run `railway-smoke.sh`, re-capture screenshots `01–06`, `11–13`, and **`14–23`**.
