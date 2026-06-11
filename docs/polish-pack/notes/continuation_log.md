@@ -759,10 +759,10 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 ### Gate summary
 
-**CI progression:** 280 errors (`getfixturevalue` in autouse fixture) → 4 failures (`7ee082d`) → 2 failures (`1398911`: 404 isinstance + SSE loop) → pending final push.
+**CI progression:** 280 errors (`getfixturevalue` in autouse fixture) → 4 failures (`7ee082d`) → 2 failures (`1398911`) → **green** (`6676845`, run [27368885194](https://github.com/HiNala/jober/actions/runs/27368885194)): api **288** passed, web **71** e2e, policy/quarantine jobs ran.
 
-**Local:** api ruff+mypy; web typecheck, unit **108** — green. Full api pytest / migrate-check deferred to CI (Docker engine 500 on host).
+**Local:** api ruff+mypy; web typecheck, lint:strict, unit **108**, build, check:motion — green. `make migrate-check` / local api pytest deferred (Docker engine 500 on host); CI authoritative.
 
 ### Deployment decision
 
-**Deploy API + web together** — Mission 18 Production Guidance. **Hold until CI green**, then batch with Missions 04–18. Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.
+**Deploy API + web together** — Mission 18 Production Guidance. **Ready to batch** with Missions 04–18 (CI green on `6676845`). Post-deploy: stop MinIO → resume upload returns 503 with retry copy; restart MinIO → upload succeeds without API restart; `bash scripts/railway-smoke.sh`.
