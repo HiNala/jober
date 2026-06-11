@@ -96,7 +96,6 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 | Item | Owner |
 |------|-------|
 | Full manual UI golden path on prod (authenticated) | Mission 03 notes — automated + API probes sufficient for this mission |
-| CI confirmation on push | Watching post-push run |
 
 ### Spot check (chaos)
 
@@ -104,7 +103,7 @@ Full gate set per `docs/polish-pack/notes/gates.md` — all green locally and on
 
 ### Gate summary
 
-`test_golden_path_integration.py` + `test-fixtures` green locally; full `gates.md` deferred to post-push CI.
+`test_golden_path_integration.py` + `test-fixtures` green locally. CI [27316536462](https://github.com/HiNala/jober/actions/runs/27316536462) **success** on push (backend + policy + web).
 
 ### Deployment decision
 
