@@ -87,6 +87,15 @@ class Settings(BaseSettings):
     sentry_dsn: str = ""
     ops_alert_webhook_url: str = ""
     ops_alert_cooldown_seconds: int = 900
+    email_backend: str = "console"
+    email_from: str = "Jober <noreply@localhost>"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    email_resend_rate_limit_max: int = 3
+    email_resend_rate_limit_window_seconds: int = 3600
 
     @field_validator("database_url", mode="before")
     @classmethod

@@ -159,9 +159,11 @@ async def _seed_default_tenant(engine) -> None:
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def seed_default_tenant(
-    db_engine, request: pytest.FixtureRequest
-) -> AsyncGenerator[None, None]:
+async def seed_default_tenant(request: pytest.FixtureRequest) -> AsyncGenerator[None, None]:
+    if request.node.get_closest_marker("no_db") is not None:
+        yield
+        return
+    db_engine = request.getfixturevalue("db_engine")
     if "truncate_tables" not in request.fixturenames:
         await _seed_default_tenant(db_engine)
     yield

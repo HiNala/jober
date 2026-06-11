@@ -30,7 +30,20 @@ def register_secrets_for_redaction() -> None:
         settings.google_client_secret,
         settings.minio_access_key,
         settings.minio_secret_key,
+        settings.smtp_password,
     )
+
+
+def _warn_production_email() -> None:
+    from jober_api.services.email.sender import inbox_delivery_enabled
+
+    if not inbox_delivery_enabled():
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "EMAIL_BACKEND is not configured for inbox delivery — "
+            "verification and password reset emails will not reach users"
+        )
 
 
 def _validate_production_secrets() -> None:
@@ -59,6 +72,7 @@ def validate_startup_secrets() -> None:
         raise RuntimeError(msg)
     if settings.jober_env == "production":
         _validate_production_secrets()
+        _warn_production_email()
         return
     if os.getenv("CI") == "true":
         return

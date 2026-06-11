@@ -103,6 +103,7 @@ markers = [
     "policy: blocking safety invariant tests",
     "quarantine: flaky tests excluded from default CI",
     "load: lightweight concurrent load smoke tests",
+    "no_db: unit tests that skip database seeding",
 ]
 addopts = "-m 'not quarantine'"
 

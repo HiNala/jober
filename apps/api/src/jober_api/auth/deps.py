@@ -22,6 +22,7 @@ PUBLIC_API_PREFIXES = (
     "/api/auth/register",
     "/api/auth/login",
     "/api/auth/verify-email",
+    "/api/auth/email-delivery",
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
     "/api/auth/refresh",

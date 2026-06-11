@@ -113,7 +113,9 @@ railway environment production
 railway variables set LLM_API_KEY=sk-... LLM_PROVIDER=openai --service api
 ```
 
-Without `LLM_API_KEY`, the API uses the template LLM provider (stub responses). Sign up at `/signup`, then use the app; email verification tokens are created but outbound email is not configured yet.
+Without `LLM_API_KEY`, the API uses the template LLM provider (stub responses). Sign up at `/signup`, then use the app.
+
+**Email (Mission 11):** verification and password-reset emails dispatch via Celery (`jober_worker.tasks.send_transactional_email`). Set `EMAIL_BACKEND=console` locally (logs to API/worker output) or `EMAIL_BACKEND=smtp` with `SMTP_*` creds in production. Links use `WEB_APP_URL`. Resend is rate-limited; tokens expire (verify 24h, reset 1h).
 
 ## Where things live
 

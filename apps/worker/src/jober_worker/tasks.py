@@ -118,6 +118,22 @@ def analytics_daily_rollup(day: str | None = None) -> dict[str, object]:
         return result
 
 
+@celery_app.task(
+    name="jober_worker.tasks.send_transactional_email",
+    bind=True,
+    max_retries=3,
+    default_retry_delay=30,
+)
+def send_transactional_email(self: object, payload: dict[str, str]) -> dict[str, str]:
+    from jober_api.services.email.sender import deliver_email_payload
+
+    try:
+        deliver_email_payload(payload)
+    except Exception as exc:
+        raise self.retry(exc=exc) from exc  # type: ignore[attr-defined]
+    return {"status": "sent"}
+
+
 @celery_app.task(name="jober_worker.tasks.execute_batch_item", bind=True)
 def execute_batch_item(self: object, item_id: str) -> dict[str, object]:
     del self

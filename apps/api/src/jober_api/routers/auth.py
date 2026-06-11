@@ -13,7 +13,7 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.oauth.state_store import consume_oauth_state
 from jober_api.auth.oauth.types import OAuthIntent
 from jober_api.auth.permissions import Permission
-from jober_api.auth.rate_limit import check_rate_limit
+from jober_api.auth.rate_limit import check_rate_limit, check_resend_rate_limit
 from jober_api.auth.sessions import (
     create_session,
     list_active_sessions,
@@ -31,6 +31,7 @@ from jober_api.schemas.auth import (
     AuthUserResponse,
     ChangePasswordRequest,
     ConfirmOAuthLinkRequest,
+    EmailDeliveryResponse,
     ForgotPasswordRequest,
     IdentityListResponse,
     LoginRequest,
@@ -42,6 +43,8 @@ from jober_api.schemas.auth import (
 )
 from jober_api.services.auth import oauth_service
 from jober_api.services.auth import service as auth_service
+from jober_api.services.email import dispatch_password_reset_email, dispatch_verification_email
+from jober_api.services.email.sender import inbox_delivery_enabled
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -93,6 +96,7 @@ async def register(
     result = auth_service.user_to_response(user, tenant)
     if settings.jober_env == "development":
         response.headers["X-Jober-Verify-Token"] = verify_token
+    dispatch_verification_email(user.email, verify_token, user.display_name)
     return result
 
 
@@ -169,6 +173,14 @@ async def refresh(request: Request, response: Response) -> AuthMessageResponse:
     return AuthMessageResponse(message="Session refreshed")
 
 
+@router.get("/email-delivery", response_model=EmailDeliveryResponse)
+async def email_delivery() -> EmailDeliveryResponse:
+    return EmailDeliveryResponse(
+        inbox_delivery=inbox_delivery_enabled(),
+        backend=settings.email_backend.strip().lower(),
+    )
+
+
 @router.post("/verify-email", response_model=AuthUserResponse)
 async def verify_email(
     body: VerifyEmailRequest,
@@ -186,9 +198,39 @@ async def forgot_password(
     _: None = Depends(_require_rate_limit),
 ) -> AuthMessageResponse:
     raw = await auth_service.request_password_reset(session, body.email)
-    if raw and settings.jober_env == "development":
-        response.headers["X-Jober-Reset-Token"] = raw
+    if raw:
+        dispatch_password_reset_email(body.email.strip().lower(), raw)
+        if settings.jober_env == "development":
+            response.headers["X-Jober-Reset-Token"] = raw
     return AuthMessageResponse(message=auth_service.GENERIC_AUTH_MESSAGE)
+
+
+@requires(Permission.AUTHENTICATED)
+@router.post("/resend-verification", response_model=AuthMessageResponse)
+async def resend_verification(
+    request: Request,
+    response: Response,
+    session: AsyncSession = Depends(get_session),
+    _: None = Depends(_require_rate_limit),
+) -> AuthMessageResponse:
+    auth = require_auth(request)
+    email = auth.email.strip().lower()
+    if not await check_resend_rate_limit(f"verify:{email}"):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many resend attempts. Try again later.",
+        )
+    user = await session.get(User, auth.user_id)
+    raw = await auth_service.resend_verification_email(session, auth.user_id)
+    if raw:
+        dispatch_verification_email(email, raw, user.display_name if user else None)
+        if settings.jober_env == "development":
+            response.headers["X-Jober-Verify-Token"] = raw
+    if inbox_delivery_enabled():
+        return AuthMessageResponse(message="Verification email sent. Check your inbox.")
+    return AuthMessageResponse(
+        message="Verification is not available on this server — contact support if you need help.",
+    )
 
 
 @router.post("/reset-password", response_model=AuthMessageResponse)

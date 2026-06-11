@@ -4,6 +4,7 @@ from jober_api.auth.redis_client import get_redis
 from jober_api.config import settings
 
 RATE_PREFIX = "jober:auth:rate:"
+RESEND_PREFIX = "jober:auth:resend:"
 LOCKOUT_PREFIX = "jober:auth:lockout:"
 
 
@@ -38,3 +39,13 @@ async def is_locked_out(email: str) -> bool:
 async def clear_failed_logins(email: str) -> None:
     redis = get_redis()
     await redis.delete(f"{LOCKOUT_PREFIX}{email.strip().lower()}")
+
+
+async def check_resend_rate_limit(bucket: str) -> bool:
+    """Stricter pacing for verification / reset resend actions."""
+    redis = get_redis()
+    key = f"{RESEND_PREFIX}{bucket}"
+    count = await redis.incr(key)
+    if count == 1:
+        await redis.expire(key, settings.email_resend_rate_limit_window_seconds)
+    return count <= settings.email_resend_rate_limit_max

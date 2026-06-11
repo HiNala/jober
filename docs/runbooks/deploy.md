@@ -60,6 +60,29 @@ Attach per-service config: `infra/railway/*.railway.toml` in Railway Settings.
 
 Boot **fails** if production secrets are placeholders or `DEV_AUTH_BYPASS` is set.
 
+### Transactional email (Mission 11)
+
+Set on **API and worker** (worker sends the Celery task):
+
+| Variable | Production example |
+|----------|-------------------|
+| `EMAIL_BACKEND` | `smtp` |
+| `EMAIL_FROM` | `Jober <noreply@yourdomain.com>` |
+| `SMTP_HOST` | `smtp.resend.com` (or SendGrid/Mailgun SMTP) |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | provider SMTP username |
+| `SMTP_PASSWORD` | provider SMTP password |
+
+Railway allows outbound SMTP on port 587. Use a transactional provider — do not commit credentials.
+
+**Smoke after deploy:**
+
+1. Register a test user → inbox receives verify link → `/verify-email?token=…` completes.
+2. `/forgot-password` → inbox receives reset link → `/reset-password?token=…` completes.
+3. API logs show `email.sent` with redacted addresses (`LOG_MODE=redacted`).
+
+**Failure runbook:** if sends fail, set `EMAIL_BACKEND=console` temporarily, check worker logs, verify `SMTP_*` and `WEB_APP_URL`, then see `docs/polish-pack/notes/11_email_decision.md`.
+
 ## Domains
 
 ```bash

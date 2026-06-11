@@ -78,6 +78,28 @@ export function logout() {
   return authFetch<{ message: string }>("/api/auth/logout", { method: "POST" });
 }
 
+export type EmailDeliveryStatus = {
+  inbox_delivery: boolean;
+  backend: string;
+};
+
+export function fetchEmailDelivery() {
+  return authFetch<EmailDeliveryStatus>("/api/auth/email-delivery");
+}
+
+export function verifyEmail(token: string) {
+  return authFetch<AuthUser>("/api/auth/verify-email", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+}
+
+export function resendVerificationEmail() {
+  return authFetch<{ message: string }>("/api/auth/resend-verification", {
+    method: "POST",
+  });
+}
+
 export function forgotPassword(email: string) {
   return authFetch<{ message: string }>("/api/auth/forgot-password", {
     method: "POST",

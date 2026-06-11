@@ -136,6 +136,20 @@ async def verify_email_token(session: AsyncSession, raw_token: str) -> AuthUserR
     return user_to_response(user, tenant)
 
 
+async def resend_verification_email(session: AsyncSession, user_id: uuid.UUID) -> str | None:
+    user = await session.get(User, user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    if user.email_verified_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already verified",
+        )
+    raw = await _create_auth_token(session, user.id, AuthTokenType.EMAIL_VERIFY, hours=24)
+    await session.commit()
+    return raw
+
+
 async def request_password_reset(session: AsyncSession, email: str) -> str | None:
     normalized = email.strip().lower()
     stmt = select(User).where(User.email == normalized)

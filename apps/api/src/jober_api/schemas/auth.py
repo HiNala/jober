@@ -51,6 +51,11 @@ class AuthMessageResponse(BaseModel):
     message: str
 
 
+class EmailDeliveryResponse(BaseModel):
+    inbox_delivery: bool
+    backend: str
+
+
 class SessionListResponse(BaseModel):
     active_sessions: int
     session_ids: list[str]

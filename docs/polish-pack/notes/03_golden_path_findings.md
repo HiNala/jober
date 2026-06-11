@@ -9,7 +9,7 @@ Canonical journey (from `docs/MISSION_INDEX.md`): import workbook + resume → p
 | Segment | Local | Production | Evidence |
 |---------|-------|------------|----------|
 | Signup / account creation | **PASS** | **PASS** (register + session cookies) | `POST /api/auth/register` → `pending_verification`; prod login succeeds without verified email |
-| Email verification | **PASS** (dev `X-Jober-Verify-Token` header) | **FAIL** (no outbound email) | Token created server-side; no SMTP/Resend configured — user cannot complete verify flow via inbox |
+| Email verification | **PASS** (console/SMTP + dev header) | **Pending re-walk** | Mission 11: Celery + SMTP backend; configure Railway `EMAIL_*` and re-verify production inbox |
 | Import workbook (XLSX) | **PASS** (API/tests) | **NOT WALKED** | Covered by import tests; manual UI import not re-run this mission |
 | Profile / vault | **PASS** (fixtures seed profile) | **NOT WALKED** | `_seed_job` + profile repo in integration tests |
 | Queue visible | **PASS** (API) | **NOT WALKED** (auth required) | Job target CRUD in test suite |
@@ -79,8 +79,8 @@ CI reference: Mission 02 run [27315598137](https://github.com/HiNala/jober/actio
 
 | ID | Surface | Severity | Repro / evidence | Owner mission |
 |----|---------|----------|------------------|---------------|
-| GP-001 | Auth — email verification | **High** | Register on prod; no email arrives; `/verify` flow unusable | **11** (email delivery) |
-| GP-002 | Auth — password reset | **High** | `/forgot-password` UI exists; no outbound mail | **11** |
+| GP-001 | Auth — email verification | **High** (code landed) | Mission 11 shipped SMTP/console dispatch; production inbox walk pending operator | **11** (landed — verify post-deploy) |
+| GP-002 | Auth — password reset | **High** (code landed) | Reset email + `/reset-password?token=` wired; production inbox walk pending | **11** (landed — verify post-deploy) |
 | GP-003 | Test — golden path analytics rollup | **Low** (fixed) | `date.today()` local vs UTC event timestamps failed outside UTC CI; fixed in `test_golden_path_integration.py` | **03** (landed) |
 | GP-004 | Auth UX — verification not enforced | **Medium** | Users can log in and use app while `pending_verification`; misleading if UI promises verify-first | **06** (honest auth copy) |
 | GP-005 | Queue empty state | **Medium** | Production screenshot + `job-data-table.tsx` shows `make seed` dev copy | **05** |
@@ -96,4 +96,4 @@ CI reference: Mission 02 run [27315598137](https://github.com/HiNala/jober/actio
 - **Core fixture golden path (discover → fill → verify → review): PASS** locally and in CI.
 - **Production infra smoke: PASS.**
 - **Production LLM: OpenAI (live).**
-- **Largest product gap unchanged: outbound email (GP-001/002).**
+- **Outbound email implemented (Mission 11); production inbox verification pending operator (GP-001/002).**

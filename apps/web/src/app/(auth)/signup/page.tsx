@@ -11,8 +11,8 @@ import { PasswordField } from "@/components/auth/password-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics/sdk";
-import { register } from "@/lib/api/auth";
-import { SIGNUP_VALUE_BULLETS } from "@/lib/auth/copy";
+import { fetchEmailDelivery, register } from "@/lib/api/auth";
+import { SIGNUP_VALUE_BULLETS, signupSubtitle } from "@/lib/auth/copy";
 import { parseAuthError } from "@/lib/auth/parse-auth-error";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
@@ -24,15 +24,19 @@ export default function SignupPage() {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [inboxDelivery, setInboxDelivery] = useState(false);
 
   useEffect(() => {
     trackEvent("signup.start");
+    void fetchEmailDelivery()
+      .then((status) => setInboxDelivery(status.inbox_delivery))
+      .catch(() => setInboxDelivery(false));
   }, []);
 
   return (
     <AuthFormShell
       title="Create account"
-      subtitle="Your workspace is ready to use immediately — no inbox verification required."
+      subtitle={signupSubtitle(inboxDelivery)}
       bullets={SIGNUP_VALUE_BULLETS}
       footer={
         <>
@@ -51,7 +55,13 @@ export default function SignupPage() {
           setPending(true);
           setError(null);
           void register(email, password, displayName || undefined)
-            .then(() => router.push("/dashboard"))
+            .then((user) => {
+              if (inboxDelivery && !user.email_verified) {
+                router.push("/verify-pending");
+                return;
+              }
+              router.push("/dashboard");
+            })
             .catch((err: unknown) =>
               setError(parseAuthError(err, "Could not create account. Try a different email.")),
             )
