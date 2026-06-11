@@ -1,23 +1,20 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Download, Lock, RefreshCw, Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Check, Copy, Download, RefreshCw, Save, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import Link from "next/link";
 
+import { KeywordCoveragePanel } from "@/components/documents/keyword-coverage-panel";
+import { LlmBudgetExceeded } from "@/components/documents/llm-budget-exceeded";
+import { LlmProviderBanner } from "@/components/documents/llm-provider-banner";
+import { ParagraphControls } from "@/components/documents/paragraph-controls";
 import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
-import { surface } from "@/lib/design/tokens";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  DOCUMENTS_EMPTY_JOBS,
-  DOCUMENTS_ERROR_JOBS,
-} from "@/lib/states/onboarding-copy";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -28,27 +25,57 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   documentDownloadUrl,
+  duplicateCoverLetter,
   fetchJobsForStudio,
   fetchLetterOptions,
   generateCoverLetter,
   patchCoverLetter,
   type GeneratedDocumentRead,
 } from "@/lib/api/documents";
-import { formatApiError } from "@/lib/api/errors";
+import { formatApiError, isApiBudgetExceeded } from "@/lib/api/errors";
+import { fetchLlmConfig } from "@/lib/api/llm";
 import { fetchProfile } from "@/lib/api/vault";
+import { coverLetterDownloadFilename } from "@/lib/documents/download-filename";
+import { splitParagraphs } from "@/lib/documents/merge-paragraphs";
+import { motionShimmer, motionStatusEnter } from "@/lib/design/motion";
+import { surface } from "@/lib/design/tokens";
+import {
+  DOCUMENTS_EMPTY_JOBS,
+  DOCUMENTS_ERROR_JOBS,
+} from "@/lib/states/onboarding-copy";
+import { cn } from "@/lib/utils";
 
 export function DocumentStudio() {
   const [jobId, setJobId] = useState<string>("");
-  const [locked, setLocked] = useState(false);
   const [draft, setDraft] = useState<GeneratedDocumentRead | null>(null);
   const [letterText, setLetterText] = useState("");
   const [templateStyle, setTemplateStyle] = useState("classic");
   const [voicePreset, setVoicePreset] = useState("direct");
   const [lockedParagraphs, setLockedParagraphs] = useState<Set<number>>(new Set());
+  const [budgetError, setBudgetError] = useState<string | null>(null);
+  const [saveFlash, setSaveFlash] = useState(false);
+  const [regenIndex, setRegenIndex] = useState<number | null>(null);
 
   const jobsQuery = useQuery({ queryKey: ["job-targets"], queryFn: fetchJobsForStudio });
   const optionsQuery = useQuery({ queryKey: ["letter-options"], queryFn: fetchLetterOptions });
   const profileQuery = useQuery({ queryKey: ["profile"], queryFn: fetchProfile });
+  const llmQuery = useQuery({ queryKey: ["llm-config"], queryFn: fetchLlmConfig });
+
+  const paragraphs = splitParagraphs(letterText);
+
+  useEffect(() => {
+    if (!saveFlash) return;
+    const timer = setTimeout(() => setSaveFlash(false), 2000);
+    return () => clearTimeout(timer);
+  }, [saveFlash]);
+
+  function handleApiError(err: unknown, fallback: string) {
+    if (isApiBudgetExceeded(err)) {
+      setBudgetError(formatApiError(err, fallback));
+      return;
+    }
+    toast.error(formatApiError(err, fallback));
+  }
 
   const generateMutation = useMutation({
     mutationFn: ({ force }: { force: boolean }) =>
@@ -64,9 +91,10 @@ export function DocumentStudio() {
       setDraft(doc);
       setLetterText(doc.text);
       setLockedParagraphs(new Set(doc.locked_paragraphs ?? []));
+      setBudgetError(null);
       toast.success(doc.cached ? "Loaded cached letter" : "Cover letter generated");
     },
-    onError: (err: unknown) => toast.error(formatApiError(err, "Cover letter generation failed")),
+    onError: (err: unknown) => handleApiError(err, "Cover letter generation failed"),
   });
 
   const saveMutation = useMutation({
@@ -80,10 +108,50 @@ export function DocumentStudio() {
     onSuccess: (doc) => {
       setDraft(doc);
       setLetterText(doc.text);
+      setBudgetError(null);
+      setSaveFlash(true);
       toast.success("Saved — ATS score updated");
     },
-    onError: (err: unknown) => toast.error(formatApiError(err, "Could not save letter")),
+    onError: (err: unknown) => handleApiError(err, "Could not save letter"),
   });
+
+  const regenMutation = useMutation({
+    mutationFn: (paragraphIndex: number) => {
+      setRegenIndex(paragraphIndex);
+      return generateCoverLetter(jobId, {
+        force: true,
+        includeDocx: true,
+        templateStyle,
+        voicePreset,
+        seedText: letterText,
+        lockedParagraphs: [...lockedParagraphs],
+        regenerateParagraphIndex: paragraphIndex,
+      });
+    },
+    onSuccess: (doc) => {
+      setDraft(doc);
+      setLetterText(doc.text);
+      setLockedParagraphs(new Set(doc.locked_paragraphs ?? []));
+      setBudgetError(null);
+      toast.success("Paragraph regenerated");
+    },
+    onError: (err: unknown) => handleApiError(err, "Regeneration failed"),
+    onSettled: () => setRegenIndex(null),
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: () => duplicateCoverLetter(draft!.id, jobId),
+    onSuccess: (doc) => {
+      setDraft(doc);
+      setLetterText(doc.text);
+      setLockedParagraphs(new Set(doc.locked_paragraphs ?? []));
+      toast.success("Duplicated as a new version");
+    },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not duplicate")),
+  });
+
+  const isGenerating =
+    generateMutation.isPending || regenMutation.isPending || regenIndex !== null;
 
   const selectedJob = useMemo(
     () => jobsQuery.data?.find((j) => j.id === jobId),
@@ -92,8 +160,18 @@ export function DocumentStudio() {
 
   const hasResume = Boolean(profileQuery.data?.active_resume?.has_text);
   const wordCount = letterText.trim() ? letterText.trim().split(/\s+/).length : 0;
-
   const coverage = draft?.keyword_coverage;
+  const downloadCompany = selectedJob?.company ?? "company";
+  const downloadRole = selectedJob?.role ?? "role";
+
+  const toggleLock = (index: number) => {
+    setLockedParagraphs((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
 
   if (jobsQuery.isLoading) return <PageLoading label="Loading jobs…" />;
   if (jobsQuery.isError) {
@@ -141,20 +219,20 @@ export function DocumentStudio() {
               ))}
             </SelectContent>
           </Select>
-          {selectedJob && (
+          {selectedJob ? (
             <div className="space-y-1 text-xs text-muted-foreground">
               <p>Lane: {selectedJob.fit_lane ?? "—"}</p>
               <p className="line-clamp-2">Hook: {selectedJob.cover_letter_hook ?? "—"}</p>
             </div>
-          )}
+          ) : null}
           <div className="rounded-md border border-border/50 p-2 text-xs">
             <p className="font-medium">Canonical resume</p>
             <p className="text-muted-foreground">
               {profileQuery.data?.active_resume?.original_filename ?? "Upload in Vault"}
             </p>
-            {!hasResume && (
+            {!hasResume ? (
               <p className="mt-1 text-amber-600">Upload a resume in Vault before generating.</p>
-            )}
+            ) : null}
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             <Select value={templateStyle} onValueChange={(v) => setTemplateStyle(v ?? "classic")}>
@@ -185,7 +263,7 @@ export function DocumentStudio() {
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
-              disabled={!jobId || !hasResume || locked || generateMutation.isPending}
+              disabled={!jobId || !hasResume || isGenerating}
               onClick={() => generateMutation.mutate({ force: false })}
             >
               <Sparkles className="mr-2 size-4" aria-hidden />
@@ -194,115 +272,127 @@ export function DocumentStudio() {
             <Button
               size="sm"
               variant="outline"
-              disabled={!jobId || !hasResume || locked || generateMutation.isPending}
+              disabled={!jobId || !hasResume || isGenerating}
               onClick={() => generateMutation.mutate({ force: true })}
             >
               <RefreshCw className="mr-2 size-4" aria-hidden />
               Regenerate
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setLocked((v) => !v)}
-              aria-pressed={locked}
-            >
-              <Lock className="mr-2 size-4" aria-hidden />
-              {locked ? "Locked" : "Lock edits"}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={!draft || saveMutation.isPending}
-              onClick={() => saveMutation.mutate()}
-            >
-              Save edits
             </Button>
           </div>
         </CardContent>
       </Card>
 
       <div className="space-y-4">
-        {draft && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card className={surface.workspace}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">ATS score</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <Progress value={draft.ats_score} className="flex-1" />
-                  <span className="text-sm font-medium tabular-nums">{draft.ats_score}</span>
-                </div>
-                {coverage && coverage.stuffing_penalty > 0 && (
-                  <p className="text-xs text-amber-600">
-                    Stuffing penalty −{coverage.stuffing_penalty} (density {coverage.density})
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={surface.workspace}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Keyword coverage</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-wrap gap-1">
-                {coverage?.present.map((kw) => (
-                  <Badge key={kw} variant="secondary" className="font-normal">
-                    {kw}
-                  </Badge>
-                ))}
-                {coverage?.missing.map((kw) => (
-                  <Badge key={kw} variant="outline" className="font-normal text-muted-foreground">
-                    missing: {kw}
-                  </Badge>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <LlmProviderBanner provider={llmQuery.data?.provider} />
+        {budgetError ? (
+          <LlmBudgetExceeded message={budgetError} onDismiss={() => setBudgetError(null)} />
+        ) : null}
+
+        {draft ? (
+          <>
+            <div className="flex flex-wrap items-center gap-2">
+              {draft.template_style ? (
+                <Badge variant="secondary">{draft.template_style}</Badge>
+              ) : null}
+              {draft.voice_preset ? (
+                <Badge variant="outline">{draft.voice_preset.replace(/_/g, " ")}</Badge>
+              ) : null}
+              {draft.version ? (
+                <Badge variant="outline" className="tabular-nums">
+                  v{draft.version}
+                </Badge>
+              ) : null}
+            </div>
+            <KeywordCoveragePanel atsScore={draft.ats_score ?? 0} coverage={coverage} />
+          </>
+        ) : null}
 
         <Card className={surface.workspace}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-sm">Letter preview</CardTitle>
-              {letterText && (
+              {letterText ? (
                 <p className="text-xs text-muted-foreground tabular-nums">{wordCount} words</p>
-              )}
+              ) : null}
             </div>
-            {draft && (
-              <div className="flex gap-2">
-                <a
-                  href={documentDownloadUrl(draft.pdf_download_path)}
-                  download
-                  className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2.5 text-xs font-medium hover:bg-muted"
-                >
-                  <Download className="size-3.5" aria-hidden />
-                  PDF
-                </a>
-                {draft.docx_download_path && (
+            {draft ? (
+              <div className="flex flex-wrap gap-2">
+                {draft.pdf_download_path ? (
+                  <a
+                    href={documentDownloadUrl(draft.pdf_download_path)}
+                    download={coverLetterDownloadFilename(downloadCompany, downloadRole, "pdf")}
+                    className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2.5 text-xs font-medium hover:bg-muted"
+                  >
+                    <Download className="size-3.5" aria-hidden />
+                    PDF
+                  </a>
+                ) : null}
+                {draft.docx_download_path ? (
                   <a
                     href={documentDownloadUrl(draft.docx_download_path)}
-                    download
+                    download={coverLetterDownloadFilename(downloadCompany, downloadRole, "docx")}
                     className="inline-flex h-7 items-center rounded-md border border-border px-2.5 text-xs font-medium hover:bg-muted"
                   >
                     DOCX
                   </a>
-                )}
+                ) : null}
               </div>
-            )}
+            ) : null}
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <Textarea
               value={letterText}
               onChange={(e) => setLetterText(e.target.value)}
-              readOnly={locked}
               rows={16}
-              className="font-mono text-sm leading-relaxed"
+              className={cn(
+                "font-sans text-sm leading-relaxed",
+                isGenerating && motionShimmer,
+              )}
               placeholder="Select a job and generate a cover letter…"
+              aria-busy={isGenerating}
             />
+            {draft ? (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  disabled={saveMutation.isPending}
+                  onClick={() => saveMutation.mutate()}
+                >
+                  {saveFlash ? (
+                    <Check
+                      className={cn("mr-1.5 size-4 text-emerald-600", motionStatusEnter)}
+                      aria-hidden
+                    />
+                  ) : (
+                    <Save className="mr-1.5 size-4" aria-hidden />
+                  )}
+                  {saveMutation.isPending ? "Saving…" : saveFlash ? "Saved" : "Save edits"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={duplicateMutation.isPending}
+                  onClick={() => duplicateMutation.mutate()}
+                >
+                  <Copy className="mr-1.5 size-4" aria-hidden />
+                  Duplicate
+                </Button>
+              </div>
+            ) : null}
+            {draft && paragraphs.length > 0 ? (
+              <ParagraphControls
+                paragraphs={paragraphs}
+                lockedParagraphs={lockedParagraphs}
+                onToggleLock={toggleLock}
+                onRegenerate={(index) => regenMutation.mutate(index)}
+                regenPendingIndex={regenIndex}
+                disabled={isGenerating || !jobId}
+              />
+            ) : null}
           </CardContent>
         </Card>
 
-        {coverage?.explain && coverage.explain.length > 0 && (
+        {coverage?.explain && coverage.explain.length > 0 ? (
           <Card className={surface.workspace}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Explain this letter</CardTitle>
@@ -325,7 +415,7 @@ export function DocumentStudio() {
               ))}
             </CardContent>
           </Card>
-        )}
+        ) : null}
       </div>
     </div>
   );

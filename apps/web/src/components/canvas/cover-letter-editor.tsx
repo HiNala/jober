@@ -1,21 +1,30 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw, Save } from "lucide-react";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check, Copy, Save } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { KeywordCoveragePanel } from "@/components/documents/keyword-coverage-panel";
+import { LlmBudgetExceeded } from "@/components/documents/llm-budget-exceeded";
+import { LlmProviderBanner } from "@/components/documents/llm-provider-banner";
+import { ParagraphControls } from "@/components/documents/paragraph-controls";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import {
   documentDownloadUrl,
+  duplicateCoverLetter,
   generateCoverLetter,
   patchCoverLetter,
 } from "@/lib/api/documents";
-import { formatApiError } from "@/lib/api/errors";
+import { formatApiError, isApiBudgetExceeded } from "@/lib/api/errors";
+import { fetchLlmConfig } from "@/lib/api/llm";
+import { coverLetterDownloadFilename } from "@/lib/documents/download-filename";
+import { splitParagraphs } from "@/lib/documents/merge-paragraphs";
+import { motionShimmer, motionStatusEnter } from "@/lib/design/motion";
 import type { ReviewPackage } from "@/lib/api/verification";
+import { cn } from "@/lib/utils";
 
 type CoverLetter = NonNullable<ReviewPackage["cover_letter"]>;
 
@@ -23,19 +32,35 @@ export function CoverLetterEditor({
   cover,
   jobTargetId,
   runId,
+  company,
+  role,
 }: {
   cover: CoverLetter;
   jobTargetId: string;
   runId: string;
+  company?: string;
+  role?: string;
 }) {
   const queryClient = useQueryClient();
   const [letterText, setLetterText] = useState(cover.text);
   const [lockedParagraphs, setLockedParagraphs] = useState<Set<number>>(
     () => new Set(cover.locked_paragraphs ?? []),
   );
+  const [budgetError, setBudgetError] = useState<string | null>(null);
+  const [saveFlash, setSaveFlash] = useState(false);
+  const [regenIndex, setRegenIndex] = useState<number | null>(null);
 
-  const paragraphs = letterText.split("\n\n").filter((part) => part.trim());
+  const llmQuery = useQuery({ queryKey: ["llm-config"], queryFn: fetchLlmConfig });
+  const paragraphs = splitParagraphs(letterText);
   const coverage = cover.keyword_coverage;
+  const downloadCompany = company ?? "company";
+  const downloadRole = role ?? "role";
+
+  useEffect(() => {
+    if (!saveFlash) return;
+    const timer = setTimeout(() => setSaveFlash(false), 2000);
+    return () => clearTimeout(timer);
+  }, [saveFlash]);
 
   const saveMutation = useMutation({
     mutationFn: () =>
@@ -44,6 +69,7 @@ export function CoverLetterEditor({
         locked_paragraphs: [...lockedParagraphs],
       }),
     onSuccess: async () => {
+      setSaveFlash(true);
       toast.success("Letter saved — ATS score updated");
       await queryClient.invalidateQueries({ queryKey: ["review-package-run", runId] });
     },
@@ -51,8 +77,9 @@ export function CoverLetterEditor({
   });
 
   const regenMutation = useMutation({
-    mutationFn: (paragraphIndex: number) =>
-      generateCoverLetter(jobTargetId, {
+    mutationFn: (paragraphIndex: number) => {
+      setRegenIndex(paragraphIndex);
+      return generateCoverLetter(jobTargetId, {
         force: true,
         runId,
         seedText: letterText,
@@ -60,97 +87,111 @@ export function CoverLetterEditor({
         regenerateParagraphIndex: paragraphIndex,
         templateStyle: cover.template_style,
         voicePreset: cover.voice_preset,
-      }),
+      });
+    },
     onSuccess: async (doc) => {
       setLetterText(doc.text);
+      setLockedParagraphs(new Set(doc.locked_paragraphs ?? []));
+      setBudgetError(null);
       toast.success("Paragraph regenerated");
       await queryClient.invalidateQueries({ queryKey: ["review-package-run", runId] });
     },
-    onError: (err: unknown) => toast.error(formatApiError(err, "Regeneration failed")),
+    onError: (err: unknown) => {
+      if (isApiBudgetExceeded(err)) {
+        setBudgetError(formatApiError(err));
+        return;
+      }
+      toast.error(formatApiError(err, "Regeneration failed"));
+    },
+    onSettled: () => setRegenIndex(null),
   });
+
+  const duplicateMutation = useMutation({
+    mutationFn: () => duplicateCoverLetter(cover.id, jobTargetId),
+    onSuccess: () => toast.success("Duplicated as a new version"),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not duplicate")),
+  });
+
+  const toggleLock = (index: number) => {
+    setLockedParagraphs((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  const isGenerating = regenMutation.isPending;
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Progress value={cover.ats_score ?? 0} className="max-w-xs flex-1" />
-        <span className="text-sm font-medium tabular-nums">{cover.ats_score ?? 0}% ATS</span>
+      <LlmProviderBanner provider={llmQuery.data?.provider} />
+      {budgetError ? (
+        <LlmBudgetExceeded message={budgetError} onDismiss={() => setBudgetError(null)} />
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
         {cover.template_style ? <Badge variant="secondary">{cover.template_style}</Badge> : null}
         {cover.voice_preset ? (
           <Badge variant="outline">{cover.voice_preset.replace(/_/g, " ")}</Badge>
         ) : null}
-      </div>
-      <div className="flex flex-wrap gap-1">
-        {coverage?.present?.map((kw) => (
-          <Badge key={kw} variant="secondary" className="font-normal">
-            {kw}
+        {cover.version ? (
+          <Badge variant="outline" className="tabular-nums">
+            v{cover.version}
           </Badge>
-        ))}
-        {coverage?.missing?.map((kw) => (
-          <Badge key={kw} variant="outline" className="font-normal text-muted-foreground">
-            missing: {kw}
-          </Badge>
-        ))}
+        ) : null}
       </div>
+
+      <KeywordCoveragePanel atsScore={cover.ats_score ?? 0} coverage={coverage} />
+
       <Textarea
         value={letterText}
         onChange={(e) => setLetterText(e.target.value)}
         rows={14}
-        className="font-sans text-sm leading-relaxed"
+        className={cn(
+          "font-sans text-sm leading-relaxed",
+          isGenerating && motionShimmer,
+        )}
+        aria-busy={isGenerating}
       />
+
       <div className="flex flex-wrap gap-2">
         <Button size="sm" disabled={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
-          <Save className="mr-1.5 size-4" aria-hidden />
-          Save edits
+          {saveFlash ? (
+            <Check className={cn("mr-1.5 size-4 text-emerald-600", motionStatusEnter)} aria-hidden />
+          ) : (
+            <Save className="mr-1.5 size-4" aria-hidden />
+          )}
+          {saveMutation.isPending ? "Saving…" : saveFlash ? "Saved" : "Save edits"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={duplicateMutation.isPending}
+          onClick={() => duplicateMutation.mutate()}
+        >
+          <Copy className="mr-1.5 size-4" aria-hidden />
+          Duplicate
         </Button>
         {cover.pdf_download_path ? (
           <a
             href={documentDownloadUrl(cover.pdf_download_path)}
-            target="_blank"
-            rel="noreferrer"
+            download={coverLetterDownloadFilename(downloadCompany, downloadRole, "pdf")}
             className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-medium hover:bg-muted"
           >
-            Open PDF
+            Download PDF
           </a>
         ) : null}
       </div>
-      <div className="space-y-2 border-t border-border pt-3">
-        <p className="text-xs font-medium text-muted-foreground">Paragraph controls</p>
-        {paragraphs.map((para, index) => (
-          <div
-            key={index}
-            className="flex flex-wrap items-start justify-between gap-2 rounded-md border border-border/50 p-2"
-          >
-            <p className="line-clamp-2 flex-1 text-xs text-muted-foreground">{para}</p>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant={lockedParagraphs.has(index) ? "default" : "outline"}
-                onClick={() => {
-                  setLockedParagraphs((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(index)) next.delete(index);
-                    else next.add(index);
-                    return next;
-                  });
-                }}
-              >
-                {lockedParagraphs.has(index) ? "Locked" : "Lock"}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                disabled={lockedParagraphs.has(index) || regenMutation.isPending}
-                onClick={() => regenMutation.mutate(index)}
-              >
-                <RefreshCw className="mr-1 size-3.5" aria-hidden />
-                Regen
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+
+      <ParagraphControls
+        paragraphs={paragraphs}
+        lockedParagraphs={lockedParagraphs}
+        onToggleLock={toggleLock}
+        onRegenerate={(index) => regenMutation.mutate(index)}
+        regenPendingIndex={regenIndex}
+        disabled={isGenerating}
+      />
     </div>
   );
 }

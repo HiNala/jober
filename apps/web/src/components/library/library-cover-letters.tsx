@@ -2,15 +2,16 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, Lock, LockOpen } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import Link from "next/link";
-
+import { DocumentStudio } from "@/components/documents/document-studio";
 import { PageEmpty } from "@/components/states/page-states";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   coverLetterPdfUrl,
   duplicateLibraryCoverLetter,
@@ -20,7 +21,14 @@ import {
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
-export function LibraryCoverLetters() {
+const LETTER_VIEWS = [
+  { id: "saved", label: "Saved letters" },
+  { id: "studio", label: "Document Studio" },
+] as const;
+
+type LetterViewId = (typeof LETTER_VIEWS)[number]["id"];
+
+function SavedCoverLetters() {
   const [filter, setFilter] = useState("");
   const queryClient = useQueryClient();
   const lettersQuery = useQuery({
@@ -46,18 +54,18 @@ export function LibraryCoverLetters() {
   });
 
   return (
-    <section aria-labelledby="library-letters-heading" className="space-y-4">
+    <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h2 id="library-letters-heading" className="text-sm font-medium">
-          Cover letters
+          Saved letters
         </h2>
         {(lettersQuery.data?.length ?? 0) > 0 ? (
           <Input
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter by company or role…"
-            className="max-w-xs"
             aria-label="Filter cover letters"
+            className="max-w-xs"
           />
         ) : null}
       </div>
@@ -71,9 +79,9 @@ export function LibraryCoverLetters() {
       {!lettersQuery.isLoading && lettersQuery.data?.length === 0 ? (
         <PageEmpty
           title="Generate your first cover letter"
-          description="Pick a job in Document Studio, tailor the letter to the role, then find every version here."
+          description="Open Document Studio, pick a job, tailor the letter to the role, then find every version here."
           action={
-            <Link href="/documents" className={buttonVariants({ size: "sm" })}>
+            <Link href="/library?tab=letters&view=studio" className={buttonVariants({ size: "sm" })}>
               Open Document Studio
             </Link>
           }
@@ -141,6 +149,48 @@ export function LibraryCoverLetters() {
           </li>
         ))}
       </ul>
+    </>
+  );
+}
+
+export function LibraryCoverLetters() {
+  const params = useSearchParams();
+  const view = (params.get("view") as LetterViewId | null) ?? "saved";
+
+  return (
+    <section
+      aria-labelledby="library-letters-heading"
+      aria-label={view === "studio" ? "Document Studio" : "Cover letters"}
+      className="space-y-4"
+    >
+      <nav aria-label="Cover letter views" className="flex flex-wrap gap-2">
+        {LETTER_VIEWS.map((item) => (
+          <Link
+            key={item.id}
+            href={`/library?tab=letters&view=${item.id}`}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              view === item.id
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+            )}
+            aria-current={view === item.id ? "page" : undefined}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
+      {view === "studio" ? (
+        <>
+          <h2 id="library-letters-heading" className="sr-only">
+            Document Studio
+          </h2>
+          <DocumentStudio />
+        </>
+      ) : (
+        <SavedCoverLetters />
+      )}
     </section>
   );
 }

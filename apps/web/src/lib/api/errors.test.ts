@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ApiError } from "@/lib/api/client";
-import { formatApiError } from "@/lib/api/errors";
+import { formatApiError, isApiBudgetExceeded } from "@/lib/api/errors";
 
 describe("formatApiError", () => {
   it("uses pydantic field messages from 422 bodies", () => {
@@ -20,5 +20,16 @@ describe("formatApiError", () => {
 
   it("maps 402 budget errors", () => {
     expect(formatApiError(new ApiError("API 402", 402), "fallback")).toContain("budget");
+  });
+});
+
+describe("isApiBudgetExceeded", () => {
+  it("returns true for 402 ApiError", () => {
+    expect(isApiBudgetExceeded(new ApiError("API 402", 402))).toBe(true);
+  });
+
+  it("returns false for other errors", () => {
+    expect(isApiBudgetExceeded(new ApiError("API 422", 422))).toBe(false);
+    expect(isApiBudgetExceeded(new Error("nope"))).toBe(false);
   });
 });

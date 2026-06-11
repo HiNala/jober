@@ -8,3 +8,7 @@ export function formatApiError(err: unknown, fallback = "Something went wrong"):
   }
   return formatMappedErrors(mapApiErrors(err, fallback), fallback);
 }
+
+export function isApiBudgetExceeded(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 402;
+}

@@ -57,6 +57,8 @@ export function DocumentView() {
             cover={cover}
             jobTargetId={review!.job_target_id}
             runId={runId}
+            company={review?.company}
+            role={review?.role}
           />
         )}
       </div>

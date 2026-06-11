@@ -1,4 +1,5 @@
 import { ApiError, apiFetch } from "@/lib/api/client";
+import type { KeywordCoverage } from "@/lib/api/documents";
 
 export interface ReadinessCheck {
   check_id: string;
@@ -37,15 +38,11 @@ export interface ReviewPackage {
     id: string;
     text: string;
     ats_score: number | null;
-    keyword_coverage?: {
-      present?: string[];
-      missing?: string[];
-      template_style?: string;
-      voice_preset?: string;
-    };
+    keyword_coverage?: KeywordCoverage | null;
     template_style?: string;
     voice_preset?: string;
     locked_paragraphs?: number[];
+    version?: number;
     pdf_download_path?: string;
   } | null;
   checkpoint_id?: string | null;
