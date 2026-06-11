@@ -161,6 +161,8 @@ Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/
 
 **Workspace shell (Mission 09/17):** two in-app layout modes in `lib/workspace/layout.ts` — **ops-desk** (nav + work + resizable canvas) on `/runs/[id]` only; **editorial** (nav + full-width content) on dashboard, queue, discover, library, search, analytics, settings, and admin. Components live in `components/workspace/`. Layout prefs persist in `localStorage` (`jober-workspace-v1`). Shortcuts: ⌘/Ctrl-K and ⌘/Ctrl-/ (command palette), ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas on ops-desk routes).
 
+**Component surfaces (Mission 10):** three families in `lib/design/surface-variants.ts` — **marketing** (bento/funnel), **workspace** (data panels), **terminal** (run stream/live view). Use `<Surface family="…">` or `surface.*` tokens; reference at `/kitchen-sink` (dev-only, robots-disallowed).
+
 **Live canvas (Mission 18):** on `/runs/[id]`, the right canvas streams screenshots via SSE, shows artifact grid/layers, document and fill-diff views, and a combined review-and-submit surface. Components live in `components/canvas/`.
 
 ## Profile vault (Mission 04)

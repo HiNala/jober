@@ -23,12 +23,12 @@ Source: `lib/design/surface-variants.ts`, `components/ui/surface.tsx`, `lib/desi
 | `components/analytics/` | `surface.card` → `surface.workspace` | **Done** |
 | `components/dashboard/` | `surface.card` → `surface.workspace` | **Done** |
 | `components/discover/` | `surface.card` → `surface.workspace` | **Done** |
-| `components/documents/` | (no surface.card) | **N/A** |
-| `components/import/` | (no surface.card) | **N/A** |
+| `components/documents/` | Bare `Card` → `surface.workspace` (Mission 31) | **Done** |
+| `components/import/` | Bare `Card` → `surface.workspace` (Mission 31) | **Done** |
 | `components/jobs/` | `surface.card` → `surface.workspace` | **Done** |
 | `components/library/` | `surface.card` → `surface.workspace` | **Done** |
 | `components/settings/` | Consolidated 4 sections → `SettingsSection`; workspace surfaces | **Done** |
-| `components/vault/` | (no surface.card) | **N/A** |
+| `components/vault/` | Bare `Card` → `surface.workspace` (Mission 31) | **Done** |
 | `components/workspace/` | (layout only, Mission 09) | **N/A** |
 | `app/blog/` | `surface.marketing` | **Done** |
 | `app/kitchen-sink/` | Three-family reference page | **Done** |

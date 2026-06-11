@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { FileUpload } from "@/components/import/file-upload";
+import { surface } from "@/lib/design/tokens";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +71,7 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
       )}
 
       {step === "preview" && preview && file && (
-        <Card className="border-border/60">
+        <Card className={surface.workspace}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Mapping preview</CardTitle>
             <p className="text-sm text-muted-foreground">{file.name}</p>
@@ -118,7 +119,7 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
       )}
 
       {step === "done" && result && (
-        <Card className="border-border/60">
+        <Card className={surface.workspace}>
           <CardHeader className="flex flex-row items-center gap-2 pb-2">
             <CheckCircle2 className="size-5 text-emerald-500" aria-hidden />
             <CardTitle className="text-base">Import complete</CardTitle>

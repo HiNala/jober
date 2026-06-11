@@ -369,3 +369,53 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — batch **Missions 04–09** as one web release. Mission 09 is the largest structural UI change; deploy only after CI green on push. **Requires migration** `q9r0s1t32u63` (Mission 08 waitlist). After deploy: manual pass all `(app)` routes at 1440px, verify ⌘K on dashboard/queue/run, run `railway-smoke.sh`, re-capture screenshots `01–06`, `11–13`, and **`14–23`**.
+
+---
+
+## Loop after Mission 10 — 2026-06-10
+
+### Re-verification (Mission 10 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Three families in code + `design-tokens.md` | **Green** — `surface-variants.ts`, `Surface`, `tokens.ts` |
+| Migration table complete; duplicates consolidated | **Green** — sweep doc; `SettingsSection` added; vault/import/documents aligned this loop |
+| No raw hex outside token layer | **Green** — grep clean in `components/`; `no-raw-color-literal` eslint rule |
+| `/kitchen-sink` reference + production-hidden | **Green** — three-family page; `robots` disallow; sitemap test |
+| All gates green | **Green** — see below |
+
+### Improvements made (this loop)
+
+- `fix(web): workspace surface on vault import documents [pack-31 after 10]` — `profile-vault`, `import-wizard`, `document-studio` bare `Card` → `surface.workspace`.
+- README — Mission 10 surface families paragraph.
+- `10_component_sweep.md` — vault/import/documents rows closed.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Screenshots `01–23` re-capture | Post-deploy batch (Missions 04–10) |
+| Design Council scores | Operator review after deploy |
+| `Card` + `surface.workspace` double-wrap in admin/analytics | Mission 22 |
+| `design-review.md` stale `surface.card` references | Mission 29 docs pass |
+| Authenticated app axe (GP-009) | Mission 26 |
+| Search as ⌘K modal | Future UX |
+
+### Spot check (a11y)
+
+- Rotated from states (Mission 09 loop) → **marketing + auth axe via full e2e** (22 specs incl. axe per marketing route, skip-link keyboard, reduced-motion hero, auth axe/keyboard).
+- `SettingsSection` preserves `h2` + `aria-labelledby`; `Surface` exposes `data-surface-family` for debugging only (no axe impact).
+
+### Gate summary
+
+**CI:** [27326577218](https://github.com/HiNala/jober/actions/runs/27326577218) **success** (Mission 10 — api pytest, policy, web e2e).
+
+**Local (web, ×2 consecutive e2e):** typecheck, lint:strict, test **79**, build, check:motion, check:bundles **2437/2800 KB**, e2e **22+22** — all green.
+
+**Local (api/worker):** ruff + mypy — green (no DB).
+
+**Local blocker:** Docker not rerun — `make migrate-check` / pytest deferred to CI (unchanged).
+
+### Deployment decision
+
+**Deploy recommended** — batch **Missions 04–10** as one web release after CI green. Includes Mission 08 migration `q9r0s1t32u63`. Mission 09 (layout) + Mission 10 (surfaces) are visually wide but behaviorally inert. After deploy: `railway-smoke.sh`, manual all-routes pass, re-capture all **23** screenshots.

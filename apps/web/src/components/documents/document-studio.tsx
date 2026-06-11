@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 
 import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
+import { surface } from "@/lib/design/tokens";
 import { buttonVariants } from "@/components/ui/button";
 import {
   DOCUMENTS_EMPTY_JOBS,
@@ -123,7 +124,7 @@ export function DocumentStudio() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-      <Card className="border-border/60">
+      <Card className={surface.workspace}>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">Job + resume</CardTitle>
         </CardHeader>
@@ -223,7 +224,7 @@ export function DocumentStudio() {
       <div className="space-y-4">
         {draft && (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Card className="border-border/60">
+            <Card className={surface.workspace}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">ATS score</CardTitle>
               </CardHeader>
@@ -239,7 +240,7 @@ export function DocumentStudio() {
                 )}
               </CardContent>
             </Card>
-            <Card className="border-border/60">
+            <Card className={surface.workspace}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm">Keyword coverage</CardTitle>
               </CardHeader>
@@ -259,7 +260,7 @@ export function DocumentStudio() {
           </div>
         )}
 
-        <Card className="border-border/60">
+        <Card className={surface.workspace}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-sm">Letter preview</CardTitle>
@@ -302,7 +303,7 @@ export function DocumentStudio() {
         </Card>
 
         {coverage?.explain && coverage.explain.length > 0 && (
-          <Card className="border-border/60">
+          <Card className={surface.workspace}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Explain this letter</CardTitle>
             </CardHeader>

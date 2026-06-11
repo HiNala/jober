@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { surface } from "@/lib/design/tokens";
 import {
   fetchCommonAnswers,
   fetchProfile,
@@ -232,7 +233,7 @@ export function ProfileVault() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-border/60">
+      <Card className={surface.workspace}>
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Profile completeness</CardTitle>
         </CardHeader>
