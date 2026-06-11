@@ -4,7 +4,7 @@
 Build-mission 34 added ops metrics, webhook alerts, structured logs, and an optional Sentry hook. This mission verifies the whole observability chain actually fires end-to-end in production — metrics are truthful, alerts arrive, logs are queryable and redacted, dashboards reflect reality — and closes instrumentation gaps found by earlier missions.
 
 ## Context From Audits
-Application audit §6/§18: `/admin/overview` shows LLM budget, run success rate, Celery backlog, circuit-breaker attention; `OPS_ALERT_WEBHOOK_URL` + `POST /api/admin/ops/test-alert`; `scripts/uptime-check.sh`; Sentry via importlib (commits `0831dbf`, `8ebc152`); structured logging with `LOG_MODE` redaction. New surfaces since M34: email sending (Mission 11), error envelope + correlation ids (Mission 18).
+Application audit §6/§18: `/admin/overview` shows LLM budget, run success rate, Celery backlog, circuit-breaker attention; `OPS_ALERT_WEBHOOK_URL` + `POST /api/admin/ops/test-alert`; `scripts/uptime-check.sh`; Sentry via importlib (commits `0831dbf`, `8ebc152`); structured logging with `LOG_MODE` redaction. New surfaces since M34: email sending (Mission 11), error envelope + correlation ids (Mission 18). **Mission 15** defers `/runs/[id]` and `/admin` screenshot capture into `docs/screenshots/` when a seeded fixture run is available — include admin overview in the capture pass if an admin account exists.
 
 ## Scope
 - **Truth audit of `/admin/overview`:** each metric traced to its source query and spot-verified against raw data (run success rate, backlog depth, LLM spend vs `LlmCall`).

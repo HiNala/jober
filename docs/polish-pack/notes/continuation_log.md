@@ -595,3 +595,45 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — Mission 14 is layout/CSS only. Smoke on real phone: `/`, `/signup`, nav drawer, dashboard Search icon, run console tabs at tablet width. Batch with Missions 09–13 web polish. Not deploying from this host — push to CI and run `scripts/railway-smoke.sh` after deploy.
+
+---
+
+## Loop after Mission 15 — 2026-06-10
+
+### Re-verification (Mission 15 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Every chaos condition recorded (no lost events, reconnect state, conflicts) | **Green** — `15_console_chaos.md` (automated + code-path evidence) |
+| 500+ event run stays responsive | **Green** — `prune-events.test.ts`, `MAX_STREAM_EVENTS=500` |
+| All run end states render designed summaries | **Green** — `run-end-state-summary.tsx` |
+| SSE survives idle (heartbeat) | **Green** — `test_sse_emits_heartbeat_when_idle`; 15s in production |
+| Resume-from-seq + resolve idempotency tests; gates green | **Green** — 3 new API tests; web vitest + e2e |
+
+### Improvements made (this loop)
+
+- `feat(web): run console SSE reconnect and checkpoint hardening [pack-15]` — landed Mission 15 (15 files).
+- `fix(web): review canvas checkpoint conflict sync [pack-31 after 15]` — `review-canvas-view.tsx` mirrors `checkpoint-card` 422 “already resolved” → `reconnect()`.
+- `docs(missions): assign Mission 15 e2e/screenshot deferrals [pack-31 after 15]` — Mission 26 (checkpoint resolve + SSE e2e), Mission 24 (run/admin screenshots).
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| `/runs/[id]` screenshots (active, checkpoint, end state) | Mission 24 / 26 capture pass with seeded fixture run |
+| Staging chaos re-verify (kill API, Slow 3G, two-tab) | Post-deploy — `railway-smoke.sh` + manual |
+| `make migrate-check`, api/worker pytest, fixtures, policy | CI — Docker Desktop unavailable locally |
+
+### Spot check (chaos)
+
+- Rotated from a11y (Mission 14 loop) → **run console chaos checklist**: re-mapped each row in `15_console_chaos.md` to test or code evidence; 17/17 **Pass** or **Pass (code)** with staging manual called out in follow-ups.
+
+### Gate summary
+
+**Local:** api ruff+mypy; worker ruff+mypy; web typecheck, lint:strict, test **102**, build, check:motion, check:bundles (**2508**/2800 KB), e2e **66×2** — all green.
+
+**Local blocker:** Docker engine unavailable — `make migrate-check`, `pytest`, `test-fixtures`, `test-policy` not rerun on host; CI authoritative.
+
+### Deployment decision
+
+**Deploy recommended** — Mission 15 hardens the signature surface (SSE reconnect contract, checkpoint idempotency). **Deploy API and web together** (SSE + resolve semantics). After deploy: verify a real run stream ≥5 min idle, resolve a checkpoint once, run `bash scripts/railway-smoke.sh`, capture `/runs/[id]` screenshots when fixture run available.

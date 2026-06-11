@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useRunCanvas } from "@/contexts/run-canvas-context";
+import { ApiError } from "@/lib/api/client";
 import { formatApiError } from "@/lib/api/errors";
 import { resolveRunCheckpoint } from "@/lib/api/run-console";
 import {
@@ -70,7 +71,18 @@ export function ReviewCanvasView() {
       toast.message("Checkpoint resolved");
       void runCanvas?.reconnect();
     },
-    onError: (err: unknown) => toast.error(formatApiError(err)),
+    onError: (err: unknown) => {
+      if (
+        err instanceof ApiError &&
+        err.status === 422 &&
+        (err.body ?? "").toLowerCase().includes("already resolved")
+      ) {
+        toast.message("Checkpoint already resolved — syncing console");
+        void runCanvas?.reconnect();
+        return;
+      }
+      toast.error(formatApiError(err));
+    },
   });
 
   if (!runId) {
