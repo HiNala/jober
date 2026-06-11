@@ -1,7 +1,7 @@
 # Mission 26: End-to-End Validation Expansion
 
 ## Purpose
-Two Playwright specs (`a11y-marketing`, `golden-path-smoke`) plus the additions from Missions 04/13/14 still leave the deepest product flows e2e-untested: full import→submit against fixtures, recovery/checkpoint paths, document studio cycles, settings/policy changes taking effect. This mission builds the e2e suite that lets every future change be trusted without a manual walkthrough.
+Two Playwright specs (`a11y-marketing`, `golden-path-smoke`) plus the additions from Missions 04/13/14 still leave the deepest product flows e2e-untested: full import→submit against fixtures, recovery/checkpoint paths, document studio cycles, settings/policy changes taking effect. Mission 13 defers the **keyboard-only golden path** (import → batch → run console → checkpoint → submit) here — axe + palette/tab keyboard specs exist in `a11y-app.spec.ts` but not the full fixture journey. This mission builds the e2e suite that lets every future change be trusted without a manual walkthrough.
 
 ## Context From Audits
 Application audit §15 gap: "no e2e of authenticated app flows (login → import → batch → run console)". Infrastructure available: fixture ATS server (`make fixture-serve`), dev-auth bypass for frictionless sessions, Playwright config (`apps/web/playwright.config.ts`), CI services already run Postgres/Redis/MinIO.

@@ -515,3 +515,44 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — Mission 12 is contract-neutral UX improvement. Safe to batch with Missions 09–11 web releases. Smoke: auth signup validation, file upload rejection (wrong type), settings vault save toast on error.
+
+---
+
+## Loop after Mission 13 — 2026-06-11
+
+### Re-verification (Mission 13 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Axe e2e on marketing + core app routes; zero unwaived serious/critical | **Green** — `a11y-marketing`, `a11y-auth`, `a11y-app` (12 route scans + open-palette axe + keyboard + consent); waivers in `13_a11y_waivers.md` |
+| Golden path keyboard-operable; focus visible/restored | **Partial (deferred)** — palette Escape + analytics tabs covered in e2e; full import→submit keyboard path → Mission 26 |
+| Charts text alternatives; run-console announcements without spam | **Green** — `ChartAccessibleFigure`; `RunStreamAnnouncer` wired in `run-console.tsx`; log is `role="log"` only |
+| Contrast fixes token-level and documented | **Green** — `--muted-foreground` in `globals.css`; waiver documents token validation |
+| All gates green | **Green (scoped)** — see below |
+
+### Improvements made (this loop)
+
+- `fix(web): command palette separator aria + open-palette axe e2e [pack-31 after 13]` — seam sweep found critical `aria-required-children` when palette open (cmdk `role="separator"` inside `listbox`); `CommandSeparator` now decorative (`role="none"`); added `axe clean: command palette when open` to `a11y-app.spec.ts`.
+- `docs(pack): assign keyboard golden path to Mission 26 [pack-31 after 13]` — explicit deferral in `26_e2e_validation_expansion.md` Context.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Full keyboard golden path (import → checkpoint → submit) | Mission 26 |
+| NVDA spot-check on `/queue` and `/runs/[id]` with fixture data | Manual / Mission 26 |
+| `make migrate-check`, api/worker pytest, fixtures, policy | CI — Docker Desktop unavailable locally (500 on engine API) |
+
+### Spot check (states)
+
+- Rotated from docs (Mission 12 loop) → **route states**: verified `/queue` uses `PageLoading` / `PageError` / table content via `loading.tsx` + query branches; `/runs/[id]` uses `RunConsoleSkeleton` + `PageError` in `run-console.tsx`. E2e axe on both routes green without API (chrome + skeleton/error paths).
+
+### Gate summary
+
+**Local:** api ruff+mypy; worker ruff+mypy; web typecheck, lint:strict, test **94**, build, check:motion, check:bundles (**2489**/2800 KB), e2e **38×2** — all green.
+
+**CI (expected):** full gate set including migrate-check + pytest per `.github/workflows/ci.yml`.
+
+### Deployment decision
+
+**Deploy recommended** — Mission 13 is low-risk accessibility improvement (palette crash fix, chart alts, live-region tuning). Batch with prior web polish (Missions 09–12). Smoke after deploy: open command palette (⌘K), analytics page tabs, queue import dialog. Not deploying from this host — push to CI and deploy via runbook when ready.
