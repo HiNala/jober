@@ -205,6 +205,101 @@ async def test_passwords_stored_as_argon2_hash(db_session, truncate_tables, monk
         app.dependency_overrides.clear()
 
 
+@pytest.mark.asyncio
+async def test_logout_invalidates_session_server_side(
+    db_session, truncate_tables, monkeypatch
+) -> None:
+    from jober_api.auth.sessions import load_session
+    from jober_api.db import session as db_session_module
+
+    monkeypatch.setattr(settings, "auth_mode", "native")
+    monkeypatch.setattr(settings, "jober_env", "development")
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    transport = ASGITransport(app=app)
+    try:
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            reg = await client.post(
+                "/api/auth/register",
+                json={
+                    "email": "logout-invalidate@example.com",
+                    "password": "Str0ng!Passw0rd",
+                    "display_name": "Logout Test",
+                },
+            )
+            assert reg.status_code == 200
+            cookies = reg.cookies
+            session_id = cookies.get(settings.session_cookie_name)
+            assert session_id
+            assert await load_session(session_id) is not None
+
+            csrf = cookies.get(settings.csrf_cookie_name, "")
+            logout = await client.post(
+                "/api/auth/logout",
+                cookies=cookies,
+                headers={"X-CSRF-Token": csrf},
+            )
+            assert logout.status_code == 200
+            assert await load_session(session_id) is None
+
+            me = await client.get("/api/auth/me", cookies=cookies)
+            assert me.status_code == 401
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_password_change_revokes_other_sessions(
+    db_session, truncate_tables, monkeypatch
+) -> None:
+    from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
+    from jober_api.auth.password import hash_password
+    from jober_api.auth.sessions import create_session, load_session
+    from jober_api.db import session as db_session_module
+    from jober_api.models.user import User
+
+    monkeypatch.setattr(settings, "auth_mode", "native")
+
+    user_id = DEFAULT_DEV_USER_ID
+    user = await db_session.get(User, user_id)
+    assert user is not None
+    user.password_hash = hash_password("Str0ng!Passw0rd")
+    await db_session.commit()
+
+    session_a, refresh_a, csrf_a = await create_session(user_id, DEFAULT_DEV_TENANT_ID)
+    session_b, refresh_b, csrf_b = await create_session(user_id, DEFAULT_DEV_TENANT_ID)
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    transport = ASGITransport(app=app)
+    cookies_a = {
+        settings.session_cookie_name: session_a,
+        settings.refresh_cookie_name: refresh_a,
+        settings.csrf_cookie_name: csrf_a,
+    }
+    try:
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            changed = await client.post(
+                "/api/auth/change-password",
+                cookies=cookies_a,
+                headers={"X-CSRF-Token": csrf_a},
+                json={
+                    "current_password": "Str0ng!Passw0rd",
+                    "new_password": "N3wStr0ng!Passw0rd",
+                },
+            )
+            assert changed.status_code == 200
+        assert await load_session(session_a) is not None
+        assert await load_session(session_b) is None
+    finally:
+        app.dependency_overrides.clear()
+
+
 def test_dev_auth_bypass_forbidden_in_production(monkeypatch) -> None:
     monkeypatch.setattr(settings, "jober_env", "production")
     monkeypatch.setattr(settings, "dev_auth_bypass", True)

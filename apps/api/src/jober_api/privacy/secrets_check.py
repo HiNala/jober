@@ -53,6 +53,12 @@ def _validate_production_secrets() -> None:
     if settings.dev_auth_bypass:
         msg = "DEV_AUTH_BYPASS must be disabled in production"
         raise RuntimeError(msg)
+    if not settings.cookie_secure:
+        msg = (
+            "COOKIE_SECURE must be true in production "
+            "(required with SameSite=None cross-origin cookies)"
+        )
+        raise RuntimeError(msg)
     for name, value in (
         ("VAULT_ENCRYPTION_KEY", settings.vault_encryption_key),
         ("SECRET_KEY", settings.secret_key),

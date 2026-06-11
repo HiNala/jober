@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.password import hash_password, password_needs_rehash, verify_password
 from jober_api.auth.rate_limit import clear_failed_logins, is_locked_out, record_failed_login
+from jober_api.auth.sessions import revoke_all_sessions
 from jober_api.auth.token_hash import generate_opaque_token, hash_opaque_token
 from jober_api.config import settings
 from jober_api.models.auth_token import AuthToken
@@ -167,6 +168,7 @@ async def reset_password(session: AsyncSession, raw_token: str, new_password: st
     if user.status == UserStatus.LOCKED:
         user.status = UserStatus.ACTIVE
     await clear_failed_logins(user.email)
+    await revoke_all_sessions(user.id)
     await session.commit()
 
 

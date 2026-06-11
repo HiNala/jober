@@ -7,7 +7,6 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.cookies import clear_auth_cookies, set_auth_cookies
-from jober_api.auth.csrf import verify_csrf
 from jober_api.auth.enforcement import requires
 from jober_api.auth.middleware import require_auth
 from jober_api.auth.oauth.state_store import consume_oauth_state
@@ -20,6 +19,7 @@ from jober_api.auth.sessions import (
     load_session,
     refresh_session,
     revoke_all_sessions,
+    revoke_other_sessions,
     revoke_session,
 )
 from jober_api.config import settings
@@ -124,7 +124,6 @@ async def login(
 async def logout(request: Request, response: Response) -> AuthMessageResponse:
     pair = await _session_from_request(request)
     if pair:
-        verify_csrf(request, pair[1])
         await revoke_session(pair[0])
     clear_auth_cookies(response)
     return AuthMessageResponse(message="Signed out")
@@ -138,9 +137,6 @@ async def logout_all(
     session: AsyncSession = Depends(get_session),
 ) -> AuthMessageResponse:
     auth = require_auth(request)
-    pair = await _session_from_request(request)
-    if pair:
-        verify_csrf(request, pair[1])
     user = await session.get(User, auth.user_id)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
@@ -252,12 +248,12 @@ async def change_password(
 ) -> AuthMessageResponse:
     auth = require_auth(request)
     pair = await _session_from_request(request)
-    if pair:
-        verify_csrf(request, pair[1])
     user = await session.get(User, auth.user_id)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     await auth_service.change_password(session, user, body.current_password, body.new_password)
+    if pair:
+        await revoke_other_sessions(auth.user_id, pair[0])
     return AuthMessageResponse(message="Password changed")
 
 
@@ -394,9 +390,6 @@ async def unlink_identity(
     session: AsyncSession = Depends(get_session),
 ) -> AuthMessageResponse:
     auth = require_auth(request)
-    pair = await _session_from_request(request)
-    if pair:
-        verify_csrf(request, pair[1])
     if provider == "native":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -107,6 +107,20 @@ async def revoke_all_sessions(user_id: uuid.UUID) -> int:
     return count
 
 
+async def revoke_other_sessions(user_id: uuid.UUID, keep_session_id: str) -> int:
+    """Invalidate every session except ``keep_session_id`` (password change)."""
+    redis = get_redis()
+    session_ids = await redis.smembers(_user_sessions_key(user_id))
+    count = 0
+    for sid in session_ids:
+        if sid == keep_session_id:
+            continue
+        await redis.delete(_session_key(sid))
+        await redis.srem(_user_sessions_key(user_id), sid)
+        count += 1
+    return count
+
+
 async def list_active_sessions(user_id: uuid.UUID) -> list[str]:
     redis = get_redis()
     return list(await redis.smembers(_user_sessions_key(user_id)))

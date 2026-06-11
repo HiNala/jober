@@ -58,8 +58,24 @@ We do **not** defend against:
 - **Determined ATS anti-bot** — pacing reduces load; we do not evade fraud detection.
 - **LLM provider breach** — prompts are redacted/truncated before audit storage; live calls still leave the trust boundary.
 
+## Session and CSRF (Mission 19)
+
+Production uses **cross-origin** Railway web + API (`COOKIE_SECURE=true`, `SameSite=None`) so the browser sends session cookies on `credentials: include` fetches. That widens classic CSRF exposure versus `SameSite=Lax`.
+
+| Control | Detail |
+|---------|--------|
+| Session storage | Redis; opaque `jober_session` + `jober_refresh` cookies (`HttpOnly`, `Secure` in prod) |
+| CSRF | `CsrfMiddleware` double-submit on all mutating `/api/*` when session cookie present; exempt list in `PUBLIC_API_PREFIXES` (auth bootstrap, webhooks, analytics collector, waitlist) |
+| Client | Web attaches `X-CSRF-Token` from `jober_csrf` cookie on mutations |
+| Revocation | Logout and password reset/change revoke server-side sessions (`revoke_session` / `revoke_other_sessions` / `revoke_all_sessions`) |
+| Rate limits | Redis counters on login/signup/reset; lockout after repeated failures |
+
+See `docs/polish-pack/notes/19_auth_matrix.md` for the full cookie/CSRF matrix.
+
 ## Residual risks
 
 - Screenshots/traces may capture filled form values until purged — use **Purge run** or **Cleanup**.
 - Presigned URLs are bearer URLs for ~15 minutes — do not forward in public channels.
 - Debug log mode (`LOG_MODE=debug`) allows longer messages but still scrubs secrets.
+- Session TTL is absolute (no separate idle timeout) — stolen session valid until expiry or revocation.
+- `SameSite=None` remains required until web and API share one site; misconfigured `COOKIE_SECURE` blocks login (startup guard added).
