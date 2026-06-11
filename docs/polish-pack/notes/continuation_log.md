@@ -419,3 +419,48 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 ### Deployment decision
 
 **Deploy recommended** — batch **Missions 04–10** as one web release after CI green. Includes Mission 08 migration `q9r0s1t32u63`. Mission 09 (layout) + Mission 10 (surfaces) are visually wide but behaviorally inert. After deploy: `railway-smoke.sh`, manual all-routes pass, re-capture all **23** screenshots.
+
+---
+
+## Loop after Mission 11 — 2026-06-11
+
+### Re-verification (Mission 11 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Signup verification + password reset end-to-end in production | **Pending operator** — code landed; Railway `EMAIL_BACKEND=smtp` + creds on API **and** worker required |
+| Dev/CI never attempt network email | **Green** — default `console` backend; `test_email.py` (8) with `no_db` marker |
+| Resend rate-limited; tokens expire; honest UI states | **Green** — Redis resend limit, `/verify-pending` + dynamic copy via `/api/auth/email-delivery` |
+| Env/docs updated; boot validation | **Green** — `.env.example`, `variables.example.env`, `11_email_decision.md`, deploy runbook |
+| No tracking pixels in emails | **Green** — text-first templates only |
+
+### Improvements made (this loop)
+
+- `feat(api): transactional email for verify and reset flows [pack-11]` — full Mission 11 delivery.
+- `tests/conftest.py` — `no_db` marker skips `seed_default_tenant` so email unit tests run without Postgres.
+- `pyproject.toml` — register `no_db` pytest marker.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Production inbox verify + reset walk (GP-001/002) | Operator post-deploy — set Railway SMTP, run loops, `railway-smoke.sh` |
+| API integration test for `email-delivery` + resend 429 | Mission 25 |
+| Email-change confirmation | Not in scope (no token flow found) |
+| Screenshots `11-signup`, `13-forgot-password`, new verify routes | Post-deploy batch |
+| Full api pytest locally | CI (Docker/Postgres not running locally) |
+
+### Spot check (states)
+
+- Rotated from a11y (Mission 10 loop) → **auth email states**: signup redirects to `/verify-pending` when `inbox_delivery`; forgot-password subtitle switches via `fetchEmailDelivery()`; verify-pending shows unavailable path when console backend; resend 60s cooldown wired.
+- Build output confirms `/verify-email` and `/verify-pending` routes present.
+
+### Gate summary
+
+**Local:** api ruff + mypy + `test_email` (8); web typecheck, lint:strict, test (80), build, check:motion, check:bundles (2457/2800 KB), e2e **22** — all green.
+
+**Local blocker:** `make migrate-check` / full api pytest deferred to CI (no local Docker).
+
+### Deployment decision
+
+**Deploy recommended for Mission 11** — requires **API + worker** env together: `EMAIL_BACKEND=smtp`, `EMAIL_FROM`, `SMTP_*`. Web can deploy independently (honest copy already). After deploy: send real verification + reset to a test inbox, complete both loops, update GP-001/002 in golden-path findings, re-capture auth screenshots.
