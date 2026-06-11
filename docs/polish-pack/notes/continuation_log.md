@@ -849,8 +849,8 @@ Infra restarted mid-loop (postgres had stopped — caused initial API connection
 
 **Local:** migrate-check, api ruff+mypy, worker ruff+mypy+pytest **22**, web typecheck — green. Api full pytest **342 passed / 30 failed** (MinIO/Redis infra on host, not pack-20 regressions).
 
-**CI:** pending push.
+**CI:** run [27380275271](https://github.com/HiNala/jober/actions/runs/27380275271) on `e458e77` — migrate-check, api **372** passed, worker **22**, web **71** e2e, policy **36** — **success**.
 
 ### Deployment decision
 
-**Deploy API after CI green** — production backup before `r1a2b3c34d65` index migration. Plain `CREATE INDEX` at current scale. Smoke queue + admin runs filter post-deploy.
+**Deploy API** — CI green on `e458e77`. Production backup before `r1a2b3c34d65` index migration. Plain `CREATE INDEX` at current scale. Smoke queue + admin runs filter post-deploy; `bash scripts/railway-smoke.sh`.
