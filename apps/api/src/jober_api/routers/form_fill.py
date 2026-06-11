@@ -10,6 +10,7 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
+from jober_api.errors import CODE_HUMAN_CHECKPOINT_REQUIRED, error_detail
 from jober_api.services.form_fill.service import (
     FillBlockedError,
     enqueue_browser_fill,
@@ -52,11 +53,12 @@ async def fill_form(
         await session.commit()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail={
-                "message": "Human checkpoint required",
-                "gate": exc.gate,
-                "run_id": str(exc.run_id),
-            },
+            detail=error_detail(
+                "Human checkpoint required",
+                code=CODE_HUMAN_CHECKPOINT_REQUIRED,
+                gate=exc.gate,
+                run_id=str(exc.run_id),
+            ),
         ) from exc
     except ValueError as exc:
         raise HTTPException(

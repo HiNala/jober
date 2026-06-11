@@ -19,6 +19,7 @@ from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.db.session import async_session_factory, get_session
+from jober_api.errors import CODE_CHECKPOINT_ALREADY_RESOLVED, error_detail
 from jober_api.privacy.browser_state import save_run_storage_state
 from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.services.console.service import (
@@ -119,9 +120,15 @@ async def resolve_run_checkpoint(
         )
         return result
     except ValueError as exc:
+        message = str(exc)
+        if message == "Checkpoint already resolved":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=error_detail(message, code=CODE_CHECKPOINT_ALREADY_RESOLVED),
+            ) from exc
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
+            detail=message,
         ) from exc
 
 

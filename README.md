@@ -319,7 +319,7 @@ Write-time redaction masks secrets and PII in run events, browser events, and LL
 | `DELETE /api/privacy/delete-all` | Wipe local data (`confirm: DELETE ALL MY DATA`) |
 | `PUT /api/application-runs/{id}/browser-storage-state` | Save encrypted Playwright session after human login |
 
-Env: `LOG_MODE=redacted` (default) or `debug` (more detail, still scrubs secrets), `PRESIGNED_URL_TTL_MINUTES=15`. See [`docs/architecture/threat-model.md`](docs/architecture/threat-model.md).
+Env: `LOG_MODE=redacted` (default) or `debug` (more detail, still scrubs secrets), `PRESIGNED_URL_TTL_MINUTES=15`. See [`docs/architecture/threat-model.md`](docs/architecture/threat-model.md). API error envelope: [`docs/architecture/errors.md`](docs/architecture/errors.md).
 
 ## Multi-tenant & billing (Mission 15)
 

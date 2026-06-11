@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jober_api.auth.enforcement import bind_route_permissions, validate_rbac_coverage
 from jober_api.auth.middleware import AuthMiddleware
 from jober_api.config import settings
+from jober_api.errors import CorrelationIdMiddleware, register_exception_handlers
 from jober_api.health import readiness_report
 from jober_api.privacy.logging import configure_logging, init_sentry
 from jober_api.privacy.secrets_check import validate_startup_secrets
@@ -32,7 +33,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(AuthMiddleware)
+
+register_exception_handlers(app)
 
 app.include_router(api_router)
 bind_route_permissions(app)

@@ -11,6 +11,12 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant
 from jober_api.db.session import get_session
+from jober_api.errors import (
+    budget_exceeded_http,
+    dependency_unavailable_http,
+    error_detail,
+    is_dependency_unavailable,
+)
 from jober_api.models.generated_document import GeneratedDocument
 from jober_api.repositories.generated_document import GeneratedDocumentRepository
 from jober_api.repositories.job_target import JobTargetRepository
@@ -106,17 +112,24 @@ async def generate_cover_letter_endpoint(
             seed_text=str(body["seed_text"]) if body.get("seed_text") else None,
         )
     except BudgetExceededError as exc:
-        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(exc)) from exc
+        raise budget_exceeded_http(str(exc) or None) from exc
     except ClaimsRejectedError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"message": "Claims guard rejected draft", "unsupported": exc.unsupported},
+            detail=error_detail(
+                "Claims guard rejected draft",
+                unsupported=exc.unsupported,
+            ),
         ) from exc
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(exc),
         ) from exc
+    except Exception as exc:
+        if is_dependency_unavailable(exc):
+            raise dependency_unavailable_http(request) from exc
+        raise
 
     await session.commit()
     return result

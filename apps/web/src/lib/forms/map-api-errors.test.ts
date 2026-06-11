@@ -33,6 +33,19 @@ describe("mapApiErrors", () => {
     );
   });
 
+  it("maps 503 dependency_unavailable detail object", () => {
+    const body = JSON.stringify({
+      detail: {
+        message: "A required service is temporarily unavailable. Try again shortly.",
+        code: "dependency_unavailable",
+      },
+      correlation_id: "abc",
+      code: "dependency_unavailable",
+    });
+    const mapped = mapApiErrors(new ApiError("API 503", 503, body), "fallback");
+    expect(mapped.formError).toContain("temporarily unavailable");
+  });
+
   it("remaps field aliases", () => {
     const mapped = remapFieldErrors({ display_name: "too long" }, { display_name: "name" });
     expect(mapped.name).toBe("too long");

@@ -145,7 +145,11 @@ async def test_generate_cover_letter_budget_exceeded_returns_402(
                 json={"job_target_id": str(job.id), "force": True},
             )
             assert response.status_code == 402, response.text
-            assert "budget" in response.json()["detail"].casefold()
+            body = response.json()
+            assert body.get("code") == "llm_budget_exceeded"
+            detail = body["detail"]
+            message = detail["message"] if isinstance(detail, dict) else detail
+            assert "budget" in str(message).casefold()
     finally:
         app.dependency_overrides.clear()
 

@@ -12,6 +12,7 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.auth.tenant_guard import require_job_for_tenant, require_run_for_tenant
 from jober_api.db.session import get_session
+from jober_api.errors import CODE_VERIFICATION_BLOCKED, error_detail
 from jober_api.services.verification.service import (
     SubmitPolicyError,
     VerifyBlockedError,
@@ -71,12 +72,13 @@ async def verify_ready(
         await session.commit()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail={
-                "message": "Readiness verification failed",
-                "reason": exc.reason,
-                "run_id": str(exc.run_id),
-                "readiness": exc.readiness,
-            },
+            detail=error_detail(
+                "Readiness verification failed",
+                code=CODE_VERIFICATION_BLOCKED,
+                reason=exc.reason,
+                run_id=str(exc.run_id),
+                readiness=exc.readiness,
+            ),
         ) from exc
     except ValueError as exc:
         raise HTTPException(

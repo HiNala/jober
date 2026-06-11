@@ -63,7 +63,10 @@ function mapDetail(detail: unknown, fallback: string): MappedApiErrors {
   }
 
   if (detail && typeof detail === "object") {
-    const obj = detail as { message?: string };
+    const obj = detail as { message?: string; code?: string };
+    if (obj.code === "dependency_unavailable" && obj.message?.trim()) {
+      return { formError: obj.message.trim(), fieldErrors: {} };
+    }
     if (obj.message?.trim()) {
       return { formError: obj.message.trim(), fieldErrors: {} };
     }
@@ -96,6 +99,20 @@ export function mapApiErrors(err: unknown, fallback = "Something went wrong"): M
       return {
         formError:
           "LLM monthly budget exceeded. Generation blocked until next month or budget is raised.",
+        fieldErrors: {},
+      };
+    }
+    if (err.status === 503) {
+      const parsed = body ? parseJsonBody(body) : null;
+      const detail = parsed?.detail;
+      if (detail && typeof detail === "object") {
+        const obj = detail as { message?: string };
+        if (obj.message?.trim()) {
+          return { formError: obj.message.trim(), fieldErrors: {} };
+        }
+      }
+      return {
+        formError: "A required service is temporarily unavailable. Try again shortly.",
         fieldErrors: {},
       };
     }

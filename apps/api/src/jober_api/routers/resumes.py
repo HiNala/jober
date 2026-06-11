@@ -9,6 +9,7 @@ from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
+from jober_api.errors import dependency_unavailable_http, is_dependency_unavailable
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
 from jober_api.serializers.profile import serialize_resume
@@ -62,6 +63,10 @@ async def upload_resume_file(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(exc),
         ) from exc
+    except Exception as exc:
+        if is_dependency_unavailable(exc):
+            raise dependency_unavailable_http(request) from exc
+        raise
 
     await session.commit()
     return serialize_resume(asset)

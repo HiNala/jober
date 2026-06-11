@@ -12,6 +12,7 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.config import settings
 from jober_api.db.session import get_session
+from jober_api.errors import budget_exceeded_http
 from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.services.batch import redis_control
 from jober_api.services.batch.daily_plan import generate_daily_plan
@@ -128,7 +129,7 @@ async def post_enqueue_batch(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
         ) from exc
     except BudgetExceededError as exc:
-        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=str(exc)) from exc
+        raise budget_exceeded_http(str(exc) or None) from exc
 
 
 @router.post("/queue/pause-all")
