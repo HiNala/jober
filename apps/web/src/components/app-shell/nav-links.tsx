@@ -22,13 +22,24 @@ import { cn } from "@/lib/utils";
 export const APP_NAV: {
   href: string;
   label: string;
+  description?: string;
   icon: LucideIcon;
 }[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/queue", label: "Queue", icon: ListTodo },
-  { href: "/discover", label: "Discover", icon: Compass },
+  { href: "/queue", label: "Queue", icon: ListTodo, description: "Your job tracker table" },
+  {
+    href: "/discover",
+    label: "Discover",
+    icon: Compass,
+    description: "Find new jobs — boards or spreadsheet",
+  },
   { href: "/library", label: "Library", icon: BookOpen },
-  { href: "/search", label: "Search", icon: Search },
+  {
+    href: "/search",
+    label: "Search",
+    icon: Search,
+    description: "Search jobs, letters, and runs you already have",
+  },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -52,12 +63,13 @@ export function NavLinks({
 
   return (
     <>
-      {nav.map(({ href, label, icon: Icon }) => {
+      {nav.map(({ href, label, description, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Link
             key={href}
             href={href}
+            title={description}
             onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 rounded-md px-2.5 py-2 text-base font-medium outline-none transition-colors",

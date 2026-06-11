@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Compass, Upload } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -17,7 +18,7 @@ import {
   type DiscoverySearchQuery,
 } from "@/lib/api/discovery";
 import { createJobList, fetchJobLists } from "@/lib/api/library";
-import { createBatch, enqueueBatch, previewBatch } from "@/lib/api/batches";
+import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ export function DiscoverShell() {
   const [candidates, setCandidates] = useState<DiscoveryCandidate[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [lastQuery, setLastQuery] = useState<DiscoverySearchQuery>({});
+  const [batchPreviewOpen, setBatchPreviewOpen] = useState(false);
 
   const listsQuery = useQuery({
     queryKey: ["library", "job-lists"],
@@ -83,27 +85,9 @@ export function DiscoverShell() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const launchBatchMutation = useMutation({
-    mutationFn: async () => {
-      if (!activeListId) throw new Error("Select a list first");
-      const preview = (await previewBatch({
-        job_list_id: activeListId,
-        status: "new",
-        limit: 50,
-      })) as { included?: unknown[] };
-      const count = preview.included?.length ?? 0;
-      if (count === 0) throw new Error("No runnable jobs in this list yet");
-      const batch = (await createBatch({
-        name: `List batch — ${new Date().toLocaleDateString()}`,
-        policy: "review_before_submit",
-        filters: { job_list_id: activeListId, status: "new", limit: 50 },
-      })) as { id: string };
-      await enqueueBatch(batch.id);
-      return count;
-    },
-    onSuccess: (count) => toast.success(`Queued batch with ${count} job${count === 1 ? "" : "s"}`),
-    onError: (err: Error) => toast.error(err.message),
-  });
+  const batchFilters = activeListId
+    ? { job_list_id: activeListId, status: "new", limit: 50 }
+    : null;
 
   const handleSearchResults = (rows: DiscoveryCandidate[], query: DiscoverySearchQuery) => {
     setCandidates(rows);
@@ -116,7 +100,11 @@ export function DiscoverShell() {
       <header className="space-y-1">
         <h1 className="text-xl font-semibold tracking-tight">Discover & build lists</h1>
         <p className="text-sm text-muted-foreground">
-          Search boards or upload your tracker — both paths feed the same target list for runs.
+          Add new jobs from boards or a spreadsheet — not the same as{" "}
+          <Link href="/search" className="underline underline-offset-2">
+            Search library
+          </Link>{" "}
+          (find items you already imported).
         </p>
       </header>
 
@@ -184,10 +172,26 @@ export function DiscoverShell() {
           acceptPending={acceptMutation.isPending}
           onRefresh={() => refreshMutation.mutate()}
           refreshPending={refreshMutation.isPending}
-          onLaunchBatch={() => launchBatchMutation.mutate()}
-          launchPending={launchBatchMutation.isPending}
+          onLaunchBatch={() => {
+            if (!activeListId) {
+              toast.error("Select a list first");
+              return;
+            }
+            setBatchPreviewOpen(true);
+          }}
+          launchPending={false}
         />
       </div>
+
+      {batchFilters ? (
+        <BatchPreviewDialog
+          open={batchPreviewOpen}
+          onOpenChange={setBatchPreviewOpen}
+          filters={batchFilters}
+          batchName={`List batch — ${new Date().toLocaleDateString()}`}
+          defaultPolicy="review_before_submit"
+        />
+      ) : null}
     </div>
   );
 }

@@ -62,8 +62,6 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
     [previewMutation],
   );
 
-  const report = result ?? preview;
-
   return (
     <div className="space-y-4">
       {step === "upload" && (
@@ -106,6 +104,26 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
               <span>·</span>
               <span>Angles: {preview.cover_letter_angles.created}</span>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Re-importing the same workbook updates matching rows in place — status, dates, and
+              notes you edited in Jober are preserved.
+            </p>
+            {preview.warnings.length > 0 ? (
+              <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3">
+                <div className="mb-2 flex items-center gap-2 text-sm font-medium text-amber-800 dark:text-amber-200">
+                  <AlertTriangle className="size-4" aria-hidden />
+                  {preview.warnings.length} parse warning{preview.warnings.length === 1 ? "" : "s"}
+                </div>
+                <ul className="max-h-36 space-y-1 overflow-y-auto text-xs text-muted-foreground">
+                  {preview.warnings.slice(0, 25).map((w, i) => (
+                    <li key={`${w.code}-${w.row}-${i}`}>
+                      [{w.sheet}
+                      {w.row ? ` row ${w.row}` : ""}] {w.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <div className="flex gap-2">
               <Button
                 onClick={() => importMutation.mutate(file)}
@@ -162,17 +180,13 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
               </a>
             </div>
             <p className="text-xs text-muted-foreground">
-              Next: review imported targets, then start a dry-run batch from the dashboard.
+              Next: review targets in the queue, build a list in Discover, or preview a batch on the
+              dashboard.
             </p>
           </CardContent>
         </Card>
       )}
 
-      {report && report.warnings.length > 0 && step !== "done" && (
-        <p className="text-xs text-muted-foreground">
-          {report.warnings.length} parse warnings will appear in the final report.
-        </p>
-      )}
     </div>
   );
 }

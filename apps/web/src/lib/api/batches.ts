@@ -25,6 +25,26 @@ export type DailyPlan = {
   pacing_note: string;
 };
 
+export type BatchPolicy = "dry_run" | "review_before_submit";
+
+export type BatchPreviewJob = {
+  job_target_id: string;
+  company: string;
+  role: string;
+  priority?: string;
+  domain?: string;
+  apply_url?: string | null;
+  reason?: string;
+};
+
+export type BatchPreviewResult = {
+  filters: Record<string, unknown>;
+  included: BatchPreviewJob[];
+  excluded: BatchPreviewJob[];
+  domain_count: number;
+  estimated_cost_usd: number;
+};
+
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   return apiFetch<DashboardSummary>("/api/dashboard/summary");
 }
@@ -41,8 +61,8 @@ export async function resumeAllQueue(): Promise<void> {
   await apiFetch("/api/queue/resume-all", { method: "POST" });
 }
 
-export async function previewBatch(filters: Record<string, unknown>) {
-  return apiFetch("/api/batches/preview", {
+export async function previewBatch(filters: Record<string, unknown>): Promise<BatchPreviewResult> {
+  return apiFetch<BatchPreviewResult>("/api/batches/preview", {
     method: "POST",
     body: JSON.stringify({ filters }),
   });

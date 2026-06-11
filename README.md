@@ -161,6 +161,8 @@ Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/
 
 **Discover (Mission 23):** `/discover` unifies board search and XLSX import into named target lists with dedupe, fit signals, saved searches, list refresh, and batch launch (`filters.job_list_id`). See `docs/missions/mission_23_unified_job_discovery.md`.
 
+**Discover → queue journey (Mission 16):** `/discover` adds **new** jobs (boards or spreadsheet into lists); `/search` finds **existing** jobs, letters, and runs. Batch preview shows included/excluded jobs with reasons (`BatchPreviewDialog`); policies **dry run** vs **review before submit** are explicit; auto-submit stays Settings opt-in only. Queue links to Discover/dashboard for batching; pause/pacing surfaced on `/queue`. Notes: `docs/polish-pack/notes/16_journey_findings.md`.
+
 **Workspace shell (Mission 09/17):** two in-app layout modes in `lib/workspace/layout.ts` — **ops-desk** (nav + work + resizable canvas) on `/runs/[id]` only; **editorial** (nav + full-width content) on dashboard, queue, discover, library, search, analytics, settings, and admin. Components live in `components/workspace/`. Layout prefs persist in `localStorage` (`jober-workspace-v1`).
 
 **Keyboard shortcuts (Mission 13):** global listeners in `components/workspace/workspace-keyboard.tsx`.
@@ -174,7 +176,7 @@ Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/
 | Escape | Close command palette, dialogs, drawers (focus returns to trigger) |
 | Tab | Standard focus order; skip link targets `#main-content` on workspace routes |
 
-E2e coverage: `e2e/a11y-marketing.spec.ts`, `e2e/a11y-auth.spec.ts`, `e2e/a11y-app.spec.ts` (core app routes with dev-auth bypass), `e2e/responsive-smoke.spec.ts` (375×812 and 768×1024 overflow + mobile nav/palette).
+E2e coverage: `e2e/a11y-marketing.spec.ts`, `e2e/a11y-auth.spec.ts`, `e2e/a11y-app.spec.ts` (core app routes with dev-auth bypass), `e2e/responsive-smoke.spec.ts` (375×812 and 768×1024 overflow + mobile nav/palette), `e2e/discover-journey.spec.ts` (Search vs Discover clarity).
 
 **Responsive (Mission 14):** below 1024px the workspace nav rail hides in favor of `MobileNav`; run console uses **Work | Canvas** tabs (`run-ops-desk-shell.tsx`); touch Search icon opens the command palette. Breakpoint constant: `lib/workspace/breakpoints.ts`. Mobile screenshots: `docs/screenshots/mobile/`.
 

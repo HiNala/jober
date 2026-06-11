@@ -25,7 +25,11 @@ function SearchResults({ initialQ }: { initialQ: string }) {
       <header>
         <h1 className="text-xl font-semibold tracking-tight">Search library</h1>
         <p className="text-sm text-muted-foreground">
-          Find jobs, cover letters, runs, and saved lists across your workspace.
+          Find jobs, cover letters, runs, and saved lists you already have — not the same as{" "}
+          <Link href="/discover" className="underline underline-offset-2">
+            Discover
+          </Link>{" "}
+          (add new jobs from boards or a spreadsheet).
         </p>
       </header>
 

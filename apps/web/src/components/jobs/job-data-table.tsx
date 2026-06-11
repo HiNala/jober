@@ -3,6 +3,7 @@
 import type { JobTargetRead, JobTargetStatus } from "@jober/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileSpreadsheet } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -29,27 +30,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { updateJobTarget } from "@/lib/api/jobs";
+import { JOB_STATUS_LABEL, JOB_STATUS_OPTIONS } from "@/lib/jobs/status-vocabulary";
 import { cn } from "@/lib/utils";
-
-const STATUS_LABEL: Record<JobTargetStatus, string> = {
-  new: "Not started",
-  queued: "Queued",
-  in_progress: "In progress",
-  applied: "Applied",
-  rejected: "Rejected",
-  withdrawn: "Withdrawn",
-  skipped: "Skipped",
-};
-
-const STATUS_OPTIONS: JobTargetStatus[] = [
-  "new",
-  "queued",
-  "in_progress",
-  "applied",
-  "rejected",
-  "withdrawn",
-  "skipped",
-];
 
 const ATS_OPTIONS = [
   "ashby",
@@ -164,9 +146,9 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
-            {STATUS_OPTIONS.map((s) => (
+            {JOB_STATUS_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
-                {STATUS_LABEL[s]}
+                {JOB_STATUS_LABEL[s]}
               </SelectItem>
             ))}
           </SelectContent>
@@ -266,9 +248,9 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {STATUS_OPTIONS.map((s) => (
+                        {JOB_STATUS_OPTIONS.map((s) => (
                           <SelectItem key={s} value={s}>
-                            {STATUS_LABEL[s]}
+                            {JOB_STATUS_LABEL[s]}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -296,9 +278,23 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
           </TableBody>
         </Table>
       </div>
-      {selected.size > 0 && (
-        <p className="text-xs text-muted-foreground">{selected.size} selected</p>
-      )}
+      {selected.size > 0 ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-sm">
+          <span className="text-muted-foreground">{selected.size} selected</span>
+          <span className="text-muted-foreground">·</span>
+          <span>
+            Batches run from{" "}
+            <Link href="/discover" className="font-medium underline underline-offset-2">
+              Discover lists
+            </Link>{" "}
+            or the{" "}
+            <Link href="/dashboard" className="font-medium underline underline-offset-2">
+              dashboard
+            </Link>
+            .
+          </span>
+        </div>
+      ) : null}
       <JobDetailDrawer
         job={detail}
         open={detail !== null}

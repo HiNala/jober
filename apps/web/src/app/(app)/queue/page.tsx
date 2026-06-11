@@ -3,10 +3,12 @@
 import type { JobTargetRead } from "@jober/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ImportWizard } from "@/components/import/import-wizard";
+import { QueuePolicyBanner } from "@/components/queue/queue-policy-banner";
 import { JobDataTable } from "@/components/jobs/job-data-table";
 import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
 import { JobKanban } from "@/components/jobs/job-kanban";
@@ -50,7 +52,10 @@ export default function QueuePage() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Job queue</h1>
           <p className="text-sm text-muted-foreground">
-            {rows.length} targets · import spreadsheet or filter below
+            {rows.length} targets · import here or add jobs via{" "}
+            <Link href="/discover" className="underline underline-offset-2">
+              Discover
+            </Link>
           </p>
         </div>
         <div className="flex gap-2">
@@ -75,6 +80,8 @@ export default function QueuePage() {
           </Dialog>
         </div>
       </div>
+
+      <QueuePolicyBanner />
 
       {isLoading && <PageLoading label="Loading job targets…" />}
       {isError && (

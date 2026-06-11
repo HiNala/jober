@@ -141,7 +141,7 @@ export function ListBuilderPanel({
         onClick={onLaunchBatch}
       >
         <Play className="mr-1.5 size-4" aria-hidden />
-        Launch batch from list
+        Preview batch from list
       </Button>
     </aside>
   );

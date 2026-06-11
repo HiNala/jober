@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
+  Compass,
   ChevronDown,
   ChevronRight,
   FolderKanban,
@@ -171,15 +172,28 @@ export function WorkspaceNav() {
           {navCollapsed ? <span className="sr-only">New run</span> : null}
         </Link>
         <Link
+          href="/discover"
+          className={cn(
+            buttonVariants({ variant: "ghost", size: navCollapsed ? "icon-sm" : "sm" }),
+            !navCollapsed && "w-full justify-start",
+          )}
+          title="Find new jobs from boards or spreadsheet"
+        >
+          <Compass className="size-4" aria-hidden />
+          {!navCollapsed ? <span className="ml-2">Discover</span> : null}
+          {navCollapsed ? <span className="sr-only">Discover</span> : null}
+        </Link>
+        <Link
           href="/search"
           className={cn(
             buttonVariants({ variant: "ghost", size: navCollapsed ? "icon-sm" : "sm" }),
             !navCollapsed && "w-full justify-start",
           )}
+          title="Search library — jobs, letters, runs you already have"
         >
           <Search className="size-4" aria-hidden />
-          {!navCollapsed ? <span className="ml-2">Search</span> : null}
-          {navCollapsed ? <span className="sr-only">Search</span> : null}
+          {!navCollapsed ? <span className="ml-2">Search library</span> : null}
+          {navCollapsed ? <span className="sr-only">Search library</span> : null}
         </Link>
         <Link
           href="/library"
