@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { FaqList } from "@/components/marketing/faq-list";
+import { FaqCategoryColumns } from "@/components/marketing/faq-category-columns";
 import { JsonLd } from "@/components/marketing/json-ld";
 import { MarketingCtaBand } from "@/components/marketing/marketing-cta-band";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
@@ -31,15 +31,13 @@ export default function FaqPage() {
           url: `${getSiteUrl()}/faq`,
         }}
       />
-      <div className="px-6 py-16">
+      <div className="px-6 py-16 md:py-20">
         <MarketingPageHeader
           eyebrow="FAQ"
           title="Straight answers"
           lead="No evasion, no fine-print surprises. If something needs a human, we say so."
         />
-        <div className="mx-auto mt-10 max-w-3xl">
-          <FaqList items={FAQ_ITEMS} />
-        </div>
+        <FaqCategoryColumns />
       </div>
       <MarketingCtaBand signupFeature="faq_cta_signup" secondaryFeature="faq_cta_pricing" />
     </MarketingShell>

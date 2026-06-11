@@ -36,14 +36,14 @@ export function MarketingFooter() {
     <footer className="border-t border-border/60 bg-muted/20">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-[1.2fr_repeat(3,minmax(0,1fr))]">
         <div className="space-y-3">
-          <p className="text-sm font-semibold">Jober</p>
+          <p className="text-base font-semibold">Jober</p>
           <p className="max-w-xs text-sm text-muted-foreground">
             Assisted job applications with human review before every submit. You stay in control.
           </p>
         </div>
         {footerGroups.map((group) => (
           <div key={group.title}>
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h2 className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
               {group.title}
             </h2>
             <ul className="mt-3 space-y-2">
