@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 
+import { FeaturesBento } from "@/components/marketing/features-bento";
 import { JsonLd } from "@/components/marketing/json-ld";
 import { MarketingCtaBand } from "@/components/marketing/marketing-cta-band";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
-import { motionFadeIn } from "@/lib/design/motion";
-import { FEATURE_DEEP_DIVES } from "@/lib/marketing/content";
 import { marketingMetadata } from "@/lib/marketing/metadata";
 import { getSiteUrl } from "@/lib/site";
-import { surface } from "@/lib/design/tokens";
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = marketingMetadata({
   title: "Features",
@@ -31,31 +28,13 @@ export default function FeaturesPage() {
             "Discovery, tailored letters, live-watch runs, workspace analytics, and review-before-submit safety.",
         }}
       />
-      <div className="px-6 py-16">
+      <div className="px-6 py-16 md:py-20">
         <MarketingPageHeader
           eyebrow="Features"
           title="Trust features, not hidden automation"
           lead="Every capability is designed so you can see what happened and approve what gets sent."
         />
-        <ul className="mx-auto mt-12 grid max-w-6xl gap-4 md:grid-cols-2">
-          {FEATURE_DEEP_DIVES.map(({ icon: Icon, title, body, bullets }) => (
-            <li key={title} className={cn(surface.card, "rounded-xl p-6", motionFadeIn)}>
-              <Icon className="size-5 text-accent" aria-hidden />
-              <h2 className="mt-3 text-lg font-semibold">{title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                {bullets.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="text-accent" aria-hidden>
-                      ·
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <FeaturesBento />
       </div>
       <MarketingCtaBand
         signupFeature="features_cta_signup"

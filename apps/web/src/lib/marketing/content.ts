@@ -17,12 +17,14 @@ export type ContentBlock = { title: string; body: string };
 
 export const HOW_IT_WORKS_STEPS: {
   icon: LucideIcon;
+  slug: string;
   title: string;
   body: string;
   detail: string;
 }[] = [
   {
     icon: ListChecks,
+    slug: "pick-roles",
     title: "Pick the roles you want",
     body: "Import or add jobs to your queue. Jober never applies on its own — you choose every target.",
     detail:
@@ -30,6 +32,7 @@ export const HOW_IT_WORKS_STEPS: {
   },
   {
     icon: ClipboardList,
+    slug: "vault-materials",
     title: "Vault + tailored materials",
     body: "Your profile vault powers cover letters and form fills. Sensitive fields stay masked until you need them.",
     detail:
@@ -37,6 +40,7 @@ export const HOW_IT_WORKS_STEPS: {
   },
   {
     icon: Eye,
+    slug: "watch-review",
     title: "Watch, then review",
     body: "Live run console shows each step. CAPTCHA, login, and checkpoints pause for you — no silent bypass.",
     detail:
@@ -44,6 +48,7 @@ export const HOW_IT_WORKS_STEPS: {
   },
   {
     icon: Send,
+    slug: "approve-submit",
     title: "You approve submit",
     body: "Review the filled application and diff. Nothing submits until you explicitly confirm.",
     detail:
@@ -77,12 +82,16 @@ export const VALUE_PROPS: { icon: LucideIcon; title: string; body: string }[] = 
 export const FEATURE_DEEP_DIVES: {
   icon: LucideIcon;
   title: string;
+  specLabel: string;
+  howItWorksHref?: string;
+  hero?: boolean;
   body: string;
   bullets: string[];
 }[] = [
   {
     icon: Compass,
     title: "Unified discovery",
+    specLabel: "queues · dedupe · fit signals",
     body: "Search boards and import lists into named target queues with dedupe and fit signals.",
     bullets: [
       "Saved searches you can refresh on demand",
@@ -93,6 +102,7 @@ export const FEATURE_DEEP_DIVES: {
   {
     icon: FileCheck2,
     title: "Tailored letters & documents",
+    specLabel: "voice · PDF · regenerate",
     body: "Cover letters and attachments that sound like you — grounded in resume facts, not generic fluff.",
     bullets: [
       "Voice presets and paragraph locks",
@@ -103,6 +113,9 @@ export const FEATURE_DEEP_DIVES: {
   {
     icon: Eye,
     title: "Live-watch canvas",
+    specLabel: "SSE · screenshots · checkpoints",
+    howItWorksHref: "/how-it-works#step-watch-review",
+    hero: true,
     body: "See what the agent sees: screenshots, fill diffs, and checkpoint cards in one run console.",
     bullets: [
       "SSE event stream with calm terminal styling",
@@ -113,6 +126,7 @@ export const FEATURE_DEEP_DIVES: {
   {
     icon: Radar,
     title: "Workspace analytics",
+    specLabel: "funnel · usage · consent-gated",
     body: "Your own funnel and usage dashboards — first-party, consent-gated, no third-party ad pixels.",
     bullets: [
       "Runs, submits, and letter generation in one place",
@@ -123,6 +137,8 @@ export const FEATURE_DEEP_DIVES: {
   {
     icon: Shield,
     title: "Safety posture you can verify",
+    specLabel: "review-first · CAPTCHA handoff",
+    howItWorksHref: "/how-it-works#step-approve-submit",
     body: "Trust features, not trust us blindly. Policy is enforced in code and surfaced in the UI.",
     bullets: [
       "Review before every submit — auto-submit is never the default",
@@ -134,6 +150,8 @@ export const FEATURE_DEEP_DIVES: {
   {
     icon: UserCheck,
     title: "You-in-the-loop by default",
+    specLabel: "queue-owned · no spray-and-pray",
+    howItWorksHref: "/how-it-works#step-pick-roles",
     body: "Jober assists applications you select. No spray-and-pray volume, no hidden submits.",
     bullets: [
       "Queue ownership stays with you",
@@ -210,49 +228,77 @@ export const FILL_DIFF_MOCK_ROWS = [
   },
 ] as const;
 
-export const FAQ_ITEMS: { question: string; answer: string }[] = [
+export type FaqCategory = "product" | "trust";
+
+export type FaqItem = {
+  question: string;
+  answer: string;
+  category: FaqCategory;
+  learnMore?: { label: string; href: string };
+};
+
+export const FAQ_ITEMS: FaqItem[] = [
   {
+    category: "product",
     question: "Does Jober auto-submit applications?",
     answer:
       "No. Auto-submit is never the default. Every application pauses for your review; nothing is sent until you explicitly approve the final submit.",
+    learnMore: { label: "How review works", href: "/how-it-works#step-approve-submit" },
   },
   {
+    category: "product",
     question: "What happens with CAPTCHAs, logins, or 2FA?",
     answer:
       "The run stops at a human checkpoint. Jober does not bypass CAPTCHAs, OAuth walls, or multi-factor prompts — you complete those steps, then the run can continue.",
+    learnMore: { label: "Watch step", href: "/how-it-works#step-watch-review" },
   },
   {
+    category: "trust",
     question: "Is my vault data private?",
     answer:
       "Your profile vault is tenant-scoped and encrypted for sensitive fields. We do not sell your data. Admin support views exclude raw vault secrets by design.",
+    learnMore: { label: "Privacy policy", href: "/privacy" },
   },
   {
+    category: "trust",
     question: "What data does Jober store?",
     answer:
       "Account info, your job queue, run artifacts (screenshots, event logs), vault fields you provide, and documents you generate. Marketing analytics are optional and first-party only.",
+    learnMore: { label: "Privacy policy", href: "/privacy" },
   },
   {
+    category: "trust",
     question: "How do cookies and analytics work?",
     answer:
       "We set a session cookie for auth and an optional analytics consent cookie. If you decline analytics, no usage events are recorded on your device or accepted by our API.",
+    learnMore: { label: "Privacy policy", href: "/privacy" },
   },
   {
+    category: "trust",
     question: "How does billing and LLM usage work?",
     answer:
       "Free and Pro plans include a monthly managed LLM budget for letter generation and fills. You can optionally bring your own API keys (BYOK) in Settings — then your provider bills you directly and usage counts against your key, not our managed pool.",
+    learnMore: { label: "Pricing", href: "/pricing" },
   },
   {
+    category: "product",
     question: "Can I apply to jobs I did not choose?",
     answer:
       "No. Jober only works on jobs you add to your queue. Our acceptable use policy prohibits evasion, spam applications, or violating employer site terms.",
+    learnMore: { label: "Acceptable use", href: "/acceptable-use" },
   },
+];
+
+export const FAQ_CATEGORIES: { id: FaqCategory; label: string }[] = [
+  { id: "product", label: "Product" },
+  { id: "trust", label: "Trust & billing" },
 ];
 
 export const PRICING_FAQ: { question: string; answer: string }[] = [
   {
     question: "When will Pro checkout be available?",
     answer:
-      "Stripe subscription checkout is rolling out soon. Free tier limits are live today and match what you see in Settings → usage.",
+      "Join the Pro waitlist on the pricing page — we email when Stripe checkout opens. Free tier limits are live today and match Settings → usage.",
   },
   {
     question: "What counts as a run?",
