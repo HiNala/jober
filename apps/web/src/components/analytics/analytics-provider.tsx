@@ -10,7 +10,7 @@ import {
   trackPageView,
 } from "@/lib/analytics/sdk";
 
-import { AnalyticsConsentBanner } from "./consent-banner";
+import { ConsentSheet } from "@/components/product/consent-sheet";
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -37,7 +37,7 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      <AnalyticsConsentBanner />
+      <ConsentSheet key={pathname} />
     </>
   );
 }

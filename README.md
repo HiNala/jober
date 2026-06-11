@@ -342,7 +342,7 @@ No Google Analytics, Segment, or third-party trackers. Events land in Postgres v
 | Server events | `emit_server_event` on signup, list create, run start, submit, letter generate |
 | Rollups | Celery `analytics_daily_rollup` (02:15 UTC) → funnel, page, DAU/WAU/MAU, LLM cost tables |
 
-Privacy: no raw IP stored (coarse geo only at ingest), PII keys blocked in event props, opt-in consent banner. Config: `ANALYTICS_ENABLED`, `ANALYTICS_RETENTION_DAYS`. Weekly Celery `analytics_retention_purge` deletes events older than the retention window.
+Privacy: no raw IP stored (coarse geo only at ingest), PII keys blocked in event props, opt-in consent via a one-time bottom sheet (change anytime under **Settings → Analytics consent**). Config: `ANALYTICS_ENABLED`, `ANALYTICS_RETENTION_DAYS`. Weekly Celery `analytics_retention_purge` deletes events older than the retention window.
 
 ## Analytics dashboards (Mission 26)
 

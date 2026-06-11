@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from "@/lib/api/client";
 
-const CONSENT_COOKIE = "jober_analytics_consent";
+import { CONSENT_COOKIE } from "@/lib/analytics/consent";
 const UTM_STORAGE_KEY = "jober_utm";
 const ANON_KEY = "jober_anon_id";
 const ANON_ROTATED_KEY = "jober_anon_rotated_at";

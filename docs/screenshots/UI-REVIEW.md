@@ -23,7 +23,7 @@
 |--------|-------------------|-------------------------|
 | Default shadcn card grid | Features, pricing, FAQ | Same border, same radius, same padding on every block |
 | Geist + teal eyebrow + blue CTA | All marketing | Correct but indistinguishable from hundreds of AI SaaS landings |
-| Floating analytics toast | Nearly every screen | Breaks immersion; competes with primary content |
+| ~~Floating analytics toast~~ | ~~Nearly every screen~~ | **Closed Mission 04 (2026-06-11):** replaced with one-time bottom sheet + Settings control |
 | Identical split layout | All in-app routes | Dashboard, queue, discover, library, search, analytics, settings share the same 40/60 shell |
 | Bottom “Describe what you want…” bar | Every in-app page | Feels pasted on; Hyper-style products use **⌘K command palette** + contextual prompts |
 | Dev copy in empty states | Queue (`make seed`) | Breaks production polish |
@@ -36,7 +36,7 @@
 3. **Component tiering** — “marketing bento” ≠ “data table” ≠ “terminal” — three distinct component families, not one `Card` everywhere.
 4. **Motion with purpose** — staggered hero entrance, live pulse on `LIVE` badge, skeleton loaders, chart draw-in (21st.dev motion catalog).
 5. **Empty states as onboarding** — illustrated steps, primary CTA, sample data toggle (Figma-style “try sample file”).
-6. **Consent UX** — bottom sheet once per device, not a persistent toast over product UI.
+6. **Consent UX** — bottom sheet once per device, not a persistent toast over product UI. *(Shipped Mission 04 — re-capture screenshots post-deploy to verify.)*
 
 ---
 

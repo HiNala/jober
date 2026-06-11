@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Shield, Sparkles } from "lucide-react";
 
 import { AiSettingsSection } from "@/components/settings/ai-settings-section";
+import { AnalyticsConsentSection } from "@/components/settings/analytics-consent-section";
 import { AppearanceSettingsSection } from "@/components/settings/appearance-settings-section";
 import { ApplicationDefaultsSection } from "@/components/settings/application-defaults-section";
 import { AuthSecuritySection } from "@/components/settings/auth-security-section";
@@ -84,6 +85,7 @@ function SettingsPanelInner() {
       />
       <AiSettingsSection />
       <NotificationsSettingsSection />
+      <AnalyticsConsentSection />
       <AuthSecuritySection />
       <PrivacyAccountSection />
 
