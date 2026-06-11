@@ -24,15 +24,15 @@
 | Default shadcn card grid | Features, pricing, FAQ | Same border, same radius, same padding on every block |
 | Geist + teal eyebrow + blue CTA | All marketing | Correct but indistinguishable from hundreds of AI SaaS landings |
 | ~~Floating analytics toast~~ | ~~Nearly every screen~~ | **Closed Mission 04 (2026-06-11):** replaced with one-time bottom sheet + Settings control |
-| Identical split layout | All in-app routes | Dashboard, queue, discover, library, search, analytics, settings share the same 40/60 shell |
-| Bottom “Describe what you want…” bar | Every in-app page | Feels pasted on; Hyper-style products use **⌘K command palette** + contextual prompts |
+| ~~Identical split layout~~ | ~~All in-app routes~~ | **Closed Mission 09 (2026-06-10):** ops-desk split-pane only on `/runs/[id]`; editorial full-width elsewhere. Re-capture 14–23 post-deploy. |
+| ~~Bottom “Describe what you want…” bar~~ | ~~Every in-app page~~ | **Closed Mission 09 (2026-06-10):** removed non-functional bar; **⌘K** / **⌘/** command palette with nav + page actions. Re-capture 14–23 post-deploy. |
 | ~~Dev copy in empty states~~ | ~~Queue (`make seed`)~~ | **Closed Mission 05 (2026-06-11):** onboarding empty states + vault dropzone + blog lead |
 | ~~Auth on empty void~~ | ~~Login, signup~~ | **Closed Mission 06:** branded auth shell + trust strip — re-capture 11–13 post-deploy |
 
 ### Priority upgrade themes (cross-cutting)
 
 1. **Brand layer** — one distinctive visual signature: mesh gradient hero, animated grid, or glass “agent orb” — used sparingly on marketing + auth only.
-2. **Layout discipline** — split-pane only on **run/watch** surfaces; other pages get full-width editorial layouts.
+2. **Layout discipline** — split-pane only on **run/watch** surfaces; other pages get full-width editorial layouts. *(Shipped Mission 09 — re-capture in-app screenshots post-deploy.)*
 3. **Component tiering** — “marketing bento” ≠ “data table” ≠ “terminal” — three distinct component families, not one `Card` everywhere.
 4. **Motion with purpose** — staggered hero entrance, live pulse on `LIVE` badge, skeleton loaders, chart draw-in (21st.dev motion catalog).
 5. **Empty states as onboarding** — illustrated steps, primary CTA, sample data toggle (Figma-style “try sample file”).
@@ -153,13 +153,15 @@
 
 ### 14 — Dashboard (`14-dashboard.png`)
 
-**What it is:** Ops overview — metric tiles, recent events, worker pool, batch control, failure analytics; right pane = idle live view.
+**What it is:** Ops overview — metric tiles, recent events, worker pool, batch control, failure analytics.
+
+**Closed Mission 09 (2026-06-10):** editorial full-width layout (no idle canvas pane); bottom command bar removed; ⌘K palette. Re-capture post-deploy.
 
 **UX / flow:** Power-user command center. Metrics communicate system health at a glance.
 
 **Issues**
 
-- **Layout overload:** metrics + events + worker + batch + failure + global AI bar + idle browser = cognitive noise for new users.
+- **Layout overload (partially addressed):** idle browser pane + global AI bar removed Mission 09; metrics density + first-run onboarding still open (Mission 05).
 - All metrics `0` — empty state doesn’t onboard (“import spreadsheet” path missing here).
 - “Start dry-run batch” without context is scary for first visit.
 - Bottom prompt bar consumes ~120px on every page.
@@ -373,7 +375,7 @@ flowchart LR
 - [ ] Fix settings resume dropzone copy (“PDF or DOCX” not spreadsheet).
 - [ ] Consent banner: corner → bottom sheet; remember choice; don’t show on auth.
 - [ ] Login/signup Google button parity if OAuth configured.
-- [ ] Hide bottom AI bar on pages where it’s non-functional noise; expose ⌘K.
+- [x] Hide bottom AI bar on pages where it’s non-functional noise; expose ⌘K. *(Mission 09)*
 
 ### P1 — Onboarding & demo (1 week)
 
@@ -391,9 +393,9 @@ flowchart LR
 
 ### P3 — Product-grade shell (2–4 weeks)
 
-- [ ] Layout refactor: live pane only on dashboard/runs routes.
+- [x] Layout refactor: live pane only on runs routes (not dashboard). *(Mission 09)*
 - [ ] Settings subnav + section scroll spy.
-- [ ] Command palette as primary AI entry.
+- [x] Command palette as primary AI entry. *(Mission 09 — navigation + contextual actions; full AI prompts deferred.)*
 - [ ] Chart + metric design pass (analytics, dashboard).
 - [ ] Design token pass: surfaces, mono labels, motion tokens in `globals.css`.
 

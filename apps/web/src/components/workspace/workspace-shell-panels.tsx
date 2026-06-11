@@ -10,40 +10,43 @@ import {
 } from "@/components/ui/resizable";
 import { WorkspaceCanvasDrawer, WorkspaceCanvasPanel } from "@/components/workspace/workspace-canvas";
 import { WorkspaceCenterHeader } from "@/components/workspace/workspace-center-header";
-import { WorkspaceCommandBar } from "@/components/workspace/workspace-command-bar";
 import { WorkspaceNav } from "@/components/workspace/workspace-nav";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { RouteTransition } from "@/components/motion/route-transition";
+import type { WorkspaceLayoutMode } from "@/lib/workspace/layout";
 import { motionView } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export function WorkspaceShellPanels({
   title,
+  layoutMode,
   children,
 }: {
   title: string;
+  layoutMode: WorkspaceLayoutMode;
   children: React.ReactNode;
 }) {
   const isNarrow = useMediaQuery("(max-width: 1023px)");
-  const {
-    navCollapsed,
-    canvasOpen,
-    focusMode,
-    setNavCollapsed,
-    setCanvasOpen,
-  } = useWorkspaceStore();
+  const isOpsDesk = layoutMode === "ops-desk";
+  const { navCollapsed, canvasOpen, focusMode, setNavCollapsed, setCanvasOpen } =
+    useWorkspaceStore();
   const navPanelRef = usePanelRef();
 
+  const effectiveCanvasOpen = isOpsDesk && canvasOpen;
+
   const panelIds = useMemo(() => {
-    if (focusMode) {
+    if (focusMode && isOpsDesk) {
       return ["center"];
     }
-    if (canvasOpen && !isNarrow) {
+    if (effectiveCanvasOpen && !isNarrow) {
       return ["nav", "center", "canvas"];
     }
     return ["nav", "center"];
-  }, [canvasOpen, focusMode, isNarrow]);
+  }, [effectiveCanvasOpen, focusMode, isNarrow, isOpsDesk]);
+
+  const panelStorageId =
+    layoutMode === "ops-desk" ? "jober-workspace-panels-ops" : "jober-workspace-panels-editorial";
 
   const layoutStorage = useMemo(
     () => ({
@@ -56,10 +59,16 @@ export function WorkspaceShellPanels({
   );
 
   const { defaultLayout, onLayoutChanged } = useDefaultLayout({
-    id: "jober-workspace-panels",
+    id: panelStorageId,
     panelIds,
     storage: layoutStorage,
   });
+
+  useEffect(() => {
+    if (!isOpsDesk) {
+      setCanvasOpen(false);
+    }
+  }, [isOpsDesk, setCanvasOpen]);
 
   useEffect(() => {
     if (isNarrow) {
@@ -69,7 +78,7 @@ export function WorkspaceShellPanels({
 
   useEffect(() => {
     const panel = navPanelRef.current;
-    if (!panel || focusMode) {
+    if (!panel || (focusMode && isOpsDesk)) {
       return;
     }
     if (navCollapsed && !panel.isCollapsed()) {
@@ -79,20 +88,20 @@ export function WorkspaceShellPanels({
     if (!navCollapsed && panel.isCollapsed()) {
       panel.expand();
     }
-  }, [focusMode, navCollapsed, navPanelRef]);
+  }, [focusMode, isOpsDesk, navCollapsed, navPanelRef]);
 
-  const showInlineCanvas = canvasOpen && !isNarrow && !focusMode;
+  const showInlineCanvas = effectiveCanvasOpen && !isNarrow && !(focusMode && isOpsDesk);
 
   return (
     <>
       <ResizablePanelGroup
-        id="jober-workspace-panels"
+        id={panelStorageId}
         orientation="horizontal"
         defaultLayout={defaultLayout}
         onLayoutChanged={onLayoutChanged}
         className={cn("min-h-0 flex-1", motionView)}
       >
-        {!focusMode ? (
+        {!(focusMode && isOpsDesk) ? (
           <>
             <ResizablePanel
               id="nav"
@@ -109,9 +118,13 @@ export function WorkspaceShellPanels({
           </>
         ) : null}
 
-        <ResizablePanel id="center" minSize={28} defaultSize={showInlineCanvas ? 38 : 86}>
-          <div className="flex h-full min-w-[20rem] flex-col">
-            <WorkspaceCenterHeader title={title} />
+        <ResizablePanel
+          id="center"
+          minSize={28}
+          defaultSize={showInlineCanvas ? 38 : 86}
+        >
+          <div className="flex h-full min-w-0 flex-col">
+            <WorkspaceCenterHeader title={title} layoutMode={layoutMode} />
             <main
               id="main-content"
               tabIndex={-1}
@@ -119,7 +132,6 @@ export function WorkspaceShellPanels({
             >
               <RouteTransition>{children}</RouteTransition>
             </main>
-            <WorkspaceCommandBar />
           </div>
         </ResizablePanel>
 
@@ -133,9 +145,9 @@ export function WorkspaceShellPanels({
         ) : null}
       </ResizablePanelGroup>
 
-      {isNarrow ? (
+      {isNarrow && isOpsDesk ? (
         <WorkspaceCanvasDrawer
-          open={canvasOpen && !focusMode}
+          open={effectiveCanvasOpen && !focusMode}
           onOpenChange={setCanvasOpen}
         />
       ) : null}

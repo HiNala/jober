@@ -60,7 +60,7 @@ export function NavLinks({
             href={href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-md px-2.5 py-2 text-sm outline-none transition-colors",
+              "flex items-center gap-3 rounded-md px-2.5 py-2 text-base font-medium outline-none transition-colors",
               "focus-visible:ring-2 focus-visible:ring-ring",
               active
                 ? "bg-sidebar-accent text-sidebar-accent-foreground"

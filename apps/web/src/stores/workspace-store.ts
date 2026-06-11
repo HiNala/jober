@@ -3,7 +3,6 @@ import { persist } from "zustand/middleware";
 
 export type CanvasViewMode = "single" | "grid" | "layers";
 export type CanvasSurface = "browser" | "document" | "fill-diff" | "review";
-export type CommandMode = "plan" | "execute";
 
 interface WorkspaceState {
   navCollapsed: boolean;
@@ -12,11 +11,9 @@ interface WorkspaceState {
   canvasViewMode: CanvasViewMode;
   canvasSurface: CanvasSurface;
   filmstripVisible: boolean;
-  commandMode: CommandMode;
-  selectedModel: string | null;
   selectedArtifactId: string | null;
   activeRunId: string | null;
-  commandDraft: string;
+  commandPaletteOpen: boolean;
   setNavCollapsed: (collapsed: boolean) => void;
   toggleNav: () => void;
   setCanvasOpen: (open: boolean) => void;
@@ -25,10 +22,9 @@ interface WorkspaceState {
   setCanvasViewMode: (mode: CanvasViewMode) => void;
   setCanvasSurface: (surface: CanvasSurface) => void;
   setFilmstripVisible: (visible: boolean) => void;
-  setCommandMode: (mode: CommandMode) => void;
-  setSelectedModel: (model: string) => void;
   setSelectedArtifactId: (id: string | null) => void;
-  setCommandDraft: (draft: string) => void;
+  setCommandPaletteOpen: (open: boolean) => void;
+  toggleCommandPalette: () => void;
 }
 
 export const WORKSPACE_PERSISTED_KEYS = [
@@ -37,8 +33,6 @@ export const WORKSPACE_PERSISTED_KEYS = [
   "canvasViewMode",
   "canvasSurface",
   "filmstripVisible",
-  "commandMode",
-  "selectedModel",
   "selectedArtifactId",
 ] as const satisfies ReadonlyArray<keyof WorkspaceState>;
 
@@ -51,11 +45,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       canvasViewMode: "single",
       canvasSurface: "browser",
       filmstripVisible: true,
-      commandMode: "plan",
-      selectedModel: null,
       selectedArtifactId: null,
       activeRunId: null,
-      commandDraft: "",
+      commandPaletteOpen: false,
       setNavCollapsed: (navCollapsed) => set({ navCollapsed }),
       toggleNav: () => set((state) => ({ navCollapsed: !state.navCollapsed })),
       setCanvasOpen: (canvasOpen) => set({ canvasOpen }),
@@ -67,10 +59,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setCanvasViewMode: (canvasViewMode) => set({ canvasViewMode }),
       setCanvasSurface: (canvasSurface) => set({ canvasSurface }),
       setFilmstripVisible: (filmstripVisible) => set({ filmstripVisible }),
-      setCommandMode: (commandMode) => set({ commandMode }),
-      setSelectedModel: (selectedModel) => set({ selectedModel }),
       setSelectedArtifactId: (selectedArtifactId) => set({ selectedArtifactId }),
-      setCommandDraft: (commandDraft) => set({ commandDraft }),
+      setCommandPaletteOpen: (commandPaletteOpen) => set({ commandPaletteOpen }),
+      toggleCommandPalette: () =>
+        set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
     }),
     {
       name: "jober-workspace-v1",

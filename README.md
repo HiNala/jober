@@ -159,7 +159,7 @@ Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/
 
 **Discover (Mission 23):** `/discover` unifies board search and XLSX import into named target lists with dedupe, fit signals, saved searches, list refresh, and batch launch (`filters.job_list_id`). See `docs/missions/mission_23_unified_job_discovery.md`.
 
-**Workspace shell (Mission 17):** three-pane layout in `components/workspace/` — collapsible nav, center work column with command bar, resizable right canvas (browser/doc preview). Layout prefs persist in `localStorage`. Shortcuts: ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas), ⌘/Ctrl-/ (command input).
+**Workspace shell (Mission 09/17):** two in-app layout modes in `lib/workspace/layout.ts` — **ops-desk** (nav + work + resizable canvas) on `/runs/[id]` only; **editorial** (nav + full-width content) on dashboard, queue, discover, library, search, analytics, settings, and admin. Components live in `components/workspace/`. Layout prefs persist in `localStorage` (`jober-workspace-v1`). Shortcuts: ⌘/Ctrl-K and ⌘/Ctrl-/ (command palette), ⌘/Ctrl-B (nav), ⌘/Ctrl-\\ (canvas on ops-desk routes).
 
 **Live canvas (Mission 18):** on `/runs/[id]`, the right canvas streams screenshots via SSE, shows artifact grid/layers, document and fill-diff views, and a combined review-and-submit surface. Components live in `components/canvas/`.
 

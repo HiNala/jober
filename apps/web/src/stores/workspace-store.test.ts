@@ -10,10 +10,8 @@ describe("useWorkspaceStore", () => {
       focusMode: false,
       canvasViewMode: "single",
       filmstripVisible: true,
-      commandMode: "plan",
-      selectedModel: null,
       selectedArtifactId: "v1",
-      commandDraft: "",
+      commandPaletteOpen: false,
     });
   });
 
@@ -33,9 +31,9 @@ describe("useWorkspaceStore", () => {
     expect(useWorkspaceStore.getState().canvasOpen).toBe(true);
   });
 
-  it("does not persist ephemeral command draft, focus mode, or active run", () => {
-    useWorkspaceStore.getState().setCommandDraft("draft text");
-    expect(WORKSPACE_PERSISTED_KEYS).not.toContain("commandDraft");
+  it("does not persist ephemeral palette or focus mode state", () => {
+    useWorkspaceStore.getState().setCommandPaletteOpen(true);
+    expect(WORKSPACE_PERSISTED_KEYS).not.toContain("commandPaletteOpen");
     expect(WORKSPACE_PERSISTED_KEYS).not.toContain("focusMode");
     expect(WORKSPACE_PERSISTED_KEYS).not.toContain("activeRunId");
   });

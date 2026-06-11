@@ -3,7 +3,8 @@
 import type { JobTargetRead } from "@jober/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { ImportWizard } from "@/components/import/import-wizard";
 import { JobDataTable } from "@/components/jobs/job-data-table";
@@ -22,8 +23,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { exportJobsXlsxUrl, fetchJobTargets } from "@/lib/api/jobs";
 
 export default function QueuePage() {
-  const [importOpen, setImportOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const importParam = searchParams.get("import") === "1";
+  const [importOpen, setImportOpen] = useState(importParam);
+  const [prevImportParam, setPrevImportParam] = useState(importParam);
   const [kanbanDetail, setKanbanDetail] = useState<JobTargetRead | null>(null);
+
+  if (importParam !== prevImportParam) {
+    setPrevImportParam(importParam);
+    if (importParam) {
+      setImportOpen(true);
+    }
+  }
+
+  useEffect(() => {
+    if (importParam) {
+      router.replace("/queue");
+    }
+  }, [importParam, router]);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["job-targets"],

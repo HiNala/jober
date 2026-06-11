@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import { RunCanvasProvider } from "@/contexts/run-canvas-context";
+import { layoutModeForPath } from "@/lib/workspace/layout";
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -18,6 +19,7 @@ const TITLES: Record<string, string> = {
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const layoutMode = layoutModeForPath(pathname);
   let title = TITLES[pathname] ?? "Jober";
   if (pathname.startsWith("/runs/")) {
     title = "Run console";
@@ -25,7 +27,9 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
 
   return (
     <RunCanvasProvider>
-      <AppShell title={title}>{children}</AppShell>
+      <AppShell title={title} layoutMode={layoutMode}>
+        {children}
+      </AppShell>
     </RunCanvasProvider>
   );
 }

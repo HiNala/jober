@@ -135,7 +135,7 @@ export function WorkspaceNav() {
     >
       <div className="flex h-12 shrink-0 items-center justify-between px-2">
         {!navCollapsed ? (
-          <Link href="/dashboard" className="px-2 text-sm font-semibold tracking-tight">
+          <Link href="/dashboard" className="px-2 text-base font-semibold tracking-tight">
             Jober
           </Link>
         ) : (

@@ -1,35 +1,37 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
-import { WorkspaceCenterHeader } from "@/components/workspace/workspace-center-header";
-import { WorkspaceCommandBar } from "@/components/workspace/workspace-command-bar";
+import { WorkspaceCommandPalette } from "@/components/workspace/workspace-command-palette";
 import { useWorkspaceKeyboard } from "@/components/workspace/workspace-keyboard";
 import { WorkspaceShellPanels } from "@/components/workspace/workspace-shell-panels";
+import type { WorkspaceLayoutMode } from "@/lib/workspace/layout";
 
 export function WorkspaceShell({
   title,
+  layoutMode,
   children,
 }: {
   title: string;
+  layoutMode: WorkspaceLayoutMode;
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false,
   );
 
-  useWorkspaceKeyboard();
+  useWorkspaceKeyboard(pathname);
 
   if (!mounted) {
     return (
       <div className="flex h-screen flex-col overflow-hidden bg-background">
-        <WorkspaceCenterHeader title={title} />
         <main id="main-content" tabIndex={-1} className="min-h-0 flex-1 overflow-auto">
           {children}
         </main>
-        <WorkspaceCommandBar />
       </div>
     );
   }
@@ -42,7 +44,10 @@ export function WorkspaceShell({
       >
         Skip to main content
       </a>
-      <WorkspaceShellPanels title={title}>{children}</WorkspaceShellPanels>
+      <WorkspaceShellPanels title={title} layoutMode={layoutMode}>
+        {children}
+      </WorkspaceShellPanels>
+      <WorkspaceCommandPalette />
     </div>
   );
 }

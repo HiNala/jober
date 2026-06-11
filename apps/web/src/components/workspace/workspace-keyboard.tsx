@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 
+import { isOpsDeskPath } from "@/lib/workspace/layout";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
-export function useWorkspaceKeyboard() {
-  const { toggleNav, toggleCanvas, toggleFocusMode } = useWorkspaceStore();
+export function useWorkspaceKeyboard(pathname: string) {
+  const { toggleNav, toggleCanvas, toggleFocusMode, setCommandPaletteOpen } = useWorkspaceStore();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -20,7 +21,16 @@ export function useWorkspaceKeyboard() {
         return;
       }
 
+      if (event.key === "k" || event.key === "K") {
+        event.preventDefault();
+        setCommandPaletteOpen(true);
+        return;
+      }
+
       if (event.key === "\\" || event.key === "|") {
+        if (!isOpsDeskPath(pathname)) {
+          return;
+        }
         event.preventDefault();
         toggleCanvas();
         return;
@@ -28,11 +38,14 @@ export function useWorkspaceKeyboard() {
 
       if (event.key === "/" && !event.shiftKey) {
         event.preventDefault();
-        document.getElementById("workspace-command-input")?.focus();
+        setCommandPaletteOpen(true);
         return;
       }
 
       if (event.shiftKey && (event.key === "F" || event.key === "f")) {
+        if (!isOpsDeskPath(pathname)) {
+          return;
+        }
         event.preventDefault();
         toggleFocusMode();
       }
@@ -40,5 +53,11 @@ export function useWorkspaceKeyboard() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [toggleCanvas, toggleFocusMode, toggleNav]);
+  }, [
+    pathname,
+    setCommandPaletteOpen,
+    toggleCanvas,
+    toggleFocusMode,
+    toggleNav,
+  ]);
 }
