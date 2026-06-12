@@ -39,8 +39,8 @@ Web vitest runs in **node** environment; pack-critical UI behavior is tested via
 
 | Item | Rationale | Owner |
 |------|-----------|-------|
-| `useRunStream` reconnect timer (React hook) | Timing-dependent; stream labels covered in unit tests | Mission 26 e2e |
-| Full React component mount (ConsentSheet, DocumentStudio) | No jsdom/RTL in web toolchain; lib extraction pattern | Mission 26 |
+| `useRunStream` reconnect timer (React hook) | **Covered (M26)** — `core-journey.fullstack.spec.ts` reload + `run-event-stream` | — |
+| Full React component mount (ConsentSheet, DocumentStudio) | **Partial (M26)** — document studio cycle e2e; ConsentSheet still lib-only | Incremental |
 | Discover/documents inline field-error migration | Form inventory **P** rows — UI pattern, not safety | Mission 12 follow-up / incremental |
 | Parametrized per-router API envelope sweep | High count, low marginal value vs `test_error_contract` | Incremental |
 

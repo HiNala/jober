@@ -44,10 +44,13 @@ async def seed_e2e() -> None:
                 )
             )
 
-        profiles = UserProfileRepository(session)
-        profile = await profiles.get_singleton()
+        await session.flush()
+
+        profiles = UserProfileRepository(session, DEFAULT_DEV_TENANT_ID)
+        profile = await profiles.get_for_tenant()
         if profile is None:
             profile = await profiles.create(
+                tenant_id=DEFAULT_DEV_TENANT_ID,
                 name="E2E Candidate",
                 email="e2e-candidate@example.com",
                 sensitive_eeo_answers=json.dumps(
