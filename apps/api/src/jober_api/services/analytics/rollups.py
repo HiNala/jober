@@ -4,7 +4,7 @@ import uuid
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import String, and_, case, cast, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -18,7 +18,6 @@ from jober_api.models.analytics import (
 from jober_api.models.application_run import ApplicationRun
 from jober_api.models.llm_call import LlmCall
 from jober_api.services.analytics.sessionization import (
-    _actor_key,
     compute_active_users,
     compute_funnel_metrics,
     compute_page_metrics,
@@ -70,26 +69,46 @@ def _fetch_events_sync(session: Session, start: datetime, end: datetime) -> list
     return _rows_to_dicts(rows)
 
 
-async def _distinct_actors(session: AsyncSession, start: datetime, end: datetime) -> int:
-    stmt = select(AnalyticsEvent).where(
-        AnalyticsEvent.ts >= start,
-        AnalyticsEvent.ts < end,
-        AnalyticsEvent.is_bot.is_(False),
-        AnalyticsEvent.is_internal.is_(False),
+def _actor_key_sql() -> Any:
+    """SQL expression matching sessionization._actor_key (user > anon > session)."""
+    return case(
+        (
+            AnalyticsEvent.user_id.isnot(None),
+            func.concat("u:", cast(AnalyticsEvent.user_id, String)),
+        ),
+        (
+            and_(
+                AnalyticsEvent.anon_id.isnot(None),
+                AnalyticsEvent.anon_id != "",
+            ),
+            func.concat("a:", AnalyticsEvent.anon_id),
+        ),
+        else_=func.concat("s:", AnalyticsEvent.session_id),
     )
-    rows = list((await session.execute(stmt)).scalars().all())
-    return len({_actor_key(_rows_to_dicts([row])[0]) for row in rows})
+
+
+def _distinct_actors_stmt(start: datetime, end: datetime) -> Any:
+    actor = _actor_key_sql()
+    return (
+        select(func.count(func.distinct(actor)))
+        .select_from(AnalyticsEvent)
+        .where(
+            AnalyticsEvent.ts >= start,
+            AnalyticsEvent.ts < end,
+            AnalyticsEvent.is_bot.is_(False),
+            AnalyticsEvent.is_internal.is_(False),
+        )
+    )
+
+
+async def _distinct_actors(session: AsyncSession, start: datetime, end: datetime) -> int:
+    result = await session.execute(_distinct_actors_stmt(start, end))
+    return int(result.scalar_one())
 
 
 def _distinct_actors_sync(session: Session, start: datetime, end: datetime) -> int:
-    stmt = select(AnalyticsEvent).where(
-        AnalyticsEvent.ts >= start,
-        AnalyticsEvent.ts < end,
-        AnalyticsEvent.is_bot.is_(False),
-        AnalyticsEvent.is_internal.is_(False),
-    )
-    rows = list(session.execute(stmt).scalars().all())
-    return len({_actor_key(_rows_to_dicts([row])[0]) for row in rows})
+    result = session.execute(_distinct_actors_stmt(start, end))
+    return int(result.scalar_one())
 
 
 async def _rollup_llm_costs(session: AsyncSession, day: date) -> None:
