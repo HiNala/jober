@@ -1153,3 +1153,59 @@ Rotated from states → **a11y**: command-palette axe flake fixed earlier (`test
 ### Deployment decision
 
 **Not deploying** — Mission 26 is test/CI infrastructure only; production unchanged with full `e2e-fullstack` green.
+
+---
+
+## Loop after Mission 27 — 2026-06-12
+
+### Re-verification (Mission 27 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| P0 copy bugs fixed; zero dev/CMS/placeholder copy (`grep apps/web/src`) | **Green** — queue/dropzone closed Mission 05; vault error + blog comment fixed M27 |
+| Marketing copy implements §17 one-liner and pillars | **Green** — `POSITIONING_ONE_LINER` on hero + home metadata |
+| Public routes: unique metadata, JSON-LD, sitemap/robots/canonicals | **Green** — `SoftwareApplication` `/`, `FAQPage` `/faq`, `BlogPosting` `/blog/*`; `ROBOTS_DISALLOW_PATHS`; OG images deferred |
+| Voice guide + sweep table | **Green** — `docs/polish-pack/notes/27_voice_guide.md` |
+| All gates green | **Green** — see Gate summary |
+
+### Improvements made (this loop)
+
+| Commit | Change |
+|--------|--------|
+| `2683b46` | P0: vault user-facing error; blog CMS comment removed |
+| `26006cd` | Legal “In short” summaries; JSON-LD home/blog; robots disallow workspace paths |
+| `f4d7394` | Voice guide + UI-REVIEW P0 copy rows closed |
+| `22bbf9c` | Hero wired to §17 one-liner constants |
+| `65ec6fb` | Email template voice pass (ruff-clean) |
+
+**Seam fix:** `templates.py` password-reset line wrapped for ruff E501 before API lint gate.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Per-route OG image assets | Mission 28 or post-launch |
+| Prod screenshot re-capture (`capture-screenshots.mjs`) | After deploy — hero copy changed |
+| `auth-journey` fullstack in CI | Mission 26 waiver (unchanged) |
+
+### Spot check (docs)
+
+Rotated from a11y → **docs**: verified `27_voice_guide.md` sweep table matches shipped files; `seo.test.ts` guards sitemap/robots overlap; `landing-content.test.ts` asserts §17 one-liner.
+
+### Gate summary
+
+**Local (py 3.12, infra on `:5434`/`:6381`/`:9010`):**
+
+| Gate | Result |
+|------|--------|
+| `migrate-check` | Green |
+| API `ruff` + `mypy` + `pytest` | 83 passed, 313 skipped |
+| Worker `ruff` + `mypy` + `pytest` | 22 passed |
+| `test-fixtures` | 23 + pipeline + browser green |
+| `test-policy` | 19 passed |
+| Web `typecheck`, `lint:strict`, `test`, `build`, `check:motion`, `check:bundles` | 127 tests green |
+| `CI=true pnpm test:e2e:marketing` | **71 passed** |
+
+### Deployment decision
+
+**Deploy recommended** — Mission 27 Production Guidance: copy and metadata are low-risk, high-polish. After push: deploy per `docs/runbooks/deploy.md`, `bash scripts/railway-smoke.sh`, fetch production `/` + `/faq` head for JSON-LD, re-capture `docs/screenshots/prod/01-home.png` and legal pages.
