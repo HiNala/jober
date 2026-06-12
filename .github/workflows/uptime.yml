@@ -1,0 +1,21 @@
+# Production uptime smoke — enable by setting repository secrets (see docs/runbooks/uptime-monitoring.md).
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    if: ${{ secrets.UPTIME_API_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run uptime check
+        env:
+          API_URL: ${{ secrets.UPTIME_API_URL }}
+          WEB_URL: ${{ secrets.UPTIME_WEB_URL }}
+          OPS_ALERT_WEBHOOK_URL: ${{ secrets.UPTIME_OPS_ALERT_WEBHOOK_URL }}
+          JOBER_ENV: production
+        run: bash scripts/uptime-check.sh

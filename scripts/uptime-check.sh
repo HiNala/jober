@@ -23,7 +23,7 @@ if ! bash "$(dirname "$0")/railway-smoke.sh"; then
   if [ "$fail_count" -ge "$FAIL_THRESHOLD" ] && [ -n "${OPS_ALERT_WEBHOOK_URL:-}" ]; then
     curl -fsS -X POST "$OPS_ALERT_WEBHOOK_URL" \
       -H "Content-Type: application/json" \
-      -d "{\"source\":\"uptime_check\",\"environment\":\"${JOBER_ENV:-unknown}\",\"attention\":[{\"level\":\"error\",\"message\":\"Uptime smoke failed ${fail_count} times in a row for ${API_URL}\"}]}" \
+      -d "{\"source\":\"uptime_check\",\"environment\":\"${JOBER_ENV:-unknown}\",\"attention\":[{\"level\":\"error\",\"message\":\"Uptime smoke failed ${fail_count} times in a row for ${API_URL}. Runbook: docs/runbooks/uptime-monitoring.md\",\"runbook\":\"docs/runbooks/uptime-monitoring.md\"}]}" \
       || true
   fi
   exit 1

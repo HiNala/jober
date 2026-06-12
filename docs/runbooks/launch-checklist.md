@@ -21,7 +21,7 @@ Tick every item before promoting staging → production or announcing publicly.
 ## Health & deploy
 
 - [x] `bash scripts/railway-smoke.sh` green on staging (API `/readyz` verified 2026-06-10)
-- [ ] `bash scripts/uptime-check.sh` green (optional cron; wire after M34 deploy)
+- [ ] `bash scripts/uptime-check.sh` green; GitHub `uptime.yml` secrets set (see [uptime-monitoring.md](./uptime-monitoring.md))
 - [x] API `/readyz` — postgres, redis, storage ok (staging)
 - [ ] Worker `/readyz` — Celery ping ok (private)
 - [x] Migrations applied (`alembic upgrade head` in API entrypoint logs)

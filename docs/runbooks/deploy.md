@@ -152,6 +152,8 @@ Verify: `POST /api/admin/ops/test-alert` (admin session required).
 
 ## Related runbooks
 
+- [email-delivery.md](./email-delivery.md)
+- [uptime-monitoring.md](./uptime-monitoring.md)
 - [launch-checklist.md](./launch-checklist.md)
 - [rollback.md](./rollback.md)
 - [restore-backup.md](./restore-backup.md)
