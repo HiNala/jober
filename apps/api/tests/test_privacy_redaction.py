@@ -42,6 +42,16 @@ def test_scrub_text_masks_registered_secrets_and_pii() -> None:
     assert "[REDACTED" in scrubbed
 
 
+def test_scrub_text_masks_bearer_and_jwt_tokens() -> None:
+    jwt = (
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0."
+        "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+    )
+    scrubbed = scrub_text(f"Authorization: Bearer {jwt}")
+    assert jwt not in scrubbed
+    assert "Bearer [REDACTED" in scrubbed
+
+
 def test_scrub_dict_redacts_sensitive_keys() -> None:
     payload = scrub_dict(
         {
