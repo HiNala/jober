@@ -18,7 +18,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers:
+    process.env.E2E_FULL_STACK === "1" ? 1 : process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? "github" : "list",
   use: {
     ...devices["Desktop Chrome"],
@@ -34,6 +35,7 @@ export default defineConfig({
     {
       name: "fullstack",
       testMatch: /.*\.fullstack\.spec\.ts$/,
+      fullyParallel: false,
     },
   ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEB_SERVER

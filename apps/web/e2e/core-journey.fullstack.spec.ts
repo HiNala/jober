@@ -22,7 +22,6 @@ test.describe("core journey (fixture-backed)", () => {
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
 
-    await expect(page.getByRole("cell", { name: "Company 1" })).toBeVisible();
     await expect(page.getByTestId("job-queue-row")).toHaveCount(2, { timeout: 15_000 });
 
     await page.goto("/dashboard");

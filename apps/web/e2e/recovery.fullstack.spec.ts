@@ -40,7 +40,7 @@ test.describe("recovery (login gate)", () => {
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
 
-    await page.getByRole("cell", { name: job.company }).click();
+    await page.getByTestId("job-queue-row").filter({ hasText: job.company }).first().click();
     await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 15_000 });
   });
 });
