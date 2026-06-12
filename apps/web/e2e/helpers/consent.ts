@@ -16,6 +16,11 @@ export async function dismissAnalyticsConsent(page: Page): Promise<void> {
   } catch {
     return;
   }
-  await decline.click({ timeout: 5000, force: true });
-  await expect(page.getByRole("dialog", { name: /first-party analytics/i })).not.toBeVisible();
+  await page.evaluate(() => {
+    document.cookie = "jober_analytics_consent=0; path=/; max-age=31536000; SameSite=Lax";
+  });
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: /first-party analytics/i })).not.toBeVisible({
+    timeout: 5000,
+  });
 }
