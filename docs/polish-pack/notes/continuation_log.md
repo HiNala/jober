@@ -1096,7 +1096,7 @@ Rotated from docs (Mission 24) → **page-state contracts**: `page-state-contrac
 
 **Local:** web typecheck + lint:strict + test **125**; api ruff + `test_coverage_critical` **4**; worker pytest **22**.
 
-**CI:** [27403227110](https://github.com/HiNala/jober/actions/runs/27403227110) failed — `test_scrub_text_masks_bearer_and_jwt_tokens` (`Authorization:` triggers pair rule); fixed in `e9dc3b3`. Re-run pending.
+**CI:** [27403227110](https://github.com/HiNala/jober/actions/runs/27403227110) failed — `test_scrub_text_masks_bearer_and_jwt_tokens` (`Authorization:` triggers pair rule); fixed in `e9dc3b3`. [27403821913](https://github.com/HiNala/jober/actions/runs/27403821913) on `5be82f6` — **success** (backend, web **71** e2e, policy).
 
 ### Deployment decision
 
