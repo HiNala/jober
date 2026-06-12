@@ -296,6 +296,153 @@ jobs:
         run: pnpm exec playwright install chromium
 
       - name: E2E (marketing a11y + funnel smoke)
-        run: pnpm exec playwright test
+        run: pnpm exec playwright test --project=marketing
         env:
           CI: "true"
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-marketing
+          path: apps/web/test-results
+          if-no-files-found: ignore
+
+  e2e-fullstack:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: jober
+          POSTGRES_PASSWORD: jober
+          POSTGRES_DB: jober
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jober -d jober"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
+      REDIS_URL: redis://localhost:6379/0
+      MINIO_ENDPOINT: localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: jober-artifacts
+      MINIO_SECURE: "false"
+      CELERY_BROKER_URL: redis://localhost:6379/0
+      CELERY_RESULT_BACKEND: redis://localhost:6379/1
+      VAULT_ENCRYPTION_KEY: "w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ="
+      SECRET_KEY: "ci-e2e-secret-key"
+      JOBER_ENV: development
+      AUTH_MODE: dev
+      DEV_AUTH_BYPASS: "true"
+      LLM_PROVIDER: template
+      FIXTURE_ATS_PORT: "8765"
+      FIXTURE_ATS_BASE: "http://127.0.0.1:8765"
+      E2E_FULL_STACK: "1"
+      E2E_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      CI: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Start MinIO
+        run: |
+          docker run -d --name minio-e2e \
+            -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e \
+            server /data
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:9000/minio/health/live && exit 0
+            sleep 1
+          done
+          echo "MinIO failed to become healthy" >&2
+          exit 1
+
+      - name: Create MinIO bucket
+        run: |
+          docker run --rm --network host --entrypoint /bin/sh minio/mc \
+            -c "mc alias set local http://127.0.0.1:9000 minioadmin minioadmin && mc mb local/jober-artifacts --ignore-existing"
+
+      - name: Install Python dependencies
+        run: |
+          pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
+          pip install "./packages/fill" "./packages/verification" "./packages/recovery"
+          pip install "./fixtures/ats" "./apps/api[dev]" "./apps/worker[dev]"
+
+      - name: Migrate and seed e2e fixtures
+        working-directory: apps/api
+        run: |
+          alembic upgrade head
+          python scripts/seed_e2e.py
+          python ../web/e2e/scripts/build-e2e-workbook.py
+
+      - name: Install web dependencies and build
+        working-directory: apps/web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Start fixture ATS, API, and worker
+        run: |
+          python -m jober_fixtures.server --port 8765 &
+          echo $! > /tmp/fixture.pid
+          cd apps/api
+          uvicorn jober_api.main:app --host 0.0.0.0 --port 8000 &
+          echo $! > /tmp/api.pid
+          cd ../worker
+          celery -A jober_worker.celery_app beat --loglevel=warning &
+          celery -A jober_worker.celery_app worker --loglevel=info --concurrency=2 &
+          echo $! > /tmp/worker.pid
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:8000/healthz && exit 0
+            sleep 2
+          done
+          echo "API failed to become healthy" >&2
+          exit 1
+
+      - name: Install Playwright Chromium
+        working-directory: apps/web
+        run: pnpm exec playwright install chromium
+
+      - name: E2E (full-stack fixture journeys)
+        working-directory: apps/web
+        run: pnpm exec playwright test --project=fullstack
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-fullstack
+          path: apps/web/test-results
+          if-no-files-found: ignore
