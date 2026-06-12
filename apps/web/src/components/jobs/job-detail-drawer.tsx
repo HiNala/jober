@@ -32,7 +32,7 @@ export function JobDetailDrawer({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="max-h-[85vh]" data-testid="job-detail-drawer">
         <DrawerHeader>
           <DrawerTitle>
             {job.company} — {job.role}

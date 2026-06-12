@@ -9,6 +9,8 @@ from jober_extraction.a11y import extract_visible_text_from_html
 from jober_extraction.gates import GateKind, detect_access_gates
 from jober_extraction.intelligence import build_job_profile
 from jober_extraction.platform import detect_platform
+from jober_recover.failure_report import build_failure_report
+from jober_recover.taxonomy import FailureClass
 from jober_schemas.job_profile import JobExtractionRead, JobProfileRead, PlatformDetectionRead
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -155,15 +157,32 @@ async def extract_from_fixture_html(
             GateKind.CAPTCHA: CheckpointType.CAPTCHA,
             GateKind.TWO_FACTOR: CheckpointType.TWO_FACTOR,
         }[gate]
+        gate_failure_class = {
+            GateKind.LOGIN: FailureClass.LOGIN,
+            GateKind.CAPTCHA: FailureClass.CAPTCHA,
+            GateKind.TWO_FACTOR: FailureClass.TWO_FACTOR,
+        }[gate]
+        prompt = f"Resolve {gate.value} before extraction can continue."
+        report = build_failure_report(
+            job_target_id=str(job_target_id),
+            company=job.company,
+            role=job.role,
+            apply_url=job.direct_apply_url,
+            failed_step=RunStatus.EXTRACT_JOB.value,
+            failure_class=gate_failure_class,
+            error_message=prompt,
+            attempt_count=1,
+        )
         await runs.create_checkpoint(
             run.id,
             checkpoint_type=checkpoint_type,
-            prompt=f"Resolve {gate.value} before extraction can continue.",
+            prompt=prompt,
         )
         await runs.update_fields(
             run.id,
             status=RunStatus.NEEDS_HUMAN,
             human_review_required_reason=gate.value,
+            checkpoint_data={"failure_report": report.to_dict()},
         )
         raise ExtractionBlockedError(gate, run.id)
 
