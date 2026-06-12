@@ -10,6 +10,7 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.services.library import service as library_service
+from jober_api.services.library.service import DEFAULT_LIBRARY_LIMIT, MAX_LIBRARY_LIMIT
 
 router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/library", tags=["library"])
 
@@ -18,10 +19,14 @@ router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/library", tags
 async def library_resumes(
     request: Request,
     session: AsyncSession = Depends(get_session),
+    limit: int = Query(DEFAULT_LIBRARY_LIMIT, ge=1, le=MAX_LIBRARY_LIMIT),
+    offset: int = Query(0, ge=0),
 ) -> dict[str, object]:
     auth = require_auth(request)
-    items = await library_service.list_resumes(session, auth.tenant_id)
-    return {"items": items}
+    items = await library_service.list_resumes(
+        session, auth.tenant_id, limit=limit, offset=offset
+    )
+    return {"items": items, "limit": limit, "offset": offset}
 
 
 @router.get("/cover-letters")
@@ -29,20 +34,28 @@ async def library_cover_letters(
     request: Request,
     q: str | None = None,
     session: AsyncSession = Depends(get_session),
+    limit: int = Query(DEFAULT_LIBRARY_LIMIT, ge=1, le=MAX_LIBRARY_LIMIT),
+    offset: int = Query(0, ge=0),
 ) -> dict[str, object]:
     auth = require_auth(request)
-    items = await library_service.list_cover_letters(session, auth.tenant_id, query=q)
-    return {"items": items}
+    items = await library_service.list_cover_letters(
+        session, auth.tenant_id, query=q, limit=limit, offset=offset
+    )
+    return {"items": items, "limit": limit, "offset": offset}
 
 
 @router.get("/runs")
 async def library_runs(
     request: Request,
     session: AsyncSession = Depends(get_session),
+    limit: int = Query(DEFAULT_LIBRARY_LIMIT, ge=1, le=MAX_LIBRARY_LIMIT),
+    offset: int = Query(0, ge=0),
 ) -> dict[str, object]:
     auth = require_auth(request)
-    items = await library_service.list_runs(session, auth.tenant_id)
-    return {"items": items}
+    items = await library_service.list_runs(
+        session, auth.tenant_id, limit=limit, offset=offset
+    )
+    return {"items": items, "limit": limit, "offset": offset}
 
 
 @router.get("/search")

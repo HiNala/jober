@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from fastapi import Depends, File, HTTPException, Request, UploadFile, status
+from fastapi import Depends, File, HTTPException, Query, Request, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.enforcement import RBACRouter
@@ -27,11 +27,13 @@ def get_storage() -> ObjectStorage:
 async def list_resumes(
     request: Request,
     session: AsyncSession = Depends(get_session),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
 ) -> dict[str, object]:
     auth = require_auth(request)
     repo = ResumeAssetRepository(session, auth.tenant_id)
-    rows = await repo.list_all(limit=50)
-    return {"items": [serialize_resume(row) for row in rows]}
+    rows = await repo.list_all(limit=limit, offset=offset)
+    return {"items": [serialize_resume(row) for row in rows], "limit": limit, "offset": offset}
 
 
 @router.post("")

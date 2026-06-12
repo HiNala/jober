@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,7 +15,11 @@ from jober_api.models.job_list import JobList, JobListItem
 from jober_api.repositories.job_list import JobListRepository
 from jober_api.services.analytics.collector import emit_server_event
 from jober_api.services.analytics.rollups import server_session_id
-from jober_api.services.library.service import serialize_job_list
+from jober_api.services.library.service import (
+    DEFAULT_LIBRARY_LIMIT,
+    MAX_LIBRARY_LIMIT,
+    serialize_job_list,
+)
 
 router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/job-lists", tags=["job-lists"])
 
@@ -43,6 +47,8 @@ class JobListReorder(BaseModel):
 async def list_job_lists(
     request: Request,
     include_archived: bool = False,
+    limit: int = Query(DEFAULT_LIBRARY_LIMIT, ge=1, le=MAX_LIBRARY_LIMIT),
+    offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ) -> dict[str, object]:
     auth = require_auth(request)
@@ -53,8 +59,10 @@ async def list_job_lists(
         auth.tenant_id,
         auth.user_id,
         include_archived=include_archived,
+        limit=limit,
+        offset=offset,
     )
-    return {"items": items}
+    return {"items": items, "limit": limit, "offset": offset}
 
 
 @router.post("")

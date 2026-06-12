@@ -33,12 +33,16 @@ class JobListRepository(Repository[JobList]):
         user_id: uuid.UUID,
         *,
         include_archived: bool = False,
+        limit: int = 50,
+        offset: int = 0,
     ) -> list[JobList]:
         stmt = (
             select(JobList)
             .where(JobList.user_id == user_id)
             .options(selectinload(JobList.items).selectinload(JobListItem.job_target))
             .order_by(JobList.updated_at.desc())
+            .limit(limit)
+            .offset(offset)
         )
         stmt = scope_stmt(stmt, JobList, self._tenant_id)
         if not include_archived:

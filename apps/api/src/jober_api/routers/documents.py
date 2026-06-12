@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Query, Request, status
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -140,11 +140,13 @@ async def list_documents(
     request: Request,
     job_target_id: uuid.UUID,
     session: AsyncSession = Depends(get_session),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
 ) -> dict[str, object]:
     auth = require_auth(request)
     await require_job_for_tenant(session, auth.tenant_id, job_target_id)
     repo = GeneratedDocumentRepository(session)
-    rows = await repo.list_for_job(job_target_id)
+    rows = await repo.list_for_job(job_target_id, limit=limit, offset=offset)
     return {
         "items": [
             {
@@ -157,7 +159,9 @@ async def list_documents(
                 "voice_preset": (row.keyword_coverage or {}).get("voice_preset"),
             }
             for row in rows
-        ]
+        ],
+        "limit": limit,
+        "offset": offset,
     }
 
 

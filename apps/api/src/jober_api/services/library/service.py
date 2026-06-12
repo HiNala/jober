@@ -15,10 +15,19 @@ from jober_api.repositories.job_list import JobListRepository
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.serializers.profile import serialize_resume
 
+DEFAULT_LIBRARY_LIMIT = 50
+MAX_LIBRARY_LIMIT = 200
 
-async def list_resumes(session: AsyncSession, tenant_id: uuid.UUID) -> list[dict[str, Any]]:
+
+async def list_resumes(
+    session: AsyncSession,
+    tenant_id: uuid.UUID,
+    *,
+    limit: int = DEFAULT_LIBRARY_LIMIT,
+    offset: int = 0,
+) -> list[dict[str, Any]]:
     repo = ResumeAssetRepository(session, tenant_id)
-    rows = await repo.list_all(limit=100)
+    rows = await repo.list_all(limit=min(limit, MAX_LIBRARY_LIMIT), offset=offset)
     return [serialize_resume(row) for row in rows]
 
 
@@ -27,7 +36,8 @@ async def list_cover_letters(
     tenant_id: uuid.UUID,
     *,
     query: str | None = None,
-    limit: int = 100,
+    limit: int = DEFAULT_LIBRARY_LIMIT,
+    offset: int = 0,
 ) -> list[dict[str, Any]]:
     stmt = (
         select(GeneratedDocument, JobTarget)
@@ -37,7 +47,8 @@ async def list_cover_letters(
             GeneratedDocument.document_type == DocumentType.COVER_LETTER,
         )
         .order_by(GeneratedDocument.generated_at.desc().nulls_last())
-        .limit(limit)
+        .limit(min(limit, MAX_LIBRARY_LIMIT))
+        .offset(offset)
     )
     if query:
         pattern = f"%{query.strip()}%"
@@ -71,14 +82,16 @@ async def list_runs(
     session: AsyncSession,
     tenant_id: uuid.UUID,
     *,
-    limit: int = 100,
+    limit: int = DEFAULT_LIBRARY_LIMIT,
+    offset: int = 0,
 ) -> list[dict[str, Any]]:
     stmt = (
         select(ApplicationRun, JobTarget)
         .join(JobTarget, ApplicationRun.job_target_id == JobTarget.id)
         .where(ApplicationRun.tenant_id == tenant_id)
         .order_by(ApplicationRun.updated_at.desc())
-        .limit(limit)
+        .limit(min(limit, MAX_LIBRARY_LIMIT))
+        .offset(offset)
     )
     result = await session.execute(stmt)
     return [
@@ -189,7 +202,14 @@ async def list_job_lists(
     user_id: uuid.UUID,
     *,
     include_archived: bool = False,
+    limit: int = DEFAULT_LIBRARY_LIMIT,
+    offset: int = 0,
 ) -> list[dict[str, Any]]:
     repo = JobListRepository(session, tenant_id)
-    rows = await repo.list_for_user(user_id, include_archived=include_archived)
+    rows = await repo.list_for_user(
+        user_id,
+        include_archived=include_archived,
+        limit=min(limit, MAX_LIBRARY_LIMIT),
+        offset=offset,
+    )
     return [serialize_job_list(row) for row in rows]

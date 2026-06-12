@@ -32,11 +32,19 @@ class GeneratedDocumentRepository(Repository[GeneratedDocument]):
                 return row
         return None
 
-    async def list_for_job(self, job_target_id: uuid.UUID) -> list[GeneratedDocument]:
+    async def list_for_job(
+        self,
+        job_target_id: uuid.UUID,
+        *,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[GeneratedDocument]:
         stmt = (
             select(GeneratedDocument)
             .where(GeneratedDocument.job_target_id == job_target_id)
             .order_by(GeneratedDocument.generated_at.desc().nulls_last())
+            .limit(min(limit, 200))
+            .offset(offset)
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
