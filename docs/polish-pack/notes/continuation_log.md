@@ -904,3 +904,44 @@ No code changes — Mission 21 landed complete on `4387b97`; this loop re-verifi
 ### Deployment decision
 
 **Deploy API + web together** — Mission 21 Production Guidance (headers/CSP touch both surfaces). Post-deploy: login smoke, browser console for CSP reports, artifact download, `bash scripts/railway-smoke.sh`. Batch with Mission 20 index migration if not yet deployed.
+
+---
+
+## Loop after Mission 22 — 2026-06-12
+
+### Re-verification (Mission 22 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Marketing LCP &lt; 2.5s, CLS &lt; 0.1 (prod mobile) | **Deferred** — Lighthouse CLI interstitial on `jober.app`; manual PSI post-deploy (`22_perf_baseline.md`) |
+| No app-only heavy deps in marketing/auth chunks | **Green** — `check-bundle-budget.mjs` import guard |
+| `/analytics` + `/runs/[id]` dynamic imports | **Green** — verified in source |
+| Budgets tightened; `check:bundles` protective | **Green** — 2650 KB cap, measured 2560 KB |
+| Compositor-clean animations; gates green | **Green** — motion tokens + full web gates |
+
+### Improvements made (this loop)
+
+| Commit | Summary |
+|--------|---------|
+| `4259b94` | `perf(web): marketing-first provider split and hero deferral [pack-22]` |
+| (docs) | `docs(pack): Mission 22 performance baseline [pack-22]` |
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Lighthouse/PSI table for `/`, `/features`, `/pricing`, `/signup` | Operator post-deploy PSI |
+| Below-fold marketing `dynamic()` if LCP still high | Mission 28 or 22 follow-up |
+| Local e2e with stale server on :3000 | Free port or `CI=true` (documented in baseline) |
+
+### Spot check (performance)
+
+- Rotated to **bundle hygiene**: marketing trees grep-clean for `recharts`, `react-resizable-panels`, `cmdk`; hero animations use `opacity`/`transform` only per `motion.ts` + `globals.css` keyframes.
+
+### Gate summary
+
+**Local:** typecheck, lint:strict, test **108**, build, check:motion, check:bundles **2560/2650**, test:e2e **71** — green (e2e after stopping stale :3000 listener).
+
+### Deployment decision
+
+**Deploy web** — provider split and hero deferral are client-bundle/route-tree changes only; safe with Mission 21 headers already deployed. Post-deploy: PageSpeed Insights mobile on `/` and `/signup`; `bash scripts/railway-smoke.sh`.
