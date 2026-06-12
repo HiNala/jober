@@ -1053,3 +1053,50 @@ Rotated from a11y (Mission 22) → **backend contention drills**: `test_domain_l
 ### Deployment decision
 
 **Deploy API** — Mission 24 Production Guidance: ops/alerting + log fields only; configure `OPS_ALERT_WEBHOOK_URL` on Railway before relying on alerts. Post-deploy: `POST /api/admin/ops/test-alert`, set GitHub `UPTIME_*` secrets, `bash scripts/railway-smoke.sh`. Batch with pending M20–M23 API deploy if not yet live.
+
+---
+
+## Loop after Mission 25 — 2026-06-12
+
+### Re-verification (Mission 25 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Coverage map complete; paths covered or waived | **Green** — `25_coverage_map.md` matrix + waivers |
+| Web tests for pack-introduced behavior | **Green** — consent, forms, page states, reconnect labels, palette, document lock |
+| Zero flakes across 3× runs | **Green** — `pnpm test` **125** ×3 local |
+| Mutation spot-checks (fill policy + redaction) | **Green** — `test_coverage_critical.py` + JWT/bearer in `test_privacy_redaction.py` |
+| CI duration within +25%; gates green | **Pending CI** — +12 web / +5 api unit tests only |
+
+### Improvements made (this loop)
+
+| Commit | Summary |
+|--------|---------|
+| `7e69a8e` | `test(web): critical-path unit coverage [pack-25]` |
+| `48f1860` | `test(api): critical-path coverage and mutation spot-checks [pack-25]` |
+| `24de4db` | `docs(pack): Mission 25 coverage map [pack-25]` |
+
+Mission 25 work was uncommitted at loop start — triaged and landed in clustered commits.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| `useRunStream` reconnect timer e2e | Mission 26 |
+| React mount tests (ConsentSheet, DocumentStudio) | Mission 26 |
+| Form inventory **P** inline field errors | Incremental / Mission 12 |
+| Full API pytest 3× on Windows host | CI authoritative |
+
+### Spot check (states)
+
+Rotated from docs (Mission 24) → **page-state contracts**: `page-state-contracts.ts` ARIA roles (`status`/`alert`) wired into `page-states.tsx`; `page-state-contracts.test.ts` asserts loading busy + empty-state copy has actionable descriptions.
+
+### Gate summary
+
+**Local:** web typecheck + lint:strict + test **125**; api ruff + `test_coverage_critical` **4**; worker pytest **22**.
+
+**CI:** pending push.
+
+### Deployment decision
+
+**Not deploying** — Mission 25 Production Guidance: test-only changes. No production surface change.
