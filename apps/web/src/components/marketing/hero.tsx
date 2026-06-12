@@ -4,6 +4,7 @@ import { ArrowRight, Play } from "lucide-react";
 import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
 import { AnimatedBackground } from "@/components/marketing/animated-background";
 import { motionHeroStagger } from "@/lib/design/motion";
+import { POSITIONING_ONE_LINER, POSITIONING_SUBHEAD } from "@/lib/marketing/content";
 import { cn } from "@/lib/utils";
 
 const HeroRunPreview = dynamic(
@@ -44,7 +45,7 @@ export function MarketingHero() {
             motionHeroStagger(1),
           )}
         >
-          Tailored job applications with clarity at every step
+          {POSITIONING_ONE_LINER}
         </h1>
         <p
           className={cn(
@@ -52,8 +53,7 @@ export function MarketingHero() {
             motionHeroStagger(2),
           )}
         >
-          Watch the run console fill forms, review every diff, and approve submit yourself —
-          quality and tracking, not hidden automation.
+          {POSITIONING_SUBHEAD}
         </p>
         <div
           className={cn(
