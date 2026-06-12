@@ -26,7 +26,7 @@ test.describe("settings policy default", () => {
     await page.getByTestId("preview-batch-tenant-default").click();
 
     await expect(page.getByTestId("batch-preview-dialog")).toBeVisible();
-    await expect(page.getByText("Loading preview…")).toBeHidden({ timeout: 30_000 });
+    await expect(page.getByText("Run policy")).toBeVisible({ timeout: 30_000 });
     await expect(page.locator('input[name="batch-policy"][value="review_before_submit"]')).toBeChecked({
       timeout: 15_000,
     });

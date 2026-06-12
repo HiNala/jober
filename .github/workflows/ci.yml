@@ -399,7 +399,16 @@ jobs:
           pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
           pip install "./packages/fill" "./packages/verification" "./packages/recovery"
           pip install "./fixtures/ats" "./apps/api[dev]" "./apps/worker[dev]"
-          playwright install chromium
+
+      - name: Install Playwright browsers (Python fill-runner)
+        run: |
+          for attempt in 1 2 3; do
+            playwright install chromium && exit 0
+            echo "Playwright browser install attempt ${attempt} failed; retrying…" >&2
+            sleep 10
+          done
+          echo "Playwright browser install failed after 3 attempts" >&2
+          exit 1
 
       - name: Migrate and seed e2e fixtures
         working-directory: apps/api
