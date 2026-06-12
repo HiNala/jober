@@ -957,3 +957,53 @@ Mission 22 validation re-run verbatim: typecheck, lint:strict, test **108**, bui
 ### Deployment decision
 
 **Deploy web** — Mission 22 Production Guidance: client-only perf wins; no API contract change. Batch with any pending Mission 20/21 deploy if not yet live. Post-deploy: PSI mobile on `/` and `/signup`, fill `22_perf_baseline.md` Lighthouse table, `bash scripts/railway-smoke.sh`.
+
+---
+
+## Loop after Mission 23 — 2026-06-12
+
+### Re-verification (Mission 23 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Latency table recorded; fixed endpoints show measured improvement; p95 targets at seeded volume | **Green** — `23_backend_perf.md` + guards in `test_load_smoke.py` (`test_hot_paths_at_perf_volume`) |
+| Every list endpoint paginates with enforced limits | **Green** — library, job-lists, documents, resumes (`max 200`); job-targets (`max 2000`); inventory in notes |
+| Rollup linear-ish in event count | **Green** — `test_analytics_rollup_scales_linearly` (2k &lt; 2s, 10k &lt; 8s, &lt; 8× ratio) |
+| Worker pacing/lock drills pass; SSE fan-out zero loss at N=10 | **Green** — `test_domain_lock_serializes_same_host`, `test_sse_fanout_no_event_loss`; batch enqueue in `test_batch_ops.py` |
+| Regression guards in `test_load_smoke.py`; all gates green | **Green** — CI on `5800cc0` |
+
+Mission 23 validation re-run: api `ruff` + `mypy` green locally; worker `ruff` + `mypy` + pytest **22** (Python 3.12). Full pytest load suite authoritative on CI (`backend` job).
+
+### Seam sweep (pagination + dashboard blast radius)
+
+- Web `library.ts` / `jobs.ts` consume `{ items }` only — added `limit`/`offset` metadata is backward compatible (no web change required).
+- Dashboard `queue_depth_priority_a` now SQL `COUNT` via `JobTargetRepository.count_filtered` — runbook `queue-backed-up.md` updated (high depth = real backlog).
+- Perf volume seed: `apps/api/scripts/seed_perf_volume.py` + `services/dev/perf_volume.py` — dev/CI only.
+- No user-facing screenshot re-capture (API/worker-only mission).
+
+### Improvements made (this loop)
+
+No code changes — Mission 23 commits (`7311a87`…`5800cc0`) verified complete; tree was clean at loop start.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Production latency sampling (Railway) | Mission 24 / operator |
+| Redis response caching for dashboard | Out of scope (Mission 23) |
+| `job-targets` `total` field (page size vs DB count) | Future API hygiene |
+| Local full API pytest on Windows host (port conflicts) | CI authoritative; use `POSTGRES_HOST_PORT=5434` per `gates.md` |
+
+### Spot check (chaos)
+
+Rotated from a11y (Mission 22) → **backend contention drills**: `test_domain_lock_serializes_same_host` asserts same-host batches serialize via Redis lock; `test_sse_fanout_no_event_loss` asserts 10 concurrent SSE consumers receive all 30 events with no loss. Runbook cross-check: `queue-backed-up.md` documents domain-lock diagnosis path.
+
+### Gate summary
+
+**CI:** run [27396078702](https://github.com/HiNala/jober/actions/runs/27396078702) on `5800cc0` — backend, web, policy, quarantine — **success**.
+
+**Local:** api ruff + mypy green; worker ruff + mypy + pytest **22** (py 3.12). Web gates unchanged since Mission 22 (no web diff in M23).
+
+### Deployment decision
+
+**Deploy API** — Mission 23 Production Guidance: gates green; pagination is backward compatible (web reads `items` only). Safe to deploy API without web if M20 index migration (`r1a2b3c34d65`) is already live; otherwise batch API deploy with M20 backup + migrate. Post-deploy: `bash scripts/railway-smoke.sh`, spot-check `/api/dashboard/summary` latency. Batch with pending M21/M22 web deploy if not yet live (independent surfaces).
