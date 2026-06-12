@@ -112,3 +112,7 @@ class FixtureServer:
             self._server.should_exit = True
         if self._thread is not None:
             self._thread.join(timeout=5)
+
+
+if __name__ == "__main__":
+    main()
