@@ -914,34 +914,46 @@ No code changes — Mission 21 landed complete on `4387b97`; this loop re-verifi
 | Criterion | Result |
 |-----------|--------|
 | Marketing LCP &lt; 2.5s, CLS &lt; 0.1 (prod mobile) | **Deferred** — Lighthouse CLI interstitial on `jober.app`; manual PSI post-deploy (`22_perf_baseline.md`) |
-| No app-only heavy deps in marketing/auth chunks | **Green** — `check-bundle-budget.mjs` import guard |
-| `/analytics` + `/runs/[id]` dynamic imports | **Green** — verified in source |
-| Budgets tightened; `check:bundles` protective | **Green** — 2650 KB cap, measured 2560 KB |
-| Compositor-clean animations; gates green | **Green** — motion tokens + full web gates |
+| No app-only heavy deps in marketing/auth chunks | **Green** — `check-bundle-budget.mjs` import guard (re-run 2026-06-12) |
+| `/analytics` + `/runs/[id]` dynamic imports | **Green** — `dynamic()` on panels + `RunConsole` (source re-verified) |
+| Budgets tightened; `check:bundles` protective | **Green** — 2650 KB cap, measured **2560 KB** |
+| Compositor-clean animations; gates green | **Green** — `check:motion` + full web validation |
+
+Mission 22 validation re-run verbatim: typecheck, lint:strict, test **108**, build, check:motion, check:bundles, test:e2e — all green on `4cca814`.
+
+### Seam sweep (provider blast radius)
+
+- Root `layout.tsx` → `ShellProviders` only; `(app)` + `(auth)` → `AppProviders`; legacy `Providers` wrapper retained for tests.
+- Marketing/blog/legal routes inherit shell-only stack (no QueryClient/auth bootstrap on first paint).
+- `/kitchen-sink` remains shell-only (no `useAuth` / `useQuery`); note unchanged.
+- No screenshot re-capture — visual surfaces unchanged (bundle/route-tree only).
 
 ### Improvements made (this loop)
 
 | Commit | Summary |
 |--------|---------|
 | `4259b94` | `perf(web): marketing-first provider split and hero deferral [pack-22]` |
-| (docs) | `docs(pack): Mission 22 performance baseline [pack-22]` |
+| `4cca814` | `docs(pack): Mission 22 performance baseline [pack-22]` |
+| (this loop) | `docs(pack): continuation loop after Mission 22 [pack-31 after 22]` — gates.md Windows e2e port note |
 
 ### Deferrals
 
 | Item | Owner |
 |------|-------|
 | Lighthouse/PSI table for `/`, `/features`, `/pricing`, `/signup` | Operator post-deploy PSI |
-| Below-fold marketing `dynamic()` if LCP still high | Mission 28 or 22 follow-up |
-| Local e2e with stale server on :3000 | Free port or `CI=true` (documented in baseline) |
+| Below-fold marketing `dynamic()` if LCP still high | Mission 28 |
+| `/kitchen-sink` + `AppProviders` if React Query needed later | note only |
 
-### Spot check (performance)
+### Spot check (a11y)
 
-- Rotated to **bundle hygiene**: marketing trees grep-clean for `recharts`, `react-resizable-panels`, `cmdk`; hero animations use `opacity`/`transform` only per `motion.ts` + `globals.css` keyframes.
+- Rotated from performance (Mission 22 close) → **marketing hero**: `section` has `aria-labelledby="hero-heading"`; H1 `id` matches; decorative icons + lazy-load pulse `aria-hidden`; CTAs remain real links with visible text. No regressions from hero `dynamic()` deferral.
 
 ### Gate summary
 
-**Local:** typecheck, lint:strict, test **108**, build, check:motion, check:bundles **2560/2650**, test:e2e **71** — green (e2e after stopping stale :3000 listener).
+**CI:** run [27389964744](https://github.com/HiNala/jober/actions/runs/27389964744) on `4cca814` — backend, web (**71** e2e), policy, quarantine — **success**.
+
+**Local (pack-31 re-run):** typecheck, lint:strict, test **108**, build, check:motion, check:bundles **2560/2650**, test:e2e **70 passed + 1 flaky** (`document-studio.spec.ts`); repeat `×3` on that spec → **6/6** green (environmental timing; CI clean).
 
 ### Deployment decision
 
-**Deploy web** — provider split and hero deferral are client-bundle/route-tree changes only; safe with Mission 21 headers already deployed. Post-deploy: PageSpeed Insights mobile on `/` and `/signup`; `bash scripts/railway-smoke.sh`.
+**Deploy web** — Mission 22 Production Guidance: client-only perf wins; no API contract change. Batch with any pending Mission 20/21 deploy if not yet live. Post-deploy: PSI mobile on `/` and `/signup`, fill `22_perf_baseline.md` Lighthouse table, `bash scripts/railway-smoke.sh`.

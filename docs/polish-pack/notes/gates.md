@@ -118,7 +118,9 @@ CI=true pnpm test:e2e
 
 Playwright starts `pnpm start` via `playwright.config.ts` unless `PLAYWRIGHT_SKIP_WEB_SERVER=1`.
 
-**Mission 02 result:** 13 passed.
+**Windows:** With `CI=true`, Playwright refuses to reuse an existing server on port 3000. Stop any stale `next start` / dev server on `:3000` before e2e, or e2e fails with *"port already used"*. Without `CI`, `reuseExistingServer: true` applies but the running server must be a fresh production build with `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` (see `playwright.config.ts` webServer env).
+
+**Mission 02 result:** 13 passed. **Mission 22:** 71 passed (CI).
 
 ## One-liner summary (Mission 31 / pre-push)
 
