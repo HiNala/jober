@@ -399,6 +399,7 @@ jobs:
           pip install "./packages/schemas" "./packages/extraction" "./packages/forms"
           pip install "./packages/fill" "./packages/verification" "./packages/recovery"
           pip install "./fixtures/ats" "./apps/api[dev]" "./apps/worker[dev]"
+          playwright install chromium
 
       - name: Migrate and seed e2e fixtures
         working-directory: apps/api

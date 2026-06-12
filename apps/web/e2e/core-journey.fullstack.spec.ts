@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 import {
   E2E_API_URL,
+  apiJson,
   importE2eWorkbook,
   seedReviewCheckpointRun,
   waitForRunStatus,
