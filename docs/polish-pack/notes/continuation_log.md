@@ -1110,8 +1110,8 @@ Rotated from docs (Mission 24) → **page-state contracts**: `page-state-contrac
 
 | Criterion | Result |
 |-----------|--------|
-| Five full-stack Playwright specs (core, recovery, studio, settings, auth) | **Partial** — 2/5 green on CI before this loop; auth skipped unless `E2E_AUTH_NATIVE=1` (documented waiver) |
-| `e2e-fullstack` CI job with Postgres/Redis/MinIO/API/worker/fixtures | **Green** — job present; 3 spec failures triaged below |
+| Five full-stack Playwright specs (core, recovery, studio, settings, auth) | **Green** — 4 specs pass in CI; `auth-journey` skipped unless `E2E_AUTH_NATIVE=1` (documented waiver) |
+| `e2e-fullstack` CI job with Postgres/Redis/MinIO/API/worker/fixtures | **Green** — 5 passed on [27433804816](https://github.com/HiNala/jober/actions/runs/27433804816) |
 | Docs (`26_e2e_map.md`, gates §8, testing.md) | **Green** |
 | Marketing e2e unchanged and green | **Green** — 71 passed on prior CI web job |
 
