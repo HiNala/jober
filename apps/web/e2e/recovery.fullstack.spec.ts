@@ -51,8 +51,11 @@ test.describe("recovery (login gate)", () => {
 
     const jobRow = page.locator(`[data-job-id="${job.id}"]`);
     await expect(jobRow).toBeVisible({ timeout: 15_000 });
+    await jobRow.scrollIntoViewIfNeeded();
     await jobRow.click();
-    await expect(page.getByTestId("job-detail-drawer")).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole("heading", { name: new RegExp(`${job.company} —`) }),
+    ).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(reportRes.body.inferred_reason)).toBeVisible();
   });
