@@ -79,6 +79,7 @@ async def seed_e2e() -> None:
                 ),
             }
             resume = await resumes.create(
+                tenant_id=DEFAULT_DEV_TENANT_ID,
                 object_key=f"tenants/{DEFAULT_DEV_TENANT_ID}/resumes/e2e/resume.docx",
                 original_filename="e2e-resume.docx",
                 extracted_text=text,
