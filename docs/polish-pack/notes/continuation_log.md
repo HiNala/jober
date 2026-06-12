@@ -1144,9 +1144,11 @@ Rotated from states → **a11y**: command-palette axe flake fixed earlier (`test
 
 **CI (pre-fix):** [27417131507](https://github.com/HiNala/jober/actions/runs/27417131507) — backend/web/policy green; `e2e-fullstack` **2 passed, 3 failed** (checkpoint `fill-form` 500, recovery panel, settings batch policy).
 
-**CI (post-fix):** `e2e-fullstack` **5 passed** on [27433305120](https://github.com/HiNala/jober/actions/runs/27433305120) (headed Playwright, JSON Content-Type, batch preview effect deps, extraction failure-report embed, `/queue?job=` deep-link, consent cookie seed). Marketing e2e consent helper stabilized in `aaaf2c2`+.
+**CI (post-fix):** Full CI green on [27433804816](https://github.com/HiNala/jober/actions/runs/27433804816) — `e2e-fullstack` **5 passed**, marketing e2e **71 passed**, backend/policy green.
 
-**Commits (this loop):** `39abf77`…`aaaf2c2` (8 commits).
+**Commits (this loop):** `39abf77`…`3523766` (10 commits).
+
+**Root causes fixed:** `PLAYWRIGHT_HEADED=false` for API fill-runner; missing `Content-Type` on browser JSON POSTs; batch preview effect re-fetch loop; extraction login-gate failure report embed; `/queue?job=` drawer deep-link; consent sheet dismiss stability.
 
 ### Deployment decision
 
