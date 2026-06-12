@@ -280,7 +280,7 @@ export function ProfileVault() {
     return (
       <PageError
         title="Vault unavailable"
-        message="Ensure the API is running with VAULT_ENCRYPTION_KEY set."
+        message="Could not load your profile vault. Check your connection and try again — contact support if this persists."
         onRetry={() => void refetch()}
       />
     );

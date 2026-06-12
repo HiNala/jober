@@ -6,7 +6,7 @@ export type BlogPost = {
   body: string[];
 };
 
-/** Markdown-driven scaffold — add posts here until a CMS is chosen. */
+/** Static blog posts shipped with the web app. */
 export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "welcome-to-jober",
