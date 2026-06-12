@@ -84,7 +84,7 @@ export async function seedReviewCheckpointRun(request: APIRequestContext): Promi
     await importE2eWorkbook(request);
     jobs = await apiJson(request, "GET", "/api/job-targets?priority=A&limit=5");
   }
-  const jobId = jobs.body.items[0]?.id;
+  const jobId = jobs.body.items[1]?.id ?? jobs.body.items[0]?.id;
   if (!jobId) {
     throw new Error("No job targets after import");
   }
@@ -106,7 +106,7 @@ export async function seedReviewCheckpointRun(request: APIRequestContext): Promi
     { data: { fixture_html: atsHtml } },
   );
   if (fill.status >= 400) {
-    throw new Error(`fill-form failed: ${fill.status}`);
+    throw new Error(`fill-form failed: ${fill.status} ${JSON.stringify(fill.body)}`);
   }
 
   const verify = await apiJson<{ run_id: string; status: string }>(

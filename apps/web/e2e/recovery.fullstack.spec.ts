@@ -48,6 +48,7 @@ test.describe("recovery (login gate)", () => {
     await waitForAppShell(page);
 
     await page.getByTestId("job-queue-row").filter({ hasText: job.company }).first().click();
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 10_000 });
     await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 15_000 });
   });
 });

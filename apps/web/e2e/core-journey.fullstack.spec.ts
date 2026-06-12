@@ -24,10 +24,17 @@ test.describe("core journey (fixture-backed)", () => {
 
     await expect(page.getByTestId("job-queue-row")).toHaveCount(2, { timeout: 15_000 });
 
+    const preview = await apiJson<{ included: unknown[] }>(request, "POST", "/api/batches/preview", {
+      data: { filters: { priority: "A", status: "new", limit: 50 } },
+    });
+    expect(preview.status).toBeLessThan(400);
+    expect(preview.body.included?.length ?? 0).toBeGreaterThan(0);
+
     await page.goto("/dashboard");
     await waitForAppShell(page);
     await page.getByRole("button", { name: "Preview dry-run" }).click();
     await expect(page.getByTestId("batch-preview-dialog")).toBeVisible();
+    await expect(page.getByText("Loading preview…")).toBeHidden({ timeout: 30_000 });
     await expect(page.getByTestId("batch-enqueue")).toBeEnabled({ timeout: 30_000 });
     await page.getByTestId("batch-enqueue").click();
 

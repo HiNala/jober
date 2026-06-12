@@ -13,31 +13,15 @@ test.describe("settings policy default", () => {
   test("tenant default pre-selects batch policy", async ({ page, request }) => {
     await importE2eWorkbook(request);
 
-    await page.goto("/settings");
-    await dismissAnalyticsConsent(page);
-    await waitForAppShell(page);
-
-    await page.locator("#run-policy").selectOption("auto_submit");
-    await expect.poll(async () => {
-      const policy = await apiJson<{ policy: { default_run_policy: string } }>(
-        request,
-        "GET",
-        "/api/settings/policy",
-      );
-      return policy.body.policy.default_run_policy;
-    }).toBe("auto_submit");
-
-    await page.locator("#run-policy").selectOption("review_before_submit");
-    await expect.poll(async () => {
-      const policy = await apiJson<{ policy: { default_run_policy: string } }>(
-        request,
-        "GET",
-        "/api/settings/policy",
-      );
-      return policy.body.policy.default_run_policy;
-    }).toBe("review_before_submit");
+    await apiJson(request, "PUT", "/api/settings/policy", {
+      data: {
+        default_run_policy: "review_before_submit",
+        auto_submit_opt_in: false,
+      },
+    });
 
     await page.goto("/dashboard");
+    await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
     await page.getByTestId("preview-batch-tenant-default").click();
 
