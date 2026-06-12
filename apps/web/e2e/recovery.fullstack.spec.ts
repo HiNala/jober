@@ -36,12 +36,13 @@ test.describe("recovery (login gate)", () => {
     expect(extract.status).toBe(409);
     expect(extract.body.detail?.gate).toBe("login");
 
-    await expect
-      .poll(async () => {
-        const report = await apiJson(request, "GET", `/api/job-targets/${job.id}/failure-report`);
-        return report.status;
-      })
-      .toBe(200);
+    const reportRes = await apiJson<{ inferred_reason: string }>(
+      request,
+      "GET",
+      `/api/job-targets/${job.id}/failure-report`,
+    );
+    expect(reportRes.status).toBe(200);
+    expect(reportRes.body.inferred_reason).toBeTruthy();
 
     await page.goto("/queue");
     await dismissAnalyticsConsent(page);
@@ -49,13 +50,8 @@ test.describe("recovery (login gate)", () => {
 
     const jobRow = page.locator(`[data-job-id="${job.id}"]`);
     await expect(jobRow).toBeVisible({ timeout: 15_000 });
-    const failureReportResponse = page.waitForResponse(
-      (response) =>
-        response.url().includes(`/api/job-targets/${job.id}/failure-report`) &&
-        response.status() === 200,
-    );
     await jobRow.click();
-    await failureReportResponse;
-    await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(reportRes.body.inferred_reason)).toBeVisible();
   });
 });

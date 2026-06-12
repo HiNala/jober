@@ -37,6 +37,16 @@ function csrfHeader(init?: RequestInit): Record<string, string> {
   return token ? { "X-CSRF-Token": token } : {};
 }
 
+function jsonContentType(init?: RequestInit): Record<string, string> {
+  if (init?.body == null || init.body instanceof FormData) {
+    return {};
+  }
+  const hasContentType = init.headers
+    ? new Headers(init.headers).has("Content-Type")
+    : false;
+  return hasContentType ? {} : { "Content-Type": "application/json" };
+}
+
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
@@ -48,6 +58,7 @@ export async function apiFetch<T>(
     headers: {
       Accept: "application/json",
       ...authHeaders(),
+      ...jsonContentType(init),
       ...csrfHeader(init),
       ...init?.headers,
     },

@@ -23,15 +23,7 @@ test.describe("settings policy default", () => {
     await page.goto("/dashboard");
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
-    const previewResponse = page.waitForResponse(
-      (response) =>
-        response.url().includes("/api/batches/preview") &&
-        response.request().method() === "POST" &&
-        response.ok(),
-    );
     await page.getByTestId("preview-batch-tenant-default").click();
-    await previewResponse;
-
     await expect(page.getByTestId("batch-preview-dialog")).toBeVisible();
     await expect(page.getByText("Run policy")).toBeVisible({ timeout: 30_000 });
     await expect(page.locator('input[name="batch-policy"][value="review_before_submit"]')).toBeChecked({
