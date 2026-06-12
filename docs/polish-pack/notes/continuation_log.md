@@ -1101,3 +1101,49 @@ Rotated from docs (Mission 24) → **page-state contracts**: `page-state-contrac
 ### Deployment decision
 
 **Not deploying** — Mission 25 Production Guidance: test-only changes. No production surface change.
+
+---
+
+## Loop after Mission 26 — 2026-06-12
+
+### Re-verification (Mission 26 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Five full-stack Playwright specs (core, recovery, studio, settings, auth) | **Partial** — 2/5 green on CI before this loop; auth skipped unless `E2E_AUTH_NATIVE=1` (documented waiver) |
+| `e2e-fullstack` CI job with Postgres/Redis/MinIO/API/worker/fixtures | **Green** — job present; 3 spec failures triaged below |
+| Docs (`26_e2e_map.md`, gates §8, testing.md) | **Green** |
+| Marketing e2e unchanged and green | **Green** — 71 passed on prior CI web job |
+
+### Improvements made (this loop)
+
+| Area | Fix |
+|------|-----|
+| `fill-form` 500 in CI | `PLAYWRIGHT_HEADED=false` on `e2e-fullstack` job — Python fill-runner was launching headed Chromium on a headless runner |
+| Batch preview stuck on “Loading preview…” | `BatchPreviewBody` effect depended on unstable `onClose` callback → infinite cancel/reload; stabilized with ref |
+| Recovery drawer missing failure panel | Duplicate workbook imports created multiple “Company N” rows; test now clicks `[data-job-id]` |
+| E2E web build auth | `NEXT_PUBLIC_DEV_AUTH_BYPASS` + dev tenant/user IDs baked at `pnpm build` in fullstack job |
+
+Prior loop commits (`0ff067d`…`22acfde`) landed Mission 26 infrastructure; this loop closes the remaining CI seams.
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| `auth-journey.fullstack.spec.ts` in CI | Mission 26 waiver — requires `E2E_AUTH_NATIVE=1` + native auth stack |
+| Fullstack 3× local flake burn-in | Optional — CI authoritative when Docker stack available |
+| `fill_from_fixture_html` tenant-scoped `UserProfileRepository` | Incremental hardening (not blocking once headed=false) |
+
+### Spot check (a11y)
+
+Rotated from states → **a11y**: command-palette axe flake fixed earlier (`test.setTimeout(60_000)` + explicit dialog wait in `a11y-app.spec.ts`); marketing e2e **71** passed locally with port 3000 cleared.
+
+### Gate summary
+
+**Local:** `pnpm typecheck`, `lint:strict` (changed files), prior loop `pnpm test` **125**, build/motion/bundles green.
+
+**CI (pre-fix):** [27417131507](https://github.com/HiNala/jober/actions/runs/27417131507) — backend/web/policy green; `e2e-fullstack` **2 passed, 3 failed** (checkpoint `fill-form` 500, recovery panel, settings batch policy).
+
+### Deployment decision
+
+**Not deploying** — Mission 26 is test/CI infrastructure only; production unchanged until `e2e-fullstack` is green on CI.

@@ -47,10 +47,9 @@ test.describe("recovery (login gate)", () => {
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
 
-    await expect(page.getByTestId("job-queue-row").filter({ hasText: job.company }).first()).toBeVisible({
-      timeout: 15_000,
-    });
-    await page.getByTestId("job-queue-row").filter({ hasText: job.company }).first().click();
+    const jobRow = page.locator(`[data-job-id="${job.id}"]`);
+    await expect(jobRow).toBeVisible({ timeout: 15_000 });
+    await jobRow.click();
     await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 20_000 });
   });
 });

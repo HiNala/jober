@@ -213,6 +213,7 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
                 <TableRow
                   key={row.id}
                   data-testid="job-queue-row"
+                  data-job-id={row.id}
                   className="cursor-pointer hover:bg-muted/40"
                   onClick={() => setDetail(row)}
                 >

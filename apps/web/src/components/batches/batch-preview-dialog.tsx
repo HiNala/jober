@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,10 @@ function BatchPreviewBody({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [policy, setPolicy] = useState<BatchPolicy>(defaultPolicy);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,7 +76,7 @@ function BatchPreviewBody({
       } catch (err) {
         if (!cancelled) {
           toast.error(err instanceof Error ? err.message : "Could not preview batch");
-          onClose();
+          onCloseRef.current();
         }
       } finally {
         if (!cancelled) {
@@ -84,7 +88,7 @@ function BatchPreviewBody({
     return () => {
       cancelled = true;
     };
-  }, [filters, onClose]);
+  }, [filters]);
 
   const included = preview?.included ?? [];
   const excluded = preview?.excluded ?? [];
