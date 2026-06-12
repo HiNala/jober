@@ -15,10 +15,10 @@ test.describe("recovery (login gate)", () => {
     const jobs = await apiJson<{ items: { id: string; company: string }[] }>(
       request,
       "GET",
-      "/api/job-targets?priority=A&limit=1",
+      "/api/job-targets?priority=A&limit=50",
     );
-    const job = jobs.body.items[0];
-    if (!job) throw new Error("missing job");
+    const job = jobs.body.items.at(-1);
+    if (!job) throw new Error("missing job after import");
 
     const loginHtml = await fetchFixtureHtml(request, "gates/login");
     const extract = await apiJson<{ detail?: { gate?: string; run_id?: string } }>(
@@ -49,7 +49,13 @@ test.describe("recovery (login gate)", () => {
 
     const jobRow = page.locator(`[data-job-id="${job.id}"]`);
     await expect(jobRow).toBeVisible({ timeout: 15_000 });
+    const failureReportResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes(`/api/job-targets/${job.id}/failure-report`) &&
+        response.status() === 200,
+    );
     await jobRow.click();
-    await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 20_000 });
+    await failureReportResponse;
+    await expect(page.getByTestId("failure-report-panel")).toBeVisible({ timeout: 15_000 });
   });
 });

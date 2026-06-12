@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,11 @@ export function BatchPanel() {
     setPreviewOpen(true);
   }
 
-  const filters = plan?.proposed_filters ?? { priority: "A", status: "new", limit: 50 };
+  const defaultFilters = useMemo(
+    () => ({ priority: "A", status: "new", limit: 50 }),
+    [],
+  );
+  const filters = plan?.proposed_filters ?? defaultFilters;
 
   return (
     <>

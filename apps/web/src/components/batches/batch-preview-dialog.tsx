@@ -59,6 +59,7 @@ function BatchPreviewBody({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [policy, setPolicy] = useState<BatchPolicy>(defaultPolicy);
+  const filtersKey = JSON.stringify(filters);
   const onCloseRef = useRef(onClose);
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -88,7 +89,7 @@ function BatchPreviewBody({
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filtersKey, filters]); // filters read when filtersKey changes
 
   const included = preview?.included ?? [];
   const excluded = preview?.excluded ?? [];

@@ -16,6 +16,14 @@ export function FailureReportPanel({ jobTargetId }: FailureReportPanelProps) {
     queryFn: () => fetchFailureReportForJob(jobTargetId),
   });
 
+  if (reportQuery.isLoading) {
+    return (
+      <p data-testid="failure-report-loading" className="text-sm text-muted-foreground">
+        Loading failure report…
+      </p>
+    );
+  }
+
   const report = reportQuery.data;
   if (!report) {
     return null;
