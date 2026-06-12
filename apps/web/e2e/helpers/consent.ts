@@ -10,17 +10,18 @@ export async function seedAnalyticsDeclinedCookie(page: Page): Promise<void> {
 
 /** Dismiss the one-time analytics consent sheet when present (fresh profile). */
 export async function dismissAnalyticsConsent(page: Page): Promise<void> {
+  await seedAnalyticsDeclinedCookie(page);
+
   const decline = page.getByRole("button", { name: "Decline" });
+  const dialog = page.getByRole("dialog", { name: /first-party analytics/i });
   try {
     await decline.waitFor({ state: "visible", timeout: 5000 });
   } catch {
     return;
   }
-  await page.evaluate(() => {
-    document.cookie = "jober_analytics_consent=0; path=/; max-age=31536000; SameSite=Lax";
+
+  await decline.click({ timeout: 5000, noWaitAfter: true }).catch(async () => {
+    await page.keyboard.press("Escape");
   });
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog", { name: /first-party analytics/i })).not.toBeVisible({
-    timeout: 5000,
-  });
+  await expect(dialog).not.toBeVisible({ timeout: 5000 });
 }

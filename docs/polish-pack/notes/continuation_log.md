@@ -1144,6 +1144,10 @@ Rotated from states → **a11y**: command-palette axe flake fixed earlier (`test
 
 **CI (pre-fix):** [27417131507](https://github.com/HiNala/jober/actions/runs/27417131507) — backend/web/policy green; `e2e-fullstack` **2 passed, 3 failed** (checkpoint `fill-form` 500, recovery panel, settings batch policy).
 
+**CI (post-fix):** `e2e-fullstack` **5 passed** on [27433305120](https://github.com/HiNala/jober/actions/runs/27433305120) (headed Playwright, JSON Content-Type, batch preview effect deps, extraction failure-report embed, `/queue?job=` deep-link, consent cookie seed). Marketing e2e consent helper stabilized in `aaaf2c2`+.
+
+**Commits (this loop):** `39abf77`…`aaaf2c2` (8 commits).
+
 ### Deployment decision
 
-**Not deploying** — Mission 26 is test/CI infrastructure only; production unchanged until `e2e-fullstack` is green on CI.
+**Not deploying** — Mission 26 is test/CI infrastructure only; production unchanged with full `e2e-fullstack` green.
