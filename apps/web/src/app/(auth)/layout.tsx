@@ -1,8 +1,10 @@
 import { AuthBrandPanel } from "@/components/auth/auth-brand-panel";
 import { TrustStrip } from "@/components/marketing/trust-strip";
+import { AppProviders } from "@/components/providers";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
+    <AppProviders>
     <div className="min-h-screen lg:grid lg:grid-cols-2">
       <aside aria-label="Jober product preview" className="hidden min-h-screen lg:block">
         <AuthBrandPanel className="h-full" />
@@ -21,5 +23,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </main>
       </div>
     </div>
+    </AppProviders>
   );
 }

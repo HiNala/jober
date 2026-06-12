@@ -4,39 +4,56 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { UserPreferencesProvider } from "@/contexts/user-preferences-context";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+/** Marketing + legal + blog — no React Query / auth session fetch on first paint. */
+export function ShellProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <TooltipProvider delay={200}>
+        <AnalyticsProvider>
+          {children}
+          <Toaster richColors closeButton position="top-right" />
+        </AnalyticsProvider>
+      </TooltipProvider>
+    </ThemeProvider>
+  );
+}
+
+/** Workspace + auth routes — session, preferences, and shared query cache. */
+export function AppProviders({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 30_000,
+            staleTime: 60_000,
+            gcTime: 5 * 60_000,
             retry: 1,
+            refetchOnWindowFocus: false,
           },
         },
       }),
   );
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider delay={200}>
-          <AuthProvider>
-            <UserPreferencesProvider>
-              <AnalyticsProvider>
-                {children}
-                <Toaster richColors closeButton position="top-right" />
-              </AnalyticsProvider>
-            </UserPreferencesProvider>
-          </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <UserPreferencesProvider>{children}</UserPreferencesProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
+/** Full stack — tests and legacy call sites only. */
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ShellProviders>
+      <AppProviders>{children}</AppProviders>
+    </ShellProviders>
   );
 }

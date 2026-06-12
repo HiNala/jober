@@ -1,10 +1,25 @@
+import dynamic from "next/dynamic";
 import { ArrowRight, Play } from "lucide-react";
 
-import { HeroRunPreview } from "@/components/marketing/hero-run-preview";
 import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
 import { AnimatedBackground } from "@/components/marketing/animated-background";
 import { motionHeroStagger } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
+
+const HeroRunPreview = dynamic(
+  () =>
+    import("@/components/marketing/hero-run-preview").then((mod) => ({
+      default: mod.HeroRunPreview,
+    })),
+  {
+    loading: () => (
+      <div
+        className="mx-auto aspect-[4/3] w-full max-w-3xl animate-pulse rounded-xl border border-border/60 bg-muted/25"
+        aria-hidden
+      />
+    ),
+  },
+);
 
 export function MarketingHero() {
   return (
