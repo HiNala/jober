@@ -92,9 +92,18 @@ Opt-in only. Never submit.
 
 ## Coverage
 
-API coverage gate: `fail_under = 58` in `apps/api/pyproject.toml`. CI uploads `coverage.xml` on every run.
+API coverage gate: `fail_under = 58` in `apps/api/pyproject.toml`. CI uploads `coverage.xml` on every run (informational artifact; gate is `fail_under` only).
 
 After adding Alembic indexes, mirror them on the SQLAlchemy models (`__table_args__`) — `python scripts/check_migration_drift.py` runs on every CI backend job.
+
+### Web vitest (Mission 25)
+
+- Tests live beside logic: `apps/web/src/**/*.test.ts` (node environment — no jsdom).
+- **Pack-critical UI behavior:** extract pure functions to `lib/` and test there (e.g. `command-palette-actions.ts`, `page-state-contracts.ts`, `merge-paragraphs.ts`). Keep React components thin wrappers.
+- **Mutation spot-checks:** for safety modules mirrored on the API (`fill_policy`, `redaction`), add a `no_db` test that would fail if the guard is removed — see `tests/test_coverage_critical.py`.
+- Run: `cd apps/web && pnpm test` (Mission 25 baseline: 125 tests). Re-run **3×** at mission boundaries to hunt flakes.
+
+Critical-path map: `docs/polish-pack/notes/25_coverage_map.md`.
 
 ## Running locally
 
