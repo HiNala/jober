@@ -13,7 +13,10 @@ export const metadata: Metadata = marketingMetadata({
 
 export default function AcceptableUsePage() {
   return (
-    <LegalDocument title="Acceptable Use Policy">
+    <LegalDocument
+      title="Acceptable Use Policy"
+      summary="Apply only to jobs you explicitly queue. Do not bypass CAPTCHAs, bot detection, or site security. Keep application materials truthful. Abuse may lead to suspension."
+    >
       <p>
         <strong>Last updated:</strong> June 2026 (draft). This policy supplements our{" "}
         <Link href="/terms" className="underline underline-offset-2">

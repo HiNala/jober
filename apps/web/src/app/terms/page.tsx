@@ -13,7 +13,10 @@ export const metadata: Metadata = marketingMetadata({
 
 export default function TermsPage() {
   return (
-    <LegalDocument title="Terms of Service">
+    <LegalDocument
+      title="Terms of Service"
+      summary="Jober helps you prepare and submit job applications you select. You review every submit, keep your vault accurate, and complete checkpoints (CAPTCHA, login) yourself. Jober is not a job board and does not guarantee interviews or offers."
+    >
       <p>
         <strong>Last updated:</strong> June 2026 (draft). By creating an account or using Jober,
         you agree to these terms.

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { ROBOTS_DISALLOW_PATHS } from "@/lib/marketing/seo";
 import { getSiteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
@@ -8,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/kitchen-sink"],
+      disallow: [...ROBOTS_DISALLOW_PATHS],
     },
     sitemap: `${base}/sitemap.xml`,
   };

@@ -13,7 +13,10 @@ export const metadata: Metadata = marketingMetadata({
 
 export default function PrivacyPage() {
   return (
-    <LegalDocument title="Privacy Policy">
+    <LegalDocument
+      title="Privacy Policy"
+      summary="Jober stores your queue, runs, vault, and documents to operate assisted applications you approve. We do not sell personal data or run third-party ad trackers. Sensitive vault fields are encrypted; analytics are opt-in on this device. You may request export or deletion — see the sections below."
+    >
       <p>
         <strong>Last updated:</strong> June 2026 (draft). This policy describes how Jober (“we”,
         “us”) handles information when you use our assisted job application service.
