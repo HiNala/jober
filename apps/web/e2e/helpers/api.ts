@@ -1,12 +1,12 @@
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 import type { APIRequestContext } from "@playwright/test";
 
 import { E2E_DEV_TENANT_ID, E2E_DEV_USER_ID } from "./app-auth";
 
-const E2E_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
+/** Playwright runs with cwd `apps/web` (see package.json / CI working-directory). */
+const E2E_WORKBOOK_PATH = join(process.cwd(), "e2e", "fixtures", "jobs.xlsx");
 
 export const E2E_API_URL = process.env.E2E_API_URL ?? process.env.API_URL ?? "http://localhost:8000";
 
@@ -57,8 +57,7 @@ export async function fetchFixtureHtml(
 }
 
 export async function importE2eWorkbook(request: APIRequestContext): Promise<void> {
-  const workbookPath = join(E2E_DIR, "fixtures", "jobs.xlsx");
-  const buffer = readFileSync(workbookPath);
+  const buffer = readFileSync(E2E_WORKBOOK_PATH);
   const response = await request.post(`${E2E_API_URL}/api/imports/jobs-xlsx`, {
     headers: devAuthHeaders(),
     multipart: {
