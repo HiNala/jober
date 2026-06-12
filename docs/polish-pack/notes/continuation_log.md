@@ -1075,6 +1075,7 @@ Rotated from a11y (Mission 22) → **backend contention drills**: `test_domain_l
 | `7e69a8e` | `test(web): critical-path unit coverage [pack-25]` |
 | `48f1860` | `test(api): critical-path coverage and mutation spot-checks [pack-25]` |
 | `24de4db` | `docs(pack): Mission 25 coverage map [pack-25]` |
+| `e9dc3b3` | `fix(test): bearer redaction assertion [pack-31 after 25]` — CI [27403227110](https://github.com/HiNala/jober/actions/runs/27403227110) |
 
 Mission 25 work was uncommitted at loop start — triaged and landed in clustered commits.
 
@@ -1095,7 +1096,7 @@ Rotated from docs (Mission 24) → **page-state contracts**: `page-state-contrac
 
 **Local:** web typecheck + lint:strict + test **125**; api ruff + `test_coverage_critical` **4**; worker pytest **22**.
 
-**CI:** pending push.
+**CI:** [27403227110](https://github.com/HiNala/jober/actions/runs/27403227110) failed — `test_scrub_text_masks_bearer_and_jwt_tokens` (`Authorization:` triggers pair rule); fixed in `e9dc3b3`. Re-run pending.
 
 ### Deployment decision
 
