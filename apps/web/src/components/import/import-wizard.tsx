@@ -126,6 +126,7 @@ export function ImportWizard({ onCommitted }: ImportWizardProps) {
             ) : null}
             <div className="flex gap-2">
               <Button
+                data-testid="import-confirm"
                 onClick={() => importMutation.mutate(file)}
                 disabled={importMutation.isPending}
               >

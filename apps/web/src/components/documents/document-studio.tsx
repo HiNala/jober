@@ -263,6 +263,7 @@ export function DocumentStudio() {
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
+              data-testid="studio-generate"
               disabled={!jobId || !hasResume || isGenerating}
               onClick={() => generateMutation.mutate({ force: false })}
             >
@@ -321,6 +322,7 @@ export function DocumentStudio() {
                   <a
                     href={documentDownloadUrl(draft.pdf_download_path)}
                     download={coverLetterDownloadFilename(downloadCompany, downloadRole, "pdf")}
+                    data-testid="studio-download-pdf"
                     className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2.5 text-xs font-medium hover:bg-muted"
                   >
                     <Download className="size-3.5" aria-hidden />
@@ -341,6 +343,7 @@ export function DocumentStudio() {
           </CardHeader>
           <CardContent className="space-y-3">
             <Textarea
+              data-testid="letter-preview"
               value={letterText}
               onChange={(e) => setLetterText(e.target.value)}
               rows={16}

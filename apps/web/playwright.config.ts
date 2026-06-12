@@ -3,6 +3,16 @@ import { defineConfig, devices } from "@playwright/test";
 const PORT = process.env.PORT ?? "3000";
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
 
+const webServerEnv = {
+  ...process.env,
+  NEXT_PUBLIC_DEV_AUTH_BYPASS: "true",
+  NEXT_PUBLIC_JOBER_TENANT_ID:
+    process.env.NEXT_PUBLIC_JOBER_TENANT_ID ?? "00000000-0000-4000-8000-000000000001",
+  NEXT_PUBLIC_JOBER_USER_ID:
+    process.env.NEXT_PUBLIC_JOBER_USER_ID ?? "00000000-0000-4000-8000-000000000002",
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000",
+};
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -15,6 +25,17 @@ export default defineConfig({
     baseURL,
     trace: "retain-on-failure",
   },
+  projects: [
+    {
+      name: "marketing",
+      testMatch: /.*\.spec\.ts$/,
+      testIgnore: /.*\.fullstack\.spec\.ts$/,
+    },
+    {
+      name: "fullstack",
+      testMatch: /.*\.fullstack\.spec\.ts$/,
+    },
+  ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEB_SERVER
     ? undefined
     : {
@@ -22,13 +43,6 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
-        env: {
-          ...process.env,
-          NEXT_PUBLIC_DEV_AUTH_BYPASS: "true",
-          NEXT_PUBLIC_JOBER_TENANT_ID:
-            process.env.NEXT_PUBLIC_JOBER_TENANT_ID ?? "00000000-0000-4000-8000-000000000001",
-          NEXT_PUBLIC_JOBER_USER_ID:
-            process.env.NEXT_PUBLIC_JOBER_USER_ID ?? "00000000-0000-4000-8000-000000000002",
-        },
+        env: webServerEnv,
       },
 });

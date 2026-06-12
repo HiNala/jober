@@ -90,7 +90,7 @@ export function EventTerminal({
   };
 
   return (
-    <section aria-labelledby="run-event-stream-heading">
+    <section aria-labelledby="run-event-stream-heading" data-testid="run-event-stream">
       <div className="mb-2 flex items-center justify-between gap-2">
         <h2 id="run-event-stream-heading" className="text-sm font-medium">
           Event stream

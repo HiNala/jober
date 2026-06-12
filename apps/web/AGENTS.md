@@ -13,3 +13,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Uploads:** `validateUploadFile()` before calling the API; show errors in `FileUpload`.
 - **Heavy editors:** `useUnsavedChanges(dirty)` on vault drafts and settings API-key entry.
 - **Toasts:** `formatApiError()` from `src/lib/api/errors.ts` for mutation failures.
+
+## E2E selectors (Mission 26)
+
+- Prefer `data-testid` for full-stack Playwright specs (`*.fullstack.spec.ts`); marketing/a11y specs may use roles.
+- Convention: `{area}-{action}` — e.g. `batch-enqueue`, `checkpoint-skip`, `studio-generate`, `paragraph-lock-0`.
+- Do not rely on marketing copy for full-stack assertions (Mission 27 may change copy).

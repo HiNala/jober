@@ -105,6 +105,7 @@ export function CheckpointCard({ runId, snapshot, onResolved }: CheckpointCardPr
 
   return (
     <section
+      data-testid="checkpoint-card"
       className={cn(
         "space-y-3 rounded-lg border border-amber-500/35 bg-amber-500/5 p-4",
         motionAttentionEnter,
@@ -157,6 +158,7 @@ export function CheckpointCard({ runId, snapshot, onResolved }: CheckpointCardPr
               size="sm"
               variant="outline"
               className={motionPress}
+              data-testid="checkpoint-skip"
               onClick={() => resolveMutation.mutate({ action: "skip" })}
               disabled={resolveMutation.isPending}
             >

@@ -222,6 +222,7 @@ function BatchPreviewBody({
         </Button>
         <Button
           type="button"
+          data-testid="batch-enqueue"
           disabled={busy || included.length === 0}
           onClick={() => void confirmEnqueue()}
         >
@@ -244,7 +245,10 @@ export function BatchPreviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[min(90vh,640px)] max-w-lg overflow-y-auto">
+      <DialogContent
+        className="max-h-[min(90vh,640px)] max-w-lg overflow-y-auto"
+        data-testid="batch-preview-dialog"
+      >
         <DialogHeader>
           <DialogTitle>Batch preview</DialogTitle>
           <DialogDescription>

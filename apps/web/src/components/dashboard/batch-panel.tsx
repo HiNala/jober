@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
@@ -12,12 +13,19 @@ import {
   type BatchPolicy,
   type DailyPlan,
 } from "@/lib/api/batches";
+import { fetchTenantPolicy } from "@/lib/api/settings";
 
 export function BatchPanel() {
   const [plan, setPlan] = useState<DailyPlan | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPolicy, setPreviewPolicy] = useState<BatchPolicy>("dry_run");
+  const policyQuery = useQuery({
+    queryKey: ["tenant-policy"],
+    queryFn: fetchTenantPolicy,
+  });
+  const tenantDefault = (policyQuery.data?.policy.default_run_policy ??
+    "review_before_submit") as BatchPolicy;
 
   useEffect(() => {
     let cancelled = false;
@@ -66,6 +74,13 @@ export function BatchPanel() {
             <p className="text-xs text-muted-foreground">{plan.pacing_note}</p>
           ) : null}
           <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              data-testid="preview-batch-tenant-default"
+              onClick={() => openPreview(tenantDefault)}
+            >
+              Preview batch
+            </Button>
             <Button size="sm" onClick={() => openPreview("dry_run")}>
               Preview dry-run
             </Button>

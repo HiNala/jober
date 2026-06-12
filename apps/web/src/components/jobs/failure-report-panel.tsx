@@ -22,7 +22,10 @@ export function FailureReportPanel({ jobTargetId }: FailureReportPanelProps) {
   }
 
   return (
-    <section className="space-y-3 rounded-lg border border-rose-500/30 bg-rose-500/5 p-4">
+    <section
+      data-testid="failure-report-panel"
+      className="space-y-3 rounded-lg border border-rose-500/30 bg-rose-500/5 p-4"
+    >
       <div className="flex items-center gap-2">
         <AlertTriangle className="size-4 text-rose-600" aria-hidden />
         <h3 className="text-sm font-semibold">Failure report</h3>

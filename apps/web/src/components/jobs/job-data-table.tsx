@@ -212,6 +212,7 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
               filtered.map((row) => (
                 <TableRow
                   key={row.id}
+                  data-testid="job-queue-row"
                   className="cursor-pointer hover:bg-muted/40"
                   onClick={() => setDetail(row)}
                 >

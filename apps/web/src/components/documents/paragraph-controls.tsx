@@ -70,6 +70,7 @@ export function ParagraphControls({
                   variant={locked ? "default" : "outline"}
                   className={locked ? motionStatusEnter : undefined}
                   disabled={disabled}
+                  data-testid={`paragraph-lock-${index}`}
                   onClick={() => onToggleLock(index)}
                   aria-pressed={locked}
                 >
@@ -81,6 +82,7 @@ export function ParagraphControls({
                   size="sm"
                   variant="outline"
                   disabled={disabled || locked || regenPending}
+                  data-testid={`paragraph-regen-${index}`}
                   onClick={() => onRegenerate(index)}
                 >
                   <RefreshCw className="mr-1 size-3.5" aria-hidden />
