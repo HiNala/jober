@@ -4,7 +4,7 @@ import type { JobTargetRead, JobTargetStatus } from "@jober/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileSpreadsheet } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
@@ -46,9 +46,16 @@ export interface JobDataTableProps {
   rows?: JobTargetRead[];
   className?: string;
   onImportClick?: () => void;
+  /** Open the detail drawer when rows load (e.g. `/queue?job=<id>`). */
+  openJobId?: string | null;
 }
 
-export function JobDataTable({ rows = [], className, onImportClick }: JobDataTableProps) {
+export function JobDataTable({
+  rows = [],
+  className,
+  onImportClick,
+  openJobId = null,
+}: JobDataTableProps) {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState<string>("all");
@@ -57,6 +64,14 @@ export function JobDataTable({ rows = [], className, onImportClick }: JobDataTab
   const [location, setLocation] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<JobTargetRead | null>(null);
+
+  useEffect(() => {
+    if (!openJobId || rows.length === 0) return;
+    const match = rows.find((row) => row.id === openJobId);
+    if (match) {
+      setDetail(match);
+    }
+  }, [openJobId, rows]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

@@ -45,14 +45,15 @@ test.describe("recovery (login gate)", () => {
     expect(reportRes.status).toBe(200);
     expect(reportRes.body.inferred_reason).toBeTruthy();
 
-    await page.goto("/queue");
+    const jobsLoaded = page.waitForResponse(
+      (response) => response.url().includes("/api/job-targets") && response.ok(),
+    );
+    await page.goto(`/queue?job=${job.id}`);
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
+    await jobsLoaded;
+    await expect(page.locator(`[data-job-id="${job.id}"]`)).toBeVisible({ timeout: 15_000 });
 
-    const jobRow = page.locator(`[data-job-id="${job.id}"]`);
-    await expect(jobRow).toBeVisible({ timeout: 15_000 });
-    await jobRow.scrollIntoViewIfNeeded();
-    await jobRow.click();
     await expect(
       page.getByRole("heading", { name: new RegExp(`${job.company} —`) }),
     ).toBeVisible({ timeout: 15_000 });

@@ -22,6 +22,7 @@ export default function QueuePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const importParam = searchParams.get("import") === "1";
+  const openJobId = searchParams.get("job");
   const [importOpen, setImportOpen] = useState(importParam);
   const [prevImportParam, setPrevImportParam] = useState(importParam);
   const [kanbanDetail, setKanbanDetail] = useState<JobTargetRead | null>(null);
@@ -99,7 +100,11 @@ export default function QueuePage() {
             <TabsTrigger value="board">Board</TabsTrigger>
           </TabsList>
           <TabsContent value="table" className="mt-4">
-            <JobDataTable rows={rows} onImportClick={() => setImportOpen(true)} />
+            <JobDataTable
+              rows={rows}
+              openJobId={openJobId}
+              onImportClick={() => setImportOpen(true)}
+            />
           </TabsContent>
           <TabsContent value="board" className="mt-4">
             <JobKanban rows={rows} onSelect={setKanbanDetail} />
