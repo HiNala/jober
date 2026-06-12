@@ -73,3 +73,37 @@ async def test_dispatch_ops_alerts_posts_webhook(
     attention = json_body["attention"]
     assert isinstance(attention, list)
     assert attention[0]["level"] == "error"
+
+
+@pytest.mark.asyncio
+async def test_ops_attention_runbook_in_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from jober_api.services.ops.alerting import RUNBOOK_INFRA_DOWN, ops_attention
+
+    posted: list[dict[str, object]] = []
+
+    class _FakeResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+    class _FakeClient:
+        async def __aenter__(self) -> _FakeClient:
+            return self
+
+        async def __aexit__(self, *_args: object) -> None:
+            return None
+
+        async def post(self, url: str, json: dict[str, object]) -> _FakeResponse:
+            posted.append({"url": url, "json": json})
+            return _FakeResponse()
+
+    monkeypatch.setattr(settings, "ops_alert_webhook_url", "https://hooks.example/alert")
+    monkeypatch.setattr(alerting, "_should_fire", lambda _fp: True)
+    monkeypatch.setattr(alerting.httpx, "AsyncClient", lambda **_kw: _FakeClient())
+
+    item = ops_attention("error", "DB down.", runbook=RUNBOOK_INFRA_DOWN)
+    sent = await alerting.dispatch_ops_alerts("test", [item], force=True)
+    assert sent is True
+    attention = posted[0]["json"]["attention"]  # type: ignore[index]
+    assert attention[0]["runbook"] == RUNBOOK_INFRA_DOWN

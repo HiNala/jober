@@ -190,7 +190,14 @@ async def enqueue_browser_fill(
     try:
         from jober_worker.tasks import fill_form
 
-        async_result = fill_form.delay(str(run.id), str(job_target_id), job.direct_apply_url)
+        from jober_api.celery_enqueue import enqueue_task
+
+        async_result = enqueue_task(
+            fill_form,
+            str(run.id),
+            str(job_target_id),
+            job.direct_apply_url,
+        )
         task_id = async_result.id
     except Exception as exc:  # noqa: BLE001
         warning = f"Celery dispatch failed: {exc}"

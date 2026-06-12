@@ -27,7 +27,7 @@ from jober_api.services.admin.overview import get_admin_overview
 from jober_api.services.admin.runs import get_admin_runs_summary
 from jober_api.services.admin.support import get_user_operational_view
 from jober_api.services.analytics.dashboard import get_admin_cost
-from jober_api.services.ops.alerting import dispatch_ops_alerts
+from jober_api.services.ops.alerting import RUNBOOK_UPTIME, dispatch_ops_alerts, ops_attention
 
 router = RBACRouter(prefix="/admin", tags=["admin-dashboard"], permission=Permission.ADMIN_OPS_READ)
 
@@ -78,7 +78,13 @@ async def admin_test_alert() -> dict[str, bool]:
     """Fire a test webhook alert (verifies OPS_ALERT_WEBHOOK_URL wiring)."""
     sent = await dispatch_ops_alerts(
         "admin_test",
-        [{"level": "warn", "message": "Test alert from Jober admin (ops/test-alert)."}],
+        [
+            ops_attention(
+                "warn",
+                "Test alert from Jober admin (ops/test-alert).",
+                runbook=RUNBOOK_UPTIME,
+            )
+        ],
         force=True,
     )
     return {"sent": sent}

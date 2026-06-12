@@ -14,7 +14,7 @@ from jober_api.middleware.security_headers import SecurityHeadersMiddleware
 from jober_api.privacy.logging import configure_logging, init_sentry
 from jober_api.privacy.secrets_check import validate_startup_secrets
 from jober_api.routers import api_router
-from jober_api.services.ops.alerting import dispatch_ops_alerts
+from jober_api.services.ops.alerting import RUNBOOK_INFRA_DOWN, dispatch_ops_alerts, ops_attention
 
 
 @asynccontextmanager
@@ -58,14 +58,21 @@ async def readyz(response: Response) -> dict[str, object]:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         checks = report.get("checks", {})
         attention = [
-            {
-                "level": "error",
-                "message": f"{name} check failed: {detail.get('detail', 'unknown')}",
-            }
+            ops_attention(
+                "error",
+                f"{name} check failed: {detail.get('detail', 'unknown')}",
+                runbook=RUNBOOK_INFRA_DOWN,
+            )
             for name, detail in checks.items()
             if isinstance(detail, dict) and not detail.get("ok")
         ]
         if not attention:
-            attention = [{"level": "error", "message": "API readiness check failed."}]
+            attention = [
+                ops_attention(
+                    "error",
+                    "API readiness check failed.",
+                    runbook=RUNBOOK_INFRA_DOWN,
+                )
+            ]
         await dispatch_ops_alerts("readyz", attention)
     return report

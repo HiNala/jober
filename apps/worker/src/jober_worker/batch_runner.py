@@ -235,6 +235,10 @@ def run_batch_item(item_id: uuid.UUID) -> dict[str, Any]:
             session.commit()
             return {"status": "succeeded", "run_id": str(run_id), "pipeline": pipeline}
         except Exception as exc:
+            import logging
+
+            from jober_api.privacy.logging import safe_log
+
             item.status = BatchItemStatus.FAILED
             if run_id is not None:
                 run_row = session.get(ApplicationRun, run_id)
@@ -242,6 +246,14 @@ def run_batch_item(item_id: uuid.UUID) -> dict[str, Any]:
                     run_row.status = RunStatus.FAILED_FINAL
                     run_row.failure_reason = str(exc)[:500]
                     run_row.completed_at = datetime.now(UTC)
+            safe_log(
+                logging.ERROR,
+                "batch_item_failed",
+                run_id=str(run_id) if run_id is not None else None,
+                tenant_id=str(job.tenant_id),
+                batch_item_id=str(item.id),
+                error=str(exc)[:500],
+            )
             session.commit()
             return {"status": "failed", "error": str(exc)}
         finally:

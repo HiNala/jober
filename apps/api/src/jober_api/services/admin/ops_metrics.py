@@ -10,6 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from jober_api.models.failure_event import FailureEvent
 from jober_api.services.batch.cost_governor import budget_status
 from jober_api.services.batch.redis_control import celery_broker_depth
+from jober_api.services.ops.alerting import (
+    RUNBOOK_COST_SPIKE,
+    RUNBOOK_WORKER_STUCK,
+    ops_attention,
+)
 
 CIRCUIT_BREAKER_THRESHOLD = 5
 QUEUE_BACKLOG_WARN = 20
@@ -58,45 +63,49 @@ async def build_ops_attention(
 
     if budget["hard_stop"]:
         attention.append(
-            {
-                "level": "error",
-                "message": (
+            ops_attention(
+                "error",
+                (
                     f"LLM monthly budget exceeded "
                     f"(${budget['spent_usd']:.2f} / ${budget['monthly_budget_usd']:.2f})."
                 ),
-            }
+                runbook=RUNBOOK_COST_SPIKE,
+            )
         )
     elif budget["soft_warn"]:
         attention.append(
-            {
-                "level": "warn",
-                "message": (
+            ops_attention(
+                "warn",
+                (
                     f"LLM spend at soft warn "
                     f"(${budget['spent_usd']:.2f} / ${budget['monthly_budget_usd']:.2f})."
                 ),
-            }
+                runbook=RUNBOOK_COST_SPIKE,
+            )
         )
 
     for trip in trips[:5]:
         attention.append(
-            {
-                "level": "warn",
-                "message": (
+            ops_attention(
+                "warn",
+                (
                     f"Circuit breaker: {trip['count']} {trip['failure_class']} "
                     f"failures on {trip['platform']}."
                 ),
-            }
+                runbook=RUNBOOK_COST_SPIKE,
+            )
         )
 
     if depth >= QUEUE_BACKLOG_WARN and int(queue.get("active_runs", 0)) == 0:
         attention.append(
-            {
-                "level": "warn",
-                "message": (
+            ops_attention(
+                "warn",
+                (
                     f"Celery broker backlog ({depth} pending) with no active runs — "
                     "worker may be stalled."
                 ),
-            }
+                runbook=RUNBOOK_WORKER_STUCK,
+            )
         )
 
     if queue.get("globally_paused"):

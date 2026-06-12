@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from jober_api.privacy.logging import safe_log
+from jober_api.request_context import bind_correlation_id, clear_correlation_id
 
 CORRELATION_ID_HEADER = "X-Correlation-Id"
 
@@ -121,6 +122,16 @@ async def http_exception_handler(request: Request, exc: Exception) -> JSONRespon
         raise exc
     correlation_id = get_correlation_id(request)
     code = _code_from_detail(exc.detail)
+    if exc.status_code == status.HTTP_402_PAYMENT_REQUIRED or code == CODE_LLM_BUDGET_EXCEEDED:
+        auth = getattr(request.state, "auth", None)
+        tenant_id = str(auth.tenant_id) if auth is not None else None
+        safe_log(
+            logging.WARNING,
+            "llm_budget_exceeded",
+            correlation_id=correlation_id,
+            tenant_id=tenant_id,
+            path=request.url.path,
+        )
     content = _envelope(detail=exc.detail, correlation_id=correlation_id, code=code)
     return JSONResponse(
         status_code=exc.status_code,
@@ -178,6 +189,7 @@ class CorrelationIdMiddleware:
                 break
 
         scope.setdefault("state", {})["correlation_id"] = correlation_id
+        bind_correlation_id(correlation_id)
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
@@ -186,7 +198,10 @@ class CorrelationIdMiddleware:
                 message["headers"] = headers
             await send(message)
 
-        await self.app(scope, receive, send_wrapper)
+        try:
+            await self.app(scope, receive, send_wrapper)
+        finally:
+            clear_correlation_id()
 
 
 def register_exception_handlers(app: FastAPI) -> None:

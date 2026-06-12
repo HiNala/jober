@@ -18,7 +18,14 @@ from jober_api.models.user import User
 from jober_api.services.admin.ops_metrics import build_ops_attention
 from jober_api.services.analytics.dashboard import get_admin_cost, resolve_date_range
 from jober_api.services.batch.redis_control import queue_snapshot
-from jober_api.services.ops.alerting import dispatch_ops_alerts
+from jober_api.services.ops.alerting import (
+    RUNBOOK_INFRA_DOWN,
+    RUNBOOK_QUEUE_BACKED_UP,
+    dispatch_ops_alerts,
+)
+from jober_api.services.ops.alerting import (
+    ops_attention as ops_alert_item,
+)
 
 
 async def get_admin_overview(session: AsyncSession) -> dict[str, Any]:
@@ -54,24 +61,36 @@ async def get_admin_overview(session: AsyncSession) -> dict[str, Any]:
 
     attention: list[dict[str, str]] = []
     if health["status"] != "ready":
-        attention.append({"level": "error", "message": "One or more infrastructure checks failed."})
+        attention.append(
+            ops_alert_item(
+                "error",
+                "One or more infrastructure checks failed.",
+                runbook=RUNBOOK_INFRA_DOWN,
+            )
+        )
     if queue["globally_paused"]:
-        attention.append({"level": "warn", "message": "Worker queue is globally paused."})
+        attention.append(
+            ops_alert_item(
+                "warn",
+                "Worker queue is globally paused.",
+                runbook=RUNBOOK_QUEUE_BACKED_UP,
+            )
+        )
     if failure_spike:
         attention.append(
-            {
-                "level": "warn",
-                "message": f"Failure events up {failure_spike['pct']}% vs prior week.",
-            }
+            ops_alert_item(
+                "warn",
+                f"Failure events up {failure_spike['pct']}% vs prior week.",
+            )
         )
     for note in cost_data.get("attention", []):
         attention.append(note)
     if run_counts["needs_human"] > 0:
         attention.append(
-            {
-                "level": "warn",
-                "message": f"{run_counts['needs_human']} run(s) need human intervention.",
-            }
+            ops_alert_item(
+                "warn",
+                f"{run_counts['needs_human']} run(s) need human intervention.",
+            )
         )
 
     ops_attention, ops = await build_ops_attention(session, queue=queue)

@@ -125,13 +125,30 @@ def analytics_daily_rollup(day: str | None = None) -> dict[str, object]:
     default_retry_delay=30,
 )
 def send_transactional_email(self: object, payload: dict[str, str]) -> dict[str, str]:
-    from jober_api.services.email.sender import deliver_email_payload
+    from jober_api.services.email.sender import deliver_email_payload, mask_email
+    from jober_api.services.ops.alerting import alert_email_send_failed
+
+    correlation_id = payload.get("correlation_id")
+    if not correlation_id:
+        headers = getattr(self.request, "headers", None) or {}  # type: ignore[attr-defined]
+        if isinstance(headers, dict):
+            correlation_id = headers.get("correlation_id")
 
     try:
         deliver_email_payload(payload)
     except Exception as exc:
+        retries = int(getattr(self.request, "retries", 0))  # type: ignore[attr-defined]
+        max_retries = int(getattr(self, "max_retries", 3))
+        if retries >= max_retries:
+            alert_email_send_failed(
+                to_email_masked=mask_email(payload.get("to_email", "")),
+                subject=payload.get("subject", ""),
+                error=str(exc),
+                correlation_id=correlation_id,
+            )
+            raise
         raise self.retry(exc=exc) from exc  # type: ignore[attr-defined]
-    return {"status": "sent"}
+    return {"status": "sent", "correlation_id": correlation_id or ""}
 
 
 @celery_app.task(name="jober_worker.tasks.execute_batch_item", bind=True)

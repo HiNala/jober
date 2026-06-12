@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -12,7 +13,9 @@ from jober_api.models.enums import AuditAction, JobTargetStatus, RunStatus
 from jober_api.models.job_target import JobTarget
 from jober_api.models.user_profile import UserProfile
 from jober_api.privacy.browser_state import delete_run_storage_state
+from jober_api.privacy.logging import safe_log
 from jober_api.repositories.application_run import ApplicationRunRepository
+from jober_api.request_context import current_correlation_id
 from jober_api.services.audit.service import record_audit
 from jober_api.storage.keys import run_prefix, tenant_root
 from jober_api.storage.minio_client import ObjectStorage
@@ -38,6 +41,14 @@ async def purge_run(
     await session.delete(run)
     if commit:
         await session.commit()
+    safe_log(
+        logging.INFO,
+        "run_purged",
+        run_id=str(run_id),
+        tenant_id=str(tenant_id),
+        removed_objects=removed_objects,
+        correlation_id=current_correlation_id(),
+    )
     return {"run_id": str(run_id), "removed_objects": removed_objects, "status": "purged"}
 
 

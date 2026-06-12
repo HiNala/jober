@@ -23,6 +23,7 @@ from jober_api.models.llm_call import LlmCall
 from jober_api.services.analytics.cache import cache_get, cache_key, cache_set
 from jober_api.services.analytics.event_registry import FUNNEL_STEPS
 from jober_api.services.billing.entitlements import entitlements_for
+from jober_api.services.ops.alerting import RUNBOOK_COST_SPIKE, ops_attention
 
 FUNNEL_ORDER = list(FUNNEL_STEPS.keys())
 
@@ -429,17 +430,19 @@ async def get_admin_cost(
     attention: list[dict[str, str]] = []
     if not abs(rollup_total - llm_total) < 0.05:
         attention.append(
-            {
-                "level": "warn",
-                "message": "Cost rollup does not reconcile with LlmCall totals.",
-            }
+            ops_attention(
+                "warn",
+                "Cost rollup does not reconcile with LlmCall totals.",
+                runbook=RUNBOOK_COST_SPIKE,
+            )
         )
     if anomalies:
         attention.append(
-            {
-                "level": "warn",
-                "message": f"{len(anomalies)} day(s) with unusually high LLM spend.",
-            }
+            ops_attention(
+                "warn",
+                f"{len(anomalies)} day(s) with unusually high LLM spend.",
+                runbook=RUNBOOK_COST_SPIKE,
+            )
         )
 
     payload = {
