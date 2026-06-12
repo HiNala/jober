@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from io import BytesIO
 
 from openpyxl import Workbook
@@ -16,6 +17,7 @@ def build_sample_workbook(
     job_count: int = 3,
     board_count: int = 2,
     angle_count: int = 2,
+    apply_url_for_row: Callable[[int], str] | None = None,
 ) -> bytes:
     wb = Workbook()
     default = wb.active
@@ -24,6 +26,11 @@ def build_sample_workbook(
     leads = wb.create_sheet(JOB_LEADS_SPEC.sheet_names[0])
     leads.append([col.aliases[0] for col in JOB_LEADS_SPEC.columns])
     for i in range(1, job_count + 1):
+        apply_url = (
+            apply_url_for_row(i)
+            if apply_url_for_row
+            else f"https://jobs.lever.co/acme/role-{i}"
+        )
         leads.append(
             [
                 i,
@@ -36,7 +43,7 @@ def build_sample_workbook(
                 "Fit reason",
                 "Hook",
                 f"hiring{i}@example.com",
-                f"https://jobs.lever.co/acme/role-{i}",
+                apply_url,
                 f"https://boards.greenhouse.io/acme/jobs/{i}",
                 "Verified on web",
                 "2025-01-01",
