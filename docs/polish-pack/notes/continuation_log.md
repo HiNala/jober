@@ -1007,3 +1007,49 @@ Rotated from a11y (Mission 22) → **backend contention drills**: `test_domain_l
 ### Deployment decision
 
 **Deploy API** — Mission 23 Production Guidance: gates green; pagination is backward compatible (web reads `items` only). Safe to deploy API without web if M20 index migration (`r1a2b3c34d65`) is already live; otherwise batch API deploy with M20 backup + migrate. Post-deploy: `bash scripts/railway-smoke.sh`, spot-check `/api/dashboard/summary` latency. Batch with pending M21/M22 web deploy if not yet live (independent surfaces).
+
+---
+
+## Loop after Mission 24 — 2026-06-12
+
+### Re-verification (Mission 24 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| Admin-overview metrics spot-verified | **Green** — `24_observability.md` truth table; `test_observability.py` run-count reconciliation |
+| Alert classes fire + email-failure alerting | **Green** — `test_ops_alerting.py` + new email enqueue/send classes with runbook links |
+| Sentry decision documented | **Green** — optional `SENTRY_DSN`; `send_default_pii=False`; worker does not init |
+| Three log questions answerable | **Green** — `batch_item_failed`, `llm_budget_exceeded`, `run_purged` structured fields |
+| Correlation id web → API → worker | **Green** — middleware + `celery_enqueue` headers + worker `task_prerun` |
+| Uptime on schedule with failure alerting | **Fixed** — `uptime.yml` job-level `secrets` `if` caused workflow validation failure; step-level skip when `UPTIME_API_URL` unset |
+
+### Improvements made (this loop)
+
+| Commit | Summary |
+|--------|---------|
+| `db2530e` | `feat(ops): observability alerts, correlation ids [pack-24]` |
+| `fe8fc40` | `docs(pack): Mission 24 baseline + uptime schedule [pack-24]` |
+| (this loop) | `fix(ci): uptime workflow skip when secrets unset [pack-31 after 24]` |
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Set `UPTIME_*` GitHub secrets for live 5m smoke | Operator |
+| Production webhook drill (`POST /api/admin/ops/test-alert`) | Operator post-deploy |
+| Enable `SENTRY_DSN` on Railway | Operator optional |
+| Grafana/Prometheus | Out of scope |
+
+### Spot check (docs)
+
+- Rotated from chaos (Mission 23) → **runbook cross-links**: alert payloads reference `email-delivery.md`, `uptime-monitoring.md`, `queue-backed-up.md`, `cost-spike.md`, `worker-stuck.md` per `24_observability.md` matrix.
+
+### Gate summary
+
+**CI:** run [27398856200](https://github.com/HiNala/jober/actions/runs/27398856200) on `fe8fc40` — backend, web, policy, quarantine — **success**. Uptime workflow [27398855557](https://github.com/HiNala/jober/actions/runs/27398855557) **failed** (workflow file issue — fixed this loop).
+
+**Local:** api ruff+mypy; `test_observability.py` + `test_ops_alerting.py` **7 passed** (2 skipped); worker pytest **22** — green.
+
+### Deployment decision
+
+**Deploy API** — Mission 24 Production Guidance: ops/alerting + log fields only; configure `OPS_ALERT_WEBHOOK_URL` on Railway before relying on alerts. Post-deploy: `POST /api/admin/ops/test-alert`, set GitHub `UPTIME_*` secrets, `bash scripts/railway-smoke.sh`. Batch with pending M20–M23 API deploy if not yet live.

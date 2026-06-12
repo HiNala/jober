@@ -8,7 +8,6 @@ on:
 
 jobs:
   smoke:
-    if: ${{ secrets.UPTIME_API_URL != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,4 +17,9 @@ jobs:
           WEB_URL: ${{ secrets.UPTIME_WEB_URL }}
           OPS_ALERT_WEBHOOK_URL: ${{ secrets.UPTIME_OPS_ALERT_WEBHOOK_URL }}
           JOBER_ENV: production
-        run: bash scripts/uptime-check.sh
+        run: |
+          if [ -z "${API_URL}" ]; then
+            echo "UPTIME_API_URL secret not set — skipping uptime smoke (configure in repo secrets)."
+            exit 0
+          fi
+          bash scripts/uptime-check.sh
