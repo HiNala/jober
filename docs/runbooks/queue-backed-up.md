@@ -9,8 +9,9 @@
 ## Diagnosis
 
 1. `/admin/overview` — queue paused? active runs vs max concurrency?
-2. Worker health — [worker-stuck.md](./worker-stuck.md)
-3. Domain locks / cooldown — batch pacing may be intentional (`BATCH_SITE_COOLDOWN_SECONDS`)
+2. `/api/dashboard/summary` — `queue_depth_priority_a` is a SQL aggregate (not a full table scan); high depth is real backlog, not a measurement artifact.
+3. Worker health — [worker-stuck.md](./worker-stuck.md)
+4. Domain locks / cooldown — batch pacing may be intentional (`BATCH_SITE_COOLDOWN_SECONDS`); two batches on the same host serialize via Redis `jober:batch:domain_lock:*`.
 
 ## Fix
 
