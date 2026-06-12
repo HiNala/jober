@@ -54,7 +54,8 @@ The fix is not done until the fixture + test exist.
 | **Unit** | `apps/api/tests/`, `packages/*/tests/` | Spreadsheet import, resume extraction, job normalization, prompt assembly, claims guard, ATS scoring, field mapping, state transitions, retry taxonomy, redaction, encryption |
 | **Integration** | `apps/api/tests/` (DB + MinIO) | API endpoints, document generation, checkpoint resolution |
 | **Browser** | `apps/worker/tests/test_fixture_browser.py`, `test_golden_path_browser.py` | Playwright against fixture server; discovery + label locators |
-| **E2E (web)** | `apps/web/e2e/` (`@playwright/test` + `@axe-core/playwright`) | Marketing a11y, keyboard skip link, reduced-motion, funnel smoke — CI runs after `pnpm build` |
+| **E2E (web, marketing)** | `apps/web/e2e/*.spec.ts` (excludes `*.fullstack.spec.ts`) | Marketing a11y, keyboard skip link, reduced-motion, funnel smoke — `web` CI job, `--project=marketing` |
+| **E2E (web, full-stack)** | `apps/web/e2e/*.fullstack.spec.ts` | Import→batch, checkpoint resolve, recovery drawer, document studio, settings policy — `e2e-fullstack` CI job (`E2E_FULL_STACK=1`) |
 | **Golden path (API)** | `apps/api/tests/test_golden_path_integration.py` | Fixture discover/fill → verify → analytics rollup → admin (hermetic, `@pytest.mark.policy`) |
 | **Schema contract** | `packages/schemas/tests/test_contract.py`, `apps/web/src/lib/schemas-contract.test.ts` | Python enums ↔ generated `types.ts`; drift fails CI |
 | **Policy (blocking)** | `pytest -m policy` | No consent-less sensitive autofill; no CAPTCHA/login bypass; no auto-submit without explicit opt-in; injection text as data |
@@ -122,14 +123,22 @@ export RUN_DB_TESTS=1 DATABASE_URL=postgresql+asyncpg://jober:jober@localhost:54
 cd apps/api && pytest -q --cov=jober_api
 ```
 
-Web E2E (marketing a11y + funnel smoke):
+Web E2E (marketing tier):
 
 ```bash
 cd apps/web
 pnpm build
 pnpm test:e2e:install
-pnpm test:e2e          # reuses an existing dev server when not in CI
-CI=true pnpm test:e2e  # starts a fresh production server (matches CI)
+pnpm test:e2e:marketing          # reuses an existing dev server when not in CI
+CI=true pnpm test:e2e:marketing  # starts a fresh production server (matches CI web job)
 ```
+
+Full-stack E2E (fixture ATS + API + worker — see `docs/polish-pack/notes/gates.md` §8):
+
+```bash
+E2E_FULL_STACK=1 LLM_PROVIDER=template pnpm test:e2e:fullstack
+```
+
+Coverage map: `docs/polish-pack/notes/26_e2e_map.md`.
 
 `playwright.config.ts` sets `reuseExistingServer` when `CI` is unset — rebuild before e2e if marketing pages changed.

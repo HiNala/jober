@@ -108,26 +108,58 @@ pnpm check:bundles
 
 Or `make web-lint` + `make web-build` + motion/bundles on Linux.
 
-### 7. E2E (~1 min after browser install)
+### 7. E2E — marketing tier (~1 min after browser install)
 
 ```bash
 cd apps/web
 pnpm test:e2e:install    # once per machine/CI image
-CI=true pnpm test:e2e
+CI=true pnpm test:e2e:marketing
 ```
 
-Playwright starts `pnpm start` via `playwright.config.ts` unless `PLAYWRIGHT_SKIP_WEB_SERVER=1`.
+Playwright starts `pnpm start` via `playwright.config.ts` unless `PLAYWRIGHT_SKIP_WEB_SERVER=1`. The `marketing` project excludes `*.fullstack.spec.ts`.
 
 **Windows:** With `CI=true`, Playwright refuses to reuse an existing server on port 3000. Stop any stale `next start` / dev server on `:3000` before e2e, or e2e fails with *"port already used"*. Without `CI`, `reuseExistingServer: true` applies but the running server must be a fresh production build with `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` (see `playwright.config.ts` webServer env).
 
-**Mission 02 result:** 13 passed. **Mission 22:** 71 passed (CI).
+**Mission 02 result:** 13 passed. **Mission 22:** 71 passed (CI). **Mission 26:** marketing project only in `web` job.
+
+### 8. E2E — full-stack tier (Mission 26)
+
+Requires Postgres, Redis, MinIO, API (`:8000`), Celery worker + beat, fixture ATS (`:8765`), and e2e seed:
+
+```bash
+# Infra (default ports — match CI)
+docker compose --profile infra up -d postgres redis minio createbuckets
+
+export DATABASE_URL=postgresql+asyncpg://jober:jober@localhost:5432/jober?ssl=disable
+export REDIS_URL=redis://localhost:6379/0
+export MINIO_ENDPOINT=localhost:9000
+export VAULT_ENCRYPTION_KEY=w-CndrrLpumBk62xq-1SBueyOre-DhzV_gGc86LmvnQ=
+export SECRET_KEY=local-dev-secret
+export DEV_AUTH_BYPASS=true
+export LLM_PROVIDER=template
+
+cd apps/api && alembic upgrade head && python scripts/seed_e2e.py
+python apps/web/e2e/scripts/build-e2e-workbook.py
+
+# Three terminals (or compose --profile full):
+make fixture-serve
+cd apps/api && uvicorn jober_api.main:app --port 8000
+cd apps/worker && celery -A jober_worker.celery_app worker --loglevel=info
+
+cd apps/web && pnpm build
+E2E_FULL_STACK=1 CI=true pnpm test:e2e:fullstack
+```
+
+Optional auth lifecycle spec: `E2E_AUTH_NATIVE=1` with `AUTH_MODE=native`, API `DEV_AUTH_BYPASS=false`, and web built without `NEXT_PUBLIC_DEV_AUTH_BYPASS`.
+
+CI job: `e2e-fullstack` in `.github/workflows/ci.yml` (runs on every PR/main push).
 
 ## One-liner summary (Mission 31 / pre-push)
 
 ```text
 make migrate-check
 make lint && make test && make test-fixtures && make test-policy
-cd apps/web && pnpm typecheck && pnpm lint:strict && pnpm test && pnpm build && pnpm check:motion && pnpm check:bundles && pnpm test:e2e
+cd apps/web && pnpm typecheck && pnpm lint:strict && pnpm test && pnpm build && pnpm check:motion && pnpm check:bundles && pnpm test:e2e:marketing
 ```
 
 On Windows without Make, run each step above with env vars exported and `docker compose --profile infra up -d` first.
@@ -140,7 +172,8 @@ On Windows without Make, run each step above with env vars exported and `docker 
 | `backend` → ruff/mypy/pytest | `make lint` + `make test` |
 | `backend` → package pytest | covered by `make test-fixtures` + api install |
 | `policy` → `pytest -m policy` | `make test-policy` |
-| `web` → typecheck/lint/test/build/bundles/e2e | web section above |
+| `web` → typecheck/lint/test/build/bundles/e2e marketing | web §6–7 |
+| `e2e-fullstack` → fixture journeys | web §8 |
 | `detect-secrets` | pre-commit / `detect-secrets scan --baseline .secrets.baseline` |
 
 CI uses default ports (5432/6379/9000); local `.env` overrides require the adjusted `DATABASE_URL` / `REDIS_URL` / `MINIO_ENDPOINT` in the table above.
