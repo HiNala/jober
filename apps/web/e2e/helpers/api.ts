@@ -90,7 +90,7 @@ export async function seedReviewCheckpointRun(request: APIRequestContext): Promi
   }
 
   const atsHtml = await fetchFixtureHtml(request, "behaviors/single-step");
-  const submitHtml = await fetchFixtureHtml(request, "behaviors/submit_success");
+  const submitHtml = await fetchFixtureHtml(request, "behaviors/submit-success");
 
   const discover = await apiJson(request, "POST", `/api/job-targets/${jobId}/discover-form`, {
     data: { fixture_html: atsHtml, platform: "greenhouse" },

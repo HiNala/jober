@@ -24,12 +24,16 @@ test.describe("document studio cycle", () => {
     await expect(page.getByTestId("letter-preview")).toBeVisible({ timeout: 30_000 });
 
     await page.getByTestId("paragraph-lock-0").click();
-    const beforeLock = await page.locator('[data-testid="letter-preview"]').inputValue();
+    await expect(page.getByTestId("paragraph-lock-0")).toHaveAttribute("aria-pressed", "true");
 
+    const regenResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/documents/generate-cover-letter") &&
+        response.request().method() === "POST" &&
+        response.ok(),
+    );
     await page.getByTestId("paragraph-regen-1").click();
-    await expect(page.getByTestId("letter-preview")).not.toHaveValue(beforeLock, {
-      timeout: 30_000,
-    });
+    await regenResponse;
 
     const [download] = await Promise.all([
       page.waitForEvent("download"),

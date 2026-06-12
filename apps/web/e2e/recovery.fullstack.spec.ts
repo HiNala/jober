@@ -36,6 +36,13 @@ test.describe("recovery (login gate)", () => {
     expect(extract.status).toBe(409);
     expect(extract.body.detail?.gate).toBe("login");
 
+    await expect
+      .poll(async () => {
+        const report = await apiJson(request, "GET", `/api/job-targets/${job.id}/failure-report`);
+        return report.status;
+      })
+      .toBe(200);
+
     await page.goto("/queue");
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);

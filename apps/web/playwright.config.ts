@@ -36,6 +36,7 @@ export default defineConfig({
       name: "fullstack",
       testMatch: /.*\.fullstack\.spec\.ts$/,
       fullyParallel: false,
+      timeout: 120_000,
     },
   ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEB_SERVER

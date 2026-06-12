@@ -28,7 +28,7 @@ test.describe("core journey (fixture-backed)", () => {
     await waitForAppShell(page);
     await page.getByRole("button", { name: "Preview dry-run" }).click();
     await expect(page.getByTestId("batch-preview-dialog")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Included" })).toBeVisible();
+    await expect(page.getByTestId("batch-enqueue")).toBeEnabled({ timeout: 30_000 });
     await page.getByTestId("batch-enqueue").click();
 
     await expect

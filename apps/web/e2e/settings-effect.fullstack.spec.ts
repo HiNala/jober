@@ -17,7 +17,7 @@ test.describe("settings policy default", () => {
     await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
 
-    await page.locator("#run-policy").selectOption("dry_run");
+    await page.locator("#run-policy").selectOption("auto_submit");
     await expect.poll(async () => {
       const policy = await apiJson<{ policy: { default_run_policy: string } }>(
         request,
@@ -25,13 +25,23 @@ test.describe("settings policy default", () => {
         "/api/settings/policy",
       );
       return policy.body.policy.default_run_policy;
-    }).toBe("dry_run");
+    }).toBe("auto_submit");
+
+    await page.locator("#run-policy").selectOption("review_before_submit");
+    await expect.poll(async () => {
+      const policy = await apiJson<{ policy: { default_run_policy: string } }>(
+        request,
+        "GET",
+        "/api/settings/policy",
+      );
+      return policy.body.policy.default_run_policy;
+    }).toBe("review_before_submit");
 
     await page.goto("/dashboard");
     await waitForAppShell(page);
     await page.getByTestId("preview-batch-tenant-default").click();
 
     await expect(page.getByTestId("batch-preview-dialog")).toBeVisible();
-    await expect(page.locator('input[name="batch-policy"][value="dry_run"]')).toBeChecked();
+    await expect(page.locator('input[name="batch-policy"][value="review_before_submit"]')).toBeChecked();
   });
 });
