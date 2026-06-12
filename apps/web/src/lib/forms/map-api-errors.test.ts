@@ -51,4 +51,15 @@ describe("mapApiErrors", () => {
     expect(mapped.name).toBe("too long");
     expect(mapped.display_name).toBeUndefined();
   });
+
+  it("maps 402 budget errors to honest generation copy", () => {
+    const mapped = mapApiErrors(new ApiError("API 402", 402, ""), "fallback");
+    expect(mapped.formError).toContain("budget exceeded");
+    expect(mapped.fieldErrors).toEqual({});
+  });
+
+  it("maps auth lockout strings from network errors", () => {
+    const mapped = mapApiErrors(new Error("Account locked after too many attempts"), "fallback");
+    expect(mapped.formError).toContain("locked");
+  });
 });

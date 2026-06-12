@@ -22,8 +22,23 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { exportJobsXlsxUrl } from "@/lib/api/jobs";
+import {
+  buildPageCommands,
+  type PageCommandId,
+} from "@/lib/workspace/command-palette-actions";
 import { isOpsDeskPath } from "@/lib/workspace/layout";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+
+const PAGE_COMMAND_ICONS: Record<
+  PageCommandId,
+  typeof FileSpreadsheet
+> = {
+  "import-spreadsheet": FileSpreadsheet,
+  "export-queue-xlsx": Download,
+  "open-job-queue": Play,
+  "toggle-canvas": PanelRightOpen,
+  "toggle-focus-mode": Maximize2,
+};
 
 export function WorkspaceCommandPalette() {
   const router = useRouter();
@@ -48,44 +63,18 @@ export function WorkspaceCommandPalette() {
   );
 
   const pageActions = useMemo(() => {
-    if (pathname === "/queue") {
-      return [
-        {
-          label: "Import spreadsheet",
-          icon: FileSpreadsheet,
-          onSelect: () => run(() => router.push("/queue?import=1")),
-        },
-        {
-          label: "Export queue XLSX",
-          icon: Download,
-          onSelect: () => run(() => window.open(exportJobsXlsxUrl(), "_blank")),
-        },
-      ];
-    }
-    if (pathname === "/dashboard") {
-      return [
-        {
-          label: "Open job queue",
-          icon: Play,
-          onSelect: () => run(() => router.push("/queue")),
-        },
-      ];
-    }
-    if (isOpsDeskPath(pathname)) {
-      return [
-        {
-          label: canvasOpen ? "Hide canvas" : "Show canvas",
-          icon: PanelRightOpen,
-          onSelect: () => run(() => toggleCanvas()),
-        },
-        {
-          label: focusMode ? "Exit focus mode" : "Enter focus mode",
-          icon: Maximize2,
-          onSelect: () => run(() => toggleFocusMode()),
-        },
-      ];
-    }
-    return [];
+    const handlers: Record<PageCommandId, () => void> = {
+      "import-spreadsheet": () => run(() => router.push("/queue?import=1")),
+      "export-queue-xlsx": () => run(() => window.open(exportJobsXlsxUrl(), "_blank")),
+      "open-job-queue": () => run(() => router.push("/queue")),
+      "toggle-canvas": () => run(() => toggleCanvas()),
+      "toggle-focus-mode": () => run(() => toggleFocusMode()),
+    };
+    return buildPageCommands(pathname, { canvasOpen, focusMode }).map((command) => ({
+      ...command,
+      icon: PAGE_COMMAND_ICONS[command.id],
+      onSelect: handlers[command.id],
+    }));
   }, [pathname, canvasOpen, focusMode, run, router, toggleCanvas, toggleFocusMode]);
 
   return (
@@ -101,8 +90,8 @@ export function WorkspaceCommandPalette() {
         {pageActions.length > 0 ? (
           <>
             <CommandGroup heading="This page">
-              {pageActions.map(({ label, icon: Icon, onSelect }) => (
-                <CommandItem key={label} onSelect={onSelect}>
+              {pageActions.map(({ id, label, icon: Icon, onSelect }) => (
+                <CommandItem key={id} onSelect={onSelect}>
                   <Icon className="size-4" aria-hidden />
                   {label}
                 </CommandItem>

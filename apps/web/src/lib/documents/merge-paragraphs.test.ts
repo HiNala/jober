@@ -12,4 +12,14 @@ describe("mergeParagraphs", () => {
       "New close",
     ]);
   });
+
+  it("keeps all locked paragraphs when every index is locked", () => {
+    const original = ["A", "B"];
+    const updated = ["X", "Y"];
+    expect(mergeParagraphs(original, updated, new Set([0, 1]))).toEqual(["A", "B"]);
+  });
+
+  it("uses updated text when no paragraphs are locked", () => {
+    expect(mergeParagraphs(["old"], ["new"], new Set())).toEqual(["new"]);
+  });
 });

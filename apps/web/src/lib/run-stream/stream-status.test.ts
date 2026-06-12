@@ -17,6 +17,15 @@ describe("streamStatusLabel", () => {
   it("shows Live when open", () => {
     expect(streamStatusLabel("open")).toBe("Live");
   });
+
+  it("shows Disconnected on error", () => {
+    expect(streamStatusLabel("error")).toBe("Disconnected");
+  });
+
+  it("passes through idle and closed labels", () => {
+    expect(streamStatusLabel("idle")).toBe("idle");
+    expect(streamStatusLabel("closed")).toBe("closed");
+  });
 });
 
 describe("isStreamReconnecting", () => {

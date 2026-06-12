@@ -1,6 +1,11 @@
 import { AlertCircle, CheckCircle2, Inbox } from "lucide-react";
 
 import { motionEmptyPulse, motionFadeIn } from "@/lib/design/motion";
+import {
+  PAGE_ERROR_ARIA,
+  PAGE_LOADING_ARIA,
+  PAGE_SUCCESS_ARIA,
+} from "@/lib/states/page-state-contracts";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -10,9 +15,9 @@ export function PageLoading({ label = "Loading…" }: { label?: string }) {
   return (
     <div
       className={cn("flex flex-col gap-4 p-6", motionFadeIn)}
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
+      role={PAGE_LOADING_ARIA.role}
+      aria-live={PAGE_LOADING_ARIA.live}
+      aria-busy={PAGE_LOADING_ARIA.busy}
     >
       <span className="sr-only">{label}</span>
       <Skeleton className="h-7 w-56" />
@@ -30,7 +35,12 @@ export function PageLoading({ label = "Loading…" }: { label?: string }) {
 
 export function RunConsoleSkeleton() {
   return (
-    <div className="space-y-4" role="status" aria-live="polite" aria-busy="true">
+    <div
+      className="space-y-4"
+      role={PAGE_LOADING_ARIA.role}
+      aria-live={PAGE_LOADING_ARIA.live}
+      aria-busy={PAGE_LOADING_ARIA.busy}
+    >
       <span className="sr-only">Loading run console</span>
       <div className="flex justify-between gap-4">
         <div className="space-y-2">
@@ -100,7 +110,7 @@ export function PageError({
         "flex flex-col items-center justify-center gap-3 px-6 py-16 text-center",
         motionFadeIn,
       )}
-      role="alert"
+      role={PAGE_ERROR_ARIA.role}
     >
       <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
         <AlertCircle className="size-5 text-destructive" aria-hidden />
@@ -131,7 +141,7 @@ export function PageSuccess({
         "flex flex-col items-center justify-center gap-3 px-6 py-12 text-center",
         motionFadeIn,
       )}
-      role="status"
+      role={PAGE_SUCCESS_ARIA.role}
     >
       <div className="flex size-12 items-center justify-center rounded-full bg-accent/15">
         <CheckCircle2 className="size-5 text-accent" aria-hidden />
