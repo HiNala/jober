@@ -371,8 +371,8 @@ flowchart LR
 
 ### P0 — Quick wins (1–3 days)
 
-- [ ] Remove `make seed` and CMS meta from user-visible copy.
-- [ ] Fix settings resume dropzone copy (“PDF or DOCX” not spreadsheet).
+- [x] Remove `make seed` and CMS meta from user-visible copy. *(Closed Mission 05 + Mission 27: grep clean; blog scaffold comment removed; vault error de-dev’d.)*
+- [x] Fix settings resume dropzone copy (“PDF or DOCX” not spreadsheet). *(Closed Mission 05 + Mission 27: `FileUpload kind="resume"` on vault; re-capture post-deploy.)*
 - [ ] Consent banner: corner → bottom sheet; remember choice; don’t show on auth.
 - [ ] Login/signup Google button parity if OAuth configured.
 - [x] Hide bottom AI bar on pages where it’s non-functional noise; expose ⌘K. *(Mission 09)*
