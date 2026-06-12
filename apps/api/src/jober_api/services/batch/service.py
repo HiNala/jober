@@ -272,15 +272,10 @@ async def reorder_batch_items(
 
 
 async def dashboard_summary(session: AsyncSession, tenant_id: uuid.UUID) -> dict[str, Any]:
-    priority_a = await JobTargetRepository(session, tenant_id).list_filtered(
-        priority="A", limit=2000
-    )
-    queue_depth = len(
-        [
-            j
-            for j in priority_a
-            if j.status not in (JobTargetStatus.APPLIED, JobTargetStatus.SKIPPED)
-        ]
+    jobs = JobTargetRepository(session, tenant_id)
+    queue_depth = await jobs.count_filtered(
+        priority="A",
+        exclude_statuses=(JobTargetStatus.APPLIED, JobTargetStatus.SKIPPED),
     )
     active_stmt = (
         select(func.count())

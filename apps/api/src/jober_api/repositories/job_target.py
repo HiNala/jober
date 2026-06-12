@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.models.enums import JobTargetStatus
@@ -71,6 +71,34 @@ class JobTargetRepository(Repository[JobTarget]):
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
+
+    async def count_filtered(
+        self,
+        *,
+        status: JobTargetStatus | None = None,
+        priority: str | None = None,
+        company: str | None = None,
+        role: str | None = None,
+        location: str | None = None,
+        exclude_statuses: tuple[JobTargetStatus, ...] = (),
+    ) -> int:
+        stmt = select(func.count()).select_from(JobTarget)
+        if self._tenant_id is not None:
+            stmt = stmt.where(JobTarget.tenant_id == self._tenant_id)
+        if status is not None:
+            stmt = stmt.where(JobTarget.status == status)
+        if priority:
+            stmt = stmt.where(JobTarget.priority == priority)
+        if company:
+            stmt = stmt.where(JobTarget.company.ilike(f"%{company}%"))
+        if role:
+            stmt = stmt.where(JobTarget.role.ilike(f"%{role}%"))
+        if location:
+            stmt = stmt.where(JobTarget.location_work_style.ilike(f"%{location}%"))
+        if exclude_statuses:
+            stmt = stmt.where(JobTarget.status.notin_(exclude_statuses))
+        result = await self._session.execute(stmt)
+        return int(result.scalar_one())
 
     async def update_fields(
         self,
