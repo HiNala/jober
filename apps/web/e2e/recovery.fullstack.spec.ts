@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 import { apiJson, fetchFixtureHtml, importE2eWorkbook } from "./helpers/api";
 import { waitForAppShell } from "./helpers/app-auth";
-import { dismissAnalyticsConsent } from "./helpers/consent";
+import { dismissAnalyticsConsent, seedAnalyticsDeclinedCookie } from "./helpers/consent";
 import { requireFullStack } from "./helpers/fullstack";
 
 test.describe("recovery (login gate)", () => {
@@ -45,12 +45,13 @@ test.describe("recovery (login gate)", () => {
     expect(reportRes.status).toBe(200);
     expect(reportRes.body.inferred_reason).toBeTruthy();
 
+    await seedAnalyticsDeclinedCookie(page);
     const jobsLoaded = page.waitForResponse(
       (response) => response.url().includes("/api/job-targets") && response.ok(),
     );
     await page.goto(`/queue?job=${job.id}`);
-    await dismissAnalyticsConsent(page);
     await waitForAppShell(page);
+    await dismissAnalyticsConsent(page);
     await jobsLoaded;
     await expect(page.locator(`[data-job-id="${job.id}"]`)).toBeVisible({ timeout: 15_000 });
 

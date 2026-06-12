@@ -4,7 +4,7 @@ import type { JobTargetRead, JobTargetStatus } from "@jober/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileSpreadsheet } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
@@ -63,15 +63,15 @@ export function JobDataTable({
   const [ats, setAts] = useState<string>("all");
   const [location, setLocation] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [detail, setDetail] = useState<JobTargetRead | null>(null);
+  const [manualDetail, setManualDetail] = useState<JobTargetRead | null>(null);
+  const [urlDismissed, setUrlDismissed] = useState(false);
 
-  useEffect(() => {
-    if (!openJobId || rows.length === 0) return;
-    const match = rows.find((row) => row.id === openJobId);
-    if (match) {
-      setDetail(match);
-    }
+  const urlLinkedJob = useMemo(() => {
+    if (!openJobId) return null;
+    return rows.find((row) => row.id === openJobId) ?? null;
   }, [openJobId, rows]);
+
+  const detail = manualDetail ?? (urlDismissed ? null : urlLinkedJob);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -230,7 +230,7 @@ export function JobDataTable({
                   data-testid="job-queue-row"
                   data-job-id={row.id}
                   className="cursor-pointer hover:bg-muted/40"
-                  onClick={() => setDetail(row)}
+                  onClick={() => setManualDetail(row)}
                 >
                   <TableCell className="sticky left-0 z-10" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
@@ -315,7 +315,12 @@ export function JobDataTable({
       <JobDetailDrawer
         job={detail}
         open={detail !== null}
-        onOpenChange={(open) => !open && setDetail(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setManualDetail(null);
+            setUrlDismissed(true);
+          }
+        }}
         onNotesChange={(notes) => {
           if (!detail) return;
           patchMutation.mutate({ id: detail.id, patch: { notes } });
