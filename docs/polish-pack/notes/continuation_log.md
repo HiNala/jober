@@ -1046,7 +1046,7 @@ Rotated from a11y (Mission 22) → **backend contention drills**: `test_domain_l
 
 ### Gate summary
 
-**CI:** run [27398856200](https://github.com/HiNala/jober/actions/runs/27398856200) on `fe8fc40` — backend, web, policy, quarantine — **success**. Uptime workflow [27398855557](https://github.com/HiNala/jober/actions/runs/27398855557) **failed** (workflow file issue — fixed this loop).
+**CI:** run [27400717154](https://github.com/HiNala/jober/actions/runs/27400717154) on `0b2c08a` — backend, web **71** e2e, policy, quarantine — **success**. Uptime [27401070968](https://github.com/HiNala/jober/actions/runs/27401070968) — **success** (skips smoke until `UPTIME_API_URL` secret set).
 
 **Local:** api ruff+mypy; `test_observability.py` + `test_ops_alerting.py` **7 passed** (2 skipped); worker pytest **22** — green.
 
