@@ -16,11 +16,11 @@ def verification_email(to_email: str, token: str, display_name: str | None) -> T
     link = _web_link("/verify-email", token)
     text = f"""Hi {name},
 
-Confirm your email to finish setting up {PRODUCT_NAME}:
+Confirm your email to finish setting up your {PRODUCT_NAME} account:
 
 {link}
 
-This link expires in 24 hours. If you did not sign up, you can ignore this email.
+This link expires in 24 hours. If you did not create an account, you can ignore this email.
 
 — {PRODUCT_NAME}
 """
@@ -35,11 +35,12 @@ def password_reset_email(to_email: str, token: str) -> TransactionalEmail:
     link = _web_link("/reset-password", token)
     text = f"""Hi,
 
-We received a request to reset your {PRODUCT_NAME} password.
+We received a request to reset your {PRODUCT_NAME} password. Use the link below to choose a new one:
 
 {link}
 
-This link expires in 1 hour. If you did not request a reset, you can ignore this email.
+This link expires in 1 hour. If you did not request a reset, ignore this email —
+your password will not change.
 
 — {PRODUCT_NAME}
 """
