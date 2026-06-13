@@ -12,6 +12,7 @@ import {
 
 import { ChartAccessibleFigure } from "./chart-accessible";
 import { chartColors, chartMargin } from "./chart-theme";
+import { useChartMotion } from "./use-chart-motion";
 
 export function AnalyticsLineChart({
   data,
@@ -24,6 +25,7 @@ export function AnalyticsLineChart({
   yKey: string;
   label: string;
 }) {
+  const chartMotion = useChartMotion();
   if (data.length === 0) {
     return <p className="text-sm text-muted-foreground">No data in this range.</p>;
   }
@@ -60,6 +62,9 @@ export function AnalyticsLineChart({
             stroke={chartColors.primary}
             strokeWidth={2}
             dot={false}
+            isAnimationActive={chartMotion.isAnimationActive}
+            animationDuration={chartMotion.animationDuration}
+            animationBegin={chartMotion.animationBegin}
           />
         </RechartsLineChart>
       </ResponsiveContainer>

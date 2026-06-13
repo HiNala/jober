@@ -12,6 +12,7 @@ import {
 
 import { ChartAccessibleFigure } from "./chart-accessible";
 import { chartColors, chartMargin } from "./chart-theme";
+import { useChartMotion } from "./use-chart-motion";
 
 export function AnalyticsBarChart({
   data,
@@ -24,6 +25,7 @@ export function AnalyticsBarChart({
   yKey: string;
   label: string;
 }) {
+  const chartMotion = useChartMotion();
   if (data.length === 0) {
     return <p className="text-sm text-muted-foreground">No data in this range.</p>;
   }
@@ -53,7 +55,15 @@ export function AnalyticsBarChart({
               fontSize: 12,
             }}
           />
-          <Bar dataKey={yKey} name={label} fill={chartColors.primary} radius={[2, 2, 0, 0]} />
+          <Bar
+            dataKey={yKey}
+            name={label}
+            fill={chartColors.primary}
+            radius={[2, 2, 0, 0]}
+            isAnimationActive={chartMotion.isAnimationActive}
+            animationDuration={chartMotion.animationDuration}
+            animationBegin={chartMotion.animationBegin}
+          />
         </RechartsBarChart>
       </ResponsiveContainer>
     </div>
