@@ -6,7 +6,7 @@ import { ContentReveal } from "@/components/motion/content-reveal";
 import { StatusPill } from "@/components/motion/status-pill";
 import { PageError, RunConsoleSkeleton } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
-import { motionFadeIn, motionPress, motionShimmer } from "@/lib/design/motion";
+import { motionFadeIn, motionPress, motionLivePulse } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { streamStatusLabel } from "@/lib/run-stream/stream-status";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ export function RunConsole({ runId }: RunConsoleProps) {
             label={streamLabel}
             icon={
               streamLive ? (
-                <Radio className={cn("size-3 fill-current", motionShimmer)} aria-hidden />
+                <Radio className={cn("size-3 fill-current", motionLivePulse)} aria-hidden />
               ) : undefined
             }
           />

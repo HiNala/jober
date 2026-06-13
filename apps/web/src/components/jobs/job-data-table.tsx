@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { motionTableRow } from "@/lib/design/motion";
 import { updateJobTarget } from "@/lib/api/jobs";
 import { JOB_STATUS_LABEL, JOB_STATUS_OPTIONS } from "@/lib/jobs/status-vocabulary";
 import { cn } from "@/lib/utils";
@@ -229,7 +230,7 @@ export function JobDataTable({
                   key={row.id}
                   data-testid="job-queue-row"
                   data-job-id={row.id}
-                  className="cursor-pointer hover:bg-muted/40"
+                  className={cn("cursor-pointer", motionTableRow, "hover:bg-muted/40")}
                   onClick={() => setManualDetail(row)}
                 >
                   <TableCell className="sticky left-0 z-10" onClick={(e) => e.stopPropagation()}>
