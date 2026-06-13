@@ -30,6 +30,11 @@ Jober uses a **CSS-first motion vocabulary** — no framer-motion. All feature s
 | `motionStatusEnter` | Status pill lifecycle change |
 | `motionSpringSettle` | Kanban card / filmstrip select |
 | `motionAttentionEnter` | Checkpoint + toast enter |
+| `motionLivePulse` | LIVE stream badge pulse |
+| `motionSkeleton` | Unified skeleton shimmer |
+| `brandBorderBeam` | Marketing primary CTA border accent |
+| `brandStepperConnector` | How-it-works stepper connector |
+| `motionTableRow` | Clickable table row hover |
 | `motionEmptyPulse` | Empty-state icon (once, no loop) |
 | `motionDragHandle` | Resize separator affordance |
 | `motionDragItem` | Grab cursor + lift on drag |
@@ -38,6 +43,7 @@ Jober uses a **CSS-first motion vocabulary** — no framer-motion. All feature s
 
 | Component | Path |
 |-----------|------|
+| `BrandSignature` | `components/marketing/brand-signature.tsx` — **marketing hero + auth only** |
 | `ReasoningShimmer` | `components/motion/reasoning-shimmer.tsx` |
 | `StreamingText` | `components/motion/streaming-text.tsx` |
 | `StatusPill` | `components/motion/status-pill.tsx` |

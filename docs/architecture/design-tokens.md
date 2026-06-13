@@ -22,9 +22,11 @@ Dark mode is the default for in-app surfaces. Marketing (`/`) may use richer mot
 | Class | Size | Use |
 |-------|------|-----|
 | `text-xs` | 12px | Meta, pills |
-| `text-sm` | 14px | Tables, nav |
+| `text-sm` | 14px | Tables, dense UI |
 | `text-base` | 16px | Body |
-| `text-lg` | 18px | Section titles |
+| `text-[1.0625rem]` | 17px | Marketing nav (md) |
+| `text-[1.125rem]` | 18px | Marketing nav (lg) |
+| `text-lg` | 18px | Section titles, marketing logo |
 | `text-2xl` | 24px | Page titles |
 | `text-4xl` | 36px | Marketing hero only |
 
@@ -33,7 +35,8 @@ Font: **Geist Sans** (UI), **Geist Mono** (logs, IDs).
 ## Radius & motion
 
 - `--radius`: `0.5rem` (8px) — cards, inputs
-- Animations use `motion-safe:` / `@media (prefers-reduced-motion: reduce)` — marketing gradient disables when reduced motion is set.
+- Animations use `motion-safe:` / `@media (prefers-reduced-motion: reduce)` — marketing brand signature and border-beam disable decorative animation when reduced motion is set.
+- **Brand signature** (`BrandSignature`): mesh gradient + grid — hero and auth only. See `docs/polish-pack/notes/28_sourcing_and_microinteractions.md`.
 
 ## Component surface families (Mission 10)
 
