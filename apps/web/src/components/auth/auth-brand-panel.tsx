@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { AnimatedBackground } from "@/components/marketing/animated-background";
+import { BrandSignature } from "@/components/marketing/brand-signature";
 import { ProductVisual } from "@/components/marketing/product-visual";
 import { motionFadeIn } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ export function AuthBrandPanel({ compact = false, className }: AuthBrandPanelPro
         className,
       )}
     >
-      <AnimatedBackground />
+      <BrandSignature />
       <div className={cn("relative mx-auto w-full max-w-lg", motionFadeIn)}>
         <Link href="/" className="text-sm font-semibold tracking-tight text-primary">
           Jober

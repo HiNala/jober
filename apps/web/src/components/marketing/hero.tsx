@@ -2,8 +2,8 @@ import dynamic from "next/dynamic";
 import { ArrowRight, Play } from "lucide-react";
 
 import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
-import { AnimatedBackground } from "@/components/marketing/animated-background";
-import { motionHeroStagger } from "@/lib/design/motion";
+import { BrandSignature } from "@/components/marketing/brand-signature";
+import { motionHeroStagger, motionSkeleton } from "@/lib/design/motion";
 import { POSITIONING_ONE_LINER, POSITIONING_SUBHEAD } from "@/lib/marketing/content";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,10 @@ const HeroRunPreview = dynamic(
   {
     loading: () => (
       <div
-        className="mx-auto aspect-[4/3] w-full max-w-3xl animate-pulse rounded-xl border border-border/60 bg-muted/25"
+        className={cn(
+          "mx-auto aspect-[4/3] w-full max-w-3xl rounded-xl border border-border/60",
+          motionSkeleton,
+        )}
         aria-hidden
       />
     ),
@@ -28,7 +31,7 @@ export function MarketingHero() {
       className="relative overflow-hidden px-6 pb-12 pt-16 md:pb-20 md:pt-20"
       aria-labelledby="hero-heading"
     >
-      <AnimatedBackground />
+      <BrandSignature />
       <div className="relative mx-auto flex max-w-4xl flex-col items-center text-center">
         <p
           className={cn(
