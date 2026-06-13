@@ -1,5 +1,5 @@
 import { HOW_IT_WORKS_STEPS } from "@/lib/marketing/content";
-import { motionFadeIn } from "@/lib/design/motion";
+import { motionFadeIn, brandStepperConnector } from "@/lib/design/motion";
 import { spacing, surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +51,10 @@ export function HowItWorks({
         >
           {isStepper ? (
             <div
-              className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-8 hidden h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent md:block"
+              className={cn(
+                "pointer-events-none absolute left-[12.5%] right-[12.5%] top-8 hidden md:block",
+                brandStepperConnector,
+              )}
               aria-hidden
             />
           ) : null}

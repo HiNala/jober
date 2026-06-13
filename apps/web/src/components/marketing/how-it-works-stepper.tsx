@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { HOW_IT_WORKS_STEPS } from "@/lib/marketing/content";
-import { motionFadeIn } from "@/lib/design/motion";
+import { motionFadeIn, brandStepperConnector } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -64,7 +64,10 @@ export function HowItWorksStepper({ showIntro = true }: { showIntro?: boolean })
 
         <ol className={cn("relative mt-10 grid gap-4 md:grid-cols-4", showIntro && "mt-12")}>
           <div
-            className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-8 hidden h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent md:block"
+            className={cn(
+              "pointer-events-none absolute left-[12.5%] right-[12.5%] top-8 hidden md:block",
+              brandStepperConnector,
+            )}
             aria-hidden
           />
           {HOW_IT_WORKS_STEPS.map(({ icon: Icon, slug, title, body, detail }, index) => {

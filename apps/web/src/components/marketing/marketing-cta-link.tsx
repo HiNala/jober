@@ -5,7 +5,7 @@ import type { ComponentProps } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { trackMarketingCta } from "@/lib/marketing/cta";
-import { motionPress } from "@/lib/design/motion";
+import { brandBorderBeam, motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
 type MarketingCtaLinkProps = ComponentProps<typeof Link> & {
@@ -30,6 +30,7 @@ export function MarketingCtaLink({
       className={cn(
         buttonVariants({ variant, size }),
         motionPress,
+        variant === "default" && brandBorderBeam,
         "inline-flex items-center gap-2",
         className,
       )}
