@@ -31,22 +31,22 @@ export function MarketingShell({
       </a>
 
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
+        <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-1">
             <MarketingMobileNav />
-            <Link href="/" className="truncate text-base font-semibold tracking-tight">
+            <Link href="/" className="truncate text-lg font-semibold tracking-tight">
               Jober
             </Link>
           </div>
           <nav
             aria-label="Marketing"
-            className="hidden flex-1 items-center justify-center gap-4 lg:flex lg:gap-6"
+            className="hidden flex-1 items-center justify-center gap-4 lg:flex lg:gap-7"
           >
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className="text-[1.0625rem] font-medium text-muted-foreground transition-colors hover:text-foreground lg:text-[1.125rem]"
               >
                 {label}
               </Link>
