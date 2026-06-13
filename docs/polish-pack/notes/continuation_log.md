@@ -1209,3 +1209,51 @@ Rotated from a11y → **docs**: verified `27_voice_guide.md` sweep table matches
 ### Deployment decision
 
 **Deploy recommended** — Mission 27 Production Guidance: copy and metadata are low-risk, high-polish. After push: deploy per `docs/runbooks/deploy.md`, `bash scripts/railway-smoke.sh`, fetch production `/` + `/faq` head for JSON-LD, re-capture `docs/screenshots/prod/01-home.png` and legal pages.
+
+---
+
+## Loop after Mission 28 — 2026-06-12
+
+### Re-verification (Mission 28 acceptance criteria)
+
+| Criterion | Result |
+|-----------|--------|
+| One brand signature on marketing + auth only | **Green** — `BrandSignature` on hero + `auth-brand-panel`; grep shows no other usages |
+| Sourced patterns token-native, documented, in budget | **Green** — `28_sourcing_and_microinteractions.md`; bundles 2564 KB / 2650 KB |
+| Nav/type scale Linear direction | **Green** — marketing shell `1.0625rem`–`1.125rem` nav, taller header |
+| Micro-interactions deliberate + reduced-motion safe | **Green** — Button/Input/Table/Tabs/Skeleton/LIVE/charts; `check:motion` OK |
+| Screenshot set + Design Council | **Deferred** — re-capture post-deploy (M28 Production Guidance); Design Council manual |
+
+### Improvements made (this loop)
+
+| Commit | Change |
+|--------|--------|
+| `854131a` | `BrandSignature` mesh + grid; hero + auth |
+| `bd88cfd` | Motion tokens + globals keyframes + skeleton shimmer |
+| `8ff7e06` | Border-beam CTAs + stepper connector wiring |
+| `07db7df` | Chart draw-in + `usePrefersReducedMotion` |
+| `1e7f34c` | Primitive micro-interaction sweep |
+| `98badfe` | Marketing nav type scale |
+| `9f508b5` | Sourcing doc + architecture + UI-REVIEW themes 1/4 |
+
+### Deferrals
+
+| Item | Owner |
+|------|-------|
+| Prod + mobile screenshot re-capture | Post-deploy same day as M28 release |
+| Design Council ≥18/20 formal score | Mission 30 launch gate |
+| Performance trace hero/analytics | Optional — animations are compositor-only (opacity/transform) |
+
+### Spot check (states)
+
+Rotated from docs → **states**: verified `Skeleton` uses `motionSkeleton` (queue/dashboard loading paths inherit via `page-states`); `ContentReveal` + `RunConsoleSkeleton` unchanged but shimmer unified at primitive layer.
+
+### Gate summary
+
+**Local:** `typecheck`, `lint:strict`, `test` **128 passed**, `check:motion`, `check:bundles` (2564 KB), `build`, `CI=true pnpm test:e2e:marketing` **71 passed**.
+
+**Backend:** unchanged by M28 — prior M27 loop gates still valid; full CI on push.
+
+### Deployment decision
+
+**Deploy recommended — single coherent release.** Mission 28 Production Guidance: most visible polish pack deploy. After push: deploy web, `bash scripts/railway-smoke.sh`, re-capture `01-home.png`, `11-login.png`, `22-analytics.png` same day; 5-second hero test on live site.
