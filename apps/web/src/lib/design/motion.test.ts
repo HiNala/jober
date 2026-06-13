@@ -4,7 +4,11 @@ import {
   HERO_STAGGER_MS,
   MOTION_DISTANCE,
   MOTION_MS,
+  brandBorderBeam,
+  brandStepperConnector,
   motionHeroStagger,
+  motionLivePulse,
+  motionSkeleton,
   runStatusTone,
 } from "@/lib/design/motion";
 
@@ -23,6 +27,13 @@ describe("motion tokens", () => {
   it("uses small transform distances only", () => {
     expect(MOTION_DISTANCE.sm).toBeLessThanOrEqual(8);
     expect(MOTION_DISTANCE.md).toBeLessThanOrEqual(16);
+  });
+
+  it("exports brand and micro-interaction tokens", () => {
+    expect(brandBorderBeam).toBe("brand-border-beam");
+    expect(motionLivePulse).toContain("jober-live-pulse");
+    expect(motionSkeleton).toContain("jober-skeleton-shimmer");
+    expect(brandStepperConnector).toContain("brand-stepper-connector");
   });
 
   it("hero stagger uses 50ms steps", () => {

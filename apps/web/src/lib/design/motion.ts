@@ -86,6 +86,23 @@ export const motionDragItem = `${motionMicro} cursor-grab active:cursor-grabbing
 export const motionAttentionEnter =
   "motion-safe:animate-[jober-attention-enter_var(--motion-view)_var(--ease-organic)_both]";
 
+/** LIVE stream badge — opacity/scale pulse (not shimmer). */
+export const motionLivePulse =
+  "motion-safe:animate-[jober-live-pulse_2s_ease-in-out_infinite]";
+
+/** Unified skeleton loading shimmer. */
+export const motionSkeleton =
+  "jober-skeleton-shimmer motion-safe:animate-[jober-skeleton-shimmer_2s_ease-in-out_infinite]";
+
+/** Marketing primary CTA / pricing card border accent (21st.dev border-beam pattern). */
+export const brandBorderBeam = "brand-border-beam";
+
+/** How-it-works stepper connector gradient flow. */
+export const brandStepperConnector = "brand-stepper-connector h-px";
+
+/** Clickable table rows — tokenized hover transition. */
+export const motionTableRow = `${motionMicro} transition-colors hover:bg-muted/50`;
+
 export function withMotion(
   base: string,
   opts?: { micro?: boolean; fadeIn?: boolean; press?: boolean },

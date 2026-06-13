@@ -262,7 +262,29 @@
   }
 }
 
-@keyframes jober-pricing-beam {
+@keyframes jober-brand-grid {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.42;
+    transform: translateY(-1%);
+  }
+}
+
+.brand-signature-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--primary) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--primary) 10%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 85% 65% at 50% 38%, black, transparent);
+}
+
+@keyframes jober-border-beam {
   0% {
     background-position: 0% 50%;
   }
@@ -271,10 +293,42 @@
   }
 }
 
+@keyframes jober-skeleton-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes jober-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes jober-stepper-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.brand-border-beam,
 .pricing-border-beam {
   position: relative;
 }
 
+.brand-border-beam::before,
 .pricing-border-beam::before {
   content: "";
   position: absolute;
@@ -288,7 +342,7 @@
     transparent
   );
   background-size: 200% 100%;
-  animation: jober-pricing-beam 6s linear infinite;
+  animation: jober-border-beam 6s linear infinite;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -300,11 +354,44 @@
   pointer-events: none;
 }
 
+.brand-stepper-connector {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--primary) 60%, transparent),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: jober-stepper-flow 5s ease-in-out infinite;
+}
+
+.jober-skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    color-mix(in oklab, var(--muted) 80%, var(--foreground) 8%) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .brand-border-beam::before,
   .pricing-border-beam::before {
     animation: none;
     background: color-mix(in oklab, var(--primary) 35%, transparent);
     background-size: auto;
+  }
+
+  .brand-stepper-connector {
+    animation: none;
+    background: color-mix(in oklab, var(--primary) 45%, transparent);
+    background-size: auto;
+  }
+
+  .brand-signature-grid {
+    animation: none;
+    opacity: 0.3;
   }
 }
 
