@@ -83,6 +83,13 @@ services:
     profiles: ["full"]
     environment:
       <<: *common-env
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      LLM_DRAFT_MODEL: ${LLM_DRAFT_MODEL:-gpt-4o-mini}
+      LLM_SCORING_MODEL: ${LLM_SCORING_MODEL:-gpt-4o-mini}
+      ADMIN_BOOTSTRAP_SECRET: ${ADMIN_BOOTSTRAP_SECRET:-}
+      AUTH_MODE: ${AUTH_MODE:-dev}
     ports:
       - "${API_HOST_PORT:-8000}:8000"
     depends_on:

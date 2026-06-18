@@ -51,7 +51,21 @@ export function WorkspaceShellPanels({
 
   const layoutStorage = useMemo(
     () => ({
-      getItem: (name: string) => window.localStorage.getItem(name),
+      getItem: (name: string) => {
+        const stored = window.localStorage.getItem(name);
+        if (!stored) return null;
+        try {
+          const layout = JSON.parse(stored) as Record<string, number>;
+          // Reject corrupted layouts where nav is below collapsedSize (4%)
+          if ("nav" in layout && layout.nav < 4) {
+            window.localStorage.removeItem(name);
+            return null;
+          }
+          return stored;
+        } catch {
+          return null;
+        }
+      },
       setItem: (name: string, value: string) => {
         window.localStorage.setItem(name, value);
       },
@@ -107,11 +121,11 @@ export function WorkspaceShellPanels({
             <ResizablePanel
               id="nav"
               panelRef={navPanelRef}
-              defaultSize={14}
-              minSize={navCollapsed ? 4 : 10}
-              maxSize={22}
+              defaultSize="14"
+              minSize={navCollapsed ? "4" : "10"}
+              maxSize="22"
               collapsible
-              collapsedSize={4}
+              collapsedSize="4"
             >
               <WorkspaceNav />
             </ResizablePanel>
@@ -121,8 +135,8 @@ export function WorkspaceShellPanels({
 
         <ResizablePanel
           id="center"
-          minSize={28}
-          defaultSize={showInlineCanvas ? 38 : 86}
+          minSize="28"
+          defaultSize={showInlineCanvas ? "38" : "86"}
         >
           <div className="flex h-full min-w-0 flex-col">
             <WorkspaceCenterHeader title={title} layoutMode={layoutMode} />
@@ -139,7 +153,7 @@ export function WorkspaceShellPanels({
         {showInlineCanvas ? (
           <>
             <ResizableHandle withHandle />
-            <ResizablePanel id="canvas" defaultSize={48} minSize={30}>
+            <ResizablePanel id="canvas" defaultSize="48" minSize="30">
               <WorkspaceCanvasPanel />
             </ResizablePanel>
           </>

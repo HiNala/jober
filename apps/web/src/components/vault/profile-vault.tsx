@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Lock, ShieldAlert } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { formatApiError } from "@/lib/api/errors";
@@ -212,14 +212,15 @@ export function ProfileVault() {
   const queryClient = useQueryClient();
   const [dirtyKeys, setDirtyKeys] = useState<Set<string>>(new Set());
 
-  const markDirty = (key: string, dirty: boolean) => {
+  const markDirty = useCallback((key: string, dirty: boolean) => {
     setDirtyKeys((prev) => {
+      if (dirty === prev.has(key)) return prev; // bail out — no real change, same reference
       const next = new Set(prev);
       if (dirty) next.add(key);
       else next.delete(key);
       return next;
     });
-  };
+  }, []);
 
   useUnsavedChanges(dirtyKeys.size > 0);
   const { data, isLoading, isError, refetch } = useQuery({
