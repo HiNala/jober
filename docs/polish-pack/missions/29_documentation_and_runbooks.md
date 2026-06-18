@@ -8,11 +8,13 @@ Application audit §17: docs are excellent but mission-history-organized and at 
 
 ## Scope
 - **README restructure:** lead with what Jober is + live URLs, then task-organized operator sections (run locally, develop, test, deploy, operate); push mission-by-mission history into a linked appendix or per-feature docs. Every command in the README is re-executed verbatim during this mission — any that fails gets fixed (command or doc).
+- **Fix stale mission number references:** README currently references "Mission 33" and "Mission 34" which do not exist in the polish pack; these should read "Mission 29" and "Mission 24" respectively.
 - **Runbook verification:** walk each of the 9 runbooks (`deploy`, `rollback`, `restore-backup`, `rotate-secrets`, `worker-stuck`, `queue-backed-up`, `infra-down`, `cost-spike`, `launch-checklist`) step-by-step against staging/local where executable; correct drift; add the email-provider runbook from Mission 11 if not already present.
-- **Env var truth:** `.env.example` and `infra/railway/variables.example.env` list every variable the code reads (cross-check with a grep of the settings modules), each with a one-line comment; no orphaned or missing vars.
-- **CHANGELOG:** summarize this pack's user-visible changes.
+- **Env var truth:** `.env.example` and `infra/railway/variables.example.env` list every variable the code reads (cross-check with a grep of the settings modules), each with a one-line comment; no orphaned or missing vars. Fix the `variables.example.env` "Mission 34" reference.
+- **CHANGELOG:** summarize this pack's user-visible changes (currently only Mission 21 in unreleased section — incomplete).
 - **Architecture docs:** confirm `errors.md` (M18), `threat-model.md` (M21), `motion.md`/`design-tokens.md` (M28), `testing.md` (M26) deltas all landed; fix cross-links.
 - **CLAUDE.md / AGENTS.md:** update agent-facing conventions (testids, forms pattern, layout modes, component families) so future agents inherit this pack's decisions.
+- **Triage uncommitted diff:** decide whether `apps/api/pyproject.toml` (`celery[redis]` addition) and `infra/compose.yaml` (LLM env vars on API service) are intentional — if so, land them with a commit; if not, restore. Remove or gitignore debug scripts (`scripts/debug_signup.js`, `scripts/screenshot_*.js`) and `tmp_screenshots/`.
 - Index the pack's notes files from `docs/polish-pack/mission_index.md`.
 
 ## Out of Scope
@@ -28,11 +30,14 @@ Application audit §17: docs are excellent but mission-history-organized and at 
 
 ## Tasks
 1. README restructure + command re-execution sweep (record each command's result in the notes file).
-2. Runbook walks with corrections; date-stamp a "last verified" line in each runbook.
-3. Env var reconciliation in both example files.
-4. CHANGELOG entry; architecture-doc cross-link fixes.
-5. CLAUDE.md/AGENTS.md convention updates.
-6. Cross-index: `docs/polish-pack/mission_index.md` ↔ notes files ↔ `docs/MISSION_INDEX.md` pointer.
+2. Fix stale mission number references in README (`Mission 33` → `29`, `Mission 34` → `24`) and `infra/railway/variables.example.env` (`Mission 34` → `24`).
+3. Runbook walks with corrections; date-stamp a "last verified" line in each runbook.
+4. Env var reconciliation in both example files.
+5. CHANGELOG: expand unreleased section to cover all polish pack missions 01-28.
+6. Architecture-doc cross-link fixes.
+7. CLAUDE.md/AGENTS.md convention updates.
+8. Triage uncommitted diff: `pyproject.toml` and `compose.yaml` (commit or restore); debug scripts and `tmp_screenshots/` (remove or gitignore).
+9. Cross-index: `docs/polish-pack/mission_index.md` ↔ notes files ↔ `docs/MISSION_INDEX.md` pointer.
 
 ## Self-Improvement Loop
 1. Inspect the next doc by *executing* it (commands run, steps followed), not by reading it.

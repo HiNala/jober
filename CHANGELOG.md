@@ -1,6 +1,57 @@
 # Changelog
 
-## [Unreleased]
+## [Unreleased] — Polish Pack 01-28 (2026-06-10 → 2026-06-12)
+
+### Foundation (Missions 01-03)
+
+- Landed in-flight work cleanly; `main` stabilized
+- Canonical quality gates documented and enforced (`docs/polish-pack/notes/gates.md`)
+- Golden path verified local + production; fixture pipeline + fullstack e2e in CI
+
+### UX & UI (Missions 04-10, 27-28)
+
+- Consent bottom sheet replaces overlapping toast; analytics opt-in gated
+- Empty/loading/error states designed as onboarding moments; zero dev copy
+- Branded auth pages with trust strip and `AuthBrandPanel`
+- Homepage hero centered with product preview; Linear-style nav + type scale
+- Marketing subpages (features, how-it-works, pricing, FAQ, blog) rebuilt
+- Workspace layout discipline: split-pane (ops-desk) only on `/runs/[id]`
+- Command palette (⌘K) replaces bolted-on AI bottom bar
+- Component tiering: marketing bento / workspace data panels / terminal surfaces
+- Brand signature (`BrandSignature` mesh+grid) on hero + auth only
+- Motion tokens + micro-interactions (Button, Input, Table, Tabs, Skeleton, charts)
+- `prefers-reduced-motion` honored globally; `check:motion` gate enforced
+
+### Flow completion (Missions 11-12, 15-17)
+
+- Email delivery: SMTP + console backends; verification + password reset via Celery
+- Forms & validation: uniform 422 mapping, pending states, no input loss
+- Run console reliability: SSE reconnect from `Last-Event-ID`, 15s heartbeat, checkpoint conflict UI, end-state summary
+- Discover → queue journey: seamless import/batch/dry-run flow; XLSX round-trip proven
+- Document studio: friction-free letter cycle; honest stub/402 states; lock guarantee tested
+
+### Hardening (Missions 18-21)
+
+- API error contract: one envelope, no leaks, truthful `/readyz`, downstream mapping
+- Auth/session hardening: cookie/CSRF/session matrix verified; lifecycle test-enforced
+- Database hygiene: replay/drift/index/retention/backup all drilled
+- Security & privacy validation: threat-model controls probe-verified; dependency audit
+
+### Performance (Missions 22-23)
+
+- Web performance: marketing LCP path cleaned; `ShellProviders`/`AppProviders` split; `dynamic()` on heavy chunks; bundle budget tightened to 2650 KB
+- API & worker performance: latency baselines; pagination everywhere; Redis lock serialization
+
+### Observability & testing (Missions 24-26)
+
+- Observability: metrics truthful; 10 alert classes fire; correlation IDs web→API→worker; log questions answerable
+- Critical path test coverage: web + api coverage maps; zero flakes; mutation spot-checks
+- E2E expansion: 71 marketing e2e + 5 fullstack specs (core, recovery, studio, settings, auth) in CI
+
+### Copy & brand (Mission 27)
+
+- Voice guide + sweep table; P0 copy bugs eliminated
+- Per-route metadata, JSON-LD, sitemap, robots, canonicals
 
 ### Security (Mission 21)
 

@@ -77,7 +77,7 @@ cd apps/api && pytest -q
 cd apps/worker && pytest -q
 ```
 
-**Mission 02 results:** api 58 passed / 212 skipped; worker 22 passed.
+**Current results (Mission 28):** api 83 passed / 313 skipped; worker 22 passed.
 
 ### 4. Fixture pipeline (~90s)
 
@@ -91,7 +91,7 @@ make test-fixtures
 make test-policy
 ```
 
-**Mission 02 result:** 12 passed.
+**Current results (Mission 28):** 19 passed.
 
 ### 6. Web gates (~7 min)
 
@@ -108,6 +108,8 @@ pnpm check:bundles
 
 Or `make web-lint` + `make web-build` + motion/bundles on Linux.
 
+**Current results (Mission 28):** `pnpm test` **128 passed**; `check:bundles` 2564 KB / 2650 KB budget.
+
 ### 7. E2E — marketing tier (~1 min after browser install)
 
 ```bash
@@ -120,7 +122,7 @@ Playwright starts `pnpm start` via `playwright.config.ts` unless `PLAYWRIGHT_SKI
 
 **Windows:** With `CI=true`, Playwright refuses to reuse an existing server on port 3000. Stop any stale `next start` / dev server on `:3000` before e2e, or e2e fails with *"port already used"*. Without `CI`, `reuseExistingServer: true` applies but the running server must be a fresh production build with `NEXT_PUBLIC_DEV_AUTH_BYPASS=true` (see `playwright.config.ts` webServer env).
 
-**Mission 02 result:** 13 passed. **Mission 22:** 71 passed (CI). **Mission 26:** marketing project only in `web` job.
+**Current results (Mission 28):** marketing e2e **71 passed** (CI); fullstack e2e **5 passed** (Mission 26).
 
 ### 8. E2E — full-stack tier (Mission 26)
 
@@ -180,4 +182,10 @@ CI uses default ports (5432/6379/9000); local `.env` overrides require the adjus
 
 ## Known blockers / waivers
 
-None as of Mission 02 closeout.
+| Item | Status | Mission | Notes |
+|---|---|---|---|
+| Legal counsel review of `/acceptable-use` | Open (external) | 30 | Waivable for soft launch |
+| Lighthouse CWV production verification | Open | 30 | Automated blocked by bot interstitial; manual PSI post-deploy |
+| Per-route OG image assets | Deferred | Post-launch | Mission 27 deferral |
+| `auth-journey` fullstack in CI | Waiver | 26 | Requires `E2E_AUTH_NATIVE=1` + native auth stack |
+| App-route axe coverage | Deferred | Post-launch | Marketing axe green; app routes incremental |

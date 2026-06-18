@@ -59,38 +59,38 @@ docs/polish-pack/
 
 ## 5. Missions 01–30 and intended outcomes
 
-| # | Mission | Intended outcome |
-|---|---------|------------------|
-| 01 | [Land in-flight changes](missions/01_land_in_flight_changes.md) | Clean `main`; uncommitted work validated and landed or parked |
-| 02 | [Quality gates baseline](missions/02_quality_gates_baseline.md) | Every gate green locally + CI; canonical gate doc written |
-| 03 | [Golden path validation](missions/03_golden_path_validation.md) | Whole journey verified local + prod; master defect list produced |
-| 04 | [Consent & analytics UX](missions/04_consent_and_analytics_ux.md) | One-time bottom sheet; no content overlap; consent provable |
-| 05 | [Page states & onboarding](missions/05_page_states_and_onboarding.md) | Every empty/loading/error state onboards; zero dev copy |
-| 06 | [Auth surface polish](missions/06_auth_surface_polish.md) | Branded auth with trust strip; honest verification copy |
-| 07 | [Homepage hero & landing](missions/07_homepage_hero_and_landing.md) | Linear-style hero with centered product preview; differentiator elevated |
-| 08 | [Marketing subpages polish](missions/08_marketing_subpages_polish.md) | Features/how/pricing/FAQ to the same bar; Pro waitlist replaces dead card |
-| 09 | [Workspace layout discipline](missions/09_workspace_layout_discipline.md) | Split-pane only on run surfaces; ⌘K palette replaces bolted-on AI bar |
-| 10 | [Component tiering & consistency](missions/10_component_tiering_consistency.md) | Three component families; duplicates consolidated; tokens enforced |
-| 11 | [Email delivery completion](missions/11_email_delivery_completion.md) | Verification + reset emails work in production; CI stays offline |
-| 12 | [Forms & validation](missions/12_forms_and_validation.md) | Uniform validation, 422 mapping, pending states; no input loss |
-| 13 | [Accessibility pass](missions/13_accessibility_pass.md) | Axe green on app routes; keyboard-complete golden path |
-| 14 | [Responsive & mobile refinement](missions/14_responsive_mobile_refinement.md) | Marketing/auth designed at 375+; app usable; run console tablet-ready |
-| 15 | [Run console reliability](missions/15_run_console_reliability.md) | SSE reconnect-proof; checkpoint conflicts handled; end states designed |
-| 16 | [Discover → queue journey](missions/16_discover_queue_journey.md) | Seamless import/discover/batch flow; XLSX round-trip proven |
-| 17 | [Document studio polish](missions/17_document_studio_polish.md) | Friction-free letter cycle; honest stub/402 states; lock guarantee tested |
-| 18 | [API error contract](missions/18_api_error_contract.md) | One error envelope; no leaks; truthful `/readyz`; downstream mapping |
-| 19 | [Auth/session hardening](missions/19_auth_session_hardening.md) | Cookie/CSRF/session matrix verified; lifecycle test-enforced |
-| 20 | [DB & migration hygiene](missions/20_database_migration_hygiene.md) | Replay/drift/index/retention/backup all drilled with evidence |
-| 21 | [Security & privacy validation](missions/21_security_privacy_validation.md) | Every threat-model control probe-verified; deps audited |
-| 22 | [Web performance](missions/22_web_performance.md) | CWV targets met; chunks clean; budgets tightened |
-| 23 | [API & worker performance](missions/23_api_worker_performance.md) | Latency baselines met; pagination everywhere; guards in load tests |
-| 24 | [Observability completion](missions/24_observability_completion.md) | Metrics truthful; every alert class fires; logs answer real questions |
-| 25 | [Test coverage critical paths](missions/25_test_coverage_critical_paths.md) | Critical paths covered; zero flakes; mutation spot-checks pass |
-| 26 | [E2E validation expansion](missions/26_e2e_validation_expansion.md) | Five deterministic e2e journeys in CI with traces |
-| 27 | [Copy, microcopy & SEO](missions/27_copy_microcopy_seo.md) | One voice everywhere; P0 copy bugs dead; full metadata/JSON-LD |
-| 28 | [Brand, motion & micro-interactions](missions/28_brand_motion_microinteractions.md) | One brand signature; sourced 21st.dev/v0-grade patterns on tokens; nothing reads default |
-| 29 | [Documentation & runbooks](missions/29_documentation_and_runbooks.md) | Every doc executed-and-verified; operator-organized README |
-| 30 | [Release candidate & launch](missions/30_release_candidate_and_launch.md) | Audit §21 criteria all true; RC deployed, certified, tagged; post-launch loop |
+| # | Mission | Intended outcome | Status |
+|---|---|---|---|
+| 01 | [Land in-flight changes](missions/01_land_in_flight_changes.md) | Clean `main`; uncommitted work validated and landed or parked | ✅ Done |
+| 02 | [Quality gates baseline](missions/02_quality_gates_baseline.md) | Every gate green locally + CI; canonical gate doc written | ✅ Done |
+| 03 | [Golden path validation](missions/03_golden_path_validation.md) | Whole journey verified local + prod; master defect list produced | ✅ Done |
+| 04 | [Consent & analytics UX](missions/04_consent_and_analytics_ux.md) | One-time bottom sheet; no content overlap; consent provable | ✅ Done |
+| 05 | [Page states & onboarding](missions/05_page_states_and_onboarding.md) | Every empty/loading/error state onboards; zero dev copy | ✅ Done |
+| 06 | [Auth surface polish](missions/06_auth_surface_polish.md) | Branded auth with trust strip; honest verification copy | ✅ Done |
+| 07 | [Homepage hero & landing](missions/07_homepage_hero_and_landing.md) | Linear-style hero with centered product preview; differentiator elevated | ✅ Done |
+| 08 | [Marketing subpages polish](missions/08_marketing_subpages_polish.md) | Features/how/pricing/FAQ to the same bar; Pro waitlist replaces dead card | ✅ Done |
+| 09 | [Workspace layout discipline](missions/09_workspace_layout_discipline.md) | Split-pane only on run surfaces; ⌘K palette replaces bolted-on AI bar | ✅ Done |
+| 10 | [Component tiering & consistency](missions/10_component_tiering_consistency.md) | Three component families; duplicates consolidated; tokens enforced | ✅ Done |
+| 11 | [Email delivery completion](missions/11_email_delivery_completion.md) | Verification + reset emails work in production; CI stays offline | ✅ Done |
+| 12 | [Forms & validation](missions/12_forms_and_validation.md) | Uniform validation, 422 mapping, pending states; no input loss | ✅ Done |
+| 13 | [Accessibility pass](missions/13_accessibility_pass.md) | Axe green on app routes; keyboard-complete golden path | ✅ Done |
+| 14 | [Responsive & mobile refinement](missions/14_responsive_mobile_refinement.md) | Marketing/auth designed at 375+; app usable; run console tablet-ready | ✅ Done |
+| 15 | [Run console reliability](missions/15_run_console_reliability.md) | SSE reconnect-proof; checkpoint conflicts handled; end states designed | ✅ Done |
+| 16 | [Discover → queue journey](missions/16_discover_queue_journey.md) | Seamless import/discover/batch flow; XLSX round-trip proven | ✅ Done |
+| 17 | [Document studio polish](missions/17_document_studio_polish.md) | Friction-free letter cycle; honest stub/402 states; lock guarantee tested | ✅ Done |
+| 18 | [API error contract](missions/18_api_error_contract.md) | One error envelope; no leaks; truthful `/readyz`; downstream mapping | ✅ Done |
+| 19 | [Auth/session hardening](missions/19_auth_session_hardening.md) | Cookie/CSRF/session matrix verified; lifecycle test-enforced | ✅ Done |
+| 20 | [DB & migration hygiene](missions/20_database_migration_hygiene.md) | Replay/drift/index/retention/backup all drilled with evidence | ✅ Done |
+| 21 | [Security & privacy validation](missions/21_security_privacy_validation.md) | Every threat-model control probe-verified; deps audited | ✅ Done |
+| 22 | [Web performance](missions/22_web_performance.md) | CWV targets met; chunks clean; budgets tightened | ✅ Done (PSI deferred post-deploy) |
+| 23 | [API & worker performance](missions/23_api_worker_performance.md) | Latency baselines met; pagination everywhere; guards in load tests | ✅ Done |
+| 24 | [Observability completion](missions/24_observability_completion.md) | Metrics truthful; every alert class fires; logs answer real questions | ✅ Done |
+| 25 | [Test coverage critical paths](missions/25_test_coverage_critical_paths.md) | Critical paths covered; zero flakes; mutation spot-checks pass | ✅ Done |
+| 26 | [E2E validation expansion](missions/26_e2e_validation_expansion.md) | Five deterministic e2e journeys in CI with traces | ✅ Done |
+| 27 | [Copy, microcopy & SEO](missions/27_copy_microcopy_seo.md) | One voice everywhere; P0 copy bugs dead; full metadata/JSON-LD | ✅ Done (OG images deferred) |
+| 28 | [Brand, motion & micro-interactions](missions/28_brand_motion_microinteractions.md) | One brand signature; sourced 21st.dev/v0-grade patterns on tokens; nothing reads default | ✅ Done |
+| 29 | [Documentation & runbooks](missions/29_documentation_and_runbooks.md) | Every doc executed-and-verified; operator-organized README | ⏳ Ready to execute |
+| 30 | [Release candidate & launch](missions/30_release_candidate_and_launch.md) | Audit §21 criteria all true; RC deployed, certified, tagged; post-launch loop | ⏳ Ready to execute |
 
 ## 6. Git commit and push guidance
 

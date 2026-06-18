@@ -20,10 +20,15 @@ Application audit §21 defines the stability bar verbatim — this mission's job
 
 ## Starting Checklist
 1. Re-read application audit §21 and `docs/runbooks/launch-checklist.md` side by side; merge into one RC checklist.
-2. `git log --oneline --grep="pack-"` — confirm every pack mission landed and pushed; `git status` clean.
+2. `git log --oneline --grep="pack-"` — confirm every pack mission landed and pushed. `git status` should be clean after Mission 29 triages the small remaining diff (`pyproject.toml`, `compose.yaml`, debug scripts).
 3. Verify Railway env state matches `infra/railway/variables.example.env` expectations (incl. M11 email vars, M24 alert/Sentry vars).
 4. Confirm a fresh production backup exists before deploying (M20 flow).
 5. Check open blockers recorded by any mission's notes files — none may be silently open.
+6. **Current known open blockers (carry into Mission 30):**
+   - Legal counsel review of `/acceptable-use` (external)
+   - Lighthouse CWV manual PSI verification (automated measurement blocked)
+   - Per-route OG image assets (deferred from Mission 27)
+   - `auth-journey` fullstack in CI requires `E2E_AUTH_NATIVE=1` (Mission 26 waiver)
 
 ## Tasks
 1. Fresh-clone sanity drill (temp directory, README only).

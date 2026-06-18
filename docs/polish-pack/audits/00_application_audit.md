@@ -85,14 +85,14 @@ Key API internals: RBAC permission registry in `auth/permissions.py` (startup-va
 
 Ranked; each item references evidence.
 
-1. **Uncommitted working tree on `main`** — **Resolved (Mission 01, 2026-06-10):** in-flight work landed in logical commits; `main` clean at pack start.
-2. **Outbound email is not configured** — **Confirmed (Mission 03, 2026-06-11):** prod register creates verify tokens but no email is sent; forgot-password same class. Login still works while `pending_verification` (see GP-004).
+1. **Uncommitted working tree on `main`** — **Resolved (Mission 01, 2026-06-10):** in-flight work landed in logical commits. **New uncommitted diff as of 2026-06-12:** `apps/api/pyproject.toml` adds `celery[redis]` dependency; `infra/compose.yaml` adds LLM env vars to API service; plus debug scripts and screenshot artifacts in `scripts/` and `tmp_screenshots/`. These should be committed (if intentional) or cleaned before Mission 29.
+2. **Outbound email is not configured** — **Resolved (Mission 11, 2026-06-11):** SMTP and console backends implemented; verification + password reset emails dispatch via Celery; production requires `EMAIL_BACKEND=smtp` + `SMTP_*` vars.
 3. **LLM in production may be the stub template provider** — **Corrected (Mission 03, 2026-06-11):** production `/api/llm/config` reports `provider: openai`, `gpt-4o-mini`; template stub not active.
-4. **UI genericness** — fully documented in `docs/screenshots/UI-REVIEW.md`: consent toast overlapping content on nearly every screen, identical 40/60 split-pane on all in-app routes, default shadcn card grids on marketing, dev copy (`make seed`) in the production queue empty state, unbranded auth pages.
-5. **Pro plan is a dead card** on `/pricing` (not purchasable; Stripe webhook exists but no checkout). Either ghost it with a waitlist or wire checkout — decided in the positioning audit.
-6. **Legal pages are drafts** (`/acceptable-use` explicitly "requires counsel before launch").
+4. **UI genericness** — **Resolved (Missions 04–10, 27–28):** consent bottom sheet replaces toast; split-pane only on `/runs/[id]` (ops-desk); marketing pages rebuilt with brand signature, motion tokens, and Linear-style type scale; dev copy removed; auth pages have branded panel + trust strip.
+5. **Pro plan is a dead card** on `/pricing` — **Deferred to post-launch:** waitlist capture via `POST /api/waitlist/pro` implemented (Mission 08); Stripe checkout activation requires owner sign-off per positioning audit §20.
+6. **Legal pages are drafts** (`/acceptable-use` explicitly "requires counsel before launch"). **Status:** unchanged — external blocker for Mission 30.
 7. **Deployment fragility signals** — **Re-tested (Mission 03):** prod `/readyz` all checks ok post hotfixes; full gate set green on Mission 02 CI after landing SSL/cookie fixes.
-8. **Thin in-app e2e coverage** — **Confirmed (Mission 03):** 13 Playwright tests, marketing-focused; authenticated app routes still uncovered (GP-009).
+8. **Thin in-app e2e coverage** — **Resolved (Mission 26, 2026-06-12):** 71 marketing e2e + 5 fullstack specs (core, recovery, studio, settings, auth journey) in CI.
 9. **Windows dev friction** — **Partially addressed (Mission 01):** `Dockerfile.web` + root compose landed; backup/restore still require Git Bash/WSL.
 10. **Possible repo hygiene issues** — **Confirmed ok (Mission 02):** `test-results/`, `*.tsbuildinfo`, `.mypy_cache/` are gitignored.
 
@@ -160,28 +160,62 @@ Marketing pages presumably responsive (standard Next/Tailwind patterns) but unve
 ## 18. Deployment readiness audit
 
 - **Live:** Railway production with private Postgres/Redis/storage, per-service `*.railway.toml`, production Dockerfiles, boot-time secret enforcement, backup/restore scripts, uptime cron, ops alert webhook, launch checklist.
-- **Open:** outbound email (blocker for real users), `LLM_API_KEY` confirmation, legal counsel on draft pages, MinIO Railway config just modified (uncommitted `infra/railway/minio.railway.toml` diff — validate before deploy), staging golden-path gate should be re-run after the in-flight work lands.
+- **Resolved since audit:** outbound email backend (SMTP/console) shipped; `LLM_API_KEY` confirmed active in production; staging golden-path gate green through Mission 28.
+- **Open:** legal counsel on draft pages; small uncommitted diff (`pyproject.toml`, `compose.yaml`, debug scripts) should be triaged before Mission 29; Lighthouse CWV needs manual PSI verification post-deploy.
 
 ## 19. Prioritized risk list
 
-| # | Risk | Severity | Mission |
-|---|---|---|---|
-| 1 | Uncommitted work on `main` lost or half-landed | High | 01 |
-| 2 | Signup verification / password reset dead-end (no email) | High | 11 |
-| 3 | Quality gates not re-validated after in-flight diff | High | 02 |
-| 4 | Golden path regression undetected in prod (recent hotfix churn) | High | 03 |
-| 5 | Consent toast degrading every page's UX | Medium | 04 |
-| 6 | Generic UI undermining positioning (full UI-REVIEW backlog) | Medium | 06–10, 27–28 |
-| 7 | `SameSite=None` cookie / CSRF surface unreviewed | Medium | 20, 22 |
-| 8 | No e2e or axe coverage of authenticated app | Medium | 14, 26 |
-| 9 | Workspace shell unusable on mobile (unverified) | Medium | 15 |
-| 10 | Legal pages unreviewed by counsel | Medium (external) | 30 (gate) |
-| 11 | Stub LLM provider silently active in prod | Medium | 03 |
-| 12 | Doc drift vs deployed reality | Low | 29 |
+| # | Risk | Severity | Mission | Status |
+|---|---|---|---|---|
+| 1 | Uncommitted work on `main` lost or half-landed | High | 01 | **Resolved** — landed cleanly. New small diff exists (see §7 item 1). |
+| 2 | Signup verification / password reset dead-end (no email) | High | 11 | **Resolved** — SMTP/console backends shipped; production requires `SMTP_*` config. |
+| 3 | Quality gates not re-validated after in-flight diff | High | 02 | **Resolved** — gates green locally and in CI through Mission 28. |
+| 4 | Golden path regression undetected in prod (recent hotfix churn) | High | 03 | **Resolved** — golden path verified local + prod; fixture pipeline + fullstack e2e in CI. |
+| 5 | Consent toast degrading every page's UX | Medium | 04 | **Resolved** — bottom sheet replaces toast; consent cookie gated. |
+| 6 | Generic UI undermining positioning (full UI-REVIEW backlog) | Medium | 06–10, 27–28 | **Resolved** — brand signature, motion tokens, Linear-style nav, component tiering shipped. |
+| 7 | `SameSite=None` cookie / CSRF surface unreviewed | Medium | 20, 22 | **Resolved** — auth/session hardening (Mission 19); security controls probed (Mission 21). |
+| 8 | No e2e or axe coverage of authenticated app | Medium | 14, 26 | **Resolved** — 71 marketing e2e + 5 fullstack specs + axe on marketing routes. App-route axe deferred to incremental. |
+| 9 | Workspace shell unusable on mobile (unverified) | Medium | 15 | **Resolved** — MobileNav below 1024px; run console tabs on tablet; responsive smoke e2e. |
+| 10 | Legal pages unreviewed by counsel | Medium (external) | 30 (gate) | **Open** — `/acceptable-use` still draft; requires counsel before public launch. |
+| 11 | Stub LLM provider silently active in prod | Medium | 03 | **Resolved** — production reports `openai` provider. |
+| 12 | Doc drift vs deployed reality | Low | 29 | **Active** — README references Mission 33/34 (does not exist); CHANGELOG unreleased section incomplete; `infra/railway/variables.example.env` references Mission 34. |
+| 13 | Lighthouse CWV unverified in production | Low | 22, 30 | **Open** — automated measurement blocked by bot interstitial; needs manual PSI post-deploy. |
 
 ## 20. Recommended mission sequence
 
 See [`docs/polish-pack/mission_index.md`](../mission_index.md). Order: land in-flight work → re-green gates → validate golden path → execute UI-REVIEW fixes (consent, states, auth, marketing, layout, components) → close the email flow → forms/a11y/responsive → core-surface reliability (run console, discovery/queue, documents) → backend hardening (errors, auth, DB, security) → performance → observability → test depth → copy/brand polish → docs → RC → launch re-certification. Run Mission 31 (continuation loop) between every mission.
+
+## 22. Polish pack review summary (2026-06-12)
+
+**Reviewer:** Fable 5 agent (pack review and validation pass)
+**Scope:** Validate entire codebase and mission pack against current state after Missions 01–28.
+
+### Verified complete
+
+- Missions 01–28: all committed to `main` (HEAD `0b2b902`); continuation loops logged after each mission.
+- Quality gates: green locally and in CI through Mission 28 (api 83 passed, worker 22, web 128 tests, marketing e2e 71, fullstack e2e 5, policy 19).
+- All audit §7 items 1–11 resolved or confirmed non-blocking.
+- UI-REVIEW themes 1–6 implemented across Missions 04–10, 27–28.
+
+### Current gaps found
+
+| # | Gap | Location | Severity | Action |
+|---|---|---|---|---|
+| 1 | Uncommitted diff: `apps/api/pyproject.toml` adds `celery[redis]`; `infra/compose.yaml` adds LLM env vars | `apps/api/pyproject.toml`, `infra/compose.yaml` | Low | Triage in Mission 29 — commit if intentional, else restore |
+| 2 | Debug scripts and screenshot artifacts untracked | `scripts/debug_signup.js`, `scripts/screenshot_*.js`, `tmp_screenshots/` | Low | Remove or add to `.gitignore` in Mission 29 |
+| 3 | README references non-existent missions | `README.md` §85, §98 | Low | Fix in Mission 29 (`Mission 33` → `29`, `Mission 34` → `24`) |
+| 4 | CHANGELOG unreleased section incomplete | `CHANGELOG.md` | Low | Expand in Mission 29 to cover missions 01–28 |
+| 5 | `variables.example.env` references non-existent mission | `infra/railway/variables.example.env` §38 | Low | Fix in Mission 29 (`Mission 34` → `24`) |
+| 6 | App-route axe coverage still thin | `e2e/a11y-app.spec.ts` | Medium | Incremental — not blocking launch; queue for post-launch |
+| 7 | Lighthouse CWV unverified in production | `docs/polish-pack/notes/22_perf_baseline.md` | Medium | Manual PSI post-deploy (Mission 30); automated blocked by bot interstitial |
+| 8 | Legal counsel review pending | `/acceptable-use` | Medium (external) | Waived in Mission 30 launch gate |
+| 9 | Per-route OG image assets deferred | Mission 27 notes | Low | Post-launch |
+
+### Recommended next actions
+
+1. **Mission 29:** Execute documentation sweep; triage uncommitted diff; fix stale references; expand CHANGELOG; verify all runbooks.
+2. **Mission 30:** Full regression ×2; deploy RC; manual production golden path; execute launch checklist with waivers for external blockers; tag release; write `post-launch.md`.
+3. **Post-launch:** App-route axe coverage; OG images; Lighthouse CWV confirmation; 7-day review per CHANGELOG.
 
 ## 21. Acceptance criteria for considering the current app stable
 

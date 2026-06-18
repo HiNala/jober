@@ -82,7 +82,7 @@ Set `VAULT_ENCRYPTION_KEY` in `.env` before seeding profiles with sensitive EEO 
 
 Backup/restore requires the infra profile (`make infra` or `make up`). On Windows, use Git Bash or WSL for `make backup`/`restore` (bash scripts).
 
-## Railway deployment (Mission 33)
+## Railway deployment (Mission 29)
 
 Staging/production run on [Railway](https://railway.com) with private Postgres, Redis, and object storage. See **`docs/runbooks/deploy.md`** for the one-command deploy flow, variable templates (`infra/railway/variables.example.env`), and backup/restore.
 
@@ -95,7 +95,7 @@ bash scripts/railway-smoke.sh
 
 Production images: `infra/docker/Dockerfile.api` (Alembic migrate + `$PORT`), `Dockerfile.web.prod` (Next standalone), `Dockerfile.worker` (headless Chromium). API refuses boot in production when secrets are placeholders or `DEV_AUTH_BYPASS` is set. Railway’s `postgresql://` URL is rewritten to `postgresql+asyncpg://` automatically.
 
-**Ops & launch (Mission 34):** `/admin/overview` shows LLM budget, run success rate, Celery backlog, and circuit-breaker attention. Set `OPS_ALERT_WEBHOOK_URL` for outbound alerts; verify with `POST /api/admin/ops/test-alert` (admin session). Cron: `scripts/uptime-check.sh`. Staging gate: `bash scripts/staging-golden-path.sh`. Full launch gate: `docs/runbooks/launch-checklist.md`.
+**Ops & launch (Mission 24 + 30):** `/admin/overview` shows LLM budget, run success rate, Celery backlog, and circuit-breaker attention. Set `OPS_ALERT_WEBHOOK_URL` for outbound alerts; verify with `POST /api/admin/ops/test-alert` (admin session). Cron: `scripts/uptime-check.sh`. Staging gate: `bash scripts/staging-golden-path.sh`. Full launch gate: `docs/runbooks/launch-checklist.md`.
 
 ### Production (live)
 
