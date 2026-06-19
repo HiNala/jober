@@ -24,7 +24,7 @@ export function DiscoverUploadPanel({ listId }: Props) {
       <ImportWizard
         onCommitted={async (report) => {
           if (!listId) {
-            toast.message("Import complete — pick a list to attach these jobs");
+            toast.success("Import complete — select a list on the right to attach these jobs");
             return;
           }
           try {

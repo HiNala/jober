@@ -5,6 +5,7 @@ import { Lock, ShieldAlert } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { track } from "@/lib/analytics/events";
 import { formatApiError } from "@/lib/api/errors";
 import { useUnsavedChanges } from "@/lib/forms/use-unsaved-changes";
 
@@ -239,13 +240,19 @@ export function ProfileVault() {
 
   const profileMutation = useMutation({
     mutationFn: patchProfile,
-    onSuccess: invalidate,
+    onSuccess: (_data, vars) => {
+      track("vault.updated", { section: Object.keys(vars)[0] ?? "profile" });
+      invalidate();
+    },
     onError: (err: unknown) => toast.error(formatApiError(err, "Could not save profile")),
   });
 
   const vaultMutation = useMutation({
     mutationFn: patchVault,
-    onSuccess: invalidate,
+    onSuccess: (_data, vars) => {
+      track("vault.updated", { section: String(vars.key ?? "vault") });
+      invalidate();
+    },
     onError: (err: unknown) => toast.error(formatApiError(err, "Could not save vault field")),
   });
 
