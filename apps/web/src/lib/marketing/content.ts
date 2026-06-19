@@ -17,10 +17,10 @@ export type ContentBlock = { title: string; body: string };
 
 /** Positioning audit §17 — use verbatim on hero and in metadata where space allows. */
 export const POSITIONING_ONE_LINER =
-  "Apply to every job on your list — at your quality bar. You review and submit. Always.";
+  "Apply to every job on your list, at your quality bar. You review and submit.";
 
 export const POSITIONING_SUBHEAD =
-  "Assisted application autopilot — watch the run console, read every fill diff, and approve submit yourself.";
+  "AI fills the form, you read the diff and hit submit. Your applications, your standard, your control.";
 
 export const HOW_IT_WORKS_STEPS: {
   icon: LucideIcon;

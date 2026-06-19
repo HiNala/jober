@@ -1,5 +1,3 @@
-import { Check } from "lucide-react";
-
 import { AUTH_TRUST_ITEMS } from "@/lib/auth/copy";
 import { cn } from "@/lib/utils";
 
@@ -11,19 +9,31 @@ export function TrustStrip({
   items?: readonly string[];
 }) {
   return (
-    <ul
+    <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground",
+        "flex flex-wrap items-center justify-center gap-px",
         className,
       )}
       aria-label="Trust and privacy commitments"
     >
-      {items.map((item) => (
-        <li key={item} className="inline-flex items-center gap-1.5">
-          <Check className="size-3.5 shrink-0 text-accent" aria-hidden />
-          <span>{item}</span>
-        </li>
+      {items.map((item, i) => (
+        <div
+          key={item}
+          className="flex items-center gap-2 px-5 py-3"
+        >
+          {i > 0 && (
+            <span
+              className="absolute -left-px hidden h-4 w-px bg-border/40 sm:block"
+              aria-hidden
+            />
+          )}
+          <span
+            className="inline-block size-1.5 rounded-full bg-accent/70 shrink-0"
+            aria-hidden
+          />
+          <span className="text-sm font-medium text-foreground/75">{item}</span>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }

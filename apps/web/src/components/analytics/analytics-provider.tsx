@@ -10,8 +10,6 @@ import {
   trackPageView,
 } from "@/lib/analytics/sdk";
 
-import { ConsentSheet } from "@/components/product/consent-sheet";
-
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const initial = useRef(true);
@@ -34,10 +32,5 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("pagehide", onHide);
   }, []);
 
-  return (
-    <>
-      {children}
-      <ConsentSheet key={pathname} />
-    </>
-  );
+  return <>{children}</>;
 }

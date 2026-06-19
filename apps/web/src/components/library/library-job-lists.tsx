@@ -8,6 +8,7 @@ import Link from "next/link";
 
 import { PageEmpty } from "@/components/states/page-states";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,12 +73,10 @@ export function LibraryJobLists() {
           Saved job lists
         </h2>
         <div className="flex items-center gap-2">
-          <input
+          <Checkbox
             id="show-archived-lists"
-            type="checkbox"
             checked={showArchived}
-            onChange={(e) => setShowArchived(e.target.checked)}
-            className="size-4 rounded border-border"
+            onCheckedChange={(checked) => setShowArchived(Boolean(checked))}
           />
           <Label htmlFor="show-archived-lists" className="text-xs text-muted-foreground">
             Show archived

@@ -2,10 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchDailyPlan,
   pauseAllQueue,
@@ -17,7 +19,7 @@ import { fetchTenantPolicy } from "@/lib/api/settings";
 
 export function BatchPanel() {
   const [plan, setPlan] = useState<DailyPlan | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewPolicy, setPreviewPolicy] = useState<BatchPolicy>("dry_run");
   const policyQuery = useQuery({
@@ -32,9 +34,15 @@ export function BatchPanel() {
     const load = async () => {
       try {
         const data = await fetchDailyPlan();
-        if (!cancelled) setPlan(data);
+        if (!cancelled) {
+          setPlan(data);
+          setLoading(false);
+        }
       } catch {
-        if (!cancelled) setPlan(null);
+        if (!cancelled) {
+          setPlan(null);
+          setLoading(false);
+        }
       }
     };
     void load();
@@ -56,10 +64,7 @@ export function BatchPanel() {
     setPreviewOpen(true);
   }
 
-  const defaultFilters = useMemo(
-    () => ({ priority: "A", status: "new", limit: 50 }),
-    [],
-  );
+  const defaultFilters = useMemo(() => ({ priority: "A", status: "new", limit: 50 }), []);
   const filters = plan?.proposed_filters ?? defaultFilters;
 
   return (
@@ -69,14 +74,26 @@ export function BatchPanel() {
           <CardTitle className="text-sm font-medium">Batch control</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {plan ? (
-            <p className="text-sm text-muted-foreground">{plan.summary}</p>
+          {loading ? (
+            <div className="space-y-2" aria-busy="true">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Loading daily plan…</p>
+            <>
+              {plan ? (
+                <p className="text-sm text-muted-foreground">{plan.summary}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No daily plan available. Check the API connection.
+                </p>
+              )}
+              {plan?.pacing_note ? (
+                <p className="text-xs text-muted-foreground">{plan.pacing_note}</p>
+              ) : null}
+            </>
           )}
-          {plan?.pacing_note ? (
-            <p className="text-xs text-muted-foreground">{plan.pacing_note}</p>
-          ) : null}
+
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
@@ -94,19 +111,22 @@ export function BatchPanel() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => void pauseAllQueue().then(() => setMessage("Queue paused"))}
+              onClick={() =>
+                void pauseAllQueue().then(() => toast.success("Queue paused"))
+              }
             >
               Pause all
             </Button>
             <Button
               size="sm"
               variant="outline"
-              onClick={() => void resumeAllQueue().then(() => setMessage("Queue resumed"))}
+              onClick={() =>
+                void resumeAllQueue().then(() => toast.success("Queue resumed"))
+              }
             >
               Resume all
             </Button>
           </div>
-          {message ? <p className="text-xs text-muted-foreground">{message}</p> : null}
         </CardContent>
       </Card>
 
@@ -114,14 +134,10 @@ export function BatchPanel() {
         open={previewOpen}
         onOpenChange={(open) => {
           setPreviewOpen(open);
-          if (!open) {
-            void loadPlan();
-          }
+          if (!open) void loadPlan();
         }}
         filters={filters}
-        batchName={
-          previewPolicy === "dry_run" ? "Dashboard dry-run" : "Dashboard apply batch"
-        }
+        batchName={previewPolicy === "dry_run" ? "Dashboard dry-run" : "Dashboard apply batch"}
         defaultPolicy={previewPolicy}
       />
     </>

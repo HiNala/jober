@@ -5,6 +5,13 @@ import { Play, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { JobListItem } from "@/lib/api/library";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
@@ -55,22 +62,19 @@ export function ListBuilderPanel({
       <h2 className="text-sm font-medium">Target list</h2>
 
       <div className="space-y-1.5">
-        <Label htmlFor="active-list">Saved list</Label>
-        <select
-          id="active-list"
-          className="h-9 w-full rounded-lg border border-border bg-background px-2 text-sm"
-          value={activeListId ?? ""}
-          onChange={(e) => onSelectList(e.target.value)}
-        >
-          <option value="" disabled>
-            Select a list…
-          </option>
-          {lists.map((list) => (
-            <option key={list.id} value={list.id}>
-              {list.name} ({list.items.length})
-            </option>
-          ))}
-        </select>
+        <Label>Saved list</Label>
+        <Select value={activeListId ?? ""} onValueChange={(v) => { if (v) onSelectList(v); }}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a list…" />
+          </SelectTrigger>
+          <SelectContent>
+            {lists.map((list) => (
+              <SelectItem key={list.id} value={list.id}>
+                {list.name} ({list.items.length})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex gap-2">

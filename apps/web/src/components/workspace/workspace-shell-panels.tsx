@@ -56,8 +56,8 @@ export function WorkspaceShellPanels({
         if (!stored) return null;
         try {
           const layout = JSON.parse(stored) as Record<string, number>;
-          // Reject corrupted layouts where nav is below collapsedSize (4%)
-          if ("nav" in layout && layout.nav < 4) {
+          // Reject corrupted layouts where nav is below collapsedSize (5%)
+          if ("nav" in layout && layout.nav < 5) {
             window.localStorage.removeItem(name);
             return null;
           }
@@ -122,10 +122,10 @@ export function WorkspaceShellPanels({
               id="nav"
               panelRef={navPanelRef}
               defaultSize="14"
-              minSize={navCollapsed ? "4" : "10"}
+              minSize={navCollapsed ? "5" : "10"}
               maxSize="22"
               collapsible
-              collapsedSize="4"
+              collapsedSize="5"
             >
               <WorkspaceNav />
             </ResizablePanel>

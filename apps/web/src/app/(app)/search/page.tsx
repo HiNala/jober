@@ -5,10 +5,10 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { PageEmpty } from "@/components/states/page-states";
+import { PageEmpty, PageLoading } from "@/components/states/page-states";
 import { Input } from "@/components/ui/input";
 import { searchLibrary } from "@/lib/api/library";
-import { surface } from "@/lib/design/tokens";
+import { spacing, surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
 function SearchResults({ initialQ }: { initialQ: string }) {
@@ -21,7 +21,7 @@ function SearchResults({ initialQ }: { initialQ: string }) {
   });
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className={cn(spacing.page, spacing.section)}>
       <header>
         <h1 className="text-xl font-semibold tracking-tight">Search library</h1>
         <p className="text-sm text-muted-foreground">
@@ -123,7 +123,7 @@ function SearchPageInner() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="p-6 text-sm text-muted-foreground">Loading search…</div>}>
+    <Suspense fallback={<PageLoading label="Loading search…" />}>
       <SearchPageInner />
     </Suspense>
   );

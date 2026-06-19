@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { DiscoveryCandidate } from "@/lib/api/discovery";
 
 type Props = {
@@ -25,13 +26,13 @@ export function CandidateReview({ candidates, selectedKeys, onToggle, onToggleAl
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-medium">Candidates ({candidates.length})</h2>
+        <h2 id="candidates-section-heading" className="text-sm font-medium">
+          Candidates ({candidates.length})
+        </h2>
         <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={allSelected}
-            onChange={(e) => onToggleAll(e.target.checked)}
-            className="size-4 rounded border-border"
+            onCheckedChange={(checked) => onToggleAll(Boolean(checked))}
           />
           Select all
         </label>
@@ -41,12 +42,11 @@ export function CandidateReview({ candidates, selectedKeys, onToggle, onToggleAl
           const checked = selectedKeys.has(candidate.candidate_key);
           return (
             <li key={candidate.candidate_key} className="flex gap-3 p-3 text-sm">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={checked}
-                onChange={() => onToggle(candidate.candidate_key)}
-                className="mt-1 size-4 shrink-0 rounded border-border"
+                onCheckedChange={() => onToggle(candidate.candidate_key)}
                 aria-label={`Select ${candidate.company} ${candidate.role}`}
+                className="mt-1 shrink-0"
               />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">

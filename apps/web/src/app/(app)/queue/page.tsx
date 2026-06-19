@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { exportJobsXlsxUrl, fetchJobTargets } from "@/lib/api/jobs";
+import { spacing } from "@/lib/design/tokens";
+import { cn } from "@/lib/utils";
 
 export default function QueuePage() {
   const router = useRouter();
@@ -48,7 +50,7 @@ export default function QueuePage() {
   const rows = data ?? [];
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className={cn(spacing.page, spacing.section)}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Job queue</h1>

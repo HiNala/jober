@@ -20,14 +20,66 @@ const geistMono = Geist_Mono({
   preload: false,
 });
 
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
-  metadataBase: new URL(getSiteUrl()),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Jober — Assisted job applications",
     template: "%s | Jober",
   },
   description:
-    "High-quality job applications with human review before submit.",
+    "AI-assisted job applications with human review before every submit. Build your queue, watch the fills, approve and send.",
+  keywords: [
+    "job application automation",
+    "assisted job applications",
+    "AI job application",
+    "human-in-the-loop",
+    "job search tool",
+    "cover letter generator",
+    "ATS form fill",
+  ],
+  authors: [{ name: "Jober" }],
+  creator: "Jober",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Jober",
+    title: "Jober — Assisted job applications",
+    description:
+      "AI fills the form, you read the diff and hit submit. Your applications, your standard, your control.",
+    images: [
+      {
+        url: "/images/og-cover.png",
+        width: 1200,
+        height: 630,
+        alt: "Jober — AI-assisted job applications",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Jober — Assisted job applications",
+    description:
+      "AI fills the form, you read the diff and hit submit. Human-in-the-loop by design.",
+    images: ["/images/og-cover.png"],
+    creator: "@joberapp",
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export const viewport = {
@@ -44,7 +96,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

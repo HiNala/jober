@@ -19,7 +19,7 @@ import {
 } from "@/lib/api/discovery";
 import { createJobList, fetchJobLists } from "@/lib/api/library";
 import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
-import { surface } from "@/lib/design/tokens";
+import { spacing, surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
 export function DiscoverShell() {
@@ -96,7 +96,7 @@ export function DiscoverShell() {
   };
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className={cn(spacing.page, spacing.section)}>
       <header className="space-y-1">
         <h1 className="text-xl font-semibold tracking-tight">Discover & build lists</h1>
         <p className="text-sm text-muted-foreground">
@@ -133,7 +133,7 @@ export function DiscoverShell() {
             </TabsContent>
           </Tabs>
 
-          <section className={cn(surface.workspace, "rounded-lg p-4")}>
+          <section aria-labelledby="candidates-section-heading" className={cn(surface.workspace, "rounded-lg p-4")}>
             <CandidateReview
               candidates={candidates}
               selectedKeys={selectedKeys}

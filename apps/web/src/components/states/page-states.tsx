@@ -73,21 +73,23 @@ export function PageEmpty({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 px-6 py-16 text-center",
+        "flex flex-col items-center justify-center gap-4 px-6 py-20 text-center",
         motionFadeIn,
       )}
     >
       <div
         className={cn(
-          "flex size-12 items-center justify-center rounded-full bg-muted",
+          "flex size-14 items-center justify-center rounded-2xl bg-muted/70",
           motionEmptyPulse,
         )}
       >
-        {icon ?? <Inbox className="size-5 text-muted-foreground" aria-hidden />}
+        {icon ?? <Inbox className="size-6 text-muted-foreground" aria-hidden />}
       </div>
-      <h2 className="text-lg font-medium">{title}</h2>
-      <p className="max-w-md text-sm text-muted-foreground">{description}</p>
-      {action ? <div className="flex flex-wrap items-center justify-center gap-2">{action}</div> : null}
+      <div className="space-y-1.5">
+        <h2 className="text-xl font-semibold">{title}</h2>
+        <p className="max-w-sm text-base text-muted-foreground">{description}</p>
+      </div>
+      {action ? <div className="flex flex-wrap items-center justify-center gap-2 pt-1">{action}</div> : null}
       {secondaryAction ? (
         <div className="flex flex-wrap items-center justify-center gap-2">{secondaryAction}</div>
       ) : null}

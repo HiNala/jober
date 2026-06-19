@@ -60,9 +60,9 @@ function SettingsPanelInner() {
   const defaultPolicy = policy.policy.default_run_policy.replace(/_/g, " ");
 
   return (
-    <div className={cn(spacing.section, motionFadeIn)}>
+    <div className={cn(spacing.page, spacing.section, motionFadeIn)}>
       <header>
-        <h1 className="text-lg font-semibold tracking-tight">Settings</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Profile vault, application behavior, AI, appearance, and account security.
         </p>
@@ -159,7 +159,9 @@ function SettingsPanelInner() {
               key={key}
               className={cn(
                 "rounded-lg border p-3 text-sm",
-                key === "auto_submit_disclosure" && "border-amber-500/35 bg-amber-500/5",
+                key === "auto_submit_disclosure"
+                  ? "border-amber-500/35 bg-amber-500/5"
+                  : "border-border/60 bg-muted/30",
               )}
             >
               <p className="font-medium">{GUIDANCE_LABELS[key] ?? key}</p>

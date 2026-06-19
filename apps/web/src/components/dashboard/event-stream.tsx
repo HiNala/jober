@@ -43,9 +43,9 @@ export function EventStream() {
         <ul className="space-y-0 p-2 font-mono text-xs" aria-live="polite">
           {events.length === 0 ? (
             <li className="px-2 py-1.5 text-muted-foreground">
-              No run events yet. Start a fill or open a{" "}
+              No activity yet. Submit a batch or open the{" "}
               <Link href="/queue" className="text-primary underline-offset-4 hover:underline">
-                job run console
+                run queue
               </Link>
               .
             </li>

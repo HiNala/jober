@@ -12,7 +12,7 @@ export function LandingPage() {
   return (
     <>
       <MarketingHero />
-      <TrustStrip items={LANDING_TRUST_ITEMS} className="border-y border-border/50 bg-muted/10 px-6 py-5" />
+      <TrustStrip items={LANDING_TRUST_ITEMS} className="relative border-y border-border/30 bg-muted/30 px-6 py-4" />
       <DifferentiatorBento />
       <HowItWorks variant="stepper" />
       <FounderProof />

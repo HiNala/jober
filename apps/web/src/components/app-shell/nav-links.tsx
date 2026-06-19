@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export const APP_NAV: {
@@ -47,9 +48,11 @@ export const APP_NAV: {
 export function NavLinks({
   collapsed = false,
   onNavigate,
+  counts = {},
 }: {
   collapsed?: boolean;
   onNavigate?: () => void;
+  counts?: Record<string, number | undefined>;
 }) {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -81,7 +84,16 @@ export function NavLinks({
             aria-current={active ? "page" : undefined}
           >
             <Icon className="size-4 shrink-0" aria-hidden />
-            {!collapsed ? <span>{label}</span> : null}
+            {!collapsed ? (
+              <>
+                <span className="flex-1">{label}</span>
+                {counts[href] !== undefined ? (
+                  <Badge variant="secondary" className="ml-auto tabular-nums text-xs">
+                    {counts[href]}
+                  </Badge>
+                ) : null}
+              </>
+            ) : null}
             {collapsed ? <span className="sr-only">{label}</span> : null}
           </Link>
         );

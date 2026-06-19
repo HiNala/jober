@@ -87,7 +87,7 @@ export function MetricCards() {
           key={label}
           className={cn(
             surface.workspace,
-            emphasize && "border-primary/40 ring-1 ring-primary/20",
+            emphasize && "border-primary/50 ring-1 ring-primary/30",
           )}
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -103,7 +103,7 @@ export function MetricCards() {
             />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold tabular-nums">{value}</div>
+            <div className="text-3xl font-semibold tabular-nums tracking-tight">{value}</div>
             <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
           </CardContent>
         </Card>

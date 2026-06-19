@@ -12,7 +12,7 @@ export function PricingTeaser() {
         <div
           className={cn(
             surface.marketing,
-            "rounded-xl p-8 text-center md:p-10",
+            "rounded-2xl p-7 text-center md:p-9",
             motionFadeIn,
           )}
         >

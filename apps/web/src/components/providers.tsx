@@ -13,7 +13,7 @@ import { UserPreferencesProvider } from "@/contexts/user-preferences-context";
 /** Marketing + legal + blog — no React Query / auth session fetch on first paint. */
 export function ShellProviders({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <TooltipProvider delay={200}>
         <AnalyticsProvider>
           {children}

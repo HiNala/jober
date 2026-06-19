@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   ChevronDown,
   Maximize2,
   MoreHorizontal,
@@ -8,6 +9,8 @@ import {
   Radio,
   Search,
 } from "lucide-react";
+
+import Link from "next/link";
 
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import { WorkerHealthPill } from "@/components/app-shell/worker-health-pill";
@@ -48,6 +51,19 @@ export function WorkspaceCenterHeader({
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b px-3 md:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <MobileNav />
+        {isOpsDesk ? (
+          <Link
+            href="/queue"
+            className={cn(
+              "hidden items-center gap-1 rounded-md px-1.5 py-1 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground md:flex",
+              motionMicro,
+            )}
+            aria-label="Back to queue"
+          >
+            <ArrowLeft className="size-3.5 shrink-0" aria-hidden />
+            <span>Queue</span>
+          </Link>
+        ) : null}
         <button
           type="button"
           className={cn(

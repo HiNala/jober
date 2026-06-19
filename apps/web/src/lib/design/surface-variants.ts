@@ -11,7 +11,7 @@ export const surfaceVariants = cva("", {
     family: {
       marketing:
         "rounded-2xl border border-border/50 bg-card/60 shadow-sm ring-1 ring-foreground/5",
-      workspace: "rounded-lg border border-border/60 bg-card/80 shadow-none",
+      workspace: "rounded-xl border border-border/70 bg-card shadow-sm",
       terminal:
         "rounded-lg border border-border/40 bg-[var(--terminal-bg)] font-mono text-xs text-[var(--terminal-fg)] shadow-[inset_0_1px_0_0_oklch(1_0_0/6%)]",
     },

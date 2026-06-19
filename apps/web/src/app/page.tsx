@@ -7,7 +7,8 @@ import { POSITIONING_ONE_LINER } from "@/lib/marketing/content";
 import { getSiteUrl } from "@/lib/site";
 
 const title = "Jober — Assisted job applications you approve";
-const description = POSITIONING_ONE_LINER;
+const description =
+  "AI-assisted job applications with human review before every submit. Build your queue, watch the fills, approve and send.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -20,11 +21,20 @@ export const metadata: Metadata = {
     siteName: "Jober",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/images/hero-dark.png",
+        width: 1536,
+        height: 1024,
+        alt: "Jober — AI-assisted job applications",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
+    images: ["/images/hero-dark.png"],
   },
 };
 
@@ -35,17 +45,37 @@ export default function HomePage() {
       <JsonLd
         data={{
           "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "Jober",
-          applicationCategory: "BusinessApplication",
-          operatingSystem: "Web",
-          description: POSITIONING_ONE_LINER,
-          url: siteUrl,
-          offers: {
-            "@type": "Offer",
-            price: "0",
-            priceCurrency: "USD",
-          },
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": `${siteUrl}/#organization`,
+              name: "Jober",
+              url: siteUrl,
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": `${siteUrl}/#software`,
+              name: "Jober",
+              url: siteUrl,
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              description: POSITIONING_ONE_LINER,
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+                description: "Free tier available — no credit card required.",
+              },
+              publisher: { "@id": `${siteUrl}/#organization` },
+            },
+            {
+              "@type": "WebSite",
+              "@id": `${siteUrl}/#website`,
+              url: siteUrl,
+              name: "Jober",
+              publisher: { "@id": `${siteUrl}/#organization` },
+            },
+          ],
         }}
       />
       <LandingPage />

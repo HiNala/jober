@@ -1,7 +1,12 @@
+"use client";
+
 import { HOW_IT_WORKS_STEPS } from "@/lib/marketing/content";
 import { motionFadeIn, brandStepperConnector } from "@/lib/design/motion";
+import { useScrollReveal } from "@/lib/hooks/use-scroll-reveal";
 import { spacing, surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
+
+const DISPLAY_NUMS = ["01", "02", "03", "04"];
 
 export function HowItWorks({
   compact = false,
@@ -13,30 +18,34 @@ export function HowItWorks({
   variant?: "cards" | "stepper";
 }) {
   const isStepper = variant === "stepper";
+  const sectionRef = useScrollReveal<HTMLElement>();
 
   return (
     <section
+      ref={sectionRef}
       id="how-it-works"
       aria-labelledby={showIntro ? "how-it-works-heading" : undefined}
       className={cn(
-        "px-6 py-20",
-        showIntro && "border-t border-border/50",
+        "px-6 py-24",
+        showIntro && "border-t border-border/20",
         spacing.section,
       )}
     >
       <div className="mx-auto max-w-6xl">
         {showIntro ? (
           <div className="mx-auto max-w-2xl text-center">
-            <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent">
+            <p className="font-mono text-xs font-medium uppercase tracking-[0.22em] text-accent">
               How it works
             </p>
             <h2
               id="how-it-works-heading"
-              className="mt-3 text-3xl font-semibold tracking-[-0.02em] md:text-4xl"
+              className="mt-4 font-bold tracking-[-0.03em]"
+              style={{ fontSize: "clamp(2rem, 4.5vw, 3.25rem)", lineHeight: 1.1 }}
             >
-              Human-in-the-loop by design
+              <span className="block">Human-in-the-loop</span>
+              <span className="block text-foreground/30">by design.</span>
             </h2>
-            <p className="mt-3 text-muted-foreground">
+            <p className="mt-4 text-base text-muted-foreground">
               Jober accelerates prep and form work — you keep authority over what gets sent.
             </p>
           </div>
@@ -45,8 +54,8 @@ export function HowItWorks({
         <ol
           className={cn(
             "relative grid gap-4",
-            isStepper ? "mt-12 md:grid-cols-4" : "md:grid-cols-2 lg:grid-cols-4",
-            showIntro ? "mt-12" : "mt-0",
+            isStepper ? "mt-14 md:grid-cols-4" : "md:grid-cols-2 lg:grid-cols-4",
+            showIntro ? "mt-14" : "mt-0",
           )}
         >
           {isStepper ? (
@@ -58,6 +67,7 @@ export function HowItWorks({
               aria-hidden
             />
           ) : null}
+
           {HOW_IT_WORKS_STEPS.map(({ icon: Icon, slug, title, body, detail }, index) => {
             const isDominant = isStepper && index === 2;
             return (
@@ -66,14 +76,23 @@ export function HowItWorks({
                 id={isStepper ? `step-${slug}` : undefined}
                 className={cn(
                   surface.marketing,
-                  "relative rounded-xl p-5",
+                  "relative overflow-hidden rounded-2xl p-6",
                   motionFadeIn,
-                  isDominant && "border-primary/40 ring-1 ring-primary/25 md:scale-[1.02]",
+                  isDominant && "border-primary/60 ring-2 ring-primary/30 md:scale-105",
                 )}
               >
+                {/* Large display number in background */}
+                <span
+                  className="pointer-events-none absolute -right-1 -top-3 font-mono text-6xl font-bold leading-none select-none"
+                  style={{ color: "oklch(0.78 0.14 68 / 0.09)" }}
+                  aria-hidden
+                >
+                  {DISPLAY_NUMS[index]}
+                </span>
+
                 <span
                   className={cn(
-                    "inline-flex size-7 items-center justify-center rounded-full border text-xs font-mono font-medium",
+                    "relative inline-flex size-7 items-center justify-center rounded-full border text-xs font-mono font-medium",
                     isDominant
                       ? "border-primary/50 bg-primary/10 text-primary"
                       : "border-border text-muted-foreground",
@@ -81,6 +100,7 @@ export function HowItWorks({
                 >
                   {index + 1}
                 </span>
+
                 {isDominant ? (
                   <div
                     className="mt-3 rounded-md border border-border/50 bg-muted/30 px-2 py-1.5 text-[10px] text-muted-foreground"
@@ -92,6 +112,7 @@ export function HowItWorks({
                     <span className="ml-2 font-mono">run console · live</span>
                   </div>
                 ) : null}
+
                 <Icon className="mt-3 size-5 text-accent" aria-hidden />
                 {showIntro ? (
                   <h3 className="mt-2 text-base font-semibold">{title}</h3>

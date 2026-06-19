@@ -24,7 +24,7 @@ export function QueuePolicyBanner({ className }: { className?: string }) {
     return (
       <div
         className={cn(
-          "rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100",
+          "rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-foreground",
           className,
         )}
         role="status"
@@ -43,11 +43,17 @@ export function QueuePolicyBanner({ className }: { className?: string }) {
   }
 
   return (
-    <p className={cn("text-xs text-muted-foreground", className)} role="note">
+    <div
+      className={cn(
+        "rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-sm text-muted-foreground",
+        className,
+      )}
+      role="note"
+    >
       {pacingNote}{" "}
-      <Link href="/dashboard" className="underline underline-offset-2">
+      <Link href="/dashboard" className="font-medium text-foreground underline underline-offset-2">
         Batch control
       </Link>
-    </p>
+    </div>
   );
 }

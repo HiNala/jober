@@ -6,10 +6,10 @@
 import { surfaceFamilyClasses } from "@/lib/design/surface-variants";
 
 export const spacing = {
-  page: "p-4 md:p-6",
+  page: "p-5 md:p-7",
   section: "space-y-6",
-  card: "p-4",
-  stack: "space-y-3",
+  card: "p-5",
+  stack: "space-y-4",
 } as const;
 
 export const shadow = {

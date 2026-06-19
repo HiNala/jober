@@ -7,7 +7,7 @@ export function FounderProof() {
   return (
     <section
       aria-labelledby="founder-proof-heading"
-      className="border-y border-border/50 bg-muted/15 px-6 py-20"
+      className="border-y border-border/20 bg-muted/8 px-6 py-20"
     >
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className={motionFadeIn}>

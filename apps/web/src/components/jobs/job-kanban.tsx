@@ -27,8 +27,8 @@ export function JobKanban({ rows = [], className, onSelect }: JobKanbanProps) {
   if (rows.length === 0) {
     return (
       <PageEmpty
-        title={QUEUE_EMPTY.title}
-        description="Switch to the table view to import your spreadsheet, then track progress by lane here."
+        title="Nothing in the pipeline yet"
+        description="Import your job tracker in the Table view or add jobs via Discover — then track each application by stage here."
       />
     );
   }
@@ -56,7 +56,9 @@ export function JobKanban({ rows = [], className, onSelect }: JobKanbanProps) {
               </CardHeader>
               <CardContent className="space-y-2">
                 {cards.length === 0 ? (
-                  <p className="min-h-16 text-xs text-muted-foreground">No cards</p>
+                  <p className="flex min-h-16 items-center text-xs text-muted-foreground/60">
+                    Empty
+                  </p>
                 ) : (
                   cards.map((job) => (
                     <button

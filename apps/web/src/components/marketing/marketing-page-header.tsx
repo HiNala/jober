@@ -22,7 +22,9 @@ export function MarketingPageHeader({
       <h1 className="mt-3 text-3xl font-semibold tracking-[-0.02em] md:text-4xl md:leading-tight">
         {title}
       </h1>
-      {lead ? <p className="mt-4 text-lg text-muted-foreground md:text-xl">{lead}</p> : null}
+      {lead ? (
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground md:text-xl">{lead}</p>
+      ) : null}
     </header>
   );
 }

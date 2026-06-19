@@ -51,7 +51,7 @@ export default function PricingPage() {
         <PricingPlans />
 
         <section
-          className="mx-auto mt-12 max-w-5xl rounded-lg border border-border/60 bg-muted/20 p-6 text-sm text-muted-foreground"
+          className="mx-auto mt-12 max-w-5xl rounded-xl border border-border/40 bg-muted/15 p-6 text-sm text-muted-foreground"
           aria-labelledby="llm-costs-heading"
         >
           <h2 id="llm-costs-heading" className="text-base font-semibold text-foreground">

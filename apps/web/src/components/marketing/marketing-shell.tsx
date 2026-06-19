@@ -1,18 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingMobileNav } from "@/components/marketing/marketing-mobile-nav";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { buttonVariants } from "@/components/ui/button";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { href: "/features", label: "Features" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/faq", label: "FAQ" },
-] as const;
+/** Pages with a dark hero — nav starts transparent and gains blur on scroll. */
+const DARK_HERO_ROUTES = ["/"];
 
 export function MarketingShell({
   children,
@@ -21,8 +22,27 @@ export function MarketingShell({
   children: React.ReactNode;
   signupFeature?: string;
 }) {
+  const pathname = usePathname();
+  const isDarkHero = DARK_HERO_ROUTES.includes(pathname);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!isDarkHero) return;
+    function onScroll() {
+      setScrolled(window.scrollY > 40);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isDarkHero]);
+
+  const navScrolled = !isDarkHero || scrolled;
+
   return (
-    <div className="flex min-h-full flex-col overflow-x-clip bg-background text-foreground">
+    <div
+      className="flex min-h-full flex-col overflow-x-clip bg-background text-foreground"
+      data-marketing-dark={isDarkHero ? "true" : undefined}
+    >
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
@@ -30,35 +50,44 @@ export function MarketingShell({
         Skip to main content
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-1">
+      {/* Floating pill navigation */}
+      <div className="fixed inset-x-0 top-4 z-40 px-4">
+        <header
+          className={cn(
+            "mx-auto flex max-w-5xl items-center justify-between gap-3 rounded-full px-4 py-2.5",
+            "motion-safe:transition-[background-color,box-shadow,backdrop-filter] motion-safe:duration-[300ms] motion-safe:ease-out",
+            navScrolled
+              ? [
+                  "bg-background/95 backdrop-blur-md",
+                  "shadow-[0_2px_24px_-2px_rgba(0,0,0,0.08),0_1px_6px_-1px_rgba(0,0,0,0.04)]",
+                  "ring-1 ring-black/[0.04]",
+                ]
+              : "bg-transparent",
+          )}
+        >
+          <div className="flex min-w-0 items-center gap-2">
             <MarketingMobileNav />
-            <Link href="/" className="truncate text-lg font-semibold tracking-tight">
+            <Link
+              href="/"
+              className={cn(
+                "text-base font-semibold tracking-tight motion-safe:transition-colors motion-safe:duration-200",
+                isDarkHero && !scrolled ? "text-white" : "text-foreground",
+              )}
+            >
               Jober
             </Link>
           </div>
-          <nav
-            aria-label="Marketing"
-            className="hidden flex-1 items-center justify-center gap-4 lg:flex lg:gap-7"
-          >
-            {navLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-[1.0625rem] font-medium text-muted-foreground transition-colors hover:text-foreground lg:text-[1.125rem]"
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+
+          <MarketingNav dark={isDarkHero && !scrolled} />
+
+          <div className="flex shrink-0 items-center gap-1">
             <Link
               href="/login"
               className={cn(
-                buttonVariants({ variant: "ghost", size: "default" }),
-                "hidden min-h-11 sm:inline-flex",
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "hidden sm:inline-flex",
                 motionPress,
+                isDarkHero && !scrolled && "text-white/80 hover:bg-white/10 hover:text-white",
               )}
             >
               Sign in
@@ -66,16 +95,22 @@ export function MarketingShell({
             <MarketingCtaLink
               href="/signup"
               feature={signupFeature}
-              size="default"
-              className="min-h-11"
+              size="sm"
+              variant={isDarkHero && !scrolled ? "ghost" : "default"}
+              className={cn(
+                "rounded-full",
+                isDarkHero && !scrolled &&
+                  "bg-[oklch(0.78_0.14_68)] text-[#0a0908] hover:bg-[oklch(0.72_0.14_68)] hover:text-[#0a0908]",
+              )}
             >
               Get started
             </MarketingCtaLink>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
-      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+      {/* Offset content so it clears the fixed nav */}
+      <main id="main-content" tabIndex={-1} className="flex-1 pt-20 outline-none">
         {children}
       </main>
 

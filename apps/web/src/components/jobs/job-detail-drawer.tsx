@@ -76,6 +76,7 @@ export function JobDetailDrawer({
               Notes
             </label>
             <Textarea
+              key={job.id}
               id="job-notes"
               defaultValue={job.notes ?? ""}
               rows={4}

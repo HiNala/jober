@@ -16,9 +16,9 @@ export function AuthFormShell({
 }) {
   return (
     <div className={cn("w-full", motionFadeIn)}>
-      <header className="mb-6 space-y-2 text-center lg:text-left">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
+      <header className="mb-7 space-y-1.5 text-center lg:text-left">
+        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+        {subtitle ? <p className="text-base text-muted-foreground">{subtitle}</p> : null}
         {bullets && bullets.length > 0 ? (
           <ul className="mt-3 space-y-1 text-left text-xs text-muted-foreground">
             {bullets.map((item) => (
@@ -32,9 +32,9 @@ export function AuthFormShell({
           </ul>
         ) : null}
       </header>
-      <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm">{children}</div>
+      <div className="space-y-4">{children}</div>
       {footer ? (
-        <p className="mt-4 text-center text-sm text-muted-foreground lg:text-left">{footer}</p>
+        <p className="mt-6 text-center text-sm text-muted-foreground lg:text-left">{footer}</p>
       ) : null}
     </div>
   );

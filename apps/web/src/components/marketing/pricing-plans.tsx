@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
 import { PlanComparisonTable } from "@/components/marketing/plan-comparison-table";
@@ -24,7 +24,10 @@ export function PricingPlans() {
           <p className="mt-3 text-sm text-muted-foreground">{free.description}</p>
           <ul className="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
             {free.highlights.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item} className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                {item}
+              </li>
             ))}
           </ul>
           <MarketingCtaLink
@@ -38,16 +41,19 @@ export function PricingPlans() {
           </MarketingCtaLink>
         </li>
 
-        <li className={cn(surface.marketing, "flex flex-col rounded-xl border-primary/25 p-6")}>
+        <li className={cn(surface.marketing, "flex flex-col rounded-xl border-primary/40 bg-primary/[0.02] p-6 ring-1 ring-primary/20")}>
           <h2 className="text-lg font-semibold">{pro.name}</h2>
           <p className="mt-4 flex items-baseline gap-2">
             <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">—</span>
             <span className="text-sm text-muted-foreground">paid monthly · launching soon</span>
           </p>
           <p className="mt-3 text-sm text-muted-foreground">{pro.description}</p>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+          <ul className="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
             {pro.highlights.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item} className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                {item}
+              </li>
             ))}
           </ul>
           <div className="mt-6">
