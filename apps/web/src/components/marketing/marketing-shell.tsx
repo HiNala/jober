@@ -50,8 +50,11 @@ export function MarketingShell({
         Skip to main content
       </a>
 
-      {/* Floating pill navigation */}
-      <div className="fixed inset-x-0 top-4 z-40 px-4">
+      {/* Floating pill navigation — top/sides account for safe areas (notch, Dynamic Island) */}
+      <div
+        className="fixed inset-x-0 z-40 px-4"
+        style={{ top: "max(1rem, var(--safe-top))", paddingLeft: "max(1rem, var(--safe-left))", paddingRight: "max(1rem, var(--safe-right))" }}
+      >
         <header
           className={cn(
             "mx-auto flex max-w-5xl items-center justify-between gap-3 rounded-full px-4 py-2.5",
@@ -109,8 +112,13 @@ export function MarketingShell({
         </header>
       </div>
 
-      {/* Offset content so it clears the fixed nav */}
-      <main id="main-content" tabIndex={-1} className="flex-1 pt-20 outline-none">
+      {/* Offset content so it clears the fixed nav (80px + safe area top) */}
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex-1 outline-none"
+        style={{ paddingTop: "calc(5rem + var(--safe-top))" }}
+      >
         {children}
       </main>
 

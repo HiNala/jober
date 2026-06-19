@@ -11,7 +11,7 @@ import { PasswordField } from "@/components/auth/password-field";
 import { fieldDescribedBy, FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { trackEvent } from "@/lib/analytics/sdk";
+import { track } from "@/lib/analytics/events";
 import { fetchEmailDelivery, register } from "@/lib/api/auth";
 import { SIGNUP_VALUE_BULLETS, signupSubtitle } from "@/lib/auth/copy";
 import { validateSignup } from "@/lib/forms/client-validation";
@@ -31,7 +31,7 @@ export default function SignupPage() {
   });
 
   useEffect(() => {
-    trackEvent("signup.start");
+    track("auth.signup_started", { method: "native" });
     void fetchEmailDelivery()
       .then((status) => setInboxDelivery(status.inbox_delivery))
       .catch(() => setInboxDelivery(false));
@@ -64,6 +64,7 @@ export default function SignupPage() {
           }
           void run(async () => {
             const user = await register(email, password, displayName || undefined);
+            track("auth.signup_completed", { method: "native" });
             if (inboxDelivery && !user.email_verified) {
               router.push("/verify-pending");
               return user;

@@ -13,7 +13,7 @@ export function PlanComparisonTable({ className }: { className?: string }) {
   const pro = MARKETING_PLANS[1];
 
   return (
-    <div className={cn(surface.marketing, "overflow-x-auto rounded-xl", className)}>
+    <div className={cn(surface.marketing, "overflow-x-auto rounded-xl", className)} role="region" aria-label="Plan comparison table" tabIndex={0}>
       <table className="w-full min-w-[20rem] text-sm">
         <caption className="sr-only">Plan feature comparison</caption>
         <thead>

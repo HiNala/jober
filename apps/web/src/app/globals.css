@@ -379,6 +379,59 @@ html {
   background-size: 200% 100%;
 }
 
+/* ── Safe area insets (notch / Dynamic Island / home indicator) ─────────── */
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+/** Horizontal padding that also accounts for side safe areas. */
+.px-safe {
+  padding-left: max(1rem, var(--safe-left));
+  padding-right: max(1rem, var(--safe-right));
+}
+
+/** Extra top padding for fixed elements sitting behind the notch/island. */
+.pt-safe {
+  padding-top: max(1rem, var(--safe-top));
+}
+
+/** Extra bottom padding so the iOS home indicator doesn't clip content. */
+.pb-safe {
+  padding-bottom: max(1rem, var(--safe-bottom));
+}
+
+/** Full-side safe padding — use on full-bleed wrappers. */
+.safe-insets {
+  padding-top: var(--safe-top);
+  padding-right: var(--safe-right);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+}
+
+/* ── Touch device optimizations ──────────────────────────────────────────── */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover-only decorative states on touch devices */
+  .motionPress:hover,
+  [class*="hover:bg-muted"]:hover,
+  [class*="hover:bg-primary"]:hover {
+    /* Allow CSS cascade to handle this — Tailwind classes are already correct */
+  }
+
+  /* Ensure minimum tap targets for interactive elements */
+  button:not([aria-hidden]),
+  a:not([aria-hidden]),
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"] {
+    min-height: 44px;
+  }
+}
+
 /* ── Marketing dark theme ─────────────────────────────────────────────── */
 
 :root {

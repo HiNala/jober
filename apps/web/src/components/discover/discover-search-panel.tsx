@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { track } from "@/lib/analytics/events";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +59,10 @@ export function DiscoverSearchPanel({ listId, lastQuery, onResults }: Props) {
       return { query, candidates: result.candidates };
     },
     onSuccess: ({ query, candidates }) => {
+      track("discover.search", {
+        board: query.board_urls?.[0] ?? "jober",
+        result_count: candidates.length,
+      });
       onResults(candidates, query);
       toast.success(
         candidates.length

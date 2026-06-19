@@ -101,8 +101,8 @@ export function MarketingHero() {
             {/* Display headline — split weight */}
             <h1
               id="hero-heading"
-              className={cn("mt-6 font-bold leading-[1.0] tracking-[-0.03em]", motionHeroStagger(1))}
-              style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)" }}
+              className={cn("mt-6 font-bold leading-[1.05] tracking-[-0.03em] break-words", motionHeroStagger(1))}
+              style={{ fontSize: "clamp(2rem, 8vw, 5.5rem)" }}
             >
               <span className="block text-white">Apply to every job</span>
               <span className="block" style={{ color: "oklch(1 0 0 / 0.22)" }}>
@@ -150,7 +150,7 @@ export function MarketingHero() {
             {/* Trust micro-stats */}
             <div
               className={cn(
-                "mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs",
+                "mt-10 flex flex-wrap gap-x-5 gap-y-2.5 font-mono text-[0.65rem] sm:text-xs",
                 motionHeroStagger(4),
               )}
               style={{ color: "oklch(1 0 0 / 0.30)" }}

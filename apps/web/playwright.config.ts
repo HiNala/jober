@@ -30,13 +30,33 @@ export default defineConfig({
     {
       name: "marketing",
       testMatch: /.*\.spec\.ts$/,
-      testIgnore: /.*\.fullstack\.spec\.ts$/,
+      testIgnore: [/.*\.fullstack\.spec\.ts$/, /.*\.mobile\.spec\.ts$/],
+      use: { ...devices["Desktop Chrome"], baseURL },
+    },
+    {
+      name: "mobile-iphone",
+      testMatch: /.*\.mobile\.spec\.ts$/,
+      use: {
+        ...devices["iPhone 14"],
+        baseURL,
+        trace: "retain-on-failure",
+      },
+    },
+    {
+      name: "mobile-android",
+      testMatch: /.*\.mobile\.spec\.ts$/,
+      use: {
+        ...devices["Pixel 5"],
+        baseURL,
+        trace: "retain-on-failure",
+      },
     },
     {
       name: "fullstack",
       testMatch: /.*\.fullstack\.spec\.ts$/,
       fullyParallel: false,
       timeout: 120_000,
+      use: { ...devices["Desktop Chrome"], baseURL },
     },
   ],
   webServer: process.env.PLAYWRIGHT_SKIP_WEB_SERVER

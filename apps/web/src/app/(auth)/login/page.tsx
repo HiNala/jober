@@ -12,6 +12,7 @@ import { PasswordField } from "@/components/auth/password-field";
 import { fieldDescribedBy, FormField } from "@/components/forms/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { track } from "@/lib/analytics/events";
 import { login } from "@/lib/api/auth";
 import { validateEmail } from "@/lib/forms/client-validation";
 import { useFormSubmit } from "@/lib/forms/use-form-submit";
@@ -57,6 +58,7 @@ export default function LoginPage() {
           }
           void run(async () => {
             await login(email, password);
+            track("auth.signin_completed", { method: "native" });
             router.push("/dashboard");
           });
         }}

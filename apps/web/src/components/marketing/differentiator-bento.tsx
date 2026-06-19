@@ -63,7 +63,7 @@ export function DifferentiatorBento() {
           <li
             className={cn(
               surface.marketing,
-              "flex flex-col gap-4 rounded-2xl p-7 md:col-span-2 md:row-span-2",
+              "relative flex flex-col gap-4 overflow-hidden rounded-2xl p-7 md:col-span-2 md:row-span-2",
               motionFadeIn,
             )}
           >

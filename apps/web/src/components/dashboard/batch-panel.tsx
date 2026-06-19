@@ -8,6 +8,7 @@ import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { track } from "@/lib/analytics/events";
 import {
   fetchDailyPlan,
   pauseAllQueue,
@@ -60,6 +61,7 @@ export function BatchPanel() {
   }
 
   function openPreview(policy: BatchPolicy) {
+    track("batch.launched", { item_count: Number(filters.limit ?? 50), policy });
     setPreviewPolicy(policy);
     setPreviewOpen(true);
   }
@@ -111,18 +113,20 @@ export function BatchPanel() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() =>
-                void pauseAllQueue().then(() => toast.success("Queue paused"))
-              }
+              onClick={() => {
+                track("batch.paused", {});
+                void pauseAllQueue().then(() => toast.success("Queue paused"));
+              }}
             >
               Pause all
             </Button>
             <Button
               size="sm"
               variant="outline"
-              onClick={() =>
-                void resumeAllQueue().then(() => toast.success("Queue resumed"))
-              }
+              onClick={() => {
+                track("batch.resumed", {});
+                void resumeAllQueue().then(() => toast.success("Queue resumed"));
+              }}
             >
               Resume all
             </Button>

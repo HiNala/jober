@@ -18,6 +18,7 @@ import {
   type DiscoverySearchQuery,
 } from "@/lib/api/discovery";
 import { createJobList, fetchJobLists } from "@/lib/api/library";
+import { track } from "@/lib/analytics/events";
 import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { spacing, surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
@@ -41,9 +42,10 @@ export function DiscoverShell() {
   const createListMutation = useMutation({
     mutationFn: () => createJobList(newListName.trim()),
     onSuccess: async (list) => {
+      track("library.list_created", {});
       setActiveListId(list.id);
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
-      toast.success(`Created list “${list.name}”`);
+      toast.success(`Created list "${list.name}"`);
     },
   });
 
@@ -60,6 +62,7 @@ export function DiscoverShell() {
       });
     },
     onSuccess: async (result) => {
+      track("library.candidates_accepted", { count: result.accepted });
       toast.success(`Added ${result.accepted} job${result.accepted === 1 ? "" : "s"} to your list`);
       setSelectedKeys(new Set());
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });

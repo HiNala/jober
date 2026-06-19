@@ -19,6 +19,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <main
             id="main-content"
             className="flex flex-1 flex-col justify-center px-8 py-10 md:px-12"
+            style={{
+              paddingLeft: "max(2rem, var(--safe-left))",
+              paddingRight: "max(2rem, var(--safe-right))",
+              paddingBottom: "max(2.5rem, var(--safe-bottom))",
+            }}
             tabIndex={-1}
           >
             <div className="mx-auto w-full max-w-sm">{children}</div>
