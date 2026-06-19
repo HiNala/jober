@@ -19,8 +19,8 @@ type AuthBrandPanelProps = {
 export function AuthBrandPanel({ compact = false, className }: AuthBrandPanelProps) {
   if (compact) {
     return (
-      <div className={cn("flex items-center gap-2 px-6 py-4 border-b border-border/25", className)}>
-        <Link href="/" className="text-sm font-semibold tracking-tight">
+      <div className={cn("flex items-center gap-2 border-b border-border/25 px-6 py-4", className)}>
+        <Link href="/" className="text-sm font-semibold tracking-tight text-foreground">
           Jober
         </Link>
       </div>
@@ -31,55 +31,73 @@ export function AuthBrandPanel({ compact = false, className }: AuthBrandPanelPro
     <div
       className={cn(
         "relative flex h-full flex-col justify-between overflow-hidden p-10 xl:p-14",
-        "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800",
+        "bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800",
         className,
       )}
     >
-      {/* Background orbs */}
+      {/* Background atmosphere */}
       <div
-        className="pointer-events-none absolute -left-1/3 -top-1/4 size-[80%] rounded-full bg-[oklch(0.42_0.14_250)]/25 blur-3xl"
+        className="pointer-events-none absolute -left-20 -top-20 size-[500px] rounded-full opacity-40 blur-3xl"
+        style={{ background: "radial-gradient(circle, oklch(0.75 0.12 245) 0%, transparent 70%)" }}
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -bottom-1/4 -right-1/4 size-[60%] rounded-full bg-blue-400/20 blur-3xl"
+        className="pointer-events-none absolute -bottom-20 -right-20 size-[400px] rounded-full opacity-30 blur-3xl"
+        style={{ background: "radial-gradient(circle, oklch(0.60 0.18 280) 0%, transparent 70%)" }}
         aria-hidden
+      />
+      {/* Subtle grid overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
       />
 
-      {/* Top — logo */}
-      <div className="relative">
+      {/* Top — logo + tagline */}
+      <div className="relative flex items-center gap-2.5">
+        <div className="flex size-7 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
+          <span className="text-xs font-bold text-white">J</span>
+        </div>
         <Link
           href="/"
-          className="text-sm font-semibold tracking-tight text-white/50 hover:text-white/80 transition-colors"
+          className="text-sm font-semibold tracking-tight text-white/90 transition-colors hover:text-white"
         >
           Jober
         </Link>
       </div>
 
-      {/* Center — headline + product visual */}
-      <div className={cn("relative mx-auto w-full max-w-lg space-y-6", motionFadeIn)}>
+      {/* Center — headline + product preview */}
+      <div className={cn("relative mx-auto w-full max-w-lg space-y-8", motionFadeIn)}>
         <div className="space-y-3">
-          <p className="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-white/35">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-blue-100 backdrop-blur-sm">
+            <span className="size-1.5 rounded-full bg-emerald-400" aria-hidden />
             Human-in-the-loop
-          </p>
-          <h2 className="text-2xl font-semibold leading-snug tracking-tight text-white xl:text-3xl">
+          </div>
+          <h2 className="text-2xl font-bold leading-snug tracking-tight text-white xl:text-3xl">
             Apply to every job on your list.{" "}
-            <span className="text-white/50">You review and submit.</span>
+            <span className="text-blue-200">You review and submit.</span>
           </h2>
-          <p className="text-sm leading-relaxed text-white/40">
-            AI fills the form, you read the diff and approve. Your applications, your standard.
+          <p className="text-sm leading-relaxed text-blue-100/70">
+            AI fills the form, you read the diff and approve. Your applications,
+            your standard.
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/40">
-          <ProductVisual />
+        {/* Product preview — glass card on blue */}
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.06] shadow-2xl shadow-black/30 backdrop-blur-sm">
+          <ProductVisual className="!bg-transparent !shadow-none !border-0" />
         </div>
       </div>
 
       {/* Bottom — trust items */}
-      <div className="relative flex flex-wrap gap-x-5 gap-y-1.5">
+      <div className="relative flex flex-wrap gap-x-5 gap-y-2">
         {["Review before submit", "No CAPTCHA bypass", "Your data, your control"].map((item) => (
-          <p key={item} className="flex items-center gap-1.5 text-xs text-white/30">
-            <span className="size-1 rounded-full bg-white/40" aria-hidden />
+          <p key={item} className="flex items-center gap-2 text-xs text-blue-100/60">
+            <span className="size-1.5 rounded-full bg-emerald-400/70" aria-hidden />
             {item}
           </p>
         ))}

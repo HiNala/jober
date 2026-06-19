@@ -48,7 +48,7 @@ export function WorkspaceNav() {
       {/* Header */}
       <div className="flex h-12 shrink-0 items-center justify-between px-2">
         {!navCollapsed ? (
-          <Link href="/dashboard" className="px-2 text-base font-semibold tracking-tight">
+          <Link href="/dashboard" className="px-2 text-base font-semibold tracking-tight text-foreground/90">
             Jober
           </Link>
         ) : (
@@ -102,7 +102,7 @@ export function WorkspaceNav() {
       {/* Footer */}
       <div className={cn("shrink-0 space-y-2 p-2", navCollapsed && "items-center")}>
         {!navCollapsed ? (
-          <div className="rounded-lg border border-sidebar-border bg-gradient-to-br from-primary/12 to-accent/8 p-3 text-xs">
+          <div className="rounded-lg border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/6 to-transparent p-3 text-xs">
             <div className="flex items-center gap-2 font-semibold text-foreground">
               <Sparkles className="size-3.5 text-primary" aria-hidden />
               Upgrade to Pro

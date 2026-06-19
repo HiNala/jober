@@ -22,7 +22,7 @@ export function MarketingShell({
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > 40);
+      setScrolled(window.scrollY > 48);
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -38,19 +38,27 @@ export function MarketingShell({
         Skip to main content
       </a>
 
-      {/* Fixed floating navigation */}
+      {/* Fixed floating nav — no ring/shadow until scrolled so it blends into white hero */}
       <div
-        className="fixed inset-x-0 z-40 px-4"
-        style={{ top: "max(1rem, var(--safe-top))", paddingLeft: "max(1rem, var(--safe-left))", paddingRight: "max(1rem, var(--safe-right))" }}
+        className="fixed inset-x-0 z-40"
+        style={{
+          top: "max(1rem, var(--safe-top))",
+          paddingLeft: "max(1rem, var(--safe-left))",
+          paddingRight: "max(1rem, var(--safe-right))",
+          paddingInline: "max(1rem, var(--safe-left)) max(1rem, var(--safe-right))",
+        }}
       >
         <header
           className={cn(
             "mx-auto flex max-w-5xl items-center justify-between gap-3 rounded-full px-4 py-2.5",
             "bg-white/95 backdrop-blur-md",
-            "motion-safe:transition-[box-shadow] motion-safe:duration-[300ms] motion-safe:ease-out",
+            "motion-safe:transition-[box-shadow,border-color] motion-safe:duration-300 motion-safe:ease-out",
             scrolled
-              ? "shadow-[0_2px_24px_-2px_rgba(0,0,0,0.10),0_1px_6px_-1px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.05]"
-              : "shadow-sm ring-1 ring-black/[0.04]",
+              ? [
+                  "shadow-[0_2px_20px_-2px_rgba(0,0,0,0.08),0_1px_4px_-1px_rgba(0,0,0,0.04)]",
+                  "ring-1 ring-slate-900/[0.06]",
+                ]
+              : "shadow-none ring-0",
           )}
         >
           <div className="flex min-w-0 items-center gap-2">
@@ -70,7 +78,7 @@ export function MarketingShell({
               href="/login"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "sm" }),
-                "hidden sm:inline-flex",
+                "hidden text-muted-foreground sm:inline-flex",
                 motionPress,
               )}
             >
@@ -81,7 +89,7 @@ export function MarketingShell({
               feature={signupFeature}
               size="sm"
               variant="default"
-              className="rounded-full"
+              className="rounded-full px-4 font-medium shadow-sm"
             >
               Get started
             </MarketingCtaLink>
@@ -89,7 +97,6 @@ export function MarketingShell({
         </header>
       </div>
 
-      {/* Offset content so it clears the fixed nav (80px + safe area top) */}
       <main
         id="main-content"
         tabIndex={-1}

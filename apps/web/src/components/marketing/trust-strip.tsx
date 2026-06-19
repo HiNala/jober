@@ -11,27 +11,21 @@ export function TrustStrip({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-px",
+        "flex flex-wrap items-center justify-center gap-0",
         className,
       )}
       aria-label="Trust and privacy commitments"
     >
       {items.map((item, i) => (
-        <div
-          key={item}
-          className="flex items-center gap-2 px-5 py-3"
-        >
+        <div key={item} className="relative flex items-center gap-2.5 px-5 py-3.5">
           {i > 0 && (
             <span
-              className="absolute -left-px hidden h-4 w-px bg-border/40 sm:block"
+              className="absolute left-0 top-1/2 hidden h-4 w-px -translate-y-1/2 bg-border/50 sm:block"
               aria-hidden
             />
           )}
-          <span
-            className="inline-block size-1.5 rounded-full bg-accent/70 shrink-0"
-            aria-hidden
-          />
-          <span className="text-sm font-medium text-foreground/75">{item}</span>
+          <span className="inline-block size-1.5 shrink-0 rounded-full bg-primary/50" aria-hidden />
+          <span className="text-[0.8rem] font-medium text-foreground/60">{item}</span>
         </div>
       ))}
     </div>
