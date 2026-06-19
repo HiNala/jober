@@ -20,14 +20,16 @@ export function FailureAnalyticsPanel() {
   });
 
   const data = analyticsQuery.data;
-  if (!data || data.buckets.length === 0) {
+  if (analyticsQuery.isError || !data || data.buckets.length === 0) {
     return (
       <Card className="border-border/60 bg-card/80">
         <CardHeader>
           <CardTitle className="text-sm font-medium">Failure analytics</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          No failure events recorded yet.
+          {analyticsQuery.isError
+            ? "Could not load failure data."
+            : "No failure events recorded yet."}
         </CardContent>
       </Card>
     );

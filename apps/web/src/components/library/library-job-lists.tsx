@@ -5,7 +5,9 @@ import { Archive, ArchiveRestore, ChevronDown, ChevronUp, Plus } from "lucide-re
 import { useState } from "react";
 
 import Link from "next/link";
+import { toast } from "sonner";
 
+import { formatApiError } from "@/lib/api/errors";
 import { PageEmpty } from "@/components/states/page-states";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -45,15 +47,19 @@ export function LibraryJobLists() {
     onSuccess: async () => {
       setName("");
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
+      toast.success("List created");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not create list")),
   });
 
   const archiveMutation = useMutation({
     mutationFn: ({ listId, archived }: { listId: string; archived: boolean }) =>
       updateJobList(listId, { archived }),
-    onSuccess: async () => {
+    onSuccess: async (_data, { archived }) => {
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
+      toast.success(archived ? "List archived" : "List restored");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not update list")),
   });
 
   const reorderMutation = useMutation({
@@ -62,6 +68,7 @@ export function LibraryJobLists() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not reorder list")),
   });
 
   const visibleLists = listsQuery.data?.filter((list) => showArchived || !list.archived) ?? [];

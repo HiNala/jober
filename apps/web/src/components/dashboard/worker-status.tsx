@@ -33,15 +33,22 @@ function StatusBadge({ label }: { label: "Running" | "Paused" | "Idle" }) {
 
 export function WorkerStatusPanel() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         const data = await fetchDashboardSummary();
-        if (!cancelled) setSummary(data);
+        if (!cancelled) {
+          setSummary(data);
+          setFetchError(false);
+        }
       } catch {
-        if (!cancelled) setSummary(null);
+        if (!cancelled) {
+          setSummary(null);
+          setFetchError(true);
+        }
       }
     };
     void load();
@@ -67,7 +74,13 @@ export function WorkerStatusPanel() {
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-sm font-medium">Worker pool</h2>
-          <p className="text-xs text-muted-foreground">Celery + Playwright</p>
+          <p className="text-xs text-muted-foreground">
+            {fetchError ? (
+              <span className="text-destructive/70">Connection error — retrying…</span>
+            ) : (
+              "Celery + Playwright"
+            )}
+          </p>
         </div>
         <StatusBadge label={label} />
       </div>

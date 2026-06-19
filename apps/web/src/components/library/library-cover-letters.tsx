@@ -39,9 +39,11 @@ function SavedCoverLetters() {
   const lockMutation = useMutation({
     mutationFn: ({ id, locked }: { id: string; locked: boolean }) =>
       lockCoverLetterTemplate(id, locked),
-    onSuccess: async () => {
+    onSuccess: async (_data, { locked }) => {
       await queryClient.invalidateQueries({ queryKey: ["library", "cover-letters"] });
+      toast.success(locked ? "Letter locked as template" : "Lock removed");
     },
+    onError: () => toast.error("Could not update letter"),
   });
 
   const duplicateMutation = useMutation({

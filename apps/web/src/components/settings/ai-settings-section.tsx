@@ -43,7 +43,9 @@ export function AiSettingsSection() {
     mutationFn: () => deleteProviderKey("openai"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["provider-keys"] });
+      toast.success("OpenAI key removed");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not remove API key")),
   });
 
   if (!preferences) return null;

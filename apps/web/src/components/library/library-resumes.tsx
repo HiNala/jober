@@ -4,6 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileUp, Star } from "lucide-react";
 import { useRef } from "react";
 
+import { toast } from "sonner";
+
+import { formatApiError } from "@/lib/api/errors";
 import { PageEmpty } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,14 +26,18 @@ export function LibraryResumes() {
     mutationFn: uploadResumeFile,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["library", "resumes"] });
+      toast.success("Resume uploaded and parsed");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not upload resume")),
   });
 
   const activateMutation = useMutation({
     mutationFn: activateResume,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["library", "resumes"] });
+      toast.success("Active resume updated");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not set active resume")),
   });
 
   return (

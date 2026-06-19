@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { PageEmpty, PageLoading } from "@/components/states/page-states";
+import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
 import { Input } from "@/components/ui/input";
 import { searchLibrary } from "@/lib/api/library";
 import { spacing, surface } from "@/lib/design/tokens";
@@ -42,6 +42,14 @@ function SearchResults({ initialQ }: { initialQ: string }) {
       />
 
       {searchQuery.isFetching ? <p className="text-sm text-muted-foreground">Searching…</p> : null}
+
+      {searchQuery.isError && query.trim() ? (
+        <PageError
+          title="Search failed"
+          message="Could not reach the server. Check your connection and try again."
+          onRetry={() => void searchQuery.refetch()}
+        />
+      ) : null}
 
       {!query.trim() ? (
         <PageEmpty

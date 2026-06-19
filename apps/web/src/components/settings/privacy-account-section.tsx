@@ -3,9 +3,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatApiError } from "@/lib/api/errors";
 import { deleteAllData, exportAllData } from "@/lib/api/privacy";
 import { SettingsSection } from "@/components/settings/settings-section";
 
@@ -23,7 +25,9 @@ export function PrivacyAccountSection() {
       anchor.download = `jober-export-${new Date().toISOString().slice(0, 10)}.json`;
       anchor.click();
       URL.revokeObjectURL(url);
+      toast.success("Export downloaded");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Export failed — try again")),
   });
 
   const deleteMutation = useMutation({
@@ -31,6 +35,7 @@ export function PrivacyAccountSection() {
     onSuccess: () => {
       router.push("/login");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not delete account data")),
   });
 
   return (

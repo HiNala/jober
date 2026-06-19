@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function MetricCards() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,11 +24,13 @@ export function MetricCards() {
         if (!cancelled) {
           setSummary(data);
           setLoading(false);
+          setFetchError(false);
         }
       } catch {
         if (!cancelled) {
           setSummary(null);
           setLoading(false);
+          setFetchError(true);
         }
       }
     };
@@ -81,6 +84,12 @@ export function MetricCards() {
   }
 
   return (
+    <div className="space-y-2">
+      {fetchError ? (
+        <p className="text-xs text-destructive/70" role="alert">
+          Dashboard data unavailable — retrying…
+        </p>
+      ) : null}
     <div className={cn("grid gap-4 sm:grid-cols-2 xl:grid-cols-4", motionFadeIn)}>
       {metrics.map(({ label, value, hint, icon: Icon, emphasize }) => (
         <Card
@@ -108,6 +117,7 @@ export function MetricCards() {
           </CardContent>
         </Card>
       ))}
+    </div>
     </div>
   );
 }

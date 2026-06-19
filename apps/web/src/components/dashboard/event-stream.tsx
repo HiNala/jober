@@ -41,7 +41,11 @@ export function EventStream() {
       <Separator />
       <ScrollArea className="h-48">
         <ul className="space-y-0 p-2 font-mono text-xs" aria-live="polite">
-          {events.length === 0 ? (
+          {eventsQuery.isError ? (
+            <li className="px-2 py-1.5 text-destructive/70">
+              Could not load recent events.
+            </li>
+          ) : events.length === 0 ? (
             <li className="px-2 py-1.5 text-muted-foreground">
               No activity yet. Submit a batch or open the{" "}
               <Link href="/queue" className="text-primary underline-offset-4 hover:underline">

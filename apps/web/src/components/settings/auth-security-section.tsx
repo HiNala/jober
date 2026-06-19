@@ -3,7 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { KeyRound, Link2, LogOut, Unlink } from "lucide-react";
 
+import { toast } from "sonner";
+
 import { useAuth } from "@/contexts/auth-context";
+import { formatApiError } from "@/lib/api/errors";
 import { isGoogleOAuthEnabled } from "@/lib/auth/google-oauth";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,13 +45,16 @@ export function AuthSecuritySection() {
       await queryClient.invalidateQueries({ queryKey: ["auth"] });
       await signOut();
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not revoke sessions")),
   });
 
   const unlinkMutation = useMutation({
     mutationFn: unlinkIdentity,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["auth", "identities"] });
+      toast.success("Provider unlinked");
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not unlink provider")),
   });
 
   if (bypass || !user) {
