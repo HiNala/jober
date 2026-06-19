@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/images/hero-dark.png",
+        url: "/images/hero-light.png",
         width: 1536,
         height: 1024,
         alt: "Jober — AI-assisted job applications",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/images/hero-dark.png"],
+    images: ["/images/hero-light.png"],
   },
 };
 

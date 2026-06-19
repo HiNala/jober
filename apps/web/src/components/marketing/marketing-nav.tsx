@@ -11,7 +11,7 @@ const navLinks = [
   { href: "/faq", label: "FAQ" },
 ] as const;
 
-export function MarketingNav({ dark = false }: { dark?: boolean }) {
+export function MarketingNav() {
   const pathname = usePathname();
 
   return (
@@ -23,14 +23,10 @@ export function MarketingNav({ dark = false }: { dark?: boolean }) {
             key={href}
             href={href}
             className={cn(
-              "rounded-full px-3.5 py-1.5 text-sm font-medium motion-safe:transition-colors motion-safe:duration-200",
-              dark
-                ? active
-                  ? "bg-white/15 text-white"
-                  : "text-white/60 hover:bg-white/10 hover:text-white"
-                : active
-                  ? "bg-muted/80 text-foreground"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+              "rounded-full px-3.5 py-1.5 text-[15px] font-medium motion-safe:transition-colors motion-safe:duration-200",
+              active
+                ? "bg-muted/80 text-foreground"
+                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
             )}
             aria-current={active ? "page" : undefined}
           >

@@ -18,7 +18,7 @@ const HeroRunPreview = dynamic(
     loading: () => (
       <div
         className={cn(
-          "mx-auto aspect-[4/3] w-full max-w-3xl rounded-2xl border border-white/10",
+          "mx-auto aspect-[4/3] w-full max-w-3xl rounded-2xl border border-slate-200 bg-slate-100",
           motionSkeleton,
         )}
         aria-hidden
@@ -30,90 +30,89 @@ const HeroRunPreview = dynamic(
 export function MarketingHero() {
   return (
     <>
-      {/* ── Dark cinematic hero ───────────────────────────────────────────── */}
+      {/* ── Light hero ───────────────────────────────────────────────── */}
       <section
         aria-labelledby="hero-heading"
-        style={{ backgroundColor: "#0a0908" }}
-        className="relative overflow-hidden"
+        className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-slate-50"
       >
-        {/* Dot field */}
+        {/* Dot field — uses --primary CSS var (blue) */}
         <ParticleField className="z-0" density="medium" />
 
-        {/* Radial glow behind copy */}
+        {/* Soft blue radial glow behind copy */}
         <div
           aria-hidden
           className="pointer-events-none absolute left-0 top-0 h-[70%] w-[55%]"
           style={{
             background:
-              "radial-gradient(ellipse 60% 55% at 25% 40%, oklch(0.42 0.14 250 / 0.12) 0%, transparent 70%)",
+              "radial-gradient(ellipse 60% 55% at 25% 40%, oklch(0.42 0.14 250 / 0.07) 0%, transparent 70%)",
           }}
         />
 
-        {/* Hero image — right side, fading left into dark */}
+        {/* Hero illustration — right side, fading into bg */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 hidden w-[52%] lg:block"
+          className="pointer-events-none absolute inset-y-0 right-0 hidden w-[50%] lg:block"
         >
           <Image
-            src="/images/hero-dark.png"
+            src="/images/hero-light.png"
             alt=""
             fill
             priority
             className="object-cover object-left"
-            sizes="52vw"
+            sizes="50vw"
           />
-          {/* Fade gradient so image bleeds into dark bg */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to right, #0a0908 0%, #0a0908 8%, transparent 45%, transparent 100%)",
+                "linear-gradient(to right, white 0%, transparent 35%, transparent 100%)",
             }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, #0a0908 0%, transparent 30%)",
+                "linear-gradient(to top, oklch(0.97 0.006 245) 0%, transparent 25%)",
             }}
           />
         </div>
 
         {/* Copy */}
-        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-20 lg:pb-32 lg:pt-28">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 pb-28 pt-20 lg:pb-36 lg:pt-28">
           <div className="max-w-2xl">
             {/* Eyebrow badge */}
             <p
               className={cn(
-                "inline-flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.22em]",
+                "inline-flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.22em] text-primary",
                 motionHeroStagger(0),
               )}
-              style={{ color: "var(--marketing-gold)" }}
             >
               <span
-                className="inline-block size-1.5 rounded-full"
-                style={{ backgroundColor: "var(--marketing-gold)" }}
+                className="inline-block size-1.5 rounded-full bg-primary"
                 aria-hidden
               />
               Human-in-the-loop job applications
             </p>
 
-            {/* Display headline — split weight */}
+            {/* Display headline */}
             <h1
               id="hero-heading"
-              className={cn("mt-6 font-bold leading-[1.05] tracking-[-0.03em] break-words", motionHeroStagger(1))}
+              className={cn(
+                "mt-6 font-black leading-[1.05] tracking-[-0.03em] break-words text-foreground",
+                motionHeroStagger(1),
+              )}
               style={{ fontSize: "clamp(2rem, 8vw, 5.5rem)" }}
             >
-              <span className="block text-white">Apply to every job</span>
-              <span className="block" style={{ color: "oklch(1 0 0 / 0.22)" }}>
-                at your quality bar.
-              </span>
+              <span className="block">Apply to every job</span>
+              <span className="block text-primary">at your quality bar.</span>
             </h1>
 
             {/* Subhead */}
             <p
-              className={cn("mt-6 max-w-lg text-lg leading-relaxed", motionHeroStagger(2))}
-              style={{ color: "var(--marketing-muted)" }}
+              className={cn(
+                "mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground",
+                motionHeroStagger(2),
+              )}
             >
               AI fills the form. You read the diff and hit submit. Your
               applications, your standard, your control.
@@ -130,8 +129,8 @@ export function MarketingHero() {
                 href="/signup"
                 feature="landing_hero_signup"
                 size="lg"
-                variant="ghost"
-                className="brand-cta-shimmer rounded-full px-8 shadow-lg bg-[oklch(0.78_0.14_68)] text-[#0a0908] hover:bg-[oklch(0.72_0.14_68)] hover:text-[#0a0908]"
+                variant="default"
+                className="brand-cta-shimmer rounded-full px-8 shadow-md"
               >
                 Get started free
                 <ArrowRight className="size-4" aria-hidden />
@@ -140,7 +139,7 @@ export function MarketingHero() {
                 href="/how-it-works"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "rounded-full border-white/20 bg-transparent px-8 text-white hover:bg-white/10 hover:text-white",
+                  "rounded-full px-8",
                 )}
               >
                 See how it works
@@ -150,15 +149,14 @@ export function MarketingHero() {
             {/* Trust micro-stats */}
             <div
               className={cn(
-                "mt-10 flex flex-wrap gap-x-5 gap-y-2.5 font-mono text-[0.65rem] sm:text-xs",
+                "mt-10 flex flex-wrap gap-x-5 gap-y-2.5 font-mono text-[0.65rem] sm:text-xs text-muted-foreground",
                 motionHeroStagger(4),
               )}
-              style={{ color: "oklch(1 0 0 / 0.30)" }}
             >
               {["Review before submit", "No CAPTCHA bypass", "No hidden auto-submit", "BYOK supported"].map(
                 (item) => (
                   <span key={item} className="flex items-center gap-1.5">
-                    <span className="size-1 rounded-full bg-current opacity-60" aria-hidden />
+                    <span className="size-1 rounded-full bg-primary/50" aria-hidden />
                     {item}
                   </span>
                 ),
@@ -168,17 +166,13 @@ export function MarketingHero() {
         </div>
       </section>
 
-      {/* ── Product preview — slightly elevated from dark ─────────────────── */}
+      {/* ── Product preview — light slate bg ─────────────────── */}
       <section
         aria-label="Product preview"
-        style={{ backgroundColor: "#0f0e0d" }}
-        className="relative overflow-hidden border-t border-white/[0.05]"
+        className="relative overflow-hidden border-t border-slate-100 bg-slate-50"
       >
         <div className="mx-auto max-w-5xl px-6 pb-20 pt-14">
-          <p
-            className="mb-8 text-center font-mono text-xs uppercase tracking-[0.2em]"
-            style={{ color: "oklch(1 0 0 / 0.28)" }}
-          >
+          <p className="mb-8 text-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Live run console
           </p>
           <div className={cn("w-full", motionHeroStagger(5))}>

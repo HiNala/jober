@@ -31,7 +31,7 @@ export function AuthBrandPanel({ compact = false, className }: AuthBrandPanelPro
     <div
       className={cn(
         "relative flex h-full flex-col justify-between overflow-hidden p-10 xl:p-14",
-        "bg-[oklch(0.16_0.025_250)]",
+        "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800",
         className,
       )}
     >
@@ -41,7 +41,7 @@ export function AuthBrandPanel({ compact = false, className }: AuthBrandPanelPro
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -bottom-1/4 -right-1/4 size-[60%] rounded-full bg-[oklch(0.52_0.16_165)]/15 blur-3xl"
+        className="pointer-events-none absolute -bottom-1/4 -right-1/4 size-[60%] rounded-full bg-blue-400/20 blur-3xl"
         aria-hidden
       />
 
@@ -79,7 +79,7 @@ export function AuthBrandPanel({ compact = false, className }: AuthBrandPanelPro
       <div className="relative flex flex-wrap gap-x-5 gap-y-1.5">
         {["Review before submit", "No CAPTCHA bypass", "Your data, your control"].map((item) => (
           <p key={item} className="flex items-center gap-1.5 text-xs text-white/30">
-            <span className="size-1 rounded-full bg-[oklch(0.52_0.16_165)]/60" aria-hidden />
+            <span className="size-1 rounded-full bg-white/40" aria-hidden />
             {item}
           </p>
         ))}

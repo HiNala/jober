@@ -42,7 +42,7 @@ export function ParticleField({ className, density = "medium" }: ParticleFieldPr
       xmlns="http://www.w3.org/2000/svg"
     >
       {dots.map((d, i) => (
-        <circle key={i} cx={d.cx} cy={d.cy} r={d.r} fill="oklch(0.78 0.14 68)" opacity="0.3">
+        <circle key={i} cx={d.cx} cy={d.cy} r={d.r} fill="oklch(0.42 0.14 250)" opacity="0.18">
           {!reduced && (
             <animate
               attributeName="opacity"

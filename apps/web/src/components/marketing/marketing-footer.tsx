@@ -33,22 +33,15 @@ export function MarketingFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      style={{ backgroundColor: "#0a0908" }}
-      className="border-t border-white/[0.06]"
-      aria-label="Site footer"
-    >
+    <footer className="border-t border-slate-100 bg-slate-50" aria-label="Site footer">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
         {/* Brand column */}
         <div className="space-y-4">
-          <p className="text-base font-semibold text-white">Jober</p>
-          <p className="max-w-xs text-sm leading-relaxed text-white/40">
+          <p className="text-base font-semibold text-foreground">Jober</p>
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
             Assisted job applications with human review before every submit. You stay in control.
           </p>
-          <p
-            className="font-mono text-xs"
-            style={{ color: "oklch(0.78 0.14 68 / 0.7)" }}
-          >
+          <p className="font-mono text-xs text-primary/70">
             Review before every submit.
           </p>
         </div>
@@ -56,7 +49,7 @@ export function MarketingFooter() {
         {/* Link columns */}
         {footerGroups.map((group) => (
           <div key={group.title}>
-            <h2 className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-white/30">
+            <h2 className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-muted-foreground/60">
               {group.title}
             </h2>
             <ul className="mt-4 space-y-2.5">
@@ -64,7 +57,7 @@ export function MarketingFooter() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm text-white/50 transition-colors duration-150 hover:text-white/90"
+                    className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
                   >
                     {label}
                   </Link>
@@ -76,7 +69,7 @@ export function MarketingFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/[0.06] px-6 py-4 text-center font-mono text-xs text-white/22">
+      <div className="border-t border-slate-100 px-6 py-4 text-center font-mono text-xs text-muted-foreground/60">
         © {year} Jober. All rights reserved.
       </div>
     </footer>

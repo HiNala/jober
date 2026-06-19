@@ -26,8 +26,8 @@ export function HowItWorks({
       id="how-it-works"
       aria-labelledby={showIntro ? "how-it-works-heading" : undefined}
       className={cn(
-        "px-6 py-24",
-        showIntro && "border-t border-border/20",
+        "bg-blue-50/40 px-6 py-24",
+        showIntro && "border-t border-slate-100",
         spacing.section,
       )}
     >
@@ -84,7 +84,7 @@ export function HowItWorks({
                 {/* Large display number in background */}
                 <span
                   className="pointer-events-none absolute -right-1 -top-3 font-mono text-6xl font-bold leading-none select-none"
-                  style={{ color: "oklch(0.78 0.14 68 / 0.09)" }}
+                  style={{ color: "oklch(0.42 0.14 250 / 0.08)" }}
                   aria-hidden
                 >
                   {DISPLAY_NUMS[index]}
