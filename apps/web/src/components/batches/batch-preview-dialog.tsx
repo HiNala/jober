@@ -57,6 +57,7 @@ function BatchPreviewBody({
 }) {
   const [preview, setPreview] = useState<BatchPreviewResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [policy, setPolicy] = useState<BatchPolicy>(defaultPolicy);
   const filtersKey = JSON.stringify(filters);
@@ -69,6 +70,7 @@ function BatchPreviewBody({
     let cancelled = false;
     const load = async () => {
       setLoading(true);
+      setPreviewError(null);
       try {
         const data = await previewBatch(filters);
         if (!cancelled) {
@@ -76,8 +78,7 @@ function BatchPreviewBody({
         }
       } catch (err) {
         if (!cancelled) {
-          toast.error(err instanceof Error ? err.message : "Could not preview batch");
-          onCloseRef.current();
+          setPreviewError(err instanceof Error ? err.message : "Could not preview batch");
         }
       } finally {
         if (!cancelled) {
@@ -121,6 +122,30 @@ function BatchPreviewBody({
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Loading preview…</p>;
+  }
+
+  if (previewError) {
+    return (
+      <div className="space-y-3 py-2">
+        <p className="text-sm text-destructive" role="alert">{previewError}</p>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setLoading(true);
+            setPreviewError(null);
+            previewBatch(filters)
+              .then((data) => { setPreview(data); setLoading(false); })
+              .catch((err: unknown) => {
+                setPreviewError(err instanceof Error ? err.message : "Could not preview batch");
+                setLoading(false);
+              });
+          }}
+        >
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   if (!preview) {
