@@ -20,6 +20,7 @@ import {
 } from "@/lib/api/documents";
 import { formatApiError, isApiBudgetExceeded } from "@/lib/api/errors";
 import { fetchLlmConfig } from "@/lib/api/llm";
+import { useUnsavedChanges } from "@/lib/forms/use-unsaved-changes";
 import { coverLetterDownloadFilename } from "@/lib/documents/download-filename";
 import { splitParagraphs } from "@/lib/documents/merge-paragraphs";
 import { motionShimmer, motionStatusEnter } from "@/lib/design/motion";
@@ -49,6 +50,8 @@ export function CoverLetterEditor({
   const [budgetError, setBudgetError] = useState<string | null>(null);
   const [saveFlash, setSaveFlash] = useState(false);
   const [regenIndex, setRegenIndex] = useState<number | null>(null);
+
+  useUnsavedChanges(letterText !== cover.text);
 
   const llmQuery = useQuery({ queryKey: ["llm-config"], queryFn: fetchLlmConfig });
   const paragraphs = splitParagraphs(letterText);

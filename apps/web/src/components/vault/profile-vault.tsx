@@ -262,6 +262,7 @@ export function ProfileVault() {
     mutationFn: ({ key, body, label }: { key: string; body: string; label: string }) =>
       saveCommonAnswer(key, body, label),
     onSuccess: invalidate,
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not save answer")),
   });
 
   const grouped = useMemo(() => {

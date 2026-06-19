@@ -32,8 +32,10 @@ import {
   patchCoverLetter,
   type GeneratedDocumentRead,
 } from "@/lib/api/documents";
+import { track } from "@/lib/analytics/events";
 import { formatApiError, isApiBudgetExceeded } from "@/lib/api/errors";
 import { fetchLlmConfig } from "@/lib/api/llm";
+import { useUnsavedChanges } from "@/lib/forms/use-unsaved-changes";
 import { fetchProfile } from "@/lib/api/vault";
 import { coverLetterDownloadFilename } from "@/lib/documents/download-filename";
 import { splitParagraphs } from "@/lib/documents/merge-paragraphs";
@@ -62,6 +64,7 @@ export function DocumentStudio() {
   const llmQuery = useQuery({ queryKey: ["llm-config"], queryFn: fetchLlmConfig });
 
   const paragraphs = splitParagraphs(letterText);
+  useUnsavedChanges(Boolean(draft) && letterText !== (draft?.text ?? ""));
 
   useEffect(() => {
     if (!saveFlash) return;
@@ -92,6 +95,7 @@ export function DocumentStudio() {
       setLetterText(doc.text);
       setLockedParagraphs(new Set(doc.locked_paragraphs ?? []));
       setBudgetError(null);
+      if (!doc.cached) track("document.generated", { doc_type: "cover_letter" });
       toast.success(doc.cached ? "Loaded cached letter" : "Cover letter generated");
     },
     onError: (err: unknown) => handleApiError(err, "Cover letter generation failed"),
