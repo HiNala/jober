@@ -93,6 +93,11 @@ jobs:
           pip install "./apps/worker[dev]"
           playwright install chromium
 
+      - name: pip-audit (api + worker deps)
+        run: |
+          pip install pip-audit
+          pip-audit --desc on
+
       - name: Export shared TypeScript types
         run: python packages/schemas/scripts/export_typescript.py
 
@@ -276,6 +281,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit (production)
+        run: pnpm audit --prod
 
       - name: Typecheck
         run: pnpm typecheck

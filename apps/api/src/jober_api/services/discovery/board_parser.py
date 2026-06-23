@@ -61,6 +61,13 @@ def parse_board_html(
 async def fetch_board_html(url: str, *, fixture_html: str | None = None) -> str:
     if fixture_html is not None:
         return fixture_html
+    from jober_api.security.outbound_url import OutboundUrlError, validate_outbound_url
+
+    try:
+        validate_outbound_url(url)
+    except OutboundUrlError as exc:
+        msg = str(exc)
+        raise ValueError(msg) from exc
     async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
         response = await client.get(url)
         response.raise_for_status()

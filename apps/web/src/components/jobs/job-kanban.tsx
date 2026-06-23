@@ -4,7 +4,6 @@ import type { JobTargetRead } from "@jober/schemas";
 
 import { PageEmpty } from "@/components/states/page-states";
 import { Badge } from "@/components/ui/badge";
-import { QUEUE_EMPTY } from "@/lib/states/onboarding-copy";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { motionDragItem, motionMicro, motionSpringSettle } from "@/lib/design/motion";

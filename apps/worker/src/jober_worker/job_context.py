@@ -16,7 +16,8 @@ def load_extraction_context(job_target_id: uuid.UUID) -> dict[str, Any]:
                 """
                 SELECT j.company, r.skills_index
                 FROM job_targets j
-                LEFT JOIN resume_assets r ON r.is_active = true
+                LEFT JOIN resume_assets r
+                  ON r.tenant_id = j.tenant_id AND r.is_active = true
                 WHERE j.id = :job_id
                 ORDER BY r.created_at DESC NULLS LAST
                 LIMIT 1

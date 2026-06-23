@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import concurrent.futures
 import signal
 from collections.abc import Callable
 from contextlib import contextmanager
@@ -139,6 +140,18 @@ def run_sandboxed_snippet(
     proxy = _LoggingActionsProxy(actions, log)
     namespace: dict[str, Any] = {"actions": proxy}
     compiled = compile(source, "<sandbox_snippet>", "exec")
-    with _time_limit(timeout_sec):
+
+    def _execute() -> None:
         exec(compiled, namespace, namespace)  # noqa: S102 — sandboxed AST-validated snippet
+
+    if hasattr(signal, "SIGALRM"):
+        with _time_limit(timeout_sec):
+            _execute()
+    else:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(_execute)
+            try:
+                future.result(timeout=timeout_sec)
+            except concurrent.futures.TimeoutError as exc:
+                raise SandboxViolation("snippet timed out") from exc
     return log

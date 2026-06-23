@@ -47,6 +47,20 @@ function jsonContentType(init?: RequestInit): Record<string, string> {
   return hasContentType ? {} : { "Content-Type": "application/json" };
 }
 
+export async function uploadFetch(path: string, form: FormData): Promise<Response> {
+  const url = `${getApiBaseUrl()}${path}`;
+  return fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      ...authHeaders(),
+      ...csrfHeader({ method: "POST" }),
+    },
+    body: form,
+    cache: "no-store",
+  });
+}
+
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,

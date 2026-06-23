@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { track } from "@/lib/analytics/events";
 import { formatApiError } from "@/lib/api/errors";
+import { formatDateTime } from "@/lib/format/date-time";
 import { useUnsavedChanges } from "@/lib/forms/use-unsaved-changes";
 
 import { FileUpload } from "@/components/import/file-upload";
@@ -163,7 +164,7 @@ function FieldRow({
           </Button>
           {field.consent.consented_at && (
             <p className="text-[11px] text-muted-foreground">
-              Consent recorded {new Date(field.consent.consented_at).toLocaleString()}
+              Consent recorded {formatDateTime(field.consent.consented_at)}
             </p>
           )}
         </>

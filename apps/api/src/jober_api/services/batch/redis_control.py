@@ -23,6 +23,18 @@ def resume_all() -> None:
     _client().delete(f"{_PREFIX}:paused")
 
 
+def pause_tenant(tenant_id: str) -> None:
+    _client().set(f"{_PREFIX}:tenant_paused:{tenant_id}", "1")
+
+
+def resume_tenant(tenant_id: str) -> None:
+    _client().delete(f"{_PREFIX}:tenant_paused:{tenant_id}")
+
+
+def is_tenant_paused(tenant_id: str) -> bool:
+    return _client().get(f"{_PREFIX}:tenant_paused:{tenant_id}") == "1"
+
+
 def is_globally_paused() -> bool:
     return _client().get(f"{_PREFIX}:paused") == "1"
 
@@ -115,6 +127,15 @@ def set_batch_paused(batch_id: str, paused: bool) -> None:
 
 def is_batch_paused(batch_id: str) -> bool:
     return _client().get(f"{_PREFIX}:batch_paused:{batch_id}") == "1"
+
+
+def try_claim_batch_item(item_id: str, ttl_sec: int = 3600) -> bool:
+    """Prevent double-dispatch of the same pending batch item across orchestrator ticks."""
+    return bool(_client().set(f"{_PREFIX}:item_claim:{item_id}", "1", nx=True, ex=ttl_sec))
+
+
+def release_batch_item_claim(item_id: str) -> None:
+    _client().delete(f"{_PREFIX}:item_claim:{item_id}")
 
 
 def celery_broker_depth(queue_name: str = "celery") -> int:

@@ -147,13 +147,19 @@ def run_batch_item(item_id: uuid.UUID) -> dict[str, Any]:
         if item is None:
             return {"status": "missing"}
         if item.status != BatchItemStatus.PENDING:
+            redis_control.release_batch_item_claim(str(item_id))
             return {"status": "not_pending", "item_status": item.status.value}
         batch = item.batch
         job = item.job_target
         if batch is None or job is None:
+            redis_control.release_batch_item_claim(str(item_id))
             return {"status": "invalid_item"}
         if redis_control.is_batch_paused(str(batch.id)) or redis_control.is_globally_paused():
+            redis_control.release_batch_item_claim(str(item_id))
             return {"status": "paused"}
+        if redis_control.is_tenant_paused(str(batch.tenant_id)):
+            redis_control.release_batch_item_claim(str(item_id))
+            return {"status": "tenant_paused"}
         url = job_apply_url(job)
         domain = item.domain
         if not redis_control.try_acquire_domain_lock(domain, str(item.id)):

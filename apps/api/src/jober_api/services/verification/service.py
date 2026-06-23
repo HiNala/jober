@@ -18,6 +18,7 @@ from jober_api.models.human_checkpoint import HumanCheckpoint
 from jober_api.repositories.application_run import ApplicationRunRepository
 from jober_api.repositories.form_field_observation import FormFieldObservationRepository
 from jober_api.repositories.job_target import JobTargetRepository
+from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
 from jober_api.services.analytics.collector import emit_server_event
 from jober_api.services.analytics.rollups import server_session_id
@@ -359,6 +360,10 @@ async def get_review_package(session: AsyncSession, run_id: uuid.UUID) -> dict[s
     )
     cover_doc = (await session.execute(doc_stmt)).scalar_one_or_none()
 
+    resume_repo = ResumeAssetRepository(session, tenant_id=job.tenant_id)
+    active_resume = await resume_repo.get_active()
+    resume_filename = active_resume.original_filename if active_resume else "resume.pdf"
+
     return {
         "run_id": str(run.id),
         "job_target_id": str(run.job_target_id),
@@ -369,7 +374,7 @@ async def get_review_package(session: AsyncSession, run_id: uuid.UUID) -> dict[s
         "readiness": readiness,
         "fill_diffs": fill_diffs,
         "screenshot_object_key": screenshot_key,
-        "resume_filename": "resume.pdf",
+        "resume_filename": resume_filename,
         "cover_letter_preview": (cover_doc.text[:500] if cover_doc and cover_doc.text else None),
         "cover_letter": (
             {

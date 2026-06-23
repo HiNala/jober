@@ -233,3 +233,63 @@ async def test_cross_tenant_run_console_blocked(db_session, truncate_tables) -> 
             assert res.status_code == 404
     finally:
         app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_cross_tenant_batch_enqueue_blocked(db_session, truncate_tables) -> None:
+    from jober_api.db import session as db_session_module
+    from jober_api.models.application_batch import ApplicationBatch
+    from jober_api.models.batch_item import BatchItem
+    from jober_api.models.enums import BatchItemStatus, BatchStatus, RunPolicy
+
+    db_session.add(
+        Tenant(
+            id=TENANT_B,
+            name="Tenant B",
+            plan=PlanTier.FREE,
+            policy={},
+        )
+    )
+    db_session.add(User(id=USER_B, tenant_id=TENANT_B, email="b@test.local", display_name="User B"))
+    jobs = JobTargetRepository(db_session, DEFAULT_DEV_TENANT_ID)
+    job = await jobs.create(
+        company="Batch Co",
+        role="Eng",
+        status=JobTargetStatus.NEW,
+        direct_apply_url="http://fixtures.local/behaviors/single-step",
+    )
+    batch = ApplicationBatch(
+        tenant_id=DEFAULT_DEV_TENANT_ID,
+        name="tenant-a-batch",
+        status=BatchStatus.DRAFT,
+        policy=RunPolicy.DRY_RUN,
+        filters={},
+    )
+    db_session.add(batch)
+    await db_session.flush()
+    db_session.add(
+        BatchItem(
+            batch_id=batch.id,
+            job_target_id=job.id,
+            sort_order=0,
+            status=BatchItemStatus.PENDING,
+            domain="fixtures.local",
+        )
+    )
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    headers_b = {
+        "X-Jober-Tenant-Id": str(TENANT_B),
+        "X-Jober-User-Id": str(USER_B),
+    }
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            res = await client.post(f"/api/batches/{batch.id}/enqueue", headers=headers_b)
+            assert res.status_code == 422
+    finally:
+        app.dependency_overrides.clear()

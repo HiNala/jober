@@ -8,6 +8,7 @@ from jober_api.auth.enforcement import RBACRouter
 from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
+from jober_api.http.upload_limits import MAX_JOBS_XLSX_UPLOAD_BYTES
 from jober_api.services.xlsx.import_service import import_jobs_workbook
 
 router = RBACRouter(permission=Permission.AUTHENTICATED, prefix="/imports", tags=["imports"])
@@ -26,6 +27,11 @@ async def import_jobs_xlsx(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Upload is empty — choose an .xlsx workbook",
+        )
+    if len(data) > MAX_JOBS_XLSX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            detail="Workbook exceeds 20 MB limit",
         )
     try:
         report = await import_jobs_workbook(

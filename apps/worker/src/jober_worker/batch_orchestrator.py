@@ -59,6 +59,8 @@ def run_orchestrator_tick(batch_id: str | None = None) -> dict[str, object]:
             return {"status": "invalid"}
         if redis_control.is_batch_paused(str(batch.id)):
             return {"status": "batch_paused", "batch_id": str(batch.id)}
+        if redis_control.is_tenant_paused(str(batch.tenant_id)):
+            return {"status": "tenant_paused", "tenant_id": str(batch.tenant_id)}
         if in_quiet_hours(
             start=batch.quiet_hours_start or settings.quiet_hours_start,
             end=batch.quiet_hours_end or settings.quiet_hours_end,
@@ -68,6 +70,8 @@ def run_orchestrator_tick(batch_id: str | None = None) -> dict[str, object]:
         holder = redis_control.domain_lock_holder(item.domain)
         if holder is not None:
             return {"status": "domain_locked", "domain": item.domain, "holder": holder}
+        if not redis_control.try_claim_batch_item(str(item.id)):
+            return {"status": "already_claimed", "item_id": str(item.id)}
         from jober_worker.tasks import execute_batch_item
 
         task = execute_batch_item.delay(str(item.id))

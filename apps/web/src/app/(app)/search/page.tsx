@@ -63,7 +63,7 @@ function SearchResults({ initialQ }: { initialQ: string }) {
           <SearchGroup title="Jobs" empty={searchQuery.data.jobs.length === 0}>
             {searchQuery.data.jobs.map((job) => (
               <li key={job.id}>
-                <Link href="/queue" className="hover:underline">
+                <Link href={`/queue?job=${job.id}`} className="hover:underline">
                   {job.company} — {job.role}
                 </Link>
               </li>

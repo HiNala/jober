@@ -10,6 +10,7 @@ from jober_api.auth.middleware import require_auth
 from jober_api.auth.permissions import Permission
 from jober_api.db.session import get_session
 from jober_api.errors import dependency_unavailable_http, is_dependency_unavailable
+from jober_api.http.upload_limits import MAX_RESUME_UPLOAD_BYTES
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.repositories.user_profile import UserProfileRepository
 from jober_api.serializers.profile import serialize_resume
@@ -49,6 +50,11 @@ async def upload_resume_file(
     data = await file.read()
     if not data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty upload")
+    if len(data) > MAX_RESUME_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            detail="Resume exceeds 10 MB limit",
+        )
 
     profiles = UserProfileRepository(session, auth.tenant_id)
     profile = await profiles.get_or_create_for_tenant()

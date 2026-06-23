@@ -1,4 +1,4 @@
-import { apiFetch, getApiBaseUrl } from "@/lib/api/client";
+import { apiFetch, getApiBaseUrl, uploadFetch } from "@/lib/api/client";
 import type { ResumeAssetRead } from "@/lib/api/vault";
 
 export type CoverLetterItem = {
@@ -118,11 +118,7 @@ export function coverLetterPdfUrl(documentId: string) {
 export async function uploadResumeFile(file: File) {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${getApiBaseUrl()}/api/resumes`, {
-    method: "POST",
-    credentials: "include",
-    body: form,
-  });
+  const res = await uploadFetch("/api/resumes", form);
   if (!res.ok) throw new Error(await res.text());
   return res.json() as Promise<ResumeAssetRead>;
 }

@@ -42,7 +42,12 @@ async def get_auth_context(
         return await _auth_from_session_cookie(request, session)
     if settings.auth_mode == "clerk" and settings.clerk_jwt_issuer:
         return await _auth_from_clerk_jwt(request, session)
-    return await _auth_from_dev_headers(request, session)
+    if settings.jober_env in ("development", "test"):
+        return await _auth_from_dev_headers(request, session)
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="Authentication is not configured for this environment",
+    )
 
 
 async def _auth_from_session_cookie(request: Request, session: AsyncSession) -> AuthContext:

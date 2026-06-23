@@ -24,6 +24,7 @@ from jober_api.auth.sessions import (
 )
 from jober_api.config import settings
 from jober_api.db.session import get_session
+from jober_api.http.client_ip import resolve_client_ip
 from jober_api.models.enums import AuthProvider
 from jober_api.models.user import User
 from jober_api.schemas.auth import (
@@ -49,17 +50,8 @@ from jober_api.services.email.sender import inbox_delivery_enabled
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("X-Forwarded-For", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    if request.client:
-        return request.client.host
-    return "unknown"
-
-
 async def _require_rate_limit(request: Request) -> None:
-    ip = _client_ip(request)
+    ip = resolve_client_ip(request)
     if not await check_rate_limit(f"{request.url.path}:{ip}"):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -112,7 +104,7 @@ async def login(
         session,
         body.email,
         body.password,
-        _client_ip(request),
+        resolve_client_ip(request),
     )
     session_id, refresh_id, csrf = await create_session(user.id, tenant.id)
     set_auth_cookies(response, session_id, refresh_id, csrf)

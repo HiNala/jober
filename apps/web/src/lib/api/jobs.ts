@@ -1,7 +1,6 @@
 import type { ImportReportRead, JobTargetRead, JobTargetStatus } from "@jober/schemas";
 
-import { getApiBaseUrl } from "@/lib/api/client";
-import { apiFetch } from "@/lib/api/client";
+import { apiFetch, uploadFetch, getApiBaseUrl } from "@/lib/api/client";
 
 export interface JobTargetFilters {
   status?: JobTargetStatus;
@@ -42,10 +41,7 @@ export async function updateJobTarget(
 export async function previewJobsImport(file: File): Promise<ImportReportRead> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${getApiBaseUrl()}/api/imports/jobs-xlsx?dry_run=true`, {
-    method: "POST",
-    body: form,
-  });
+  const res = await uploadFetch("/api/imports/jobs-xlsx?dry_run=true", form);
   if (!res.ok) {
     throw new Error(`Import preview failed (${res.status})`);
   }
@@ -55,10 +51,7 @@ export async function previewJobsImport(file: File): Promise<ImportReportRead> {
 export async function commitJobsImport(file: File): Promise<ImportReportRead> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${getApiBaseUrl()}/api/imports/jobs-xlsx`, {
-    method: "POST",
-    body: form,
-  });
+  const res = await uploadFetch("/api/imports/jobs-xlsx", form);
   if (!res.ok) {
     throw new Error(`Import failed (${res.status})`);
   }

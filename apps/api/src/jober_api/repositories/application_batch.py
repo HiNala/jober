@@ -52,10 +52,20 @@ class BatchItemRepository(Repository[BatchItem]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, BatchItem)
 
-    async def list_for_batch(self, batch_id: uuid.UUID) -> list[BatchItem]:
+    async def get_for_tenant(self, item_id: uuid.UUID, tenant_id: uuid.UUID) -> BatchItem | None:
         stmt = (
             select(BatchItem)
-            .where(BatchItem.batch_id == batch_id)
+            .join(ApplicationBatch, BatchItem.batch_id == ApplicationBatch.id)
+            .where(BatchItem.id == item_id, ApplicationBatch.tenant_id == tenant_id)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def list_for_batch(self, batch_id: uuid.UUID, tenant_id: uuid.UUID) -> list[BatchItem]:
+        stmt = (
+            select(BatchItem)
+            .join(ApplicationBatch, BatchItem.batch_id == ApplicationBatch.id)
+            .where(BatchItem.batch_id == batch_id, ApplicationBatch.tenant_id == tenant_id)
             .order_by(BatchItem.sort_order.asc(), BatchItem.created_at.asc())
         )
         result = await self._session.execute(stmt)

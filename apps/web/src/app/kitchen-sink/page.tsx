@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { EventTerminal } from "@/components/run-console/event-terminal";
 import { MetricCards } from "@/components/dashboard/metric-cards";
@@ -35,6 +36,10 @@ const SAMPLE_EVENTS = [
 ];
 
 export default function KitchenSinkPage() {
+  if (process.env.NODE_ENV === "production") {
+    notFound();
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b px-6 py-4">

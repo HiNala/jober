@@ -14,6 +14,7 @@ import {
   Search,
   Settings,
   Shield,
+  LockKeyhole,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,6 +36,7 @@ export const APP_NAV: {
     description: "Find new jobs — boards or spreadsheet",
   },
   { href: "/library", label: "Library", icon: BookOpen },
+  { href: "/vault", label: "Vault", icon: LockKeyhole, description: "Profile, resume, and autofill data" },
   {
     href: "/search",
     label: "Search",

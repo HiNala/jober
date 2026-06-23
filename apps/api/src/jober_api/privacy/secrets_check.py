@@ -64,6 +64,7 @@ def _validate_production_secrets() -> None:
         ("SECRET_KEY", settings.secret_key),
         ("MINIO_ACCESS_KEY", settings.minio_access_key),
         ("MINIO_SECRET_KEY", settings.minio_secret_key),
+        ("STRIPE_WEBHOOK_SECRET", settings.stripe_webhook_secret),
     ):
         if _is_placeholder(value):
             msg = f"{name} is missing or a placeholder — set a real value before starting"

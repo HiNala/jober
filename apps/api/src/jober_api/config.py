@@ -70,6 +70,9 @@ class Settings(BaseSettings):
     auth_rate_limit_window_seconds: int = 300
     auth_lockout_threshold: int = 5
     auth_lockout_seconds: int = 900
+    trust_proxy_headers: bool = False
+    analytics_rate_limit_max: int = 60
+    analytics_rate_limit_window_seconds: int = 60
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
     stripe_price_pro_monthly: str = ""

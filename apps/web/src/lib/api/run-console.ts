@@ -68,8 +68,11 @@ export function getApiBaseUrl(): string {
 }
 
 export function runEventsStreamUrl(runId: string, afterSeq = 0): string {
-  const base = getApiBaseUrl();
   const suffix = afterSeq > 0 ? `?after_seq=${afterSeq}` : "";
+  if (typeof window !== "undefined") {
+    return `/api/application-runs/${runId}/events${suffix}`;
+  }
+  const base = getApiBaseUrl();
   return `${base}/api/application-runs/${runId}/events${suffix}`;
 }
 

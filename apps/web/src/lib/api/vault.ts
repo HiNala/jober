@@ -1,4 +1,4 @@
-import { apiFetch, getApiBaseUrl } from "@/lib/api/client";
+import { apiFetch, uploadFetch } from "@/lib/api/client";
 
 export interface FieldConsent {
   consent: boolean;
@@ -102,10 +102,7 @@ export async function saveCommonAnswer(
 export async function uploadResume(file: File): Promise<ResumeAssetRead> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${getApiBaseUrl()}/api/resumes`, {
-    method: "POST",
-    body: form,
-  });
+  const res = await uploadFetch("/api/resumes", form);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || `Upload failed (${res.status})`);

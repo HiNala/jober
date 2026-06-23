@@ -34,6 +34,17 @@ class FillDiffItemRead(SchemaBase):
     locator_strategy: str | None = None
 
 
+class ReviewCoverLetterRead(SchemaBase):
+    id: UUID
+    text: str
+    ats_score: float | None = None
+    keyword_coverage: dict[str, Any] | None = None
+    template_style: str | None = None
+    voice_preset: str | None = None
+    locked_paragraphs: list[int] = []
+    pdf_download_path: str | None = None
+
+
 class ReviewPackageRead(SchemaBase):
     run_id: UUID
     job_target_id: UUID
@@ -46,6 +57,7 @@ class ReviewPackageRead(SchemaBase):
     screenshot_object_key: str | None = None
     resume_filename: str | None = None
     cover_letter_preview: str | None = None
+    cover_letter: ReviewCoverLetterRead | None = None
     checkpoint_id: UUID | None = None
     policy: str
 

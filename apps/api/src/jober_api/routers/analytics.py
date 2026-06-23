@@ -6,7 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from jober_api.auth.context import AuthContext
 from jober_api.auth.deps import get_auth_context
+from jober_api.auth.rate_limit import check_analytics_rate_limit
 from jober_api.db.session import get_session
+from jober_api.http.client_ip import resolve_client_ip
 from jober_api.services.analytics.collector import ingest_client_batch
 
 router = APIRouter(prefix="/events", tags=["analytics"])
@@ -28,6 +30,9 @@ async def collect_events(
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     """First-party analytics collector. Always returns 204 (fail silently for clients)."""
+    ip = resolve_client_ip(request)
+    if not await check_analytics_rate_limit(ip):
+        return Response(status_code=204)
     auth = await _optional_auth(request, session)
     await ingest_client_batch(session, request, body, auth)
     return Response(status_code=204)

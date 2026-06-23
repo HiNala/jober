@@ -229,6 +229,12 @@ async def enrich_job_target_inline(
 
     html = fixture_html
     if html is None:
+        from jober_api.security.outbound_url import OutboundUrlError, validate_outbound_url
+
+        try:
+            validate_outbound_url(url)
+        except OutboundUrlError:
+            return None
         async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
             response = await client.get(url)
             response.raise_for_status()

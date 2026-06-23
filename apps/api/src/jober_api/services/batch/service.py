@@ -4,7 +4,6 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from jober_verify.idempotency import has_prior_successful_run
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -82,11 +81,23 @@ async def _eligible_jobs(
     return rows
 
 
-async def _skip_reason(session: AsyncSession, job: Any) -> str | None:
+async def _job_ids_with_prior_success(
+    session: AsyncSession, job_ids: list[uuid.UUID]
+) -> set[uuid.UUID]:
+    if not job_ids:
+        return set()
+    stmt = select(ApplicationRun.job_target_id).where(
+        ApplicationRun.job_target_id.in_(job_ids),
+        ApplicationRun.status == RunStatus.SUCCEEDED,
+    )
+    rows = (await session.execute(stmt)).scalars().all()
+    return set(rows)
+
+
+def _skip_reason(job: Any, prior_success: set[uuid.UUID]) -> str | None:
     if job.status == JobTargetStatus.APPLIED:
         return "already_applied"
-    runs = await ApplicationRunRepository(session).list_for_job(job.id)
-    if has_prior_successful_run(runs):
+    if job.id in prior_success:
         return "prior_successful_run"
     url = job_apply_url(job)
     if not url:
@@ -100,11 +111,12 @@ async def preview_batch(
     tenant_id: uuid.UUID,
 ) -> dict[str, Any]:
     jobs = await _eligible_jobs(session, filters, tenant_id)
+    prior_success = await _job_ids_with_prior_success(session, [job.id for job in jobs])
     included: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
     domains: set[str] = set()
     for job in jobs:
-        reason = await _skip_reason(session, job)
+        reason = _skip_reason(job, prior_success)
         url = job_apply_url(job)
         domain = extract_domain(url) if url else "unknown"
         entry = {
@@ -186,9 +198,13 @@ async def create_batch(
 
 
 async def enqueue_batch(
-    session: AsyncSession, batch_id: uuid.UUID, *, run_at: datetime | None = None
+    session: AsyncSession,
+    batch_id: uuid.UUID,
+    *,
+    tenant_id: uuid.UUID,
+    run_at: datetime | None = None,
 ) -> dict[str, Any]:
-    batches = ApplicationBatchRepository(session)
+    batches = ApplicationBatchRepository(session, tenant_id)
     batch = await batches.get(batch_id)
     if batch is None:
         msg = "Batch not found"
@@ -214,6 +230,12 @@ async def enqueue_batch(
     from jober_api.services.batch.celery_dispatch import dispatch_batch_tick
 
     task_id = dispatch_batch_tick(str(batch.id))
+    if task_id is None:
+        batch.status = BatchStatus.DRAFT
+        batch.started_at = None
+        await session.flush()
+        msg = "Failed to dispatch batch orchestrator — worker broker may be unavailable"
+        raise BatchValidationError(msg)
     return {
         "batch_id": str(batch.id),
         "status": batch.status.value,
@@ -221,21 +243,29 @@ async def enqueue_batch(
     }
 
 
-async def pause_all_batches() -> dict[str, str]:
-    redis_control.pause_all()
+async def pause_all_batches(tenant_id: uuid.UUID) -> dict[str, str]:
+    redis_control.pause_tenant(str(tenant_id))
     return {"status": "paused"}
 
 
-async def resume_all_batches() -> dict[str, str]:
-    redis_control.resume_all()
+async def resume_all_batches(tenant_id: uuid.UUID) -> dict[str, str]:
+    redis_control.resume_tenant(str(tenant_id))
     return {"status": "resumed"}
 
 
-async def pause_batch(batch_id: uuid.UUID) -> None:
+async def pause_batch(session: AsyncSession, batch_id: uuid.UUID, tenant_id: uuid.UUID) -> None:
+    batches = ApplicationBatchRepository(session, tenant_id)
+    if await batches.get(batch_id) is None:
+        msg = "Batch not found"
+        raise BatchValidationError(msg)
     redis_control.set_batch_paused(str(batch_id), True)
 
 
-async def resume_batch(batch_id: uuid.UUID) -> None:
+async def resume_batch(session: AsyncSession, batch_id: uuid.UUID, tenant_id: uuid.UUID) -> None:
+    batches = ApplicationBatchRepository(session, tenant_id)
+    if await batches.get(batch_id) is None:
+        msg = "Batch not found"
+        raise BatchValidationError(msg)
     redis_control.set_batch_paused(str(batch_id), False)
 
 
@@ -246,10 +276,13 @@ async def cancel_run(session: AsyncSession, run_id: uuid.UUID) -> None:
 
 
 async def skip_batch_item(
-    session: AsyncSession, item_id: uuid.UUID, reason: str = "skipped_by_user"
+    session: AsyncSession,
+    item_id: uuid.UUID,
+    tenant_id: uuid.UUID,
+    reason: str = "skipped_by_user",
 ) -> None:
     items = BatchItemRepository(session)
-    item = await items.get(item_id)
+    item = await items.get_for_tenant(item_id, tenant_id)
     if item is None:
         msg = "Batch item not found"
         raise BatchValidationError(msg)
@@ -259,10 +292,17 @@ async def skip_batch_item(
 
 
 async def reorder_batch_items(
-    session: AsyncSession, batch_id: uuid.UUID, ordered_ids: list[uuid.UUID]
+    session: AsyncSession,
+    batch_id: uuid.UUID,
+    tenant_id: uuid.UUID,
+    ordered_ids: list[uuid.UUID],
 ) -> None:
+    batches = ApplicationBatchRepository(session, tenant_id)
+    if await batches.get(batch_id) is None:
+        msg = "Batch not found"
+        raise BatchValidationError(msg)
     items = BatchItemRepository(session)
-    rows = await items.list_for_batch(batch_id)
+    rows = await items.list_for_batch(batch_id, tenant_id)
     by_id = {row.id: row for row in rows}
     for index, item_id in enumerate(ordered_ids):
         row = by_id.get(item_id)

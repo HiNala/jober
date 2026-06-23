@@ -41,6 +41,16 @@ async def clear_failed_logins(email: str) -> None:
     await redis.delete(f"{LOCKOUT_PREFIX}{email.strip().lower()}")
 
 
+async def check_analytics_rate_limit(bucket: str) -> bool:
+    """Return True if analytics ingest is allowed for this bucket (typically IP)."""
+    redis = get_redis()
+    key = f"jober:analytics:rate:{bucket}"
+    count = await redis.incr(key)
+    if count == 1:
+        await redis.expire(key, settings.analytics_rate_limit_window_seconds)
+    return count <= settings.analytics_rate_limit_max
+
+
 async def check_resend_rate_limit(bucket: str) -> bool:
     """Stricter pacing for verification / reset resend actions."""
     redis = get_redis()

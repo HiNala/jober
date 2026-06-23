@@ -57,14 +57,16 @@ def load_fill_context(job_target_id: uuid.UUID, _fill_attempt_id: uuid.UUID) -> 
         profile = session.execute(
             text(
                 """
-                SELECT name, email, phone, location, current_title, links,
-                       relocation_pref, onsite_pref, hybrid_pref, notice_period,
-                       salary_prefs, sensitive_answers_encrypted, sensitive_consent_flags
-                FROM user_profiles
-                ORDER BY created_at DESC
+                SELECT p.name, p.email, p.phone, p.location, p.current_title, p.links,
+                       p.relocation_pref, p.onsite_pref, p.hybrid_pref, p.notice_period,
+                       p.salary_prefs, p.sensitive_eeo_answers, p.field_consent
+                FROM user_profiles p
+                JOIN job_targets j ON j.id = :job_id AND j.tenant_id = p.tenant_id
+                ORDER BY p.updated_at DESC NULLS LAST, p.created_at DESC
                 LIMIT 1
                 """
-            )
+            ),
+            {"job_id": str(job_target_id)},
         ).mappings().first()
 
         if profile:
@@ -104,13 +106,15 @@ def load_fill_context(job_target_id: uuid.UUID, _fill_attempt_id: uuid.UUID) -> 
         resume = session.execute(
             text(
                 """
-                SELECT id, object_key, original_filename
-                FROM resume_assets
-                WHERE is_active = true
-                ORDER BY created_at DESC
+                SELECT r.id, r.object_key, r.original_filename
+                FROM resume_assets r
+                JOIN job_targets j ON j.id = :job_id AND j.tenant_id = r.tenant_id
+                WHERE r.is_active = true
+                ORDER BY r.created_at DESC
                 LIMIT 1
                 """
-            )
+            ),
+            {"job_id": str(job_target_id)},
         ).mappings().first()
 
         cover = session.execute(
@@ -167,8 +171,8 @@ def _merge_sensitive(profile: Any, profile_values: dict[str, Any]) -> None:
 
     from jober_worker.config import settings
 
-    encrypted = profile.get("sensitive_answers_encrypted")
-    consent_flags = profile.get("sensitive_consent_flags") or {}
+    encrypted = profile.get("sensitive_eeo_answers")
+    consent_flags = profile.get("field_consent") or {}
     if not encrypted or not settings.vault_encryption_key:
         return
     try:

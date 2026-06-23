@@ -18,6 +18,7 @@ import {
   fetchLibraryCoverLetters,
   lockCoverLetterTemplate,
 } from "@/lib/api/library";
+import { formatDateTime } from "@/lib/format/date-time";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +101,7 @@ function SavedCoverLetters() {
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {letter.generated_at
-                    ? new Date(letter.generated_at).toLocaleString()
+                    ? formatDateTime(letter.generated_at)
                     : "Draft"}
                   {letter.ats_score != null ? ` · ATS ${Math.round(letter.ats_score)}%` : ""}
                 </p>

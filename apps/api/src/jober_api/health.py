@@ -2,16 +2,16 @@ from typing import Any
 
 import redis.asyncio as aioredis
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from jober_api.config import settings
-from jober_api.db.connect import asyncpg_connect_args
+from jober_api.db.session import engine
 from jober_api.storage.minio_client import ObjectStorage
 
 
-async def check_postgres(engine: AsyncEngine) -> tuple[bool, str]:
+async def check_postgres(db_engine: AsyncEngine) -> tuple[bool, str]:
     try:
-        async with engine.connect() as conn:
+        async with db_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
         return True, "ok"
     except Exception as exc:  # noqa: BLE001
@@ -39,22 +39,15 @@ async def check_minio() -> tuple[bool, str]:
 
 
 async def readiness_report(database_url: str, redis_url: str) -> dict[str, Any]:
-    engine = create_async_engine(
-        database_url,
-        pool_pre_ping=True,
-        connect_args=asyncpg_connect_args(database_url),
-    )
-    try:
-        pg_ok, pg_msg = await check_postgres(engine)
-        redis_ok, redis_msg = await check_redis(redis_url)
-        minio_ok, minio_msg = await check_minio()
+    del database_url  # shared pool via db.session.engine
+    pg_ok, pg_msg = await check_postgres(engine)
+    redis_ok, redis_msg = await check_redis(redis_url)
+    minio_ok, minio_msg = await check_minio()
 
-        checks = {
-            "postgres": {"ok": pg_ok, "detail": pg_msg},
-            "redis": {"ok": redis_ok, "detail": redis_msg},
-            "minio": {"ok": minio_ok, "detail": minio_msg},
-        }
-        all_ok = pg_ok and redis_ok and minio_ok
-        return {"status": "ready" if all_ok else "not_ready", "checks": checks}
-    finally:
-        await engine.dispose()
+    checks = {
+        "postgres": {"ok": pg_ok, "detail": pg_msg},
+        "redis": {"ok": redis_ok, "detail": redis_msg},
+        "minio": {"ok": minio_ok, "detail": minio_msg},
+    }
+    all_ok = pg_ok and redis_ok and minio_ok
+    return {"status": "ready" if all_ok else "not_ready", "checks": checks}

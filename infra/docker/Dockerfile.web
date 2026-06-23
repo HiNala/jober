@@ -7,7 +7,7 @@ FROM node:22-slim
 
 WORKDIR /app
 
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@10
 
 # Install deps from the lockfile so node_modules is reproducible and built for
 # Linux. A named volume shadows /app/node_modules at runtime to preserve it.

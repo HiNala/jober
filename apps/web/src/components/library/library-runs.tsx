@@ -7,6 +7,7 @@ import { PageEmpty } from "@/components/states/page-states";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchLibraryRuns } from "@/lib/api/library";
+import { formatDateTime } from "@/lib/format/date-time";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +53,7 @@ export function LibraryRuns() {
               </p>
               <p className="text-xs text-muted-foreground">
                 {run.status.replace(/_/g, " ")} · {run.policy.replace(/_/g, " ")} ·{" "}
-                {new Date(run.updated_at).toLocaleString()}
+                {formatDateTime(run.updated_at)}
               </p>
             </div>
             <Link
