@@ -1817,5 +1817,8 @@ Audit remediation landed on `main` (`6a46500` + follow-ups). Summary:
 | Staging CD | **`.github/workflows/deploy-staging.yml`** (requires `RAILWAY_TOKEN`) |
 | Production deploy | **Blocked** on `STRIPE_WEBHOOK_SECRET` (user action) |
 | Stripe Checkout (P1), legal counsel (P2), notifications (P3), demo workspace (P4) | **Open** — product/legal |
+| Demo workspace API + UI (P4) | **Fixed** — `POST /api/onboarding/demo-workspace` |
+| In-app notifications (P3 partial) | **Fixed** — prefs + banner + batch toasts |
+| Client error observability (L7) | **Fixed** — `client.error` analytics event |
 
 Pre-deploy: run `alembic upgrade head` on production after Stripe vars are set; set `TRUST_PROXY_HEADERS=true` (done on Railway API).
