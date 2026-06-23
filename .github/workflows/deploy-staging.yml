@@ -1,0 +1,75 @@
+# Deploy staging to Railway after CI passes on main.
+# Requires repository secret: RAILWAY_TOKEN (Project token from Railway dashboard).
+
+name: Deploy Staging
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      RAILWAY_PROJECT_ID: b06c0938-d4f7-4f77-bcb7-e2eb42c0b4be
+      RAILWAY_ENVIRONMENT: staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli@4
+
+      - name: Deploy API
+        run: |
+          railway up \
+            --project "$RAILWAY_PROJECT_ID" \
+            --environment "$RAILWAY_ENVIRONMENT" \
+            --service api \
+            --detach \
+            -m "CD: ${{ github.sha }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy worker
+        run: |
+          railway up \
+            --project "$RAILWAY_PROJECT_ID" \
+            --environment "$RAILWAY_ENVIRONMENT" \
+            --service worker \
+            --detach \
+            -m "CD: ${{ github.sha }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy web
+        run: |
+          railway up \
+            --project "$RAILWAY_PROJECT_ID" \
+            --environment "$RAILWAY_ENVIRONMENT" \
+            --service web \
+            --detach \
+            -m "CD: ${{ github.sha }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Smoke readyz
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "https://api-staging-a8ca.up.railway.app/readyz" | grep -q '"status":"ready"'; then
+              echo "Staging API ready"
+              exit 0
+            fi
+            echo "Waiting for staging API… ($i/30)"
+            sleep 10
+          done
+          echo "Staging readyz did not pass in time" >&2
+          exit 1

@@ -34,6 +34,22 @@ def _user_sessions_key(user_id: uuid.UUID) -> str:
     return f"{USER_SESSIONS_PREFIX}{user_id}"
 
 
+def _parse_session_payload(raw: str) -> dict[str, str]:
+    data: dict[str, str] = json.loads(raw)
+    return data
+
+
+def _idle_expired(data: dict[str, str], now: datetime) -> bool:
+    idle_limit = settings.session_idle_timeout_seconds
+    if idle_limit <= 0:
+        return False
+    last_raw = data.get("last_activity_at") or data.get("created_at")
+    if not last_raw:
+        return False
+    last_activity = datetime.fromisoformat(last_raw)
+    return (now - last_activity).total_seconds() > idle_limit
+
+
 async def create_session(
     user_id: uuid.UUID,
     tenant_id: uuid.UUID,
@@ -42,12 +58,14 @@ async def create_session(
     session_id = secrets.token_urlsafe(32)
     refresh_id = secrets.token_urlsafe(32)
     csrf_token = secrets.token_urlsafe(24)
+    now = datetime.now(UTC).isoformat()
     payload = json.dumps(
         {
             "user_id": str(user_id),
             "tenant_id": str(tenant_id),
             "csrf": csrf_token,
-            "created_at": datetime.now(UTC).isoformat(),
+            "created_at": now,
+            "last_activity_at": now,
         }
     )
     redis = get_redis()
@@ -62,12 +80,23 @@ async def create_session(
     return session_id, refresh_id, csrf_token
 
 
-async def load_session(session_id: str) -> SessionData | None:
+async def load_session(session_id: str, *, touch: bool = True) -> SessionData | None:
     redis = get_redis()
-    raw = await redis.get(_session_key(session_id))
+    key = _session_key(session_id)
+    raw = await redis.get(key)
     if not raw:
         return None
-    data = json.loads(raw)
+    data = _parse_session_payload(raw)
+    now = datetime.now(UTC)
+    if _idle_expired(data, now):
+        await revoke_session(session_id)
+        return None
+    if touch:
+        data["last_activity_at"] = now.isoformat()
+        ttl = await redis.ttl(key)
+        if ttl <= 0:
+            ttl = settings.session_ttl_seconds
+        await redis.setex(key, ttl, json.dumps(data))
     return SessionData(
         session_id=session_id,
         user_id=uuid.UUID(data["user_id"]),
@@ -81,7 +110,7 @@ async def refresh_session(refresh_id: str) -> tuple[str, str, str] | None:
     session_id = await redis.get(_refresh_key(refresh_id))
     if not session_id:
         return None
-    existing = await load_session(session_id)
+    existing = await load_session(session_id, touch=False)
     if existing is None:
         return None
     await revoke_session(session_id)
@@ -90,10 +119,11 @@ async def refresh_session(refresh_id: str) -> tuple[str, str, str] | None:
 
 async def revoke_session(session_id: str) -> None:
     redis = get_redis()
-    existing = await load_session(session_id)
+    raw = await redis.get(_session_key(session_id))
     await redis.delete(_session_key(session_id))
-    if existing:
-        await redis.srem(_user_sessions_key(existing.user_id), session_id)
+    if raw:
+        data = _parse_session_payload(raw)
+        await redis.srem(_user_sessions_key(uuid.UUID(data["user_id"])), session_id)
 
 
 async def revoke_all_sessions(user_id: uuid.UUID) -> int:

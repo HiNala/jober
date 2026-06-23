@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import uuid
 
@@ -311,3 +312,29 @@ def test_dev_auth_bypass_forbidden_in_production(monkeypatch) -> None:
 
     with pytest.raises(RuntimeError, match="DEV_AUTH_BYPASS"):
         validate_startup_secrets()
+
+
+@pytest.mark.asyncio
+async def test_session_idle_timeout_revokes_stale_session(monkeypatch) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    from jober_api.auth.constants import DEFAULT_DEV_TENANT_ID, DEFAULT_DEV_USER_ID
+    from jober_api.auth.redis_client import get_redis
+    from jober_api.auth.sessions import _session_key, create_session, load_session
+
+    monkeypatch.setattr(settings, "session_idle_timeout_seconds", 60)
+
+    session_id, _refresh_id, _csrf = await create_session(
+        DEFAULT_DEV_USER_ID,
+        DEFAULT_DEV_TENANT_ID,
+    )
+    redis = get_redis()
+    raw = await redis.get(_session_key(session_id))
+    assert raw is not None
+    data = json.loads(raw)
+    stale = (datetime.now(UTC) - timedelta(seconds=120)).isoformat()
+    data["last_activity_at"] = stale
+    await redis.setex(_session_key(session_id), settings.session_ttl_seconds, json.dumps(data))
+
+    assert await load_session(session_id) is None
+    assert await redis.get(_session_key(session_id)) is None

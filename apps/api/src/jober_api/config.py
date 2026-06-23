@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     refresh_cookie_name: str = "jober_refresh"
     csrf_cookie_name: str = "jober_csrf"
     session_ttl_seconds: int = 86_400
+    session_idle_timeout_seconds: int = 3_600
     refresh_ttl_seconds: int = 604_800
     cookie_secure: bool = False
     auth_rate_limit_max: int = 20

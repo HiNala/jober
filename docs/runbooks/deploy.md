@@ -34,6 +34,14 @@ railway up --service web --environment staging --detach -m "deploy web"
 
 API runs `alembic upgrade head` in its entrypoint **before** uvicorn binds to `$PORT`.
 
+## Automated staging CD
+
+After CI passes on `main`, `.github/workflows/deploy-staging.yml` deploys `api`, `worker`, and `web` to Railway staging and smoke-checks `/readyz`.
+
+**One-time setup:** add a Railway **project token** as GitHub secret `RAILWAY_TOKEN` (Settings → Tokens in Railway; scope to the `jober` project).
+
+Manual staging deploy remains available via CLI (above) when CD is disabled or for hotfixes.
+
 ## Service layout
 
 | Service | Dockerfile | Public? | Health |

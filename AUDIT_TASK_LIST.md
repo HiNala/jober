@@ -71,14 +71,14 @@
 
 | # | Task | Status |
 |---|------|--------|
-| P1 | Stripe Checkout + Pro upgrade flow | ☐ |
+| P1 | Stripe Checkout + Pro upgrade flow | ☐ (user — last) |
 | P2 | Legal pages — counsel review, remove draft banner | ☐ |
 | P3 | Notification delivery implementation | ☐ |
 | P4 | Demo workspace / sample data mode | ☐ |
-| P5 | TUI stub menu cleanup | ☐ |
-| P6 | Enforcing CSP (post report-only burn-in) | ☐ |
-| P7 | Session idle timeout | ☐ |
-| P8 | Automated CD workflow | ☐ |
+| P5 | TUI stub menu cleanup | ✅ |
+| P6 | Enforcing CSP (post report-only burn-in) | ✅ (env toggle `CSP_ENFORCE`) |
+| P7 | Session idle timeout | ✅ |
+| P8 | Automated CD workflow | ✅ (staging CD; needs `RAILWAY_TOKEN` secret) |
 
 ---
 

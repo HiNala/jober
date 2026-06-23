@@ -13,33 +13,28 @@ FIXTURE = """<!DOCTYPE html><html><body>
 
 
 def main_menu(console: Console) -> None:
+    """Developer console — only implemented flows are listed (no stub menu items)."""
     client = JoberApiClient()
     while True:
-        console.print("\n[bold]Jober[/] — interactive console", justify="center")
+        console.print("\n[bold]Jober[/] — developer console", justify="center")
         console.print(
-            "1 Import workbook\n"
-            "2 Set up profile\n"
-            "3 Pick a batch\n"
-            "4 Start run\n"
-            "5 Watch live\n"
-            "6 Review pending checkpoints\n"
-            "7 Reports\n"
-            "8 Settings\n"
+            "[dim]Experimental local tool — use the web app for full workflows.[/dim]\n"
+            "1 Start fixture fill run\n"
+            "2 Watch live run\n"
+            "3 Review pending checkpoint\n"
             "0 Exit",
             justify="left",
         )
-        choice = Prompt.ask("Choose", choices=[str(i) for i in range(9)], default="5")
+        choice = Prompt.ask("Choose", choices=["0", "1", "2", "3"], default="2")
         if choice == "0":
             return
-        if choice == "4":
+        if choice == "1":
             _start_fixture_run(console, client)
-        elif choice == "5":
+        elif choice == "2":
             run_id = Prompt.ask("Run id to watch")
             watch_run(console, client, run_id.strip())
-        elif choice == "6":
+        elif choice == "3":
             _review_checkpoints(console, client)
-        else:
-            console.print("Coming soon in a future mission.", style="dim")
 
 
 def _start_fixture_run(console: Console, client: JoberApiClient) -> None:

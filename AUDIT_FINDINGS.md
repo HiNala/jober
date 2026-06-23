@@ -1799,3 +1799,23 @@ All Pass 1–5 Critical/High items re-checked: **0 resolved**.
 | Info | 3 | +1 |
 
 **Pass 6 verdict:** No prior Critical/High finding was fixed. **New Critical worker tenant leak** in form-fill path is the highest-risk delta and should be addressed before multi-tenant production use.
+
+---
+
+## Remediation Log (2026-06-23)
+
+Audit remediation landed on `main` (`6a46500` + follow-ups). Summary:
+
+| Area | Status |
+|------|--------|
+| Critical/High (tenant isolation, auth, uploads, SSRF, Stripe idempotency, SSE proxy) | **Fixed** |
+| Medium/Low (rate limits, readyz, env templates, CI audits, UX polish) | **Fixed** |
+| Staging deploy | **Live** — `/readyz` green |
+| Session idle timeout (`SESSION_IDLE_TIMEOUT_SECONDS`, default 1h) | **Fixed** |
+| TUI stub menu | **Removed** — dev console lists working flows only |
+| CSP enforcing | **Env toggle** `CSP_ENFORCE=true` on web (report-only retained) |
+| Staging CD | **`.github/workflows/deploy-staging.yml`** (requires `RAILWAY_TOKEN`) |
+| Production deploy | **Blocked** on `STRIPE_WEBHOOK_SECRET` (user action) |
+| Stripe Checkout (P1), legal counsel (P2), notifications (P3), demo workspace (P4) | **Open** — product/legal |
+
+Pre-deploy: run `alembic upgrade head` on production after Stripe vars are set; set `TRUST_PROXY_HEADERS=true` (done on Railway API).
