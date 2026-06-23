@@ -84,6 +84,8 @@
 
 ## Pre-deploy checklist
 
-- [ ] Run migration `s1t2r3i4p5e67_stripe_idempotency_and_index.py` (`alembic upgrade head`)
-- [ ] Set `TRUST_PROXY_HEADERS=true` on Railway API when behind Railway edge
-- [ ] Set `STRIPE_WEBHOOK_SECRET` in production
+- [x] Run migration `s1t2r3i4p5e67_stripe_idempotency_and_index.py` (staging deploy 2026-06-23)
+- [x] Set `TRUST_PROXY_HEADERS=true` on Railway API (staging + production)
+- [ ] Set `STRIPE_WEBHOOK_SECRET` in production (requires Stripe Dashboard webhook — see below)
+- [x] Commit + push audit remediation (`6a46500`)
+- [x] Deploy staging (api/worker/web)
