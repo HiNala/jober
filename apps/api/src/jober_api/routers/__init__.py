@@ -20,6 +20,7 @@ from jober_api.routers.job_lists import router as job_lists_router
 from jober_api.routers.job_targets import router as job_targets_router
 from jober_api.routers.library import router as library_router
 from jober_api.routers.llm import router as llm_router
+from jober_api.routers.onboarding import router as onboarding_router
 from jober_api.routers.privacy import router as privacy_router
 from jober_api.routers.profile import router as profile_router
 from jober_api.routers.recovery import router as recovery_router
@@ -58,5 +59,6 @@ api_router.include_router(privacy_router)
 api_router.include_router(billing_router)
 api_router.include_router(settings_router)
 api_router.include_router(llm_router)
+api_router.include_router(onboarding_router)
 api_router.include_router(waitlist_router)
 api_router.include_router(webhooks_router)

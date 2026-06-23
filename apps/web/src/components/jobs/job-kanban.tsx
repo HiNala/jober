@@ -2,6 +2,7 @@
 
 import type { JobTargetRead } from "@jober/schemas";
 
+import { DemoWorkspaceButton } from "@/components/onboarding/demo-workspace-button";
 import { PageEmpty } from "@/components/states/page-states";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,7 @@ export function JobKanban({ rows = [], className, onSelect }: JobKanbanProps) {
       <PageEmpty
         title="Nothing in the pipeline yet"
         description="Import your job tracker in the Table view or add jobs via Discover — then track each application by stage here."
+        action={<DemoWorkspaceButton redirectTo="/queue" />}
       />
     );
   }

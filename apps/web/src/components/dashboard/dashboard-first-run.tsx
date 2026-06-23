@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FileSpreadsheet, Play, Upload } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { DemoWorkspaceButton } from "@/components/onboarding/demo-workspace-button";
 import { DASHBOARD_FIRST_RUN } from "@/lib/states/onboarding-copy";
 import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
@@ -43,13 +44,14 @@ export function DashboardFirstRun() {
         <p className="mx-auto max-w-md text-sm text-muted-foreground">
           {DASHBOARD_FIRST_RUN.description}
         </p>
-        <div className="flex justify-center gap-3 pt-2">
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
           <Link href="/queue" className={buttonVariants({ size: "sm" })}>
             Import spreadsheet
           </Link>
           <Link href="/vault" className={buttonVariants({ variant: "outline", size: "sm" })}>
             Upload resume
           </Link>
+          <DemoWorkspaceButton />
         </div>
       </div>
 

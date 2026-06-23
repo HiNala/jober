@@ -360,12 +360,23 @@ async def dashboard_summary(session: AsyncSession, tenant_id: uuid.UUID) -> dict
                 "counts": counts,
             }
         )
+    finished_batches = await batches.list_recently_finished(limit=5)
+    recently_finished = [
+        {
+            "id": str(batch.id),
+            "name": batch.name,
+            "status": batch.status.value,
+            "completed_at": batch.completed_at.isoformat() if batch.completed_at else None,
+        }
+        for batch in finished_batches
+    ]
     return {
         "queue_depth_priority_a": queue_depth,
         "active_runs": active_runs,
         "needs_review": needs_review,
         "worker": queue,
         "batches": batch_summaries,
+        "recently_finished_batches": recently_finished,
     }
 
 

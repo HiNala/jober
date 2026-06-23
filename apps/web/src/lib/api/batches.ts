@@ -17,6 +17,12 @@ export type DashboardSummary = {
     policy: string;
     counts: Record<string, number>;
   }>;
+  recently_finished_batches?: Array<{
+    id: string;
+    name: string;
+    status: string;
+    completed_at: string | null;
+  }>;
 };
 
 export type DailyPlan = {

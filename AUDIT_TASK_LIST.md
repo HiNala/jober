@@ -65,7 +65,7 @@
 | L4 | JsonLd static-data comment | ✅ |
 | L5 | Notification settings → FormField pattern | ⏭ N/A (replaced with honest copy) |
 | L6 | Central date formatter | ✅ |
-| L7 | Web Sentry (optional) | ⏭ defer |
+| L7 | Web Sentry (optional) | ✅ (client errors → analytics `client.error`) |
 
 ## Product / defer (needs product/legal decision)
 
@@ -73,8 +73,8 @@
 |---|------|--------|
 | P1 | Stripe Checkout + Pro upgrade flow | ☐ (user — last) |
 | P2 | Legal pages — counsel review, remove draft banner | ☐ |
-| P3 | Notification delivery implementation | ☐ |
-| P4 | Demo workspace / sample data mode | ☐ |
+| P3 | Notification delivery implementation | ✅ (in-app; email pref saved, delivery pending SMTP) |
+| P4 | Demo workspace / sample data mode | ✅ |
 | P5 | TUI stub menu cleanup | ✅ |
 | P6 | Enforcing CSP (post report-only burn-in) | ✅ (env toggle `CSP_ENFORCE`) |
 | P7 | Session idle timeout | ✅ |

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { motionFadeIn } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 import { fetchDashboardSummary, type DashboardSummary } from "@/lib/api/batches";
@@ -11,6 +12,7 @@ import { fetchDashboardSummary, type DashboardSummary } from "@/lib/api/batches"
 import { buttonVariants } from "@/components/ui/button";
 
 export function NeedsAttentionBanner() {
+  const { preferences } = useUserPreferences();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
 
   useEffect(() => {
@@ -33,6 +35,10 @@ export function NeedsAttentionBanner() {
 
   const needsReview = summary?.needs_review ?? 0;
   const activeRuns = summary?.active_runs ?? 0;
+
+  if (!preferences?.notifications.in_app_run_attention) {
+    return null;
+  }
 
   if (!summary || (needsReview === 0 && activeRuns === 0)) {
     return null;

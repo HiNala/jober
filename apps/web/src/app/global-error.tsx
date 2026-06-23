@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+
+import { track } from "@/lib/analytics/events";
 
 export default function GlobalError({
   error,
@@ -9,6 +12,13 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    track("client.error", {
+      message: error.message,
+      path: typeof window !== "undefined" ? window.location.pathname : "/",
+    });
+  }, [error]);
+
   return (
     <html lang="en">
       <body className="min-h-screen bg-background text-foreground antialiased">

@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell/app-shell";
+import { AppNotifications } from "@/components/notifications/app-notifications";
 import { ConsentSheet } from "@/components/product/consent-sheet";
 import { RunCanvasProvider } from "@/contexts/run-canvas-context";
 import { layoutModeForPath } from "@/lib/workspace/layout";
@@ -31,6 +32,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
       <AppShell title={title} layoutMode={layoutMode}>
         {children}
       </AppShell>
+      <AppNotifications />
       <ConsentSheet key={pathname} />
     </RunCanvasProvider>
   );

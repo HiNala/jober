@@ -47,6 +47,19 @@ class ApplicationBatchRepository(Repository[ApplicationBatch]):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
+    async def list_recently_finished(self, *, limit: int = 5) -> list[ApplicationBatch]:
+        stmt = (
+            scope_stmt(select(ApplicationBatch), ApplicationBatch, self._tenant_id)
+            .where(
+                ApplicationBatch.status.in_([BatchStatus.COMPLETED, BatchStatus.CANCELLED]),
+                ApplicationBatch.completed_at.is_not(None),
+            )
+            .order_by(ApplicationBatch.completed_at.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
 
 class BatchItemRepository(Repository[BatchItem]):
     def __init__(self, session: AsyncSession) -> None:
