@@ -6,6 +6,7 @@ import { Suspense, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { PageEmpty, PageError, PageLoading } from "@/components/states/page-states";
+import { PageHeader } from "@/components/app-shell/page-header";
 import { Input } from "@/components/ui/input";
 import { searchLibrary } from "@/lib/api/library";
 import { spacing, surface } from "@/lib/design/tokens";
@@ -22,16 +23,18 @@ function SearchResults({ initialQ }: { initialQ: string }) {
 
   return (
     <div className={cn(spacing.page, spacing.section)}>
-      <header>
-        <h1 className="text-xl font-semibold tracking-tight">Search library</h1>
-        <p className="text-sm text-muted-foreground">
-          Find jobs, cover letters, runs, and saved lists you already have — not the same as{" "}
-          <Link href="/discover" className="underline underline-offset-2">
-            Discover
-          </Link>{" "}
-          (add new jobs from boards or a spreadsheet).
-        </p>
-      </header>
+      <PageHeader
+        title="Search library"
+        description={
+          <>
+            Find jobs, cover letters, runs, and saved lists you already have — not the same as{" "}
+            <Link href="/discover" className="text-primary underline-offset-4 hover:underline">
+              Discover
+            </Link>{" "}
+            (add new jobs from boards or a spreadsheet).
+          </>
+        }
+      />
 
       <Input
         value={query}
@@ -112,8 +115,8 @@ function SearchGroup({
   children: ReactNode;
 }) {
   return (
-    <section className={cn(surface.workspace, "rounded-lg p-4")}>
-      <h2 className="text-sm font-medium">{title}</h2>
+    <section className={cn(surface.workspace, "p-4")}>
+      <h2 className="text-sm font-semibold tracking-tight">{title}</h2>
       {empty ? (
         <p className="mt-2 text-sm text-muted-foreground">No matches</p>
       ) : (

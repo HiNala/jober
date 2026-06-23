@@ -79,11 +79,11 @@ export function PageEmpty({
     >
       <div
         className={cn(
-          "flex size-14 items-center justify-center rounded-2xl bg-muted/70",
+          "flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 via-primary/8 to-muted/40 ring-1 ring-primary/20",
           motionEmptyPulse,
         )}
       >
-        {icon ?? <Inbox className="size-6 text-muted-foreground" aria-hidden />}
+        {icon ?? <Inbox className="size-7 text-primary/70" aria-hidden />}
       </div>
       <div className="space-y-1.5">
         <h2 className="text-xl font-semibold">{title}</h2>

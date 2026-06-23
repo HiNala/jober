@@ -20,10 +20,10 @@ export function SettingsSection({
       aria-labelledby={headingId}
       className={cn(className)}
     >
-      <h2 id={headingId} className="text-sm font-medium">
+      <h2 id={headingId} className="border-b border-border/50 pb-3 text-base font-semibold tracking-tight">
         {title}
       </h2>
-      <div className="mt-4">{children}</div>
+      <div className="mt-5">{children}</div>
     </Surface>
   );
 }

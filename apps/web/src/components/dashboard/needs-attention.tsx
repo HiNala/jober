@@ -62,13 +62,15 @@ export function NeedsAttentionBanner() {
   return (
     <section
       className={cn(
-        "flex flex-col gap-3 rounded-lg border border-primary/25 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between",
+        "flex flex-col gap-3 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between",
         motionFadeIn,
       )}
       aria-label="What needs you now"
     >
       <div className="flex gap-3">
-        <Clock className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+          <Clock className="size-5 text-primary" aria-hidden />
+        </div>
         <div>
           <h2 className="text-sm font-semibold">{primary.headline}</h2>
           <p className="mt-0.5 text-sm text-muted-foreground">{primary.detail}</p>

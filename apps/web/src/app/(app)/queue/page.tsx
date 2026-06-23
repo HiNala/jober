@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { ImportWizard } from "@/components/import/import-wizard";
+import { PageHeader } from "@/components/app-shell/page-header";
 import { QueuePolicyBanner } from "@/components/queue/queue-policy-banner";
 import { JobDataTable } from "@/components/jobs/job-data-table";
 import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
@@ -51,38 +52,40 @@ export default function QueuePage() {
 
   return (
     <div className={cn(spacing.page, spacing.section)}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Job queue</h1>
-          <p className="text-sm text-muted-foreground">
+      <PageHeader
+        title="Job queue"
+        description={
+          <>
             {rows.length} targets · import here or add jobs via{" "}
-            <Link href="/discover" className="underline underline-offset-2">
+            <Link href="/discover" className="text-primary underline-offset-4 hover:underline">
               Discover
             </Link>
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <a
-            href={exportJobsXlsxUrl()}
-            download
-            className="inline-flex h-7 items-center gap-1 rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium hover:bg-muted"
-          >
-            <Download className="size-3.5" aria-hidden />
-            Export XLSX
-          </a>
-          <Button size="sm" type="button" onClick={() => setImportOpen(true)}>
-            Import spreadsheet
-          </Button>
-          <Dialog open={importOpen} onOpenChange={setImportOpen}>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Import job tracker</DialogTitle>
-              </DialogHeader>
-              <ImportWizard />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+          </>
+        }
+        actions={
+          <>
+            <a
+              href={exportJobsXlsxUrl()}
+              download
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border/70 bg-background px-3 text-sm font-medium transition-colors hover:bg-muted/60"
+            >
+              <Download className="size-3.5" aria-hidden />
+              Export XLSX
+            </a>
+            <Button size="sm" type="button" onClick={() => setImportOpen(true)}>
+              Import spreadsheet
+            </Button>
+            <Dialog open={importOpen} onOpenChange={setImportOpen}>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Import job tracker</DialogTitle>
+                </DialogHeader>
+                <ImportWizard />
+              </DialogContent>
+            </Dialog>
+          </>
+        }
+      />
 
       <QueuePolicyBanner />
 

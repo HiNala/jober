@@ -48,11 +48,23 @@ export function WorkspaceNav() {
       {/* Header */}
       <div className="flex h-12 shrink-0 items-center justify-between px-2">
         {!navCollapsed ? (
-          <Link href="/dashboard" className="px-2 text-base font-semibold tracking-tight text-foreground/90">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 px-2 text-base font-semibold tracking-tight text-foreground/90"
+          >
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">
+              J
+            </span>
             Jober
           </Link>
         ) : (
-          <span className="sr-only">Jober</span>
+          <Link
+            href="/dashboard"
+            className="flex size-8 items-center justify-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground"
+            aria-label="Jober dashboard"
+          >
+            J
+          </Link>
         )}
         <Button
           variant="ghost"

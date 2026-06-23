@@ -73,7 +73,7 @@ export function WorkerStatusPanel() {
     <div className={cn(surface.workspace, "p-4")}>
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-sm font-medium">Worker pool</h2>
+          <h2 className="text-sm font-semibold tracking-tight">Worker pool</h2>
           <p className="text-xs text-muted-foreground">
             {fetchError ? (
               <span className="text-destructive/70">Connection error — retrying…</span>

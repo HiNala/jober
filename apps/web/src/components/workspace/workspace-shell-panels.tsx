@@ -143,7 +143,7 @@ export function WorkspaceShellPanels({
             <main
               id="main-content"
               tabIndex={-1}
-              className="min-h-0 flex-1 overflow-auto focus:outline-none"
+              className="workspace-canvas min-h-0 flex-1 overflow-auto focus:outline-none"
               style={{ paddingBottom: "var(--safe-bottom)" }}
             >
               <RouteTransition>{children}</RouteTransition>

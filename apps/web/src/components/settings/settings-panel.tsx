@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Sparkles } from "lucide-react";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { AiSettingsSection } from "@/components/settings/ai-settings-section";
 import { AnalyticsConsentSection } from "@/components/settings/analytics-consent-section";
 import { AppearanceSettingsSection } from "@/components/settings/appearance-settings-section";
@@ -17,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchUsageDashboard } from "@/lib/api/billing";
 import { fetchTenantPolicy } from "@/lib/api/settings";
 import { motionFadeIn } from "@/lib/design/motion";
-import { surface, spacing } from "@/lib/design/tokens";
+import { spacing } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
 const GUIDANCE_LABELS: Record<string, string> = {
@@ -61,12 +62,10 @@ function SettingsPanelInner() {
 
   return (
     <div className={cn(spacing.page, spacing.section, motionFadeIn)}>
-      <header>
-        <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Profile vault, application behavior, AI, appearance, and account security.
-        </p>
-      </header>
+      <PageHeader
+        title="Settings"
+        description="Profile vault, application behavior, AI, appearance, and account security."
+      />
 
       <section aria-labelledby="vault-settings-heading" className="space-y-3">
         <div className="flex items-center gap-2">
@@ -94,7 +93,7 @@ function SettingsPanelInner() {
           Usage this month
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Card className={surface.workspace}>
+          <Card className="metric-card-accent border-border/60">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Application runs
@@ -110,7 +109,7 @@ function SettingsPanelInner() {
               </p>
             </CardContent>
           </Card>
-          <Card className={surface.workspace}>
+          <Card className="metric-card-accent border-border/60">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Documents
@@ -122,7 +121,7 @@ function SettingsPanelInner() {
               </p>
             </CardContent>
           </Card>
-          <Card className={surface.workspace}>
+          <Card className="metric-card-accent border-border/60">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 LLM spend

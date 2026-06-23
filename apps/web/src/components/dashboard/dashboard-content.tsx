@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { BatchPanel } from "@/components/dashboard/batch-panel";
+import { PageHeader } from "@/components/app-shell/page-header";
 import { DashboardFirstRun } from "@/components/dashboard/dashboard-first-run";
 import { EventStream } from "@/components/dashboard/event-stream";
 import { FailureAnalyticsPanel } from "@/components/dashboard/failure-analytics";
@@ -39,9 +40,11 @@ export function DashboardContent() {
 
   return (
     <div className={cn(spacing.section, spacing.page)}>
-      <header className="sr-only">
-        <h1>Dashboard</h1>
-      </header>
+      <PageHeader
+        title="Dashboard"
+        description="Live queue metrics, worker status, and recent run activity."
+        className="border-b-0 pb-0"
+      />
       <NeedsAttentionBanner />
       <MetricCards />
       <div className="grid gap-4 lg:grid-cols-3">

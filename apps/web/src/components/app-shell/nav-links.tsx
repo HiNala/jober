@@ -77,11 +77,11 @@ export function NavLinks({
             title={description}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-md px-2.5 py-2 text-base font-medium outline-none transition-colors",
+              "relative flex items-center gap-3 rounded-lg px-2.5 py-2 text-[0.9375rem] outline-none transition-colors",
               "focus-visible:ring-2 focus-visible:ring-ring",
               active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                ? "workspace-nav-active pl-3"
+                : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
             )}
             aria-current={active ? "page" : undefined}
           >

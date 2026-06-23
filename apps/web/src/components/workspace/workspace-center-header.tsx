@@ -48,7 +48,7 @@ export function WorkspaceCenterHeader({
   const isNarrow = useMediaQuery(WORKSPACE_NARROW_QUERY);
 
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-background/95 px-3 backdrop-blur-sm md:px-4">
+    <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border/60 bg-background/80 px-3 shadow-sm backdrop-blur-md md:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <MobileNav />
         {isOpsDesk ? (

@@ -558,6 +558,48 @@ html {
 }
 
 @layer components {
+  .workspace-canvas {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(
+        ellipse 80% 50% at 100% 0%,
+        color-mix(in oklab, var(--primary) 7%, transparent) 0%,
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 0% 100%,
+        color-mix(in oklab, var(--primary) 4%, transparent) 0%,
+        transparent 50%
+      );
+  }
+
+  .workspace-nav-active {
+    position: relative;
+    background: color-mix(in oklab, var(--primary) 12%, var(--sidebar-accent));
+    color: var(--sidebar-accent-foreground);
+    font-weight: 500;
+  }
+
+  .workspace-nav-active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 1.25rem;
+    width: 3px;
+    translate: 0 -50%;
+    border-radius: 9999px;
+    background: var(--primary);
+  }
+
+  .metric-card-accent {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--primary) 6%, var(--card)) 0%,
+      var(--card) 100%
+    );
+  }
+
   .cn-toast {
     animation: jober-attention-enter var(--motion-view) var(--ease-organic) both;
   }

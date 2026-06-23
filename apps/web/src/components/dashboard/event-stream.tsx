@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Surface } from "@/components/ui/surface";
 import { fetchRecentRunEvents } from "@/lib/api/run-console";
 
 function formatLine(event: {
@@ -28,9 +29,9 @@ export function EventStream() {
   const events = eventsQuery.data ?? [];
 
   return (
-    <div className="rounded-lg border border-border/60 bg-card/80">
+    <Surface family="workspace" className="overflow-hidden">
       <div className="px-4 py-3">
-        <h2 className="text-sm font-medium">Recent events</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Recent events</h2>
         <p className="text-xs text-muted-foreground">
           Live worker + browser telemetry ·{" "}
           <Link href="/queue" className="text-primary underline-offset-4 hover:underline">
@@ -70,6 +71,6 @@ export function EventStream() {
           )}
         </ul>
       </ScrollArea>
-    </div>
+    </Surface>
   );
 }

@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { fetchFailureAnalytics } from "@/lib/api/recovery";
+import { surface } from "@/lib/design/tokens";
 
 export function FailureAnalyticsPanel() {
   const analyticsQuery = useQuery({
@@ -22,9 +23,9 @@ export function FailureAnalyticsPanel() {
   const data = analyticsQuery.data;
   if (analyticsQuery.isError || !data || data.buckets.length === 0) {
     return (
-      <Card className="border-border/60 bg-card/80">
+      <Card className={surface.workspace}>
         <CardHeader>
-          <CardTitle className="text-sm font-medium">Failure analytics</CardTitle>
+          <CardTitle className="text-sm font-semibold tracking-tight">Failure analytics</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           {analyticsQuery.isError
@@ -36,9 +37,9 @@ export function FailureAnalyticsPanel() {
   }
 
   return (
-    <Card className="border-border/60 bg-card/80">
+    <Card className={surface.workspace}>
       <CardHeader>
-        <CardTitle className="text-sm font-medium">Failure analytics by ATS</CardTitle>
+        <CardTitle className="text-sm font-semibold tracking-tight">Failure analytics by ATS</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {data.alerts.length > 0 && (

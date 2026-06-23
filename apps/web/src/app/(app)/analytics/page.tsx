@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin } from "@/lib/auth/permissions";
 
+import { PageHeader } from "@/components/app-shell/page-header";
 import { PageLoading } from "@/components/states/page-states";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { spacing } from "@/lib/design/tokens";
@@ -35,12 +36,10 @@ export default function AnalyticsPage() {
 
   return (
     <div className={cn(spacing.page, spacing.section)}>
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Analytics</h1>
-        <p className="text-sm text-muted-foreground">
-          First-party metrics from your workspace and product rollups. No third-party trackers.
-        </p>
-      </div>
+      <PageHeader
+        title="Analytics"
+        description="First-party metrics from your workspace and product rollups. No third-party trackers."
+      />
 
       {showAdmin ? (
         <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>

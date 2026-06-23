@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Activity, CheckCircle2, Clock, ListTodo } from "lucide-react";
 
 import { motionFadeIn } from "@/lib/design/motion";
-import { surface } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 import { fetchDashboardSummary, type DashboardSummary } from "@/lib/api/batches";
 
@@ -95,21 +94,24 @@ export function MetricCards() {
         <Card
           key={label}
           className={cn(
-            surface.workspace,
-            emphasize && "border-primary/50 ring-1 ring-primary/30",
+            "metric-card-accent border-border/60 transition-shadow hover:shadow-md",
+            emphasize && "border-primary/40 ring-1 ring-primary/25",
           )}
         >
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {label}
             </CardTitle>
-            <Icon
+            <div
               className={cn(
-                "size-4",
-                emphasize ? "text-primary" : "text-muted-foreground",
+                "flex size-8 items-center justify-center rounded-lg",
+                emphasize
+                  ? "bg-primary/15 text-primary"
+                  : "bg-muted/80 text-muted-foreground",
               )}
-              aria-hidden
-            />
+            >
+              <Icon className="size-4" aria-hidden />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-semibold tabular-nums tracking-tight">{value}</div>

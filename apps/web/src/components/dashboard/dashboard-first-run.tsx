@@ -57,9 +57,16 @@ export function DashboardFirstRun() {
 
       <ol className="grid gap-4 sm:grid-cols-3">
         {STEPS.map(({ step, title, body, href, cta, icon: Icon }) => (
-          <li key={step} className={cn(surface.workspace, "relative flex flex-col rounded-xl p-5")}>
+          <li
+            key={step}
+            className={cn(
+              surface.workspace,
+              "group relative flex flex-col overflow-hidden p-5 transition-shadow hover:shadow-md",
+            )}
+          >
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary/60 via-primary/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="flex items-center gap-3">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-sm font-bold text-primary ring-1 ring-primary/20">
                 {step}
               </div>
               <Icon className="size-4 text-muted-foreground" aria-hidden />
