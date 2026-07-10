@@ -3,6 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Sparkles } from "lucide-react";
 
+import Link from "next/link";
+
 import { PageHeader } from "@/components/app-shell/page-header";
 import { AiSettingsSection } from "@/components/settings/ai-settings-section";
 import { AnalyticsConsentSection } from "@/components/settings/analytics-consent-section";
@@ -12,11 +14,17 @@ import { AuthSecuritySection } from "@/components/settings/auth-security-section
 import { BillingSettingsSection } from "@/components/settings/billing-settings-section";
 import { NotificationsSettingsSection } from "@/components/settings/notifications-settings-section";
 import { PrivacyAccountSection } from "@/components/settings/privacy-account-section";
+import { SettingsSection } from "@/components/settings/settings-section";
 import { PageError, PageLoading } from "@/components/states/page-states";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ProfileVault } from "@/components/vault/profile-vault";
 import { fetchUsageDashboard } from "@/lib/api/billing";
 import { fetchTenantPolicy } from "@/lib/api/settings";
-import { motionFadeIn } from "@/lib/design/motion";
+import {
+  setWalkthroughDismissed,
+  setWalkthroughMarkedComplete,
+} from "@/lib/onboarding/first-apply-walkthrough";
+import { motionFadeIn, motionPress } from "@/lib/design/motion";
 import { spacing } from "@/lib/design/tokens";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +85,34 @@ function SettingsPanelInner() {
       </section>
 
       <BillingSettingsSection />
+      <SettingsSection headingId="walkthrough-heading" title="First-apply guide">
+        <p className="text-sm text-muted-foreground">
+          Restart the dashboard checklist that walks you from import → resume → dry-run → review.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href="/dashboard"
+            className={cn(buttonVariants({ size: "sm" }), motionPress)}
+            onClick={() => {
+              setWalkthroughDismissed(false);
+              setWalkthroughMarkedComplete(false);
+            }}
+          >
+            Open guided walkthrough
+          </Link>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setWalkthroughDismissed(false);
+              setWalkthroughMarkedComplete(false);
+            }}
+          >
+            Reset checklist progress
+          </Button>
+        </div>
+      </SettingsSection>
       <AppearanceSettingsSection />
       <ApplicationDefaultsSection
         defaultRunPolicy={policy.policy.default_run_policy}

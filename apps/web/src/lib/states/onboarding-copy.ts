@@ -11,7 +11,7 @@ export const QUEUE_FILTER_EMPTY = "No matches — try adjusting your filters.";
 export const DASHBOARD_FIRST_RUN = {
   title: "Let's get to work.",
   description:
-    "Import your tracker or discover perfect-fit roles, upload a resume, then run a dry-run batch. You review the fill diff and approve before anything is sent.",
+    "Import your tracker or discover roles, upload a resume, tailor materials, then dry-run a batch. You review every fill diff before anything is sent.",
 } as const;
 
 export const DOCUMENTS_EMPTY_JOBS = {

@@ -10,6 +10,7 @@ import { FailureAnalyticsPanel } from "@/components/dashboard/failure-analytics"
 import { MetricCards } from "@/components/dashboard/metric-cards";
 import { NeedsAttentionBanner } from "@/components/dashboard/needs-attention";
 import { WorkerStatusPanel } from "@/components/dashboard/worker-status";
+import { FirstApplyWalkthrough } from "@/components/onboarding/first-apply-walkthrough";
 import { PageLoading } from "@/components/states/page-states";
 import { fetchJobTargets } from "@/lib/api/jobs";
 import { spacing } from "@/lib/design/tokens";
@@ -34,6 +35,7 @@ export function DashboardContent() {
           <h1>Dashboard</h1>
         </header>
         <DashboardFirstRun />
+        <FirstApplyWalkthrough forceShow className="mt-8" />
       </div>
     );
   }
@@ -42,9 +44,10 @@ export function DashboardContent() {
     <div className={cn(spacing.section, spacing.page)}>
       <PageHeader
         title="Dashboard"
-        description="Live queue metrics, worker status, and recent run activity."
+        description="Live queue metrics, worker status, and your first-apply checklist."
         className="border-b-0 pb-0"
       />
+      <FirstApplyWalkthrough />
       <NeedsAttentionBanner />
       <MetricCards />
       <div className="grid gap-4 lg:grid-cols-3">
