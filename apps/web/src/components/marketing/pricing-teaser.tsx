@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function PricingTeaser() {
   return (
-    <section aria-labelledby="pricing-teaser-heading" className="bg-blue-50/40 px-6 py-20">
+    <section aria-labelledby="pricing-teaser-heading" className="bg-muted/30 px-6 py-20">
       <div className="mx-auto max-w-3xl">
         <div
           className={cn(

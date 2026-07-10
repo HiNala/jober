@@ -24,7 +24,7 @@ export function MarketingCtaBand({
     <section
       aria-labelledby="marketing-cta-band-heading"
       className={cn(
-        "relative overflow-hidden bg-blue-600 px-6 py-24",
+        "relative overflow-hidden border-y border-border/40 bg-primary px-6 py-24",
         motionFadeIn,
       )}
     >
@@ -34,27 +34,27 @@ export function MarketingCtaBand({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 20% 50%, oklch(0.55 0.18 250 / 0.4) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 50%, oklch(0.35 0.16 260 / 0.3) 0%, transparent 60%)",
+            "radial-gradient(ellipse 80% 60% at 20% 50%, oklch(1 0 0 / 0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 80% 50%, oklch(0.2 0.08 260 / 0.35) 0%, transparent 60%)",
         }}
       />
 
       <div className="relative mx-auto max-w-3xl text-center">
-        <p className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-blue-200">
+        <p className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.22em] text-primary-foreground/70">
           Get started
         </p>
         <h2
           id="marketing-cta-band-heading"
-          className="mt-4 text-3xl font-bold tracking-[-0.02em] text-white md:text-4xl"
+          className="mt-4 text-3xl font-bold tracking-[-0.02em] text-primary-foreground md:text-4xl"
         >
           {title}
         </h2>
-        <p className="mx-auto mt-4 max-w-md text-lg text-blue-100/80">{lead}</p>
+        <p className="mx-auto mt-4 max-w-md text-lg text-primary-foreground/80">{lead}</p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <MarketingCtaLink
             href="/signup"
             feature={signupFeature}
             size="lg"
-            className="rounded-full bg-white px-8 font-semibold text-blue-700 shadow-lg shadow-blue-900/20 hover:bg-blue-50"
+            className="rounded-full bg-background px-8 font-semibold text-foreground shadow-lg shadow-black/25 hover:bg-background/90"
           >
             Start free
             <ArrowRight className="size-4" aria-hidden />
@@ -62,7 +62,7 @@ export function MarketingCtaBand({
           {secondaryFeature ? (
             <Link
               href={secondaryHref}
-              className="inline-flex h-11 items-center justify-center rounded-full border border-white/25 bg-white/10 px-8 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              className="inline-flex h-11 items-center justify-center rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-8 text-sm font-medium text-primary-foreground backdrop-blur-sm transition-colors hover:bg-primary-foreground/20"
             >
               {secondaryLabel}
             </Link>

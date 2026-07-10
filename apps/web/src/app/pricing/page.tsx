@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
+import { UnlockModal } from "@/components/billing/unlock-modal";
 import { FaqList } from "@/components/marketing/faq-list";
 import { JsonLd } from "@/components/marketing/json-ld";
 import { MarketingCtaBand } from "@/components/marketing/marketing-cta-band";
@@ -35,7 +37,10 @@ export default function PricingPage() {
           offers: MARKETING_PLANS.map((plan) => ({
             "@type": "Offer",
             name: plan.name,
-            price: plan.id === "free" ? "0" : undefined,
+            price:
+              plan.id === "free"
+                ? "0"
+                : plan.priceLabel.replace(/[^0-9.]/g, "") || undefined,
             priceCurrency: "USD",
             description: plan.description,
           })),
@@ -45,8 +50,12 @@ export default function PricingPage() {
         <MarketingPageHeader
           eyebrow="Pricing"
           title="Plans that match how you search"
-          lead="Limits mirror Settings today. Join the Pro waitlist for early access — Stripe checkout opens soon."
+          lead="Free is live with real run, batch, and LLM limits that match Settings. Upgrade to Pro via Stripe when billing is enabled — or join the waitlist for early access."
         />
+
+        <Suspense fallback={null}>
+          <UnlockModal />
+        </Suspense>
 
         <PricingPlans />
 
@@ -60,7 +69,7 @@ export default function PricingPage() {
           <p className="mt-2">
             Each plan includes a monthly managed budget for cover letters and form assistance (
             ${free.entitlements.maxLlmBudgetUsd} Free / ${pro.entitlements.maxLlmBudgetUsd} Pro).
-            Usage appears in Settings → usage.
+            Usage appears in Settings → Plan &amp; billing.
           </p>
           <p className="mt-2">
             Optionally add your own OpenAI or Anthropic key in Settings. When BYOK is active, your

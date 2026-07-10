@@ -2,7 +2,7 @@ import { ArrowRight, Check } from "lucide-react";
 
 import { MarketingCtaLink } from "@/components/marketing/marketing-cta-link";
 import { PlanComparisonTable } from "@/components/marketing/plan-comparison-table";
-import { ProWaitlistForm } from "@/components/marketing/pro-waitlist-form";
+import { ProCheckoutCta } from "@/components/marketing/pro-checkout-cta";
 import { motionFadeIn } from "@/lib/design/motion";
 import { MARKETING_PLANS } from "@/lib/marketing/plans";
 import { surface } from "@/lib/design/tokens";
@@ -18,7 +18,9 @@ export function PricingPlans() {
         <li className={cn(surface.marketing, "pricing-border-beam relative flex flex-col rounded-xl p-6")}>
           <h2 className="text-lg font-semibold">{free.name}</h2>
           <p className="mt-4 flex items-baseline gap-1">
-            <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">$0</span>
+            <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">
+              {free.priceLabel}
+            </span>
             <span className="text-sm text-muted-foreground">/mo</span>
           </p>
           <p className="mt-3 text-sm text-muted-foreground">{free.description}</p>
@@ -41,11 +43,20 @@ export function PricingPlans() {
           </MarketingCtaLink>
         </li>
 
-        <li className={cn(surface.marketing, "flex flex-col rounded-xl border-primary/40 bg-primary/[0.02] p-6 ring-1 ring-primary/20")}>
+        <li
+          className={cn(
+            surface.marketing,
+            "flex flex-col rounded-xl border-primary/40 bg-primary/[0.02] p-6 ring-1 ring-primary/20",
+          )}
+        >
           <h2 className="text-lg font-semibold">{pro.name}</h2>
           <p className="mt-4 flex items-baseline gap-2">
-            <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">—</span>
-            <span className="text-sm text-muted-foreground">paid monthly · launching soon</span>
+            <span className="text-5xl font-semibold tabular-nums tracking-[-0.03em]">
+              {pro.priceLabel}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {pro.priceNote ?? "per month · via Stripe"}
+            </span>
           </p>
           <p className="mt-3 text-sm text-muted-foreground">{pro.description}</p>
           <ul className="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
@@ -57,7 +68,7 @@ export function PricingPlans() {
             ))}
           </ul>
           <div className="mt-6">
-            <ProWaitlistForm />
+            <ProCheckoutCta />
           </div>
         </li>
       </ul>

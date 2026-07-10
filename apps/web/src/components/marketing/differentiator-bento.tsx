@@ -37,7 +37,7 @@ export function DifferentiatorBento() {
       ref={sectionRef}
       id="differentiator"
       aria-labelledby="differentiator-heading"
-      className="bg-white px-6 py-24"
+      className="bg-background px-6 py-24"
     >
       <div className="mx-auto max-w-6xl">
         {/* Section header with display scale */}

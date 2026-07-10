@@ -303,9 +303,9 @@ export const FAQ_CATEGORIES: { id: FaqCategory; label: string }[] = [
 
 export const PRICING_FAQ: { question: string; answer: string }[] = [
   {
-    question: "When will Pro checkout be available?",
+    question: "How do I upgrade to Pro?",
     answer:
-      "Join the Pro waitlist on the pricing page — we email when Stripe checkout opens. Free tier limits are live today and match Settings → usage.",
+      "When Stripe is enabled, use Upgrade to Pro on the pricing page or in Settings → Plan & billing, then complete checkout on Stripe. Free limits match Settings today; if self-serve is not live yet, join the waitlist on pricing.",
   },
   {
     question: "What counts as a run?",

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function HomeFaqTeaser() {
   return (
-    <section aria-labelledby="home-faq-heading" className="bg-slate-50 px-6 py-20">
+    <section aria-labelledby="home-faq-heading" className="bg-background px-6 py-20">
       <div className={cn("mx-auto max-w-3xl", motionFadeIn)}>
         <div className="text-center">
           <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent">

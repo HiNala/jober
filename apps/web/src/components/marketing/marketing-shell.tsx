@@ -38,7 +38,7 @@ export function MarketingShell({
         Skip to main content
       </a>
 
-      {/* Fixed floating nav — no ring/shadow until scrolled so it blends into white hero */}
+      {/* Fixed floating nav — glass chrome; ring/shadow strengthen on scroll */}
       <div
         className="fixed inset-x-0 z-40"
         style={{
@@ -51,12 +51,12 @@ export function MarketingShell({
         <header
           className={cn(
             "mx-auto flex max-w-5xl items-center justify-between gap-3 rounded-full px-4 py-2.5",
-            "bg-white/95 backdrop-blur-md",
-            "motion-safe:transition-[box-shadow,border-color] motion-safe:duration-300 motion-safe:ease-out",
+            "border border-border/40 bg-background/80 backdrop-blur-md",
+            "motion-safe:transition-[box-shadow,border-color,background-color] motion-safe:duration-300 motion-safe:ease-out",
             scrolled
               ? [
-                  "shadow-[0_2px_20px_-2px_rgba(0,0,0,0.08),0_1px_4px_-1px_rgba(0,0,0,0.04)]",
-                  "ring-1 ring-slate-900/[0.06]",
+                  "bg-card/85 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.45),0_1px_4px_-1px_rgba(0,0,0,0.25)]",
+                  "ring-1 ring-border/50",
                 ]
               : "shadow-none ring-0",
           )}

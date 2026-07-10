@@ -40,8 +40,8 @@ export const MARKETING_PLANS: MarketingPlan[] = [
   {
     id: "pro",
     name: "Pro",
-    priceLabel: "Coming soon",
-    priceNote: "paid monthly via Stripe",
+    priceLabel: "$29",
+    priceNote: "per month · via Stripe",
     description: "Higher limits for active pipelines and batch scheduling at scale.",
     entitlements: {
       maxBatchItems: 100,
@@ -52,7 +52,7 @@ export const MARKETING_PLANS: MarketingPlan[] = [
       "Everything in Free",
       "Larger batches and monthly run allowance",
       "Higher managed LLM budget for letters and fills",
-      "Priority support as we roll out billing",
+      "Priority support and self-serve billing portal",
     ],
   },
 ];

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -17,7 +18,10 @@ const HeroRunPreview = dynamic(
   {
     loading: () => (
       <div
-        className={cn("w-full rounded-xl border border-slate-100 bg-slate-50 aspect-[4/3]", motionSkeleton)}
+        className={cn(
+          "aspect-[4/3] w-full rounded-xl border border-border/50 bg-muted/30",
+          motionSkeleton,
+        )}
         aria-hidden
       />
     ),
@@ -28,24 +32,36 @@ export function MarketingHero() {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative bg-white"
+      className="relative overflow-hidden bg-background"
     >
-      {/* Very subtle top-left glow */}
+      {/* Ambient backdrop — low opacity cinematic texture */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <Image
+          src="/images/2030/hero-ambient.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-[0.22]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background" />
+      </div>
+
+      {/* Soft primary glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-0 size-[700px] rounded-full opacity-60"
+        className="pointer-events-none absolute -left-40 top-0 size-[700px] rounded-full opacity-50"
         style={{
-          background: "radial-gradient(circle, oklch(0.88 0.06 250 / 0.4) 0%, transparent 65%)",
+          background:
+            "radial-gradient(circle, oklch(0.55 0.12 250 / 0.28) 0%, transparent 65%)",
         }}
       />
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 pb-20 pt-8 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:pb-28 lg:pt-12">
-
         {/* ── Left: copy ───────────────────────────────────────── */}
         <div className={cn("flex flex-col", motionHeroStagger(0))}>
-
           {/* Eyebrow pill */}
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3.5 py-1.5">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1.5">
             <span className="size-1.5 rounded-full bg-primary" aria-hidden />
             <span className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-primary">
               Human-in-the-loop job applications
@@ -55,7 +71,10 @@ export function MarketingHero() {
           {/* Headline */}
           <h1
             id="hero-heading"
-            className={cn("mt-6 font-bold leading-[1.08] tracking-[-0.025em] text-slate-900", motionHeroStagger(1))}
+            className={cn(
+              "mt-6 font-bold leading-[1.08] tracking-[-0.025em] text-foreground",
+              motionHeroStagger(1),
+            )}
             style={{ fontSize: "clamp(2.4rem, 5vw, 3.75rem)" }}
           >
             Apply to every job
@@ -63,12 +82,15 @@ export function MarketingHero() {
             <span className="text-primary">at your quality bar.</span>
           </h1>
 
-          {/* Subhead */}
+          {/* Subhead — review before submit */}
           <p
-            className={cn("mt-5 max-w-[440px] text-[1.0625rem] leading-relaxed text-slate-500", motionHeroStagger(2))}
+            className={cn(
+              "mt-5 max-w-[440px] text-[1.0625rem] leading-relaxed text-muted-foreground",
+              motionHeroStagger(2),
+            )}
           >
             AI fills the form. You read the diff and approve before anything
-            gets sent. Your applications, your standard.
+            gets sent — every time. Your applications, your standard.
           </p>
 
           {/* CTAs */}
@@ -78,7 +100,7 @@ export function MarketingHero() {
               feature="landing_hero_signup"
               size="lg"
               variant="default"
-              className="rounded-full px-8 font-semibold shadow-md shadow-blue-200"
+              className="rounded-full px-8 font-semibold shadow-md shadow-primary/20"
             >
               Get started free
               <ArrowRight className="size-4" aria-hidden />
@@ -87,7 +109,7 @@ export function MarketingHero() {
               href="/how-it-works"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "rounded-full px-8 font-medium text-slate-600 hover:text-slate-900",
+                "rounded-full px-8 font-medium text-muted-foreground hover:text-foreground",
               )}
             >
               See how it works
@@ -97,7 +119,7 @@ export function MarketingHero() {
           {/* Trust micro-stats */}
           <div
             className={cn(
-              "mt-8 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[0.62rem] text-slate-400",
+              "mt-8 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[0.62rem] text-muted-foreground/80",
               motionHeroStagger(4),
             )}
           >
@@ -116,27 +138,26 @@ export function MarketingHero() {
         </div>
 
         {/* ── Right: live product demo ──────────────────────────── */}
-        <div
-          className={cn("relative hidden lg:block", motionHeroStagger(5))}
-        >
+        <div className={cn("relative hidden lg:block", motionHeroStagger(5))}>
           {/* Glow behind frame */}
           <div
             aria-hidden
             className="pointer-events-none absolute -inset-6 rounded-3xl opacity-70"
             style={{
-              background: "radial-gradient(ellipse 90% 80% at 50% 50%, oklch(0.88 0.06 250 / 0.5) 0%, transparent 70%)",
+              background:
+                "radial-gradient(ellipse 90% 80% at 50% 50%, oklch(0.45 0.12 250 / 0.35) 0%, transparent 70%)",
             }}
           />
 
-          {/* Browser chrome frame */}
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-12px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)]">
+          {/* Dark product chrome frame */}
+          <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[0_24px_80px_-16px_rgba(0,0,0,0.55),0_0_0_1px_oklch(1_0_0/0.04)]">
             {/* Title bar */}
-            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
-              <span className="size-3 rounded-full bg-red-400/80" aria-hidden />
-              <span className="size-3 rounded-full bg-amber-400/80" aria-hidden />
-              <span className="size-3 rounded-full bg-emerald-400/80" aria-hidden />
-              <div className="mx-3 flex-1 rounded-md border border-slate-200 bg-white px-3 py-1">
-                <span className="font-mono text-[10px] text-slate-400">
+            <div className="flex items-center gap-2 border-b border-border/50 bg-muted/40 px-4 py-3">
+              <span className="size-3 rounded-full bg-red-400/70" aria-hidden />
+              <span className="size-3 rounded-full bg-amber-400/70" aria-hidden />
+              <span className="size-3 rounded-full bg-emerald-400/70" aria-hidden />
+              <div className="mx-3 flex-1 rounded-md border border-border/50 bg-background/70 px-3 py-1">
+                <span className="font-mono text-[10px] text-muted-foreground">
                   app.jober.app/runs/sr_northwind
                 </span>
               </div>
@@ -147,16 +168,15 @@ export function MarketingHero() {
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Mobile demo (stacked below copy) */}
-      <div className={cn("px-6 pb-10 lg:hidden", motionHeroStagger(5))}>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
-          <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
-            <span className="size-2.5 rounded-full bg-red-400/80" aria-hidden />
-            <span className="size-2.5 rounded-full bg-amber-400/80" aria-hidden />
-            <span className="size-2.5 rounded-full bg-emerald-400/80" aria-hidden />
+      <div className={cn("relative px-6 pb-10 lg:hidden", motionHeroStagger(5))}>
+        <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-lg shadow-black/30">
+          <div className="flex items-center gap-2 border-b border-border/50 bg-muted/40 px-4 py-3">
+            <span className="size-2.5 rounded-full bg-red-400/70" aria-hidden />
+            <span className="size-2.5 rounded-full bg-amber-400/70" aria-hidden />
+            <span className="size-2.5 rounded-full bg-emerald-400/70" aria-hidden />
           </div>
           <div className="p-3">
             <HeroRunPreview />
@@ -165,10 +185,7 @@ export function MarketingHero() {
       </div>
 
       {/* Smooth bottom transition into trust strip / next section */}
-      <div
-        aria-hidden
-        className="h-px w-full bg-slate-100"
-      />
+      <div aria-hidden className="relative h-px w-full bg-border/40" />
     </section>
   );
 }

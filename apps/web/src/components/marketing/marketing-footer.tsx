@@ -33,7 +33,7 @@ export function MarketingFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-100 bg-slate-50" aria-label="Site footer">
+    <footer className="border-t border-border/40 bg-muted/20" aria-label="Site footer">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
         {/* Brand column */}
         <div className="space-y-4">
@@ -69,7 +69,7 @@ export function MarketingFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-slate-100 px-6 py-4 text-center font-mono text-xs text-muted-foreground/60">
+      <div className="border-t border-border/40 px-6 py-4 text-center font-mono text-xs text-muted-foreground/60">
         © {year} Jober. All rights reserved.
       </div>
     </footer>
