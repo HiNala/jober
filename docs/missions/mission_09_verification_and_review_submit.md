@@ -28,3 +28,15 @@
 ## Iteration clause
 - [x] Pre-submit human-readable summary (`build_human_summary`) shown above Submit
 - [x] Mission 99: verify-ready continues fill run; fill→verify integration test; web 404 helper test
+
+---
+
+## Residual perfection (2026-07) → Mission 42
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| ApproveSendBar + five-second scan review UX | **M42** |
+| CheckpointCard-grade human handoffs | **M42** + **M39** |
+| Masked fill-diff polish | **M42** |
+| Confirmation → JobTarget/XLSX status round-trip reliability | **M42** |
+| Design Council ≥19/20 on review surface | **M42** |

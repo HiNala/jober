@@ -33,3 +33,20 @@
 - [x] Full gates: API/worker pytest, web lint/typecheck/build, policy suite, `detect-secrets`
 - [x] Design Council 19/20 in `design-review.md`
 - [x] Pushed to `origin/main` at mission boundary
+
+---
+
+## Residual perfection (2026-07) → Mission 38
+
+Build mission closed entitlements + webhook **hooks**, not full self-serve monetization.
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Stripe Checkout Session API + web CTAs | **M38** |
+| Customer Portal for manage/cancel | **M38** |
+| Webhook signing required in production (verify held) | **M38** + audit C6 |
+| Pricing “Coming soon” / waitlist-only Pro card | **M36** UI + **M38** wire |
+| Unlock / post-upgrade experience | **M38** |
+| Usage meters + upgrade in Settings | **M38** + **M39** shell |
+
+Do **not** re-open M15 task checkboxes; track residual work only in M38 acceptance criteria.

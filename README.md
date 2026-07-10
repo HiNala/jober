@@ -134,8 +134,12 @@ infra/
   railway/  Per-service `*.railway.toml` + `variables.example.env`
 docs/
   MASTER_PLAN.md
-  MISSION_INDEX.md
-  missions/
+  MISSION_INDEX.md          # Phases A–C (incl. active perfection 35–45)
+  architecture/
+    design-north-star-2030.md   # Binding UI/UX bible for perfection pack
+  missions/                 # mission_00 … mission_45 + mission_99
+  polish-pack/              # post-v0.1 polish (mostly complete)
+
 ```
 
 ## Web app (Mission 02+)
@@ -149,9 +153,11 @@ pnpm dev                     # http://localhost:3000
 
 Routes: `/` (marketing landing), `/pricing`, `/privacy`, `/terms`, `/signup`, `/login`, `/dashboard`, `/queue`, `/discover`, `/library`, `/search`, `/settings`, `/kitchen-sink` (component catalog). `/documents` and `/vault` redirect into Library and Settings.
 
-**Marketing (Missions 29–30, polish pack 07–08):** Public site at `/` (landing), `/features`, `/how-it-works`, `/faq`, `/pricing`, `/blog`, plus `/privacy`, `/terms`, and `/acceptable-use` (draft legal — requires counsel before launch). Pricing mirrors API plan limits in `services/billing/entitlements.py` (Free: 20 runs/mo, 5 batch, $5 LLM; Pro: 500/100/$50). Pro interest is captured via `POST /api/waitlist/pro` (see `docs/polish-pack/notes/08_waitlist.md`). CTA clicks emit `feature.use` (consent-gated); UTM params persist in-session for signup attribution. Set `NEXT_PUBLIC_SITE_URL` for sitemap/OG.
+**Marketing (Missions 29–30, polish 07–08; rebuild in M36):** Public site at `/` (landing), `/features`, `/how-it-works`, `/faq`, `/pricing`, `/blog`, plus `/privacy`, `/terms`, and `/acceptable-use` (draft legal — requires counsel before launch). Pricing mirrors API plan limits. Pro waitlist today; **full Stripe Checkout in Mission 38**. CTA clicks emit `feature.use` (consent-gated). Set `NEXT_PUBLIC_SITE_URL` for sitemap/OG.
 
-**Design system (Mission 16):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
+**Perfection pack 2030 (Missions 35–45 — active):** Design north star Hyperagent + Grok + Linear — see `docs/architecture/design-north-star-2030.md` and `docs/MISSION_INDEX.md` Phase C. Covers design system rebuild, marketing v3, Google auth production, Stripe, command-center shell, job matching, resume tailoring, approve/send, analytics/admin, mobile, and launch re-cert.
+
+**Design system (Mission 16; tokens refresh M35):** tokens in `apps/web/src/lib/design/tokens.ts`; shared page states in `components/states/page-states.tsx`. Settings shows plan usage and tenant policy from the API (Mission 15).
 
 **Motion (Mission 19):** central vocabulary in `apps/web/src/lib/design/motion.ts` — see `docs/architecture/motion.md`. Feature components must use motion tokens (`pnpm check:motion`); `prefers-reduced-motion` is honored globally.
 

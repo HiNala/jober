@@ -47,3 +47,16 @@ Register redirect URIs in Google Cloud Console for local, staging, and productio
 - [x] Login OAuth error banner (`?error=oauth_state` etc.)
 - [x] Hide Google UI unless `NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED=true`
 - [x] Tests: unverified Google email separate account; returning user no duplicate
+
+---
+
+## Residual perfection (2026-07) → Mission 37
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Production Google Cloud redirect URIs for staging/prod | **M37** |
+| Deploy wiring: enable web flag only when API secrets present | **M37** |
+| Real staging E2E with Google credentials | **M37** |
+| Branded 2030 auth UI (AmbientCanvas, trust strip) | **M37** (+ M35 tokens) |
+| Verify/reset email delivery in production SMTP | **M37** |
+| Never show disabled “coming soon” Google button | **M37** (regression lock) |

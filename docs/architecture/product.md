@@ -17,10 +17,15 @@ Jober is **not** a spray-and-pray auto-applier. It does not:
 
 | Pillar | Promise |
 |--------|---------|
-| **Quality** | Tailored cover letters and form fills grounded in your profile and the specific role |
+| **Quality** | Tailored cover letters **and** human-approved resume variants, plus form fills grounded in your profile and the specific role |
+| **Matching** | Discover and import high-signal jobs with explainable fit — build the perfect list before you apply |
 | **Tracking** | Full run history, artifacts, and batch visibility — know what happened on each application |
-| **Control** | Human checkpoints for sensitive fields, auth challenges, and final submit review |
+| **Control** | Human checkpoints for sensitive fields, auth challenges, and final **Approve / Send** |
 | **Integrity** | Respect site terms; sensitive EEO/veteran fields require explicit user entry |
+
+## 2030 product experience (Perfection pack)
+
+Visual and interaction north star: [`design-north-star-2030.md`](design-north-star-2030.md) — Hyperagent-grade command center, Grok-grade empty states, Linear-grade typography. Active missions: **35–45** in `MISSION_INDEX.md`.
 
 ## Differentiation
 

@@ -46,3 +46,16 @@ Blog/changelog scaffold shipped.
 ## Notes
 - Legal text is **draft** — requires counsel sign-off before public launch.
 - Pro Stripe checkout not wired on web yet; pricing copy is honest about “coming soon”.
+
+---
+
+## Residual perfection (2026-07) → Missions 36 + 38
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Full marketing visual language → dark 2030 | **M36** |
+| Features / how-it-works / FAQ redesign | **M36** |
+| Pricing Pro: Checkout when Stripe on; waitlist only when off | **M36** + **M38** |
+| Remove permanent “coming soon” equal-weight dead card | **M36** + **M38** |
+| Legal draft banners remain until counsel (layout polish only) | **M36** / launch checklist |
+| SEO + OG refresh after visual rebuild | **M36** |

@@ -45,3 +45,19 @@ curl -X POST -H "Cookie: ..." https://api.example.com/api/admin/ops/test-alert
 - [x] **Design Council:** 19/20 unchanged; CI link in design-review.md
 
 CI after M99: [run 27278864869](https://github.com/HiNala/jober/actions/runs/27278864869) ✅
+
+---
+
+## Residual perfection (2026-07) → Mission 45
+
+M34 certified **v0.1.0** launch readiness for the original build. Perfection pack (35–45) changes surface area; **re-certify** rather than re-checking M34 boxes.
+
+| Residual / re-cert item | Owner mission |
+|-------------------------|---------------|
+| Full gate matrix after UI + billing + auth changes | **M45** |
+| Stripe live webhook secret on production | **M38** then **M45** |
+| Google OAuth production credentials | **M37** then **M45** |
+| Screenshot pack refresh (prod + mobile) | **M44** + **M45** |
+| Design Council ≥19/20 all primary surfaces | **M45** |
+| Legal counsel still blocks “final” legal pages | Launch checklist / owner |
+| New tag after perfection (e.g. `v0.2.0` / `v1.0.0-perfection`) | **M45** |

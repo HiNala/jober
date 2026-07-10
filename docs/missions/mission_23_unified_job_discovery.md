@@ -47,3 +47,15 @@
 ## Deferred (non-blocking)
 - Redis-backed per-board cooldown enforcement (httpx fetch only today)
 - Worker fallback when inline enrich fails on live ATS pages
+
+---
+
+## Residual perfection (2026-07) → Mission 40
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Explainable fit score v2 (reasons chips, ranking) | **M40** |
+| Candidate UX + bulk accept on 2030 shell | **M40** |
+| Saved search refresh reliability | **M40** |
+| Seamless handoff to document prep + batch | **M40** → M41/M42 |
+| Redis board cooldowns (if still open) | **M40** if in scope, else note |

@@ -30,3 +30,17 @@
 - [x] API `ruff` + `mypy` green; full pytest requires CI Postgres locally
 - [x] Design Council scores in `design-review.md` (incl. settings addendum 19/20)
 - [x] Release tagged `v0.16.0-design`; M99 commit pushed to `origin/main`
+
+---
+
+## Residual perfection (2026-07) → Missions 35–36, 39
+
+M16 established tokens, states, and Design Council discipline. **2030 bar is higher** and visually re-anchored:
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Near-black Hyperagent shell + new primitives | **M35** |
+| Marketing no longer generic light AI SaaS | **M36** |
+| App command center (not merely polished v1 chrome) | **M39** |
+| Design Council target ≥19/20 | All perfection missions |
+| Binding references: Hyperagent, Grok, Linear, 21st.dev | `design-north-star-2030.md` |

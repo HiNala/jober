@@ -41,3 +41,15 @@
 
 ## Deferred (non-blocking)
 - Library “apply to job” UI — duplicate API accepts `job_target_id`; Library only duplicates in place today
+
+---
+
+## Residual perfection (2026-07) → Mission 41
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Per-job **resume tailoring** (human-approved variants) | **M41** |
+| Side-by-side job vs docs + stronger studio UX | **M41** |
+| Library “apply to job” / attach letter+resume to run | **M41** |
+| Fabrication guards as first-class tests | **M41** |
+| Document Studio 2030 visual language | **M41** + **M39** |

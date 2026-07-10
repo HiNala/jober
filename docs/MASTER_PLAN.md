@@ -162,6 +162,37 @@ Never log API keys/passwords/tokens/full sensitive answers. Encrypt vault fields
 
 See `MISSION_INDEX.md`. Run **Mission 99 (Iteration Loop)** between every numbered mission to finish leftovers and self-improve before advancing.
 
+### Phase C — Perfection pack 2030 (active)
+
+Missions **35–45** raise Jober from “shipped v0.1 autopilot” to **world-class premium product**:
+
+| Mission | Focus |
+|---------|--------|
+| 35 | Design system 2030 (Hyperagent/Grok tokens & primitives) |
+| 36 | Marketing site v3 (hero, sales, conversion) |
+| 37 | Auth + Google OAuth production completion |
+| 38 | Stripe Checkout + Pro monetization |
+| 39 | Workspace command center (app shell) |
+| 40 | Perfect job matching / discovery |
+| 41 | Resume tailoring + cover letter studio |
+| 42 | Apply pipeline: review → approve → send |
+| 43 | Analytics + admin ops excellence |
+| 44 | Mobile / responsive perfection |
+| 45 | Full QA, integration hardening, launch cert |
+
+**Design bible:** `docs/architecture/design-north-star-2030.md`  
+**Visual references:** Hyperagent (thread/canvas, checkpoints, ambient loading), Grok (power empty states, unlock modals), Linear (type/focus), 21st.dev (craft).
+
+**Design Council bar (perfection):** ≥19/20 per primary surface (raised from 18).
+
+**Product completeness targets:**
+- Search/import → perfect-fit lists with explainable scores  
+- Custom cover letter **and** tailored resume (human-approved)  
+- Form fill from vault + uploads + verification  
+- User only **approves/sends** (or resolves a clear checkpoint)  
+- Stripe Pro self-serve; Google auth when configured; first-party analytics; admin ops  
+- Flawless mobile; zero lint/type/test debt on release  
+
 ---
 
 ## 12. Research sources

@@ -1,6 +1,8 @@
 # Jober Polish Pack — Mission Index
 
-**Created:** 2026-06-10 · **Status:** ready to execute · **Location:** `docs/polish-pack/` (self-contained)
+**Created:** 2026-06-10 · **Status:** nearly complete (29–30 remaining) · **Location:** `docs/polish-pack/` (self-contained)
+
+> **Next major track:** Perfection pack **Missions 35–45** in [`docs/MISSION_INDEX.md`](../MISSION_INDEX.md) + design bible [`docs/architecture/design-north-star-2030.md`](../architecture/design-north-star-2030.md). Finish polish 29–30, then execute Phase C perfection (or fold remaining polish into M45 certification).
 
 This is the **improvement/polish mission pack** for Jober. It is fully separate from the historical build missions (`docs/missions/mission_NN_*.md`, indexed in [`docs/MISSION_INDEX.md`](../MISSION_INDEX.md)), which are complete and serve as archived records. This pack drives the *existing, deployed* product to excellence: coherent, reliable, beautiful, accessible, performant, clearly positioned, and production-certified — **without feature creep**.
 

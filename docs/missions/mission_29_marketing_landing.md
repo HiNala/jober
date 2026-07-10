@@ -39,3 +39,19 @@ Interactive demo sandbox **deferred** — static product visual mock ships in v1
 - [x] Mobile header shows Pricing link; How it works visible from `md` up
 - [x] README + `.env.example` document `NEXT_PUBLIC_SITE_URL`
 - [x] Web gates green: `typecheck`, `lint:strict`, `build`, vitest
+
+---
+
+## Residual perfection (2026-07) → Mission 36
+
+Landing v1/v2 closed Linear-style light hero. **2030 rebuild** supersedes visual direction:
+
+| Residual gap | Owner mission |
+|--------------|---------------|
+| Dark Hyperagent/Grok-grade hero + ambient canvas | **M36** |
+| Product proof that shows review/approve, not generic AI | **M36** |
+| Design Council bar raised to ≥19/20 | **M36** |
+| Sales hierarchy: quality + human submit as differentiator | **M36** |
+| Assets: ambient/OG under `public/images/` | **M36** |
+
+See `docs/architecture/design-north-star-2030.md`.
