@@ -24,8 +24,8 @@ const GUIDANCE_LABELS: Record<string, string> = {
   apply_only_chosen_jobs: "You choose every job",
   respect_site_terms: "Respect site terms",
   no_captcha_bypass: "Human handoff for security",
-  sensitive_fields: "Sensitive fields",
-  auto_submit_disclosure: "auto_submit disclosure",
+  sensitive_fields: "Sensitive fields stay manual",
+  auto_submit_disclosure: "Auto-submit is opt-in only",
 };
 
 function SettingsPanelInner() {
@@ -63,7 +63,7 @@ function SettingsPanelInner() {
     <div className={cn(spacing.page, spacing.section, motionFadeIn)}>
       <PageHeader
         title="Settings"
-        description="Profile vault, application behavior, AI, appearance, and account security."
+        description="Vault, billing, application defaults, AI, notifications, and account security — all in one place."
       />
 
       <section aria-labelledby="vault-settings-heading" className="space-y-3">

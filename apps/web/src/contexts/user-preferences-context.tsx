@@ -54,7 +54,11 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!query.data) return;
     const prefs = query.data;
-    if (prefs.appearance.theme === "light" || prefs.appearance.theme === "dark") {
+    if (
+      prefs.appearance.theme === "light" ||
+      prefs.appearance.theme === "dark" ||
+      prefs.appearance.theme === "system"
+    ) {
       setTheme(prefs.appearance.theme);
     }
     if (prefs.appearance.canvas_view_mode === "single" || prefs.appearance.canvas_view_mode === "grid") {
@@ -68,7 +72,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     async (patch: Partial<UserPreferences>) => {
       const res = await patchUserPreferences(patch);
       queryClient.setQueryData(["user-preferences"], res.preferences);
-      if (patch.appearance?.theme && patch.appearance.theme !== "system") {
+      if (patch.appearance?.theme) {
         setTheme(patch.appearance.theme);
       }
       if (patch.appearance) {

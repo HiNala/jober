@@ -9,6 +9,7 @@ import {
   BarChart3,
   BookOpen,
   Compass,
+  FileText,
   LayoutDashboard,
   ListTodo,
   Search,
@@ -35,6 +36,12 @@ export const APP_NAV: {
     icon: Compass,
     description: "Find new jobs — boards or spreadsheet",
   },
+  {
+    href: "/documents",
+    label: "Documents",
+    icon: FileText,
+    description: "Tailor cover letters and resume variants",
+  },
   { href: "/library", label: "Library", icon: BookOpen },
   { href: "/vault", label: "Vault", icon: LockKeyhole, description: "Profile, resume, and autofill data" },
   {
@@ -58,11 +65,12 @@ export function NavLinks({
 }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  // Admin sits before Settings so ops surfaces are easy to find.
   const nav = isAdmin(user)
     ? [
-        ...APP_NAV.slice(0, 6),
-        { href: "/admin", label: "Admin", icon: Shield },
-        ...APP_NAV.slice(6),
+        ...APP_NAV.filter((item) => item.href !== "/settings"),
+        { href: "/admin", label: "Admin", icon: Shield, description: "Ops, users, cost, system" },
+        ...APP_NAV.filter((item) => item.href === "/settings"),
       ]
     : APP_NAV;
 

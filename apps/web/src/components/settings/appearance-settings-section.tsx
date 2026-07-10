@@ -28,6 +28,7 @@ export function AppearanceSettingsSection() {
           >
             <option value="dark">Dark</option>
             <option value="light">Light</option>
+            <option value="system">System</option>
           </select>
         </div>
         <div className="space-y-2">

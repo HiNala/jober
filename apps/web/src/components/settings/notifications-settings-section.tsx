@@ -75,7 +75,8 @@ export function NotificationsSettingsSection() {
           <div className="grid gap-1">
             <Label htmlFor="notify-email-batch">Batch finished (email)</Label>
             <p className="text-xs text-muted-foreground">
-              Sends email when SMTP is configured and a batch completes (coming soon).
+              Email when a batch completes. Delivered only when SMTP is configured on the API;
+              otherwise the preference is saved for when email is enabled.
             </p>
           </div>
         </div>

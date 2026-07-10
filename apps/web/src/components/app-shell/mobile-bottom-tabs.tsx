@@ -18,6 +18,7 @@ const TABS = [
   { href: "/discover", label: "Discover", icon: Compass },
   { href: "/queue", label: "Queue", icon: ListTodo },
   { href: "/documents", label: "Docs", icon: FileText },
+  /** Settings hub — vault, library, analytics, admin live under “More” on small screens. */
   { href: "/settings", label: "More", icon: MoreHorizontal },
 ] as const;
 
