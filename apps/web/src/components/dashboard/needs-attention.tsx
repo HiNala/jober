@@ -49,14 +49,14 @@ export function NeedsAttentionBanner() {
       ? {
           headline: `${needsReview} run${needsReview === 1 ? "" : "s"} need your review`,
           detail: "Open a checkpoint to approve, edit, or hand off before submit.",
-          href: "/queue",
-          cta: "Review queue",
+          href: "/queue?status=needs_review",
+          cta: "Open runs needing you",
         }
       : {
           headline: `${activeRuns} active run${activeRuns === 1 ? "" : "s"} in progress`,
           detail: "Runs stream live in the console — nothing to approve yet.",
-          href: "/dashboard",
-          cta: "Watch events",
+          href: "/queue",
+          cta: "Open queue",
         };
 
   return (

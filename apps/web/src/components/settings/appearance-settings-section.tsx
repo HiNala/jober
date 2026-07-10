@@ -5,8 +5,23 @@ import { Label } from "@/components/ui/label";
 import { SettingsSection } from "@/components/settings/settings-section";
 
 export function AppearanceSettingsSection() {
-  const { preferences, updatePreferences } = useUserPreferences();
-  if (!preferences) return null;
+  const { preferences, updatePreferences, isLoading } = useUserPreferences();
+  if (isLoading) {
+    return (
+      <SettingsSection headingId="appearance-heading" title="Appearance">
+        <p className="text-sm text-muted-foreground">Loading preferences…</p>
+      </SettingsSection>
+    );
+  }
+  if (!preferences) {
+    return (
+      <SettingsSection headingId="appearance-heading" title="Appearance">
+        <p className="text-sm text-muted-foreground">
+          Sign in to sync theme, density, and motion preferences across devices.
+        </p>
+      </SettingsSection>
+    );
+  }
 
   return (
     <SettingsSection headingId="appearance-heading" title="Appearance">

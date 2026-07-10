@@ -12,10 +12,18 @@ const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/queue": "Queue",
   "/discover": "Discover",
+  "/documents": "Documents",
   "/library": "Library",
+  "/vault": "Vault",
   "/search": "Search",
   "/analytics": "Analytics",
+  "/admin": "Admin",
   "/admin/users": "Admin users",
+  "/admin/runs": "Admin runs",
+  "/admin/cost": "Admin cost",
+  "/admin/system": "Admin system",
+  "/admin/acquisition": "Admin acquisition",
+  "/admin/config": "Admin config",
   "/settings": "Settings",
 };
 
@@ -25,6 +33,8 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
   let title = TITLES[pathname] ?? "Jober";
   if (pathname.startsWith("/runs/")) {
     title = "Run console";
+  } else if (pathname.startsWith("/admin/") && !TITLES[pathname]) {
+    title = "Admin";
   }
 
   return (

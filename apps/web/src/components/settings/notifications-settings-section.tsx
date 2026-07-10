@@ -7,8 +7,23 @@ import { Label } from "@/components/ui/label";
 import { SettingsSection } from "@/components/settings/settings-section";
 
 export function NotificationsSettingsSection() {
-  const { preferences, updatePreferences } = useUserPreferences();
-  if (!preferences) return null;
+  const { preferences, updatePreferences, isLoading } = useUserPreferences();
+  if (isLoading) {
+    return (
+      <SettingsSection headingId="notifications-heading" title="Notifications">
+        <p className="text-sm text-muted-foreground">Loading preferences…</p>
+      </SettingsSection>
+    );
+  }
+  if (!preferences) {
+    return (
+      <SettingsSection headingId="notifications-heading" title="Notifications">
+        <p className="text-sm text-muted-foreground">
+          Sign in to configure in-app and email notification preferences.
+        </p>
+      </SettingsSection>
+    );
+  }
 
   const { notifications } = preferences;
 

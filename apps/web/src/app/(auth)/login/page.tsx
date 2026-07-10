@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 import { AuthFormError } from "@/components/auth/auth-form-error";
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
@@ -14,13 +14,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { track } from "@/lib/analytics/events";
 import { login } from "@/lib/api/auth";
+import { safeNextPath } from "@/lib/auth/safe-next-path";
 import { validateEmail } from "@/lib/forms/client-validation";
 import { useFormSubmit } from "@/lib/forms/use-form-submit";
 import { motionPress } from "@/lib/design/motion";
 import { cn } from "@/lib/utils";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = safeNextPath(searchParams.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { pending, formError, fieldErrors, run, setClientFieldErrors } = useFormSubmit({
@@ -34,14 +37,17 @@ export default function LoginPage() {
       footer={
         <>
           No account?{" "}
-          <Link href="/signup" className="font-medium text-primary underline underline-offset-4">
+          <Link
+            href={nextPath !== "/dashboard" ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"}
+            className="font-medium text-primary underline underline-offset-4"
+          >
             Create one
           </Link>
         </>
       }
     >
       <AuthOAuthAlert />
-      <GoogleSignInBlock />
+      <GoogleSignInBlock nextPath={nextPath} />
       <form
         className="space-y-4"
         noValidate
@@ -59,7 +65,7 @@ export default function LoginPage() {
           void run(async () => {
             await login(email, password);
             track("auth.signin_completed", { method: "native" });
-            router.push("/dashboard");
+            router.push(nextPath);
           });
         }}
       >
@@ -94,5 +100,19 @@ export default function LoginPage() {
         </Button>
       </form>
     </AuthFormShell>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <AuthFormShell title="Sign in" subtitle="Access your workspace and runs.">
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        </AuthFormShell>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatApiError } from "@/lib/api/errors";
@@ -13,6 +14,7 @@ import { SettingsSection } from "@/components/settings/settings-section";
 
 export function PrivacyAccountSection() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const [confirm, setConfirm] = useState("");
 
   const exportMutation = useMutation({
@@ -32,7 +34,8 @@ export function PrivacyAccountSection() {
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteAllData(confirm),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await signOut();
       router.push("/login");
     },
     onError: (err: unknown) => toast.error(formatApiError(err, "Could not delete account data")),

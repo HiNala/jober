@@ -68,9 +68,13 @@ function ProCheckoutCtaInner({ className }: { className?: string }) {
     },
   });
 
+  // Prefer API status once loaded; env only for optimistic pre-hydration.
   const stripeEnabled =
-    envEnabled ||
-    (authQuery.data?.kind === "authed" && authQuery.data.status.stripe_enabled);
+    authQuery.data?.kind === "authed"
+      ? authQuery.data.status.stripe_enabled
+      : authQuery.data?.kind === "anonymous"
+        ? envEnabled
+        : envEnabled;
 
   if (authQuery.isLoading && !envEnabled) {
     return (

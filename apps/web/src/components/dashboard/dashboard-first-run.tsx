@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FileSpreadsheet, Play, Upload } from "lucide-react";
 
+import { AmbientCanvas } from "@/components/design-system/ambient-canvas";
 import { SuggestionChips } from "@/components/design-system/suggestion-chips";
 import { buttonVariants } from "@/components/ui/button";
 import { DemoWorkspaceButton } from "@/components/onboarding/demo-workspace-button";
@@ -43,19 +44,23 @@ const FIRST_RUN_CHIPS = [
 
 export function DashboardFirstRun() {
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
-      <div className="space-y-4 text-center">
+    <div className="relative mx-auto max-w-3xl space-y-10">
+      {/* Hyperagent / Grok empty power moment */}
+      <AmbientCanvas
+        className="pointer-events-none absolute inset-x-0 -top-8 h-64 rounded-3xl opacity-70"
+        drift
+      />
+      <div className="relative space-y-4 text-center">
+        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Command center
+        </p>
         <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl sm:tracking-[-0.02em]">
           {DASHBOARD_FIRST_RUN.title}
         </h2>
         <p className="mx-auto max-w-md text-sm text-muted-foreground sm:text-base">
           {DASHBOARD_FIRST_RUN.description}
         </p>
-        <SuggestionChips
-          className="pt-1"
-          label="Get started"
-          chips={[...FIRST_RUN_CHIPS]}
-        />
+        <SuggestionChips className="pt-1" label="Get started" chips={[...FIRST_RUN_CHIPS]} />
         <div className="flex flex-wrap justify-center gap-3 pt-1">
           <Link href="/queue" className={buttonVariants({ size: "sm" })}>
             Import spreadsheet
@@ -67,7 +72,7 @@ export function DashboardFirstRun() {
         </div>
       </div>
 
-      <ol className="grid gap-4 sm:grid-cols-3">
+      <ol className="relative grid gap-4 sm:grid-cols-3">
         {STEPS.map(({ step, title, body, href, cta, icon: Icon }) => (
           <li
             key={step}

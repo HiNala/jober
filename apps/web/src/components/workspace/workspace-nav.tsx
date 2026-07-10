@@ -135,19 +135,19 @@ export function WorkspaceNav() {
 
       <Separator />
 
-      {/* Footer */}
+      {/* Footer — Hyperagent-style identity pill + honest plan CTA */}
       <div className={cn("shrink-0 space-y-2 p-2", navCollapsed && "items-center")}>
-        {!navCollapsed ? (
+        {!navCollapsed && user?.plan !== "pro" ? (
           <div className="rounded-lg border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/6 to-transparent p-3 text-xs">
             <div className="flex items-center gap-2 font-semibold text-foreground">
               <Sparkles className="size-3.5 text-primary" aria-hidden />
               Upgrade to Pro
             </div>
             <p className="mt-1 leading-relaxed text-muted-foreground">
-              Higher run limits and priority support.
+              Higher run limits, larger batches, more LLM budget.
             </p>
             <Link
-              href="/settings"
+              href="/settings#billing-heading"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-2.5 w-full rounded-lg")}
             >
               View plans
@@ -167,8 +167,15 @@ export function WorkspaceNav() {
             <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
           {!navCollapsed ? (
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{user?.display_name ?? "Signed in"}</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-sm font-medium">{user?.display_name ?? "Signed in"}</p>
+                {user?.plan ? (
+                  <span className="shrink-0 rounded-full border border-border/60 bg-muted/50 px-1.5 py-px font-mono text-[0.6rem] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {user.plan}
+                  </span>
+                ) : null}
+              </div>
               <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
             </div>
           ) : (

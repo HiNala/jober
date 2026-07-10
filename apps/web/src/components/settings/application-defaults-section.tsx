@@ -44,6 +44,11 @@ export function ApplicationDefaultsSection({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["tenant-policy"] });
     },
+    onError: async (err: unknown) => {
+      const { toast } = await import("sonner");
+      const { formatApiError } = await import("@/lib/api/errors");
+      toast.error(formatApiError(err, "Could not update application defaults"));
+    },
   });
 
   if (!preferences) return null;

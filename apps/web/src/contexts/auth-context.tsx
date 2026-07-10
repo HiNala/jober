@@ -29,7 +29,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [sessionExpired, setSessionExpired] = useState(false);
   const meQuery = useQuery({
     queryKey: ["auth", "me"],
-    queryFn: fetchMe,
+    queryFn: async () => {
+      try {
+        return await fetchMe();
+      } catch {
+        // Stale cookie: try silent refresh once, then re-auth UI.
+        try {
+          await refreshSession();
+          return await fetchMe();
+        } catch {
+          setSessionExpired(true);
+          return null;
+        }
+      }
+    },
     retry: false,
     enabled: !BYPASS,
     staleTime: 60_000,
@@ -44,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     queryClient.setQueryData(["auth", "me"], null);
+    queryClient.clear();
     await queryClient.invalidateQueries({ queryKey: ["auth"] });
   }, [queryClient]);
 

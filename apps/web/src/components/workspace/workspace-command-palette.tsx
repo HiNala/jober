@@ -21,6 +21,8 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { useAuth } from "@/contexts/auth-context";
+import { isAdmin } from "@/lib/auth/permissions";
 import { exportJobsXlsxUrl } from "@/lib/api/jobs";
 import {
   buildPageCommands,
@@ -28,6 +30,7 @@ import {
 } from "@/lib/workspace/command-palette-actions";
 import { isOpsDeskPath } from "@/lib/workspace/layout";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+import { Shield } from "lucide-react";
 
 const PAGE_COMMAND_ICONS: Record<
   PageCommandId,
@@ -43,6 +46,7 @@ const PAGE_COMMAND_ICONS: Record<
 export function WorkspaceCommandPalette() {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
@@ -107,6 +111,12 @@ export function WorkspaceCommandPalette() {
               {label}
             </CommandItem>
           ))}
+          {isAdmin(user) ? (
+            <CommandItem onSelect={() => run(() => router.push("/admin"))}>
+              <Shield className="size-4" aria-hidden />
+              Admin
+            </CommandItem>
+          ) : null}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Shortcuts">

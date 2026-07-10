@@ -298,6 +298,17 @@ async def upsert_job_from_candidate(
     if existing is not None:
         return existing
 
+    reasons = candidate.get("fit_reasons") or []
+    if not isinstance(reasons, list):
+        reasons = []
+    why_fit = "\n".join(str(r) for r in reasons if r) or None
+    fit_score = candidate.get("fit_score")
+    profile: dict[str, Any] = {}
+    if isinstance(fit_score, (int, float)):
+        profile["fit_score"] = float(fit_score)
+    if reasons:
+        profile["fit_reasons"] = [str(r) for r in reasons if r]
+
     row = JobTarget(
         id=uuid.uuid4(),
         tenant_id=tenant_id,
@@ -309,9 +320,11 @@ async def upsert_job_from_candidate(
         location_work_style=candidate.get("location_work_style"),
         priority=priority or candidate.get("priority"),
         fit_lane=fit_lane or candidate.get("fit_lane"),
+        why_fit=why_fit,
         source_note=str(candidate.get("source_label") or candidate.get("source")),
         status=JobTargetStatus.NEW,
         import_id=import_id,
+        extracted_job_profile=profile or None,
     )
     session.add(row)
     await session.flush()

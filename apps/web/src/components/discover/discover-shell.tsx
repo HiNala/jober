@@ -18,6 +18,7 @@ import {
   type DiscoverySearchQuery,
 } from "@/lib/api/discovery";
 import { createJobList, fetchJobLists } from "@/lib/api/library";
+import { formatApiError } from "@/lib/api/errors";
 import { track } from "@/lib/analytics/events";
 import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { spacing, surface } from "@/lib/design/tokens";
@@ -47,6 +48,7 @@ export function DiscoverShell() {
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
       toast.success(`Created list "${list.name}"`);
     },
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not create list")),
   });
 
   const acceptMutation = useMutation({
@@ -68,7 +70,7 @@ export function DiscoverShell() {
       await queryClient.invalidateQueries({ queryKey: ["library", "job-lists"] });
       await queryClient.invalidateQueries({ queryKey: ["job-targets"] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not accept candidates")),
   });
 
   const refreshMutation = useMutation({
@@ -85,7 +87,7 @@ export function DiscoverShell() {
           : "No new openings since your last check",
       );
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: unknown) => toast.error(formatApiError(err, "Could not refresh list")),
   });
 
   const batchFilters = activeListId

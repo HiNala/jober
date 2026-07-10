@@ -70,19 +70,26 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
 
   const updatePreferences = useCallback(
     async (patch: Partial<UserPreferences>) => {
-      const res = await patchUserPreferences(patch);
-      queryClient.setQueryData(["user-preferences"], res.preferences);
-      if (patch.appearance?.theme) {
-        setTheme(patch.appearance.theme);
-      }
-      if (patch.appearance) {
-        applyAppearance(res.preferences);
-      }
-      if (patch.appearance?.canvas_view_mode) {
-        setCanvasViewMode(patch.appearance.canvas_view_mode as "single" | "grid");
-      }
-      if (patch.appearance?.filmstrip_visible !== undefined) {
-        setFilmstripVisible(patch.appearance.filmstrip_visible);
+      try {
+        const res = await patchUserPreferences(patch);
+        queryClient.setQueryData(["user-preferences"], res.preferences);
+        if (patch.appearance?.theme) {
+          setTheme(patch.appearance.theme);
+        }
+        if (patch.appearance) {
+          applyAppearance(res.preferences);
+        }
+        if (patch.appearance?.canvas_view_mode) {
+          setCanvasViewMode(patch.appearance.canvas_view_mode as "single" | "grid");
+        }
+        if (patch.appearance?.filmstrip_visible !== undefined) {
+          setFilmstripVisible(patch.appearance.filmstrip_visible);
+        }
+      } catch (err) {
+        const { toast } = await import("sonner");
+        const { formatApiError } = await import("@/lib/api/errors");
+        toast.error(formatApiError(err, "Could not save preferences"));
+        throw err;
       }
     },
     [queryClient, setCanvasViewMode, setFilmstripVisible, setTheme],

@@ -32,8 +32,11 @@ export function BillingSettingsSection() {
   });
   const [pendingAction, setPendingAction] = useState<"checkout" | "portal" | null>(null);
 
+  // Prefer live API status once loaded; env only before status resolves.
   const stripeEnabled =
-    isStripeEnabledClient() || statusQuery.data?.stripe_enabled === true;
+    statusQuery.data !== undefined
+      ? statusQuery.data.stripe_enabled === true
+      : isStripeEnabledClient();
   const plan = statusQuery.data?.plan ?? usageQuery.data?.plan ?? "free";
   const isPro = plan === "pro";
   const hasCustomer = statusQuery.data?.has_stripe_customer === true;
