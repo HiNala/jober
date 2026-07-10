@@ -35,10 +35,11 @@ from jober_api.services.documents.cover_letter_generator import (
     _fallback_job_description,
     _serialize_document,
 )
-from jober_api.services.documents.render_pdf import render_cover_letter_pdf
+from jober_api.services.documents.render_docx import render_resume_docx
+from jober_api.services.documents.render_pdf import render_resume_pdf
 from jober_api.services.documents.variant_mapping import map_fit_lane_to_variant
 from jober_api.services.llm.gateway import assert_budget, log_llm_call, resolve_llm_runtime
-from jober_api.storage.keys import document_pdf_key
+from jober_api.storage.keys import document_docx_key, document_pdf_key
 from jober_api.storage.minio_client import ObjectStorage
 
 RESUME_VARIANT_SYSTEM = """You are the Document Agent for Jober. Draft a tailored resume variant.
@@ -183,15 +184,27 @@ async def generate_resume_variant(
     coverage = score_keyword_coverage(body, job_description, extracted_reqs)
     document_id = uuid.uuid4()
     applicant = profile.name if profile and profile.name else "Applicant"
-    pdf_bytes = render_cover_letter_pdf(
+    pdf_bytes = render_resume_pdf(
         body=body,
         applicant_name=applicant,
-        company=job.company,
-        role=job.role,
-        template="classic",
+        target_role=job.role,
+        target_company=job.company,
     )
     pdf_key = document_pdf_key(job_target_id, document_id)
     await storage.put_object(pdf_key, pdf_bytes, content_type="application/pdf")
+
+    docx_bytes = render_resume_docx(
+        body=body,
+        applicant_name=applicant,
+        target_role=job.role,
+        target_company=job.company,
+    )
+    docx_key = document_docx_key(job_target_id, document_id)
+    await storage.put_object(
+        docx_key,
+        docx_bytes,
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
 
     keyword_payload: dict[str, Any] = {
         "present": coverage.present,
@@ -205,8 +218,9 @@ async def generate_resume_variant(
         "explain": draft.paragraph_grounding,
         "status": "draft",
         "document_kind": "resume_variant",
-        "version": 1,
+        "version": 2,
         "fabrication_guard": "never invent employers/degrees",
+        "layout": "resume",
         "ab_tracking": {
             "fit_lane": job.fit_lane,
             "company": job.company,
@@ -220,7 +234,7 @@ async def generate_resume_variant(
         run_id=run_id,
         document_type=DocumentType.RESUME_VARIANT,
         object_key_pdf=pdf_key,
-        object_key_docx=None,
+        object_key_docx=docx_key,
         text=body,
         keyword_coverage=keyword_payload,
         ats_score=coverage.ats_score,

@@ -2,44 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Compass,
-  FileText,
-  Home,
-  ListTodo,
-  MoreHorizontal,
-} from "lucide-react";
+import { Compass, FileText, Home, ListTodo } from "lucide-react";
 
+import { MobileMoreSheet } from "@/components/app-shell/mobile-more-sheet";
 import { cn } from "@/lib/utils";
 import { motionMicro } from "@/lib/design/motion";
 
-const TABS = [
+const PRIMARY_TABS = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/discover", label: "Discover", icon: Compass },
   { href: "/queue", label: "Queue", icon: ListTodo },
   { href: "/documents", label: "Docs", icon: FileText },
-  /** Settings hub — vault, library, analytics, admin live under “More” on small screens. */
-  { href: "/settings", label: "More", icon: MoreHorizontal },
 ] as const;
 
-function isActive(pathname: string, href: string): boolean {
+function isPrimaryActive(pathname: string, href: string): boolean {
   if (href === "/dashboard") {
     return pathname === "/dashboard" || pathname === "/";
-  }
-  if (href === "/settings") {
-    return (
-      pathname.startsWith("/settings") ||
-      pathname.startsWith("/vault") ||
-      pathname.startsWith("/library") ||
-      pathname.startsWith("/analytics") ||
-      pathname.startsWith("/admin") ||
-      pathname.startsWith("/search")
-    );
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Fixed bottom tab bar for small viewports (Mission 44). */
+function isMoreActive(pathname: string): boolean {
+  return (
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/vault") ||
+    pathname.startsWith("/library") ||
+    pathname.startsWith("/analytics") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/search")
+  );
+}
+
+/** Fixed bottom tab bar for small viewports (Mission 44 + More sheet). */
 export function MobileBottomTabs() {
   const pathname = usePathname();
 
@@ -52,8 +46,8 @@ export function MobileBottomTabs() {
       )}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between px-1 pt-1">
-        {TABS.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
+        {PRIMARY_TABS.map(({ href, label, icon: Icon }) => {
+          const active = isPrimaryActive(pathname, href);
           return (
             <li key={href} className="flex-1">
               <Link
@@ -73,6 +67,9 @@ export function MobileBottomTabs() {
             </li>
           );
         })}
+        <li className="flex-1">
+          <MobileMoreSheet active={isMoreActive(pathname)} />
+        </li>
       </ul>
     </nav>
   );
