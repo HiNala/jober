@@ -1,7 +1,8 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { FileText } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { patchRunOptions, type RunConsoleSnapshot } from "@/lib/api/run-console";
@@ -23,17 +24,26 @@ export function RunLetterOptions({
   runId: string;
   snapshot: RunConsoleSnapshot;
 }) {
-  const queryClient = useQueryClient();
-  const override = snapshot.run_options?.generate_cover_letter ?? null;
+  const serverOverride = snapshot.run_options?.generate_cover_letter ?? null;
+  const [override, setOverride] = useState<boolean | null>(serverOverride);
   const canEdit = !TERMINAL_STATUSES.has(snapshot.status);
+
+  useEffect(() => {
+    setOverride(serverOverride);
+  }, [serverOverride, runId]);
 
   const mutation = useMutation({
     mutationFn: (generate: boolean | null) => patchRunOptions(runId, generate),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["run-console", runId] });
+    onMutate: (generate) => {
+      setOverride(generate);
+    },
+    onSuccess: () => {
       toast.success("Run letter preference updated");
     },
-    onError: () => toast.error("Could not update run letter preference"),
+    onError: (_err, _vars, _ctx) => {
+      setOverride(serverOverride);
+      toast.error("Could not update run letter preference");
+    },
   });
 
   if (!canEdit && override === null) return null;

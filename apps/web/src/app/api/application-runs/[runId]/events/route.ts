@@ -18,8 +18,23 @@ export async function GET(
   if (session) parts.push(`jober_session=${session.value}`);
   if (csrf) parts.push(`jober_csrf=${csrf.value}`);
 
+  // Mirror REST client: forward cookie session and optional dev-bypass identity.
+  const headers: Record<string, string> = {};
+  if (parts.length) headers.Cookie = parts.join("; ");
+  const devBypass =
+    process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true" ||
+    process.env.NEXT_PUBLIC_AUTH_MODE === "dev";
+  if (devBypass) {
+    const tenant =
+      process.env.NEXT_PUBLIC_DEV_TENANT_ID ?? "00000000-0000-4000-8000-000000000001";
+    const user =
+      process.env.NEXT_PUBLIC_DEV_USER_ID ?? "00000000-0000-4000-8000-000000000002";
+    headers["X-Jober-Tenant-Id"] = tenant;
+    headers["X-Jober-User-Id"] = user;
+  }
+
   const backend = await fetch(target, {
-    headers: parts.length ? { Cookie: parts.join("; ") } : {},
+    headers,
     cache: "no-store",
   });
 

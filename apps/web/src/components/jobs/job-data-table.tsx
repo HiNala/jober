@@ -3,10 +3,10 @@
 import type { JobTargetRead, JobTargetStatus } from "@jober/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileSpreadsheet } from "lucide-react";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { BatchPreviewDialog } from "@/components/batches/batch-preview-dialog";
 import { JobDetailDrawer } from "@/components/jobs/job-detail-drawer";
 import { PageEmpty } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
@@ -66,6 +66,7 @@ export function JobDataTable({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [manualDetail, setManualDetail] = useState<JobTargetRead | null>(null);
   const [urlDismissed, setUrlDismissed] = useState(false);
+  const [batchOpen, setBatchOpen] = useState(false);
 
   const urlLinkedJob = useMemo(() => {
     if (!openJobId) return null;
@@ -298,21 +299,35 @@ export function JobDataTable({
       </div>
       {selected.size > 0 ? (
         <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-sm">
-          <span className="text-muted-foreground">{selected.size} selected</span>
-          <span className="text-muted-foreground">·</span>
-          <span>
-            Batches run from{" "}
-            <Link href="/discover" className="font-medium underline underline-offset-2">
-              Discover lists
-            </Link>{" "}
-            or the{" "}
-            <Link href="/dashboard" className="font-medium underline underline-offset-2">
-              dashboard
-            </Link>
-            .
+          <span className="font-medium tabular-nums">{selected.size} selected</span>
+          <Button type="button" size="sm" onClick={() => setBatchOpen(true)}>
+            Preview batch
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setSelected(new Set())}
+          >
+            Clear
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            Dry-run or review-before-submit for the selected jobs only.
           </span>
         </div>
       ) : null}
+      <BatchPreviewDialog
+        open={batchOpen}
+        onOpenChange={setBatchOpen}
+        filters={{ job_target_ids: [...selected], limit: selected.size }}
+        batchName={`Queue selection (${selected.size})`}
+        defaultPolicy="dry_run"
+        onEnqueued={() => {
+          setSelected(new Set());
+          setBatchOpen(false);
+          toast.success("Batch enqueued — watch progress on the dashboard");
+        }}
+      />
       <JobDetailDrawer
         job={detail}
         open={detail !== null}

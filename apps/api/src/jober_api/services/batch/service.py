@@ -57,12 +57,27 @@ async def _eligible_jobs(
     tenant_id: uuid.UUID,
 ) -> list[Any]:
     list_raw = filters.get("job_list_id")
+    ids_raw = filters.get("job_target_ids") or filters.get("ids")
     if list_raw:
         list_repo = JobListRepository(session, tenant_id)
         job_list = await list_repo.get(uuid.UUID(str(list_raw)))
         if job_list is None:
             return []
         rows = [item.job_target for item in job_list.items if item.job_target is not None]
+    elif ids_raw:
+        # Explicit selection from the queue multi-select (UUID list).
+        repo = JobTargetRepository(session, tenant_id)
+        wanted: list[uuid.UUID] = []
+        for raw in ids_raw if isinstance(ids_raw, list) else []:
+            try:
+                wanted.append(uuid.UUID(str(raw)))
+            except ValueError:
+                continue
+        rows = []
+        for job_id in wanted:
+            job = await repo.get(job_id)
+            if job is not None:
+                rows.append(job)
     else:
         repo = JobTargetRepository(session, tenant_id)
         status_raw = filters.get("status")

@@ -85,12 +85,25 @@ async def _checkout_completed(session: AsyncSession, checkout: dict[str, Any]) -
         return {"status": "tenant_not_found"}
     tenant.stripe_customer_id = customer_id or tenant.stripe_customer_id
     tenant.plan = PlanTier.PRO
+    # Subscription id may be string or expandable object depending on API version.
+    sub_raw = checkout.get("subscription")
+    if isinstance(sub_raw, str) and sub_raw:
+        tenant.stripe_subscription_id = sub_raw
+    elif isinstance(sub_raw, dict) and sub_raw.get("id"):
+        tenant.stripe_subscription_id = str(sub_raw["id"])
+        period_end = sub_raw.get("current_period_end")
+        if period_end:
+            tenant.subscription_ends_at = datetime.fromtimestamp(int(period_end), tz=UTC)
     await record_audit(
         session,
         tenant_id=tenant.id,
         user_id=None,
         action=AuditAction.SUBSCRIPTION_CHANGED,
         message="Checkout completed — upgraded to pro",
+        details={
+            "subscription_id": tenant.stripe_subscription_id,
+            "plan": tenant.plan.value,
+        },
     )
     await session.flush()
     return {"status": "upgraded", "plan": tenant.plan.value}
