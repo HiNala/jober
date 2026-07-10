@@ -35,6 +35,9 @@ export const surface = {
   inset: "bg-muted/20",
   terminalMuted: "text-[var(--terminal-muted)]",
   terminalMedia: "bg-[var(--terminal-bg)]",
+  /** LIVE status color (CSS `--live`). */
+  live: "text-[var(--live)]",
+  ambientCanvas: "jober-ambient-canvas",
 } as const;
 
 /** Consistent product terminology (Mission 16 copy pass). */

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DesignSystem2030Showcase } from "@/components/design-system/design-system-2030-showcase";
 import { EventTerminal } from "@/components/run-console/event-terminal";
 import { MetricCards } from "@/components/dashboard/metric-cards";
 import { FeaturesBento } from "@/components/marketing/features-bento";
@@ -90,6 +91,8 @@ export default function KitchenSinkPage() {
             </Surface>
           </div>
         </section>
+
+        <DesignSystem2030Showcase />
 
         <section className="space-y-4">
           <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">

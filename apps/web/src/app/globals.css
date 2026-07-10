@@ -39,6 +39,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-live: var(--live);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -95,27 +96,37 @@
   --sidebar-accent-foreground: oklch(0.18 0.015 240);
   --sidebar-border: oklch(0.91 0.006 240);
   --sidebar-ring: oklch(0.52 0.14 250);
+  --canvas-ambient-from: oklch(0.78 0.08 300 / 0.35);
+  --canvas-ambient-mid: oklch(0.88 0.06 60 / 0.28);
+  --canvas-ambient-to: oklch(0.8 0.07 240 / 0.3);
+  --live: oklch(0.55 0.14 165);
 }
 
 .dark {
-  --background: oklch(0.13 0.015 240);
-  --foreground: oklch(0.96 0.008 240);
-  --card: oklch(0.17 0.015 240);
-  --card-foreground: oklch(0.96 0.008 240);
-  --popover: oklch(0.17 0.015 240);
-  --popover-foreground: oklch(0.96 0.008 240);
-  --primary: oklch(0.7 0.14 250);
-  --primary-foreground: oklch(0.13 0.015 240);
-  --secondary: oklch(0.21 0.015 240);
-  --secondary-foreground: oklch(0.94 0.008 240);
-  --muted: oklch(0.21 0.015 240);
-  --muted-foreground: oklch(0.68 0.02 240);
-  --accent: oklch(0.6 0.14 250);
-  --accent-foreground: oklch(0.11 0.03 250);
+  /* 2030 near-black canvas (Hyperagent-grade) */
+  --background: oklch(0.11 0.015 260);
+  --foreground: oklch(0.96 0.008 260);
+  --card: oklch(0.16 0.018 260);
+  --card-foreground: oklch(0.96 0.008 260);
+  --popover: oklch(0.16 0.018 260);
+  --popover-foreground: oklch(0.96 0.008 260);
+  --primary: oklch(0.72 0.12 250);
+  --primary-foreground: oklch(0.12 0.015 260);
+  --secondary: oklch(0.19 0.018 260);
+  --secondary-foreground: oklch(0.94 0.008 260);
+  --muted: oklch(0.19 0.018 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  --accent: oklch(0.62 0.14 165);
+  --accent-foreground: oklch(0.12 0.03 165);
   --destructive: oklch(0.62 0.18 25);
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 13%);
-  --ring: oklch(0.58 0.14 250);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.62 0.12 250);
+  /* Live / ambient brand (M35) */
+  --live: oklch(0.72 0.14 165);
+  --canvas-ambient-from: oklch(0.55 0.12 300 / 0.35);
+  --canvas-ambient-mid: oklch(0.78 0.06 85 / 0.28);
+  --canvas-ambient-to: oklch(0.62 0.1 240 / 0.32);
   --chart-1: oklch(0.68 0.14 250);
   --chart-2: oklch(0.62 0.16 165);
   --chart-3: oklch(0.58 0.1 280);
@@ -132,17 +143,17 @@
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --motion-distance-sm: 4px;
   --motion-distance-md: 8px;
-  --terminal-bg: oklch(0.11 0.015 240);
-  --terminal-fg: oklch(0.95 0.008 240);
-  --terminal-muted: oklch(0.56 0.018 240);
-  --sidebar: oklch(0.15 0.015 240);
-  --sidebar-foreground: oklch(0.96 0.008 240);
-  --sidebar-primary: oklch(0.7 0.14 250);
-  --sidebar-primary-foreground: oklch(0.13 0.015 240);
-  --sidebar-accent: oklch(0.21 0.015 240);
-  --sidebar-accent-foreground: oklch(0.96 0.008 240);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.58 0.14 250);
+  --terminal-bg: oklch(0.09 0.015 260);
+  --terminal-fg: oklch(0.95 0.008 260);
+  --terminal-muted: oklch(0.56 0.018 260);
+  --sidebar: oklch(0.13 0.018 260);
+  --sidebar-foreground: oklch(0.96 0.008 260);
+  --sidebar-primary: oklch(0.72 0.12 250);
+  --sidebar-primary-foreground: oklch(0.12 0.015 260);
+  --sidebar-accent: oklch(0.19 0.018 260);
+  --sidebar-accent-foreground: oklch(0.96 0.008 260);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.62 0.12 250);
 }
 
 html {
@@ -156,6 +167,20 @@ html {
   }
   50% {
     transform: translate(6%, 4%) scale(1.05);
+  }
+}
+
+/** Slow ambient gradient blob drift — canvas idle / loading only. */
+@keyframes jober-ambient-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(3%, -2%) scale(1.03);
+  }
+  66% {
+    transform: translate(-2%, 3%) scale(0.98);
   }
 }
 
@@ -377,6 +402,27 @@ html {
     var(--muted) 100%
   );
   background-size: 200% 100%;
+}
+
+/** Hyperagent-style multi-hue ambient wash (lavender → peach → cool blue). */
+.jober-ambient-canvas {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(
+      ellipse 85% 65% at 18% 28%,
+      var(--canvas-ambient-from),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 75% 55% at 82% 72%,
+      var(--canvas-ambient-mid),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 50% 48%,
+      var(--canvas-ambient-to),
+      transparent 62%
+    );
 }
 
 /* ── Safe area insets (notch / Dynamic Island / home indicator) ─────────── */

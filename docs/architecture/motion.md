@@ -31,6 +31,7 @@ Jober uses a **CSS-first motion vocabulary** — no framer-motion. All feature s
 | `motionSpringSettle` | Kanban card / filmstrip select |
 | `motionAttentionEnter` | Checkpoint + toast enter |
 | `motionLivePulse` | LIVE stream badge pulse |
+| `motionAmbientDrift` | Ambient canvas gradient slow drift |
 | `motionSkeleton` | Unified skeleton shimmer |
 | `brandBorderBeam` | Marketing primary CTA border accent |
 | `brandStepperConnector` | How-it-works stepper connector |
@@ -49,6 +50,9 @@ Jober uses a **CSS-first motion vocabulary** — no framer-motion. All feature s
 | `StatusPill` | `components/motion/status-pill.tsx` |
 | `MotionCrossfade` | `components/motion/motion-crossfade.tsx` |
 | `RouteTransition` | `components/motion/route-transition.tsx` |
+| `AmbientCanvas` | `components/design-system/ambient-canvas.tsx` |
+| `StatusLivePill` | `components/design-system/status-live-pill.tsx` |
+| `SkeletonStream` | `components/design-system/skeleton-stream.tsx` |
 
 ## Lint / CI
 

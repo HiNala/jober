@@ -7,6 +7,7 @@ import {
   brandBorderBeam,
   brandStepperConnector,
   motionHeroStagger,
+  motionAmbientDrift,
   motionLivePulse,
   motionSkeleton,
   runStatusTone,
@@ -32,6 +33,7 @@ describe("motion tokens", () => {
   it("exports brand and micro-interaction tokens", () => {
     expect(brandBorderBeam).toBe("brand-border-beam");
     expect(motionLivePulse).toContain("jober-live-pulse");
+    expect(motionAmbientDrift).toContain("jober-ambient-drift");
     expect(motionSkeleton).toContain("jober-skeleton-shimmer");
     expect(brandStepperConnector).toContain("brand-stepper-connector");
   });

@@ -9,7 +9,7 @@ describe("surfaceVariants", () => {
     const terminal = surfaceVariants({ family: "terminal" });
 
     expect(marketing).toContain("rounded-2xl");
-    expect(workspace).toContain("rounded-lg");
+    expect(workspace).toContain("rounded-xl");
     expect(terminal).toContain("font-mono");
     expect(marketing).not.toBe(workspace);
     expect(workspace).not.toBe(terminal);

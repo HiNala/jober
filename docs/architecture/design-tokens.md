@@ -6,16 +6,18 @@ Dark mode is the default for in-app surfaces. Marketing (`/`) may use richer mot
 
 | Token | Light | Dark (default app) | Use |
 |-------|-------|-------------------|-----|
-| `--background` | `oklch(0.99 0.005 250)` | `oklch(0.14 0.02 250)` | Page canvas |
-| `--foreground` | `oklch(0.18 0.02 250)` | `oklch(0.96 0.01 250)` | Body text |
-| `--card` | `oklch(1 0 0)` | `oklch(0.19 0.02 250)` | Panels |
-| `--primary` | `oklch(0.45 0.12 250)` | `oklch(0.72 0.12 250)` | Actions, focus |
-| `--muted` | `oklch(0.96 0.01 250)` | `oklch(0.22 0.02 250)` | Subtle fills |
-| `--muted-foreground` | `oklch(0.45 0.02 250)` | `oklch(0.65 0.02 250)` | Secondary text |
-| `--accent` | `oklch(0.55 0.14 165)` | `oklch(0.62 0.14 165)` | Success / live |
+| `--background` | `oklch(1 0 0)` | `oklch(0.11 0.015 260)` | Near-black page canvas |
+| `--foreground` | `oklch(0.14 0.015 240)` | `oklch(0.96 0.008 260)` | Body text |
+| `--card` | `oklch(1 0 0)` | `oklch(0.16 0.018 260)` | Panels |
+| `--primary` | `oklch(0.42 0.14 250)` | `oklch(0.72 0.12 250)` | Actions, focus |
+| `--muted` | `oklch(0.96 0.005 240)` | `oklch(0.19 0.018 260)` | Subtle fills |
+| `--muted-foreground` | `oklch(0.48 0.02 240)` | `oklch(0.65 0.02 260)` | Secondary text |
+| `--accent` | `oklch(0.52 0.14 250)` | `oklch(0.62 0.14 165)` | Accents |
+| `--live` | `oklch(0.55 0.14 165)` | `oklch(0.72 0.14 165)` | LIVE badges / pulse |
+| `--canvas-ambient-from/mid/to` | soft lavender/peach/blue | softer multi-hue on black | AmbientCanvas |
 | `--destructive` | `oklch(0.55 0.2 25)` | `oklch(0.62 0.18 25)` | Errors |
-| `--border` | `oklch(0.9 0.01 250)` | `oklch(1 0 0 / 12%)` | Dividers |
-| `--sidebar` | — | `oklch(0.16 0.02 250)` | Nav rail |
+| `--border` | `oklch(0.91 0.006 240)` | `oklch(1 0 0 / 10%)` | Dividers |
+| `--sidebar` | light elevated | `oklch(0.13 0.018 260)` | Nav rail |
 
 ## Type scale
 

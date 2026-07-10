@@ -90,6 +90,10 @@ export const motionAttentionEnter =
 export const motionLivePulse =
   "motion-safe:animate-[jober-live-pulse_2s_ease-in-out_infinite]";
 
+/** Ambient canvas gradient blob drift — decorative; gated by motion-safe. */
+export const motionAmbientDrift =
+  "motion-safe:animate-[jober-ambient-drift_20s_ease-in-out_infinite]";
+
 /** Unified skeleton loading shimmer. */
 export const motionSkeleton =
   "jober-skeleton-shimmer motion-safe:animate-[jober-skeleton-shimmer_2s_ease-in-out_infinite]";
