@@ -1,5 +1,28 @@
 # Changelog
 
+## [Unreleased] — Perfection Pack 35–45 (2026-07)
+
+### Design & marketing
+- Design system 2030: AmbientCanvas, SkeletonStream, StatusLivePill, CommandComposer, SuggestionChips, ApproveSendBar, UnlockModal
+- Near-black Hyperagent-grade tokens (`--live`, canvas ambient gradients)
+- Dark-first marketing site with ambient hero, glass nav, honest Pro pricing
+- Default theme: dark
+
+### Monetization & auth
+- Stripe Checkout + Customer Portal APIs; pricing/settings CTAs with waitlist fallback
+- Post-checkout unlock modal; env docs for `STRIPE_*` / `NEXT_PUBLIC_STRIPE_ENABLED`
+- Auth surfaces on 2030 tokens; Google button remains hidden when OAuth disabled
+
+### Product loops
+- Discovery fit explainability (`fit_reasons` chips)
+- Resume variant generation (no-fabrication guards) + Document Studio “Tailor resume”
+- Review package sticky ApproveSendBar; run console StatusLivePill
+- Dashboard “Let’s get to work.” empty state + Discover primary nav CTA
+- Mobile bottom tab bar (Home / Discover / Queue / Docs / More)
+
+### Docs
+- Missions 35–45, design-north-star-2030, residual notes on primary missions
+
 ## [Unreleased] — Polish Pack 01-28 (2026-06-10 → 2026-06-12)
 
 ### Foundation (Missions 01-03)
