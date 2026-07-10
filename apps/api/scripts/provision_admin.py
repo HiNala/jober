@@ -64,6 +64,8 @@ async def provision_admin(
             )
             session.add(tenant)
             session.add(user)
+            # Persist user before audit row (FK on actor_user_id).
+            await session.flush()
             action = AdminAuditAction.BOOTSTRAP_ADMIN
             message = f"Provisioned new admin {normalized}"
         else:
@@ -73,6 +75,7 @@ async def provision_admin(
             user.role = UserRole.ADMIN
             if display_name:
                 user.display_name = display_name
+            await session.flush()
             action = AdminAuditAction.ROLE_CHANGED
             message = f"Updated admin credentials for {normalized}"
 
