@@ -98,3 +98,33 @@ async def test_stripe_subscription_active_upgrades_plan(db_session, truncate_tab
     await db_session.commit()
     await db_session.refresh(tenant)
     assert tenant.plan == PlanTier.PRO
+
+
+@pytest.mark.asyncio
+async def test_checkout_completed_upgrades_via_tenant_metadata(
+    db_session, truncate_tables
+) -> None:
+    from jober_api.services.billing.stripe_webhook import apply_stripe_event
+
+    tenant = await db_session.get(Tenant, DEFAULT_DEV_TENANT_ID)
+    assert tenant is not None
+    tenant.plan = PlanTier.FREE
+    tenant.stripe_customer_id = None
+    await db_session.commit()
+
+    await apply_stripe_event(
+        db_session,
+        {
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "customer": "cus_from_checkout",
+                    "metadata": {"tenant_id": str(DEFAULT_DEV_TENANT_ID)},
+                }
+            },
+        },
+    )
+    await db_session.commit()
+    await db_session.refresh(tenant)
+    assert tenant.plan == PlanTier.PRO
+    assert tenant.stripe_customer_id == "cus_from_checkout"

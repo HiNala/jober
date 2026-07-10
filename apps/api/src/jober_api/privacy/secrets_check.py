@@ -64,11 +64,17 @@ def _validate_production_secrets() -> None:
         ("SECRET_KEY", settings.secret_key),
         ("MINIO_ACCESS_KEY", settings.minio_access_key),
         ("MINIO_SECRET_KEY", settings.minio_secret_key),
-        ("STRIPE_WEBHOOK_SECRET", settings.stripe_webhook_secret),
     ):
         if _is_placeholder(value):
             msg = f"{name} is missing or a placeholder — set a real value before starting"
             raise RuntimeError(msg)
+    # Only require webhook secret when Checkout/billing is configured.
+    if settings.stripe_secret_key.strip() and _is_placeholder(settings.stripe_webhook_secret):
+        msg = (
+            "STRIPE_WEBHOOK_SECRET is missing or a placeholder — "
+            "required when STRIPE_SECRET_KEY is set"
+        )
+        raise RuntimeError(msg)
 
 
 def validate_startup_secrets() -> None:

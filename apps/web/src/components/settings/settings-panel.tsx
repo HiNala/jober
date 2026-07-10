@@ -9,12 +9,11 @@ import { AnalyticsConsentSection } from "@/components/settings/analytics-consent
 import { AppearanceSettingsSection } from "@/components/settings/appearance-settings-section";
 import { ApplicationDefaultsSection } from "@/components/settings/application-defaults-section";
 import { AuthSecuritySection } from "@/components/settings/auth-security-section";
+import { BillingSettingsSection } from "@/components/settings/billing-settings-section";
 import { NotificationsSettingsSection } from "@/components/settings/notifications-settings-section";
 import { PrivacyAccountSection } from "@/components/settings/privacy-account-section";
 import { PageError, PageLoading } from "@/components/states/page-states";
 import { ProfileVault } from "@/components/vault/profile-vault";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchUsageDashboard } from "@/lib/api/billing";
 import { fetchTenantPolicy } from "@/lib/api/settings";
 import { motionFadeIn } from "@/lib/design/motion";
@@ -77,6 +76,7 @@ function SettingsPanelInner() {
         <ProfileVault />
       </section>
 
+      <BillingSettingsSection />
       <AppearanceSettingsSection />
       <ApplicationDefaultsSection
         defaultRunPolicy={policy.policy.default_run_policy}
@@ -88,62 +88,15 @@ function SettingsPanelInner() {
       <AuthSecuritySection />
       <PrivacyAccountSection />
 
-      <section aria-labelledby="usage-heading">
-        <h2 id="usage-heading" className="mb-3 text-sm font-medium">
-          Usage this month
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Card className="metric-card-accent border-border/60">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Application runs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold tabular-nums">
-                {usage.usage.monthly_runs}
-                <span className="text-sm font-normal text-muted-foreground">
-                  {" "}
-                  / {usage.limits.max_monthly_runs}
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="metric-card-accent border-border/60">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Documents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold tabular-nums">
-                {usage.usage.documents_generated}
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="metric-card-accent border-border/60">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                LLM spend
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-semibold tabular-nums">
-                ${usage.usage.llm_cost_usd.toFixed(2)}
-                <span className="text-sm font-normal text-muted-foreground">
-                  {" "}
-                  / ${usage.limits.max_llm_budget_usd.toFixed(0)}
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Plan: <Badge variant="secondary">{usage.plan}</Badge> · Batch limit:{" "}
-          {usage.limits.max_batch_items} jobs · Default policy:{" "}
-          <span className="capitalize">{defaultPolicy}</span>
-        </p>
-      </section>
+      <p className="text-xs text-muted-foreground">
+        Default policy: <span className="capitalize">{defaultPolicy}</span>
+        {usage ? (
+          <>
+            {" "}
+            · Batch limit: {usage.limits.max_batch_items} jobs
+          </>
+        ) : null}
+      </p>
 
       <section aria-labelledby="guidance-heading">
         <div className="mb-3 flex items-center gap-2">
