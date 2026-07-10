@@ -1,12 +1,13 @@
 "use client";
 
-import { Radio, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
+import { StatusLivePill } from "@/components/design-system/status-live-pill";
 import { ContentReveal } from "@/components/motion/content-reveal";
 import { StatusPill } from "@/components/motion/status-pill";
 import { PageError, RunConsoleSkeleton } from "@/components/states/page-states";
 import { Button } from "@/components/ui/button";
-import { motionFadeIn, motionPress, motionLivePulse } from "@/lib/design/motion";
+import { motionFadeIn, motionPress } from "@/lib/design/motion";
 import { surface } from "@/lib/design/tokens";
 import { streamStatusLabel } from "@/lib/run-stream/stream-status";
 import { cn } from "@/lib/utils";
@@ -77,14 +78,15 @@ export function RunConsole({ runId }: RunConsoleProps) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill status={snapshot.status} />
-          <StatusPill
-            status={streamLive ? "in_progress" : status}
-            label={streamLabel}
-            icon={
-              streamLive ? (
-                <Radio className={cn("size-3 fill-current", motionLivePulse)} aria-hidden />
-              ) : undefined
+          <StatusLivePill
+            status={
+              snapshot.open_checkpoint
+                ? "needs_you"
+                : streamLive
+                  ? "live"
+                  : "idle"
             }
+            label={snapshot.open_checkpoint ? "Needs you" : streamLabel}
           />
           <Button
             size="sm"

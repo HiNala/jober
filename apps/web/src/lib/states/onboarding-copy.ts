@@ -9,9 +9,9 @@ export const QUEUE_EMPTY = {
 export const QUEUE_FILTER_EMPTY = "No matches — try adjusting your filters.";
 
 export const DASHBOARD_FIRST_RUN = {
-  title: "Welcome to Jober",
+  title: "Let's get to work.",
   description:
-    "Import your tracker, upload a resume, then run a dry-run batch to watch Jober fill applications while you review every step.",
+    "Import your tracker or discover perfect-fit roles, upload a resume, then run a dry-run batch. You review the fill diff and approve before anything is sent.",
 } as const;
 
 export const DOCUMENTS_EMPTY_JOBS = {

@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Compass,
   ListTodo,
   PanelLeftClose,
   PanelLeftOpen,
@@ -83,17 +84,40 @@ export function WorkspaceNav() {
 
       <Separator />
 
-      {/* Primary CTA */}
-      <div className={cn("shrink-0 p-2", navCollapsed && "flex justify-center")}>
+      {/* Primary CTAs — Discover + queue (M39 command center) */}
+      <div
+        className={cn(
+          "shrink-0 space-y-1.5 p-2",
+          navCollapsed && "flex flex-col items-center",
+        )}
+      >
         <Link
-          href="/queue"
+          href="/discover"
           className={cn(
             buttonVariants({ variant: "default", size: navCollapsed ? "icon-sm" : "sm" }),
             !navCollapsed && "w-full justify-start",
           )}
         >
+          <Compass className="size-4" aria-hidden />
+          {!navCollapsed ? (
+            <span className="ml-2">Discover jobs</span>
+          ) : (
+            <span className="sr-only">Discover jobs</span>
+          )}
+        </Link>
+        <Link
+          href="/queue"
+          className={cn(
+            buttonVariants({ variant: "outline", size: navCollapsed ? "icon-sm" : "sm" }),
+            !navCollapsed && "w-full justify-start",
+          )}
+        >
           <ListTodo className="size-4" aria-hidden />
-          {!navCollapsed ? <span className="ml-2">Open queue</span> : <span className="sr-only">Open queue</span>}
+          {!navCollapsed ? (
+            <span className="ml-2">Open queue</span>
+          ) : (
+            <span className="sr-only">Open queue</span>
+          )}
         </Link>
       </div>
 

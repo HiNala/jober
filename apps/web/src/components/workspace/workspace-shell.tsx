@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
+import { MobileBottomTabs } from "@/components/app-shell/mobile-bottom-tabs";
 import { WorkspaceCommandPalette } from "@/components/workspace/workspace-command-palette";
 import { useWorkspaceKeyboard } from "@/components/workspace/workspace-keyboard";
 import { WorkspaceShellPanels } from "@/components/workspace/workspace-shell-panels";
@@ -44,9 +45,12 @@ export function WorkspaceShell({
       >
         Skip to main content
       </a>
-      <WorkspaceShellPanels title={title} layoutMode={layoutMode}>
-        {children}
-      </WorkspaceShellPanels>
+      <div className="flex min-h-0 flex-1 flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+        <WorkspaceShellPanels title={title} layoutMode={layoutMode}>
+          {children}
+        </WorkspaceShellPanels>
+      </div>
+      <MobileBottomTabs />
       <WorkspaceCommandPalette />
     </div>
   );

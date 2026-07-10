@@ -1,8 +1,7 @@
-"use client";
-
 import Link from "next/link";
 import { FileSpreadsheet, Play, Upload } from "lucide-react";
 
+import { SuggestionChips } from "@/components/design-system/suggestion-chips";
 import { buttonVariants } from "@/components/ui/button";
 import { DemoWorkspaceButton } from "@/components/onboarding/demo-workspace-button";
 import { DASHBOARD_FIRST_RUN } from "@/lib/states/onboarding-copy";
@@ -36,20 +35,33 @@ const STEPS = [
   },
 ] as const;
 
+const FIRST_RUN_CHIPS = [
+  { id: "import", label: "Import tracker", href: "/queue" },
+  { id: "discover", label: "Discover jobs", href: "/discover" },
+  { id: "vault", label: "Open vault", href: "/vault" },
+] as const;
+
 export function DashboardFirstRun() {
   return (
     <div className="mx-auto max-w-3xl space-y-10">
-      <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">{DASHBOARD_FIRST_RUN.title}</h2>
-        <p className="mx-auto max-w-md text-sm text-muted-foreground">
+      <div className="space-y-4 text-center">
+        <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl sm:tracking-[-0.02em]">
+          {DASHBOARD_FIRST_RUN.title}
+        </h2>
+        <p className="mx-auto max-w-md text-sm text-muted-foreground sm:text-base">
           {DASHBOARD_FIRST_RUN.description}
         </p>
-        <div className="flex flex-wrap justify-center gap-3 pt-2">
+        <SuggestionChips
+          className="pt-1"
+          label="Get started"
+          chips={[...FIRST_RUN_CHIPS]}
+        />
+        <div className="flex flex-wrap justify-center gap-3 pt-1">
           <Link href="/queue" className={buttonVariants({ size: "sm" })}>
             Import spreadsheet
           </Link>
-          <Link href="/vault" className={buttonVariants({ variant: "outline", size: "sm" })}>
-            Upload resume
+          <Link href="/discover" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            Discover jobs
           </Link>
           <DemoWorkspaceButton />
         </div>

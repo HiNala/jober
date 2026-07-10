@@ -1,0 +1,78 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Compass,
+  FileText,
+  Home,
+  ListTodo,
+  MoreHorizontal,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { motionMicro } from "@/lib/design/motion";
+
+const TABS = [
+  { href: "/dashboard", label: "Home", icon: Home },
+  { href: "/discover", label: "Discover", icon: Compass },
+  { href: "/queue", label: "Queue", icon: ListTodo },
+  { href: "/documents", label: "Docs", icon: FileText },
+  { href: "/settings", label: "More", icon: MoreHorizontal },
+] as const;
+
+function isActive(pathname: string, href: string): boolean {
+  if (href === "/dashboard") {
+    return pathname === "/dashboard" || pathname === "/";
+  }
+  if (href === "/settings") {
+    return (
+      pathname.startsWith("/settings") ||
+      pathname.startsWith("/vault") ||
+      pathname.startsWith("/library") ||
+      pathname.startsWith("/analytics") ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/search")
+    );
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/** Fixed bottom tab bar for small viewports (Mission 44). */
+export function MobileBottomTabs() {
+  const pathname = usePathname();
+
+  return (
+    <nav
+      aria-label="Primary"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-background/95 backdrop-blur-md lg:hidden",
+        "pb-[max(0.5rem,env(safe-area-inset-bottom))]",
+      )}
+    >
+      <ul className="mx-auto flex max-w-lg items-stretch justify-between px-1 pt-1">
+        {TABS.map(({ href, label, icon: Icon }) => {
+          const active = isActive(pathname, href);
+          return (
+            <li key={href} className="flex-1">
+              <Link
+                href={href}
+                className={cn(
+                  motionMicro,
+                  "flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-md px-1 py-1.5 text-[0.65rem] font-medium",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-current={active ? "page" : undefined}
+              >
+                <Icon className="size-5 shrink-0" aria-hidden />
+                <span>{label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
