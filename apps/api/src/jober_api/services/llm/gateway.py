@@ -91,7 +91,7 @@ class TemplateLlmProvider:
         user: str,
         temperature: float = 0.4,
     ) -> LlmCompletion:
-        del system, temperature
+        del temperature
         company = "the company"
         role = "this role"
         hook = ""
@@ -107,58 +107,87 @@ class TemplateLlmProvider:
         resume_text = _resume_block_from_prompt(user)
         skills = _supported_skill_labels(resume_text)
         skill_phrase = ", ".join(skills[:4]) if skills else "the technologies in my resume"
-        opener = hook or "Your mission aligns with how I build."
 
-        evidence_1 = (
-            f"In prior roles I owned delivery end-to-end with {skill_phrase}. I scoped work with "
-            "product partners, wrote the interfaces and services myself, and kept feedback loops "
-            "short so we could ship iteratively instead of debating hypotheticals."
-        )
-        evidence_2 = (
-            f"Technically, I lean on {skill_phrase} where they fit the problem, not because they "
-            "are fashionable. I document decisions, add observability early, and treat reliability "
-            "as part of the user experience rather than a post-launch patch."
-        )
-        evidence_3 = (
-            "I am comfortable presenting tradeoffs to leadership and mentoring teammates on "
-            "execution. I step into ambiguous spaces when the roadmap is still forming. That "
-            "operator posture is what I would bring to your team from day one."
-        )
-        evidence_4 = (
-            "Across engagements I have paired with design and go-to-market partners to validate "
-            "assumptions quickly, cut scope when learning demands it, and keep quality high when "
-            "deadlines are real. I care about maintainable codebases and kind collaboration."
-        )
-
-        body = (
-            f"Dear {company} team,\n\n"
-            f"I am excited about the {role} opportunity. {opener} "
-            f"I have shipped production systems using {skill_phrase}, with a founder-operator "
-            "mindset focused on measurable outcomes rather than slide decks.\n\n"
-            f"{evidence_1}\n\n"
-            f"{evidence_2}\n\n"
-            f"{evidence_3}\n\n"
-            f"{evidence_4}\n\n"
-            "I would welcome a conversation about how I can contribute. I am available to start "
-            "after a standard notice period and happy to walk through relevant work samples. "
-            "Thank you for your consideration."
-        )
-        payload = {
-            "body": body,
-            "asserted_facts": skills,
-            "paragraph_grounding": [
-                {
-                    "paragraph_index": 0,
-                    "resume_facts": skills[:2] or ["resume experience"],
-                    "job_keywords": [company, role],
-                },
-                {
-                    "paragraph_index": 1,
-                    "resume_facts": skills,
-                    "job_keywords": skills[:3],
-                },
-            ],
-        }
+        system_lower = (system or "").casefold()
+        if "resume variant" in system_lower or "never invent employers" in system_lower:
+            # Deterministic tailored resume: reorder/emphasis only — no new employers.
+            source = resume_text.strip() or "Experience grounded in the uploaded resume."
+            header = (
+                f"SUMMARY (tailored for {role} at {company})\n"
+                f"Operator-engineer emphasizing {skill_phrase}. "
+                "All employers, titles, and credentials below are from the "
+                "source resume only.\n\n"
+                f"SKILLS FOCUS\n{skill_phrase}\n\n"
+                "SOURCE RESUME (reordered emphasis; no fabricated "
+                f"employers/degrees)\n{source[:6000]}"
+            )
+            payload = {
+                "body": header,
+                "asserted_facts": skills,
+                "paragraph_grounding": [
+                    {
+                        "paragraph_index": 0,
+                        "resume_facts": skills[:2] or ["resume experience"],
+                        "job_keywords": [company, role],
+                    }
+                ],
+            }
+        else:
+            opener = hook or "Your mission aligns with how I build."
+            evidence_1 = (
+                f"In prior roles I owned delivery end-to-end with {skill_phrase}. "
+                "I scoped work with product partners, wrote the interfaces and "
+                "services myself, and kept feedback loops short so we could ship "
+                "iteratively instead of debating hypotheticals."
+            )
+            evidence_2 = (
+                f"Technically, I lean on {skill_phrase} where they fit the problem, "
+                "not because they are fashionable. I document decisions, add "
+                "observability early, and treat reliability as part of the user "
+                "experience rather than a post-launch patch."
+            )
+            evidence_3 = (
+                "I am comfortable presenting tradeoffs to leadership and mentoring "
+                "teammates on execution. I step into ambiguous spaces when the "
+                "roadmap is still forming. That operator posture is what I would "
+                "bring to your team from day one."
+            )
+            evidence_4 = (
+                "Across engagements I have paired with design and go-to-market "
+                "partners to validate assumptions quickly, cut scope when learning "
+                "demands it, and keep quality high when deadlines are real. I care "
+                "about maintainable codebases and kind collaboration."
+            )
+            body = (
+                f"Dear {company} team,\n\n"
+                f"I am excited about the {role} opportunity. {opener} "
+                f"I have shipped production systems using {skill_phrase}, with a "
+                "founder-operator mindset focused on measurable outcomes rather "
+                "than slide decks.\n\n"
+                f"{evidence_1}\n\n"
+                f"{evidence_2}\n\n"
+                f"{evidence_3}\n\n"
+                f"{evidence_4}\n\n"
+                "I would welcome a conversation about how I can contribute. I am "
+                "available to start after a standard notice period and happy to "
+                "walk through relevant work samples. Thank you for your consideration."
+            )
+            payload = {
+                "body": body,
+                "asserted_facts": skills,
+                "paragraph_grounding": [
+                    {
+                        "paragraph_index": 0,
+                        "resume_facts": skills[:2] or ["resume experience"],
+                        "job_keywords": [company, role],
+                    },
+                    {
+                        "paragraph_index": 1,
+                        "resume_facts": skills,
+                        "job_keywords": skills[:3],
+                    },
+                ],
+            }
         content = json.dumps(payload)
         prompt_tokens = max(1, len(user) // 4)
         completion_tokens = max(1, len(content) // 4)

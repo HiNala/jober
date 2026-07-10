@@ -86,6 +86,22 @@ export async function generateCoverLetter(
   });
 }
 
+/** Tailored resume draft for a job target (never fabricates employers/degrees). */
+export async function generateResumeVariant(
+  jobTargetId: string,
+  options: { force?: boolean; runId?: string } = {},
+): Promise<GeneratedDocumentRead> {
+  return apiFetch<GeneratedDocumentRead>("/api/documents/generate-resume-variant", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      job_target_id: jobTargetId,
+      force: options.force ?? false,
+      run_id: options.runId,
+    }),
+  });
+}
+
 export async function patchCoverLetter(
   documentId: string,
   body: {

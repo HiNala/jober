@@ -1,7 +1,31 @@
 from __future__ import annotations
 
-from jober_api.services.discovery.board_parser import parse_board_html
+from jober_api.services.discovery.board_parser import (
+    estimate_fit_with_reasons,
+    parse_board_html,
+)
 from tests.fixtures.ats_pages import load_ats_fixture
+
+
+def test_estimate_fit_with_reasons_matched_skills_and_title() -> None:
+    score, reasons = estimate_fit_with_reasons(
+        "Staff Python Engineer",
+        ["Python", "TypeScript", "React"],
+        location_work_style="Remote US",
+        location_filter="Remote",
+        stack=["Python"],
+    )
+    assert score is not None
+    assert score >= 0
+    joined = " ".join(reasons).casefold()
+    assert "python" in joined or "matched skills" in joined or "title" in joined
+    assert any("location" in r.casefold() for r in reasons)
+
+
+def test_estimate_fit_with_reasons_empty_without_signals() -> None:
+    score, reasons = estimate_fit_with_reasons("Mystery Role", [])
+    assert score is None
+    assert reasons == []
 
 
 def test_parse_board_html_extracts_ats_links() -> None:

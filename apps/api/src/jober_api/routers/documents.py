@@ -30,6 +30,7 @@ from jober_api.services.documents.cover_letter_generator import (
 )
 from jober_api.services.documents.letter_editor import persist_letter_text
 from jober_api.services.documents.letter_styles import LETTER_TEMPLATES, VOICE_PRESETS
+from jober_api.services.documents.resume_variant_generator import generate_resume_variant
 from jober_api.services.llm.gateway import BudgetExceededError
 from jober_api.storage.minio_client import ObjectStorage
 
@@ -118,6 +119,65 @@ async def generate_cover_letter_endpoint(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=error_detail(
                 "Claims guard rejected draft",
+                unsupported=exc.unsupported,
+            ),
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        if is_dependency_unavailable(exc):
+            raise dependency_unavailable_http(request) from exc
+        raise
+
+    await session.commit()
+    return result
+
+
+@router.post("/generate-resume-variant")
+async def generate_resume_variant_endpoint(
+    request: Request,
+    body: dict[str, object],
+    session: AsyncSession = Depends(get_session),
+    storage: ObjectStorage = Depends(get_storage),
+) -> dict[str, object]:
+    """Generate a tailored resume draft for a job (never fabricates employers/degrees)."""
+    auth = require_auth(request)
+    raw_id = body.get("job_target_id")
+    if not raw_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="job_target_id required",
+        )
+    try:
+        job_target_id = uuid.UUID(str(raw_id))
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid UUID",
+        ) from exc
+
+    run_id = uuid.UUID(str(body["run_id"])) if body.get("run_id") else None
+
+    try:
+        result = await generate_resume_variant(
+            session,
+            storage,
+            tenant_id=auth.tenant_id,
+            user_id=auth.user_id,
+            job_target_id=job_target_id,
+            force=bool(body.get("force", False)),
+            run_id=run_id,
+        )
+    except BudgetExceededError as exc:
+        raise budget_exceeded_http(str(exc) or None) from exc
+    except ClaimsRejectedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=error_detail(
+                "Claims guard rejected resume variant",
                 unsupported=exc.unsupported,
             ),
         ) from exc

@@ -17,7 +17,7 @@ from jober_api.repositories.job_target import JobTargetRepository
 from jober_api.repositories.resume_asset import ResumeAssetRepository
 from jober_api.services.ats_guess import guess_ats
 from jober_api.services.discovery.board_parser import (
-    estimate_fit_score,
+    estimate_fit_with_reasons,
     fetch_board_html,
     parse_board_html,
 )
@@ -55,6 +55,7 @@ def _serialize_candidate(
     existing_job_target_id: uuid.UUID | None,
     priority: str | None = None,
     fit_lane: str | None = None,
+    fit_reasons: list[str] | None = None,
 ) -> dict[str, Any]:
     url = direct_apply_url or company_careers_url
     return {
@@ -68,6 +69,7 @@ def _serialize_candidate(
         "stage_signal": stage_signal,
         "location_work_style": location_work_style,
         "fit_score": fit_score,
+        "fit_reasons": list(fit_reasons or []),
         "ats_guess": guess_ats(url),
         "existing_job_target_id": str(existing_job_target_id) if existing_job_target_id else None,
         "priority": priority,
@@ -135,12 +137,24 @@ async def search_candidates(
         if key in exclude_keys:
             return
         existing = existing_jobs.get(key)
+        role_for_fit = f"{fields['role']} {' '.join(stack)}"
         fit = fields.get("fit_score")
-        if fit is None:
-            fit = estimate_fit_score(
-                f"{fields['role']} {' '.join(stack)}",
+        fit_reasons = fields.get("fit_reasons")
+        if not isinstance(fit_reasons, list):
+            fit_reasons = None
+        if fit is None or fit_reasons is None:
+            scored, reasons = estimate_fit_with_reasons(
+                role_for_fit,
                 skills,
+                location_work_style=fields.get("location_work_style"),
+                fit_lane=fields.get("fit_lane"),
+                location_filter=location or None,
+                stack=stack,
             )
+            if fit is None:
+                fit = scored
+            if fit_reasons is None:
+                fit_reasons = reasons
         payload = _serialize_candidate(
             company=fields["company"],
             role=fields["role"],
@@ -154,6 +168,7 @@ async def search_candidates(
             existing_job_target_id=existing.id if existing else None,
             priority=fields.get("priority"),
             fit_lane=fields.get("fit_lane"),
+            fit_reasons=fit_reasons or [],
         )
         if role_filter and not _matches_text(payload["role"], role_filter):
             return

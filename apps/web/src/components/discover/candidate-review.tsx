@@ -64,6 +64,17 @@ export function CandidateReview({ candidates, selectedKeys, onToggle, onToggleAl
                   Source: {candidate.source_label} ({candidate.source})
                   {candidate.ats_guess ? ` · ${candidate.ats_guess}` : ""}
                 </p>
+                {candidate.fit_reasons && candidate.fit_reasons.length > 0 ? (
+                  <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Fit reasons">
+                    {candidate.fit_reasons.map((reason) => (
+                      <li key={reason}>
+                        <Badge variant="outline" className="font-normal text-[0.65rem]">
+                          {reason}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 {candidate.direct_apply_url ? (
                   <p className="mt-1 truncate text-xs text-muted-foreground">
                     {candidate.direct_apply_url}

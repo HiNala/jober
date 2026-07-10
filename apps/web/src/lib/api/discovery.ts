@@ -11,6 +11,8 @@ export type DiscoveryCandidate = {
   stage_signal: string | null;
   location_work_style: string | null;
   fit_score: number | null;
+  /** Explainable fit chips from discovery scoring (M40). */
+  fit_reasons?: string[];
   ats_guess: string | null;
   existing_job_target_id: string | null;
   priority: string | null;

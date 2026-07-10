@@ -77,6 +77,9 @@ async def test_discovery_search_returns_board_candidates(
         assert len(candidates) >= 2
         assert any(c["source"] == "board" for c in candidates)
         assert any(c.get("fit_score") is not None for c in candidates)
+        with_reasons = [c for c in candidates if c.get("fit_reasons")]
+        assert with_reasons, "expected fit_reasons on scored candidates"
+        assert all(isinstance(c.get("fit_reasons"), list) for c in candidates)
 
 
 @pytest.mark.asyncio

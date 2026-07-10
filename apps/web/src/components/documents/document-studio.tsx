@@ -29,6 +29,7 @@ import {
   fetchJobsForStudio,
   fetchLetterOptions,
   generateCoverLetter,
+  generateResumeVariant,
   patchCoverLetter,
   type GeneratedDocumentRead,
 } from "@/lib/api/documents";
@@ -57,6 +58,7 @@ export function DocumentStudio() {
   const [budgetError, setBudgetError] = useState<string | null>(null);
   const [saveFlash, setSaveFlash] = useState(false);
   const [regenIndex, setRegenIndex] = useState<number | null>(null);
+  const [resumeVariant, setResumeVariant] = useState<GeneratedDocumentRead | null>(null);
 
   const jobsQuery = useQuery({ queryKey: ["job-targets"], queryFn: fetchJobsForStudio });
   const optionsQuery = useQuery({ queryKey: ["letter-options"], queryFn: fetchLetterOptions });
@@ -154,8 +156,25 @@ export function DocumentStudio() {
     onError: (err: unknown) => toast.error(formatApiError(err, "Could not duplicate")),
   });
 
+  const resumeVariantMutation = useMutation({
+    mutationFn: ({ force }: { force: boolean }) =>
+      generateResumeVariant(jobId, { force }),
+    onSuccess: (doc) => {
+      setResumeVariant(doc);
+      setBudgetError(null);
+      if (!doc.cached) track("document.generated", { doc_type: "resume_variant" });
+      toast.success(
+        doc.cached ? "Loaded cached resume variant" : "Resume variant draft ready — review before use",
+      );
+    },
+    onError: (err: unknown) => handleApiError(err, "Resume variant generation failed"),
+  });
+
   const isGenerating =
-    generateMutation.isPending || regenMutation.isPending || regenIndex !== null;
+    generateMutation.isPending ||
+    regenMutation.isPending ||
+    regenIndex !== null ||
+    resumeVariantMutation.isPending;
 
   const selectedJob = useMemo(
     () => jobsQuery.data?.find((j) => j.id === jobId),
@@ -272,7 +291,7 @@ export function DocumentStudio() {
               onClick={() => generateMutation.mutate({ force: false })}
             >
               <Sparkles className="mr-2 size-4" aria-hidden />
-              Generate
+              Generate letter
             </Button>
             <Button
               size="sm"
@@ -283,7 +302,21 @@ export function DocumentStudio() {
               <RefreshCw className="mr-2 size-4" aria-hidden />
               Regenerate
             </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              data-testid="studio-generate-resume-variant"
+              disabled={!jobId || !hasResume || isGenerating}
+              onClick={() => resumeVariantMutation.mutate({ force: true })}
+            >
+              <Sparkles className="mr-2 size-4" aria-hidden />
+              Tailor resume
+            </Button>
           </div>
+          <p className="text-[0.65rem] leading-snug text-muted-foreground">
+            Resume variants reorder and emphasize existing experience only — they never invent
+            employers or degrees. Review before attaching to a run.
+          </p>
         </CardContent>
       </Card>
 
@@ -310,6 +343,40 @@ export function DocumentStudio() {
             </div>
             <KeywordCoveragePanel atsScore={draft.ats_score ?? 0} coverage={coverage} />
           </>
+        ) : null}
+
+        {resumeVariant ? (
+          <Card className={surface.workspace}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="text-sm">Resume variant draft</CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  Status: draft · review required · no fabricated employers
+                </p>
+              </div>
+              {resumeVariant.pdf_download_path ? (
+                <a
+                  href={documentDownloadUrl(resumeVariant.pdf_download_path)}
+                  download={`resume-variant-${downloadCompany}-${downloadRole}.pdf`}
+                  data-testid="studio-download-resume-pdf"
+                  className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2.5 text-xs font-medium hover:bg-muted"
+                >
+                  <Download className="size-3.5" aria-hidden />
+                  PDF
+                </a>
+              ) : null}
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                data-testid="resume-variant-preview"
+                value={resumeVariant.text}
+                readOnly
+                rows={10}
+                className="font-sans text-sm leading-relaxed"
+                aria-label="Resume variant draft"
+              />
+            </CardContent>
+          </Card>
         ) : null}
 
         <Card className={surface.workspace}>

@@ -155,6 +155,76 @@ async def test_generate_cover_letter_budget_exceeded_returns_402(
 
 
 @pytest.mark.asyncio
+async def test_generate_resume_variant_endpoint_returns_draft(
+    db_session,
+    truncate_tables,
+    monkeypatch,
+) -> None:
+    from jober_api.db import session as db_session_module
+
+    stored: dict[str, bytes] = {}
+
+    async def _fake_put(self, key, data, content_type="application/octet-stream", length=None):
+        stored[key] = bytes(data)
+        from jober_api.storage.minio_client import StoredObject
+
+        return StoredObject(bucket="test", key=key, etag="1")
+
+    monkeypatch.setattr(ObjectStorage, "put_object", _fake_put)
+    monkeypatch.setattr(settings, "llm_provider", "template")
+    monkeypatch.setattr(settings, "llm_monthly_budget_usd", 100.0)
+
+    profiles = UserProfileRepository(db_session)
+    await profiles.create(name="Brian Permut", email="brian@example.com")
+    jobs = JobTargetRepository(db_session)
+    job = await jobs.create(
+        company="Acme AI",
+        role="Staff Engineer",
+        fit_lane="AI platform",
+        status=JobTargetStatus.NEW,
+    )
+    resumes = ResumeAssetRepository(db_session)
+    text = "Brian built Python FastAPI systems with RAG and Docker at Beacon Labs."
+    await resumes.create(
+        object_key="resumes/test/resume.docx",
+        original_filename="resume.docx",
+        extracted_text=text,
+        skills_index={
+            "skills": ["Python", "FastAPI", "RAG", "Docker"],
+            "claims_index": build_claims_index(
+                text,
+                {"skills": ["Python", "FastAPI", "RAG", "Docker"]},
+            ),
+        },
+        is_active=True,
+    )
+    await db_session.commit()
+
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[db_session_module.get_session] = _override
+    try:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            response = await client.post(
+                "/api/documents/generate-resume-variant",
+                json={"job_target_id": str(job.id), "force": True},
+            )
+            assert response.status_code == 200, response.text
+            body = response.json()
+            assert body["document_type"] == "resume_variant"
+            assert body["text"]
+            assert "Beacon Labs" in body["text"] or "Python" in body["text"]
+            assert body["pdf_download_path"].startswith("/api/documents/")
+            meta = body.get("keyword_coverage") or {}
+            assert meta.get("status") == "draft"
+            assert "fabricat" in str(meta.get("fabrication_guard", "")).casefold()
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
 async def test_letter_options_lists_templates_and_voices(db_session, truncate_tables) -> None:
     from jober_api.db import session as db_session_module
 
